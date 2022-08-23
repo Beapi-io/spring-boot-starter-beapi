@@ -1,0 +1,219 @@
+package io.beapi.api.interceptor
+
+import io.beapi.api.service.ApiCacheService
+import io.beapi.api.utils.ApiDescriptor
+import io.beapi.api.utils.ErrorCodes;
+
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+import java.io.PrintWriter;
+
+import org.apache.commons.io.IOUtils
+import org.json.JSONObject
+import groovy.json.JsonOutput
+
+import java.nio.charset.StandardCharsets
+
+public class ExchangeLayer extends ExchangeLayerProcess {
+
+    private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml']
+
+
+    // [REQUEST]
+    boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority){
+        initVars(request.getHeader('Accept'), request.getContentType(),  authority)
+        //parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(),uList[7])
+        //if(method=='GET') { setCacheHash(request.getSession().getAttribute('params')) }
+        //if (!checkRequestParams(request.getSession().getAttribute('params'))){ writeErrorResponse(response, '400', request.getRequestURI()); return false;}
+
+
+        // routing call to controller
+        return true
+    }
+
+    boolean batchRequest(HttpServletRequest request, HttpServletResponse response){
+
+    }
+
+    boolean chainRequest(HttpServletRequest request, HttpServletResponse response){
+
+    }
+
+    boolean resourceRequest(HttpServletRequest request, HttpServletResponse response){
+
+    }
+
+    // [REQUEST]
+    boolean traceRequest(HttpServletRequest request, HttpServletResponse response){
+
+        // routing call to controller
+        return true
+    }
+
+    // ######################## [RESPONSE] #############################################
+
+    void apiResponse(String body, HttpServletResponse response){
+        //String output = parseOutput(body, responseFileType)
+        if(method=='GET') {
+            apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, body)
+        }
+
+        PrintWriter writer = response.getWriter();
+        writer.write(body);
+        writer.close()
+        response.writer.flush()
+    }
+
+    void batchResponse(ArrayList body, HttpServletResponse response){
+
+    }
+
+    void chainResponse(ArrayList body, HttpServletResponse response){
+
+    }
+
+    void resourceResponse(ArrayList body, HttpServletResponse response){
+
+    }
+
+    void traceResponse(String body, HttpServletResponse response){
+        //String traceoutput = parseOutput(body, responseFileType)
+        PrintWriter writer = response.getWriter();
+        writer.write(body);
+        writer.close()
+        response.writer.flush()
+    }
+
+    void initVars(String accept, String contentType,String authority){
+        switch((this.callType+1)){
+            case 1:
+            case 2:
+            case 3:
+                requestMimeType = (accept!=null)?accept:contentType
+                requestFileType = (SUPPORTED_MIME_TYPES.contains(requestFormat))?getFormat(requestMimeType):'JSON'
+                responseFileType = requestFileType
+                responseMimeType = requestMimeType
+                break
+            case 4:
+                requestMimeType = (accept!=null)?accept:contentType
+                requestFileType = getFormat(requestMimeType)
+                responseFileType = requestFileType
+                responseMimeType = requestMimeType
+                break
+            case 5:
+                // resources
+                break;
+            case 6:
+                requestMimeType = (accept!=null)?accept:contentType
+                requestFileType = (SUPPORTED_MIME_TYPES.contains(requestFormat))?getFormat(requestMimeType):'JSON'
+                responseFileType = requestFileType
+                responseMimeType = requestMimeType
+                break;
+            default:
+                throw new Exception("[ExchangeObject :: init] : Exception. Unsupported calltype. Calltype not found. Supported types are [v,b,c,r,t] :")
+                break
+        }
+
+
+        // TODO : set 'max'
+        // TODO : set 'offset'
+        def temp = cache[this.apiversion]
+        this.defaultAction = temp['defaultAction']
+        this.deprecated = temp['deprecated'] as List
+
+        try{
+            //this.appVersion = request.getSession().getAttribute('version')
+            this.apiObject = temp[this.action]
+            this.receives = this.apiObject.getReceives()
+            this.receivesAuths = this.receives.keySet()
+            this.rturns = this.apiObject['returns'] as LinkedHashMap
+            this.returnsAuths = this.rturns.keySet()
+            this.networkGrp = this.apiObject['networkGrp']
+
+            LinkedHashMap tempNetworkRoles = networkGrpRoles[this.networkGrp].each(){ it-> it.getValue() }
+            this.networkRoles = tempNetworkRoles.collect{entry -> entry.value}
+        }catch(Exception e){
+            throw new Exception("[ExchangeObject :: init] : Exception. full stack trace follows:",e)
+        }
+
+        if(checkNetworkGrp(this.networkRoles, this.authority)){
+            setReceivesList()
+            setReturnsList()
+        }else{
+            throw new Exception("[ExchangeObject :: init] : Request params do not match expect params for '${uri}'")
+        }
+    }
+
+
+    /*
+    protected String parseOutput(ArrayList responseBody, String responseFileType){
+        StringBuilder output = new StringBuilder('')
+        if(responseBody.size()<2) {
+            output = parseBodyByFiletype(responseBody[0], responseFileType)
+        }else{
+            int inc = 0
+            output.append('[')
+            responseBody.each(){ it ->
+                if(inc>0){ output.append(',') }
+                output.append(parseBodyByFiletype(it, responseFileType))
+                inc+=1
+            }
+            output.append(']')
+        }
+
+        return output.toString()
+    }
+
+
+
+    protected String parseBodyByFiletype(LinkedHashMap responseBody, String responseFileType){
+        switch(responseFileType){
+            case 'JSON':
+                return new JSONObject(responseBody).toString()
+                break;
+            case 'XML':
+                // TODO : move to an XMLService(??)
+                //'XML'
+                return '[]'
+                break;
+            default:
+                // unsupported mimetype
+                return ''
+                break;
+        }
+    }
+
+     */
+
+    /**
+     * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
+     * @param HttpServletResponse response
+     * @param String statusCode
+     * @return LinkedHashMap commonly formatted linkedhashmap
+     */
+    void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
+        response.setContentType("application/json")
+        response.setStatus(Integer.valueOf(statusCode))
+        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
+        response.getWriter().write(message)
+        response.writer.flush()
+    }
+
+
+    /**
+     * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
+     * @param HttpServletResponse response
+     * @param String statusCode
+     * @return LinkedHashMap commonly formatted linkedhashmap
+     */
+    void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
+        response.setContentType("application/json")
+        response.setStatus(Integer.valueOf(statusCode))
+        if(msg.isEmpty()){
+            msg = ErrorCodes.codes[statusCode]['long']
+        }
+        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
+        response.getWriter().write(message)
+        response.writer.flush()
+    }
+}

@@ -1,0 +1,316 @@
+package io.beapi.api.interceptor
+
+import javax.servlet.http.HttpServletRequest
+
+import org.json.JSONObject
+import groovyx.gpars.*
+
+import io.beapi.api.service.IoStateService
+import io.beapi.api.service.PrincipleService
+import io.beapi.api.utils.ApiDescriptor
+
+import io.beapi.api.utils.UriObject;
+import org.slf4j.LoggerFactory
+import com.google.common.hash.Hashing
+import java.nio.charset.StandardCharsets;
+
+public class ExchangeLayerProcess {
+
+    // todo : get supported mimetypes from properties
+    //private static final org.slf4j.Logger logger = LoggerFactory.getLogger(IoStateService.class);
+    private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
+    boolean overrideAutoMimeTypes = false
+
+    private static final ArrayList formats = ['XML','JSON']
+
+    int callType
+    protected String method
+    protected String defaultAction
+    protected String apiversion
+
+    String requestFormat
+    protected String requestMimeType
+    protected String requestFileType
+    protected String responseMimeType
+    protected String responseFileType
+    protected LinkedHashMap receives = [:]
+    protected ArrayList receivesAuths = []
+    protected ArrayList receivesList = []
+    protected LinkedHashMap rturns = [:]
+    protected ArrayList returnsAuths = []
+    protected ArrayList returnsList = []
+    // [CACHE]
+    protected ApiDescriptor apiObject
+    // [SECURITY] : reliant on apiProperties
+    protected String networkGrp
+    protected ArrayList networkRoles
+    protected LinkedHashMap networkGrpRoles
+    protected ArrayList deprecated
+    String authority
+    protected LinkedHashMap<String,Integer> rateLimit
+    protected LinkedHashMap<String,Integer> dataLimit
+
+    // # in seconds (3600 = 60 minutes)
+    protected Integer expires
+
+    protected String cacheHash
+    protected boolean cachedResponse = false
+
+    //protected LinkedHashMap params
+
+    // [BATCH]
+    LinkedList batch = []
+
+    // [CHAIN]
+    LinkedList chain = []
+    String newPath
+
+
+    String uri
+    String version
+    String controller
+    String action
+    String auth
+    String cacheHash
+    String responseFileType
+    String method
+    int cores
+
+    /**
+     * Given params, handles basic tests for the API request and returns boolean based upon result
+     * @see io.beapi.api.interceptor.ApiInterceptor#before()
+     * @param deprecated
+     * @param method
+     * @param mthd
+     * @param response
+     * @param params
+     * @return boolean returns false if past deprecation date
+     */
+    boolean validateDeprecationDate(List deprecated){
+        boolean result = true
+        try{
+            // CHECK VERSION DEPRECATION DATE
+            if(deprecated?.get(0)){
+                if(checkDeprecationDate(deprecated[0].toString())){
+                    result = false
+                }
+            }
+        }catch(Exception e){
+            throw new Exception("[ApiExchange : validateDeprecationDate] : Exception - full stack trace follows:",e)
+        }
+        return result
+    }
+
+    boolean validateMethod(){
+        boolean result = false
+        if(this.apiObject['method'].toUpperCase() == this.method.toUpperCase()){
+            result = true
+        }
+        return result
+    }
+
+    /**
+     * Given the request params and endpoint request definitions, test to check whether the request params match the expected endpoint params; returns boolean
+     * @see io.beapi.api.interceptor.ApiInterceptor#before()
+     * @see BatchInterceptor#before()
+     * @see ChainInterceptor#before()
+     * @param GrailsParameterMap Map of params created from the request data
+     * @param LinkedHashMap map of variables defining endpoint request variables
+     * @return Boolean returns false if request variable keys do not match expected endpoint keys
+     */
+    boolean checkRequestParams(LinkedHashMap methodParams){
+        ArrayList checkList = this.receivesList
+        ArrayList paramsList
+        ArrayList reservedNames = ['batchLength','batchInc','chainInc','apiChain','_','batch','max','offset','chaintype']
+
+        try {
+            if(checkList.contains('*')) {
+                return true
+            } else {
+                paramsList = methodParams.keySet() as ArrayList
+
+                // remove reservedNames from List
+                reservedNames.each() { paramsList.remove(it) }
+
+                if (paramsList.size() == checkList.intersect(paramsList).size()) {
+                    return true
+                }
+            }
+
+            // todo : set stats cache
+            //statsService.setStatsCache(userId, response.status, request.requestURI)
+            return false
+        }catch(Exception e) {
+            throw new Exception("[ApiExchange :: checkRequestParams] : Exception - full stack trace follows:",e)
+        }
+        return false
+    }
+
+    protected void setReceivesList(){
+        ArrayList result = []
+        this.receives.each() { k, v ->
+            if(k==this.authority || k=='permitAll') {
+                v.each { it2 ->
+                    if (!result.contains(it2['name'])) {
+                        result.add(it2['name'])
+                    }
+                }
+            }
+        }
+        this.receivesList = result
+    }
+
+    protected void setReturnsList(){
+        ArrayList result = []
+        this.rturns.each() { k, v ->
+            if(k==this.authority || k=='permitAll') {
+                v.each() { it2 ->
+                    if (!result.contains(it2['name'])) {
+                        result.add(it2['name'])
+                    }
+                }
+            }
+        }
+        this.returnsList = result
+    }
+
+    /**
+     * Returns concatenated IDS as a HASH used as ID for the API cache
+     * @see io.beapi.api.interceptor.ApiInterceptor#before()
+     * @see BatchInterceptor#before()
+     * @see ChainInterceptor#before()
+     * @param LinkedHashMap List of ids required when making request to endpoint
+     * @return a hash from all id's needed when making request to endpoint
+     */
+    protected void setCacheHash(LinkedHashMap params){
+        StringBuilder hashString = new StringBuilder('')
+        this.receivesList.each(){ it ->
+            hashString.append(params[it])
+            hashString.append("/")
+        }
+        this.cacheHash = Hashing.murmur3_32().hashString(hashString.toString(), StandardCharsets.UTF_8).toString()
+    }
+
+    protected String getFormat(String mimeType){
+        String format
+        switch(mimeType){
+            case 'text/json':
+            case 'application/json':
+                format = 'JSON'
+                break;
+            case 'application/xml':
+            case 'text/xml':
+                format = 'XML'
+                break;
+            default:
+                // todo : check if callType is 'resource'
+                break;
+        }
+        return format
+    }
+
+    protected void parseParams(HttpServletRequest request, String formData, String uriData, String id){
+        LinkedHashMap get = parseGetParams(uriData, id)
+        request.getSession().setAttribute('GET',get)
+        LinkedHashMap post = parsePutParams(formData)
+        request.getSession().setAttribute('POST',post)
+        LinkedHashMap output = get + post
+        request.getSession().setAttribute('params',output)
+    }
+
+    private LinkedHashMap parseGetParams(String uriData, String id){
+        LinkedHashMap output = [:]
+        ArrayList pairs = uriData?.split("&");
+        if(pairs) {
+            pairs.each() { it ->
+                int idx = it.indexOf("=");
+                output.put(URLDecoder.decode(it.substring(0, idx), "UTF-8"), URLDecoder.decode(it.substring(idx + 1), "UTF-8"));
+            }
+        }
+        if(id){ output['id'] = id }
+        return output
+    }
+
+    private LinkedHashMap parsePutParams(String formData){
+        //String formData = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
+        LinkedHashMap output = [:]
+        if (formData) {
+            JSONObject object
+            try {
+                switch (this.requestFileType) {
+                    case 'JSON':
+                        object = new JSONObject(formData)
+                        break
+                    case 'XML':
+                        object = XML.toJSONObject(formData)
+                        break
+                }
+            } catch (Exception e) {
+                throw new Exception("[ExchangeObject :: parsePutParams] : Badly formatted '${this.requestFileType}'. Please check the syntax and try again")
+            }
+
+            if(object) {
+                Iterator<String> keys = object.keys();
+                Set<String> keyset = object.keySet()
+
+                switch(keyset){
+                    case {it.contains('chain')}:
+                        LinkedHashMap temp = [:]
+                        while (keys.hasNext()) {
+                            String key = keys.next();
+
+                            if (key.toString() == 'chain') {
+                                LinkedHashMap chainOrder = [:]
+                                // get chainOrder vars
+
+                                def temp2 = object.get(key).remove('order').entrySet()
+
+                                temp2.each() { it ->
+                                    //String k = it.getKey()
+                                    //String v = it.getValue()
+                                    chainOrder[it.getKey()] = it.getValue()
+                                }
+
+                                output['chainOrder'] = chainOrder
+                                output['chainType'] = object.get(key)['chaintype']
+                                output['chainKey'] = object.get(key)['initdata']
+                                output['chainSize'] = chainOrder.size()
+                            }else{
+                                temp[key] = object.get(key)
+                            }
+                        }
+                        if(!temp.isEmpty()){
+                            output['chainParams'] = temp
+                        }
+                        break;
+                    case {it.contains('batch')}:
+                        output['batchVars'] = []
+                        while (keys.hasNext()) {
+                            String key = keys.next();
+                            if (key.toString() == 'batch') {
+                                output['batchVars'] = object.get(key) as LinkedList
+                            }else{
+                                output[key] = object.get(key)
+                            }
+                        }
+                        break;
+                    default:
+                        while (keys.hasNext()) {
+                            String key = keys.next();
+                            if (!RESERVED_PARAM_NAMES.contains(key)) {
+                                output[key] = object.get(key)
+                            } else {
+                                throw new Exception("[ExchangeObject :: parsePutParams] : Batch/Chain call attempted on regular API endpoint without sending required params [ie batch/chain]")
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+        return output
+    }
+
+    protected boolean checkNetworkGrp(ArrayList networkRoles, String authority){
+        return networkRoles.contains(authority)
+    }
+}
