@@ -11,6 +11,7 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath("io.github.gradle-nexus:publish-plugin:1.0.0")
+        // classpath group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
     }
 }
 
@@ -18,19 +19,20 @@ buildscript {
 plugins {
     id 'org.springframework.boot' version "${springBootVersion}"
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    //id "signing"
+    id "signing"
     id 'maven-publish'
     id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
     id 'groovy'
 }
 
 
-apply plugin: "maven-publish"
 apply plugin: 'signing'
 apply plugin: 'io.github.gradle-nexus.publish-plugin'
+
 apply plugin: 'groovy'
 apply plugin: 'io.spring.dependency-management'
 
+apply plugin: "maven-publish"
 
 description = "The Beapi Springboot Starter for API Automation; automates and simplifies almost all API functionality and security"
 
@@ -46,6 +48,7 @@ version = "${version}"
 
 sourceCompatibility = "${sourceCompatibility}"
 
+/*
 publishing {
     publications {
         maven(MavenPublication) {
@@ -54,6 +57,7 @@ publishing {
     }
 }
 
+ */
 
 java {
     withJavadocJar()
@@ -142,91 +146,26 @@ dependencies {
 
 }
 
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
 
-project.plugins.withType(MavenPublishPlugin).all {
-    PublishingExtension publishing = project.extensions.getByType(PublishingExtension)
-    publishing.publications.withType(MavenPublication).all { mavenPublication ->
-        mavenPublication.pom {
-            name = "${project.group}:${project.name}"
-            description = "The Beapi Springboot Starter for API Automation; automates and simplifies almost all API functionality and security"
-            url = "https://github.com/orubel/spring-boot-starter-beapi"
-            licenses {
-                license {
-                    name = "Reciprocal Public License (RPL-1.5)"
-                    url = "https://opensource.org/licenses/RPL-1.5"
-                }
-            }
-            developers {
-                developer {
-                    id = "orubel"
-                    name = "Owen Rubel"
-                    email = "orubel+spam@gmail.com"
-                }
-            }
-            scm {
-                connection = "https://github.com/orubel/spring-boot-starter-beapi.git"
-                developerConnection = "https://github.com/orubel/spring-boot-starter-beapi.git"
-                url = "https://github.com/orubel/spring-boot-starter-beapi"
-            }
-        }
-    }
-}
-
-nexusPublishing {
-    repositories {
-        sonatype {
-            username = System.getenv("ORG_GRADLE_PROJECT_ossrhUsername")
-            password = System.getenv("ORG_GRADLE_PROJECT_ossrhPassword")
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-        }
-    }
-
-    // these are not strictly required. The default timeouts are set to 1 minute. But Sonatype can be really slow.
-    // If you get the error "java.net.SocketTimeoutException: timeout", these lines will help.
-    connectTimeout = Duration.ofMinutes(3)
-    clientTimeout = Duration.ofMinutes(3)
+mavenPublishing {
+    // available options:
+    //   - JavaLibrary
+    //   - GradlePlugin
+    //   - AndroidLibrary (deprecated)
+    //   - AndroidSingleVariantLibrary (requires AGP 7.1.1)
+    //   - AndroidMultiVariantLibrary (requires AGP 7.1.1)
+    // first param configures the javadoc jar : [None,Empty,Javadoc]
+    // second param is for whether to publish sources, optional, defaults to true
+    configure(new JavaLibrary(new JavadocJar.Javadoc(), true))
 }
 
 
-
-//artifacts {
-//    archives javadocJar, sourcesJar
-//}
-
-//signing {
-//    sign project.configurations.archives
-//}
-
-//task javadocJar(type: Jar) {
-//    classifier = 'javadoc'
-//    from javadoc
-//}
-
-//task sourcesJar(type: Jar) {
-//    classifier = 'sources'
-//    from sourceSets.main.allSource
-//}
-
-def hasSigningKey = System.getenv("ORG_GRADLE_PROJECT_signingKeyId") || System.getenv("ORG_GRADLE_PROJECT_signingKey")
-if(hasSigningKey) {
-    sign(project)
+signing {
+    sign configurations.archives
 }
-void sign(Project project) {
-    project.signing {
-        required { project.gradle.taskGraph.hasTask("publish") }
-        def signingKeyId = findProperty("signingKeyId")
-        def signingKey = findProperty("signingKey")
-        def signingPassword = findProperty("signingPassword")
 
-        if (signingKeyId) {
-            useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-        } else if (signingKey) {
-            useInMemoryPgpKeys(signingKey, signingPassword)
-        }
-        sign publishing.publications.maven
-    }
-}
 
 
 
