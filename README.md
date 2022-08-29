@@ -42,7 +42,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 **Configuration Files** - https://github.com/orubel/spring-boot-starter-beapi-config (Note : Move these into your 'iostateDir' location as found in your demo-application/src/main/resources/beapi_api.yaml file)
 
 
-**Documentation (new documentation coming soon)** - [https://orubel.github.io/spring-boot-starter-beapi/](https://orubel.github.io/spring-boot-starter-beapi/)
+**Documentation** - [https://beapi-io.github.io/spring-boot-starter-beapi/](https://beapi-io.github.io/spring-boot-starter-beapi/)
 
 ## 0.5 (release Sept/2022)
  - API AUTOMATION
