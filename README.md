@@ -15,18 +15,16 @@ Additionally, this also allow for the introduction of addition patterns like aut
 
 **Springboot Version** - 2.6.2 (or greater)
 
-**JVM** - 1.8 (or greater)
+**JVM** - 17 (contact if you need a build for a lower version)
 
-**Build (Gradle 7)** 
+**Gradle Implementation**
 ```
-gradle --stop;gradle clean;gradle build --stacktrace  --refresh-dependencies
-```
-**Run Demo Application(Gradle 7)** 
-- Change to demo-application and run the following from a shell:
-```
-cd demo-application
-java -jar build/libs/demo-application-{appVersion}.jar
-```
+dependencies {
+    ...
+    implementation 'io.beapi:spring-boot-starter-beapi:0.4.1'
+    ...
+}
+ ```
 
 **Getting a Token and calling your api** - 
 
@@ -44,9 +42,9 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 **Configuration Files** - https://github.com/orubel/spring-boot-starter-beapi-config (Note : Move these into your 'iostateDir' location as found in your demo-application/src/main/resources/beapi_api.yaml file)
 
 
-**OLD Documentation (new documentation coming soon)** - [https://orubel.github.io/spring-boot-starter-beapi/](https://orubel.github.io/spring-boot-starter-beapi/)
+**Documentation (new documentation coming soon)** - [https://orubel.github.io/spring-boot-starter-beapi/](https://orubel.github.io/spring-boot-starter-beapi/)
 
-## 0.5-PUBLIC-RELEASE (release Sept/2022)
+## 0.5 (release Sept/2022)
  - API AUTOMATION
     - localized api caching (do first for benchmarking) 
     - automated versioning for urlmapping
@@ -61,7 +59,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
     - network groups
     - role checking
     - automated resolution for [API3:2019 Excessive Data Exposure](https://github.com/OWASP/API-Security/blob/master/2019/en/src/0xa3-excessive-data-exposure.md).
-  - DEMO APPLICATION
+  - DEMO APPLICATION (separate application - link TB provided)
     - JWT token creation and authentication 
    
 
