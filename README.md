@@ -2,14 +2,11 @@
 # Beapi Spring Boot Starter
 **( public version will be released under a [Reciprocal Public License]([https://en.wikipedia.org/wiki/Cross-cutting_concern](https://en.wikipedia.org/wiki/Reciprocal_Public_License)) )**
 
-**Beapi abstracts all RULES for API endpoints** so they can be **shared/syncronized with all services** in a distributed API architecture **without requiring restarts of all servers** to do so. 
-In current architectures, DATA for endpoints is bound to FUNCTIONALITY ( see [Cross Cutting Concern](https://en.wikipedia.org/wiki/Cross-cutting_concern) ) through things like 'annotations'; this makes it so that you have to duplicate this DATA everywhere (see OpenApi) as it is hardcoded into functionality.
+**Beapi abstracts all RULES for API endpoints** so they can be **shared/syncronized with all services** in a distributed API architecture **without requiring restarts of all servers** to do so.
 
-The thing that changes from server to server is VERSION and FUNCTIONALITY... **NOT ENDPOINT RULES**. How you call the data (and how the data is returned) is related to VERSION; both the VERSION of the CODE and the API. In other words, you may want to call your API several different ways with each FUNCTIONAL VERSION OF THE CODE and **without having to release a several different versions of the code on a several different servers**. 
+In current architectures, DATA for endpoints is bound to FUNCTIONALITY ( see [Cross Cutting Concern](https://en.wikipedia.org/wiki/Cross-cutting_concern) ) through things like 'annotations'; this makes it so that you have to **duplicate this DATA everywhere**(see OpenApi) as it is hardcoded into functionality.
 
-If the API Object remains the same, we merely have to parse it differently using different rules. Thus we merely need an abstracted set of rules for each different version and one common codebase (until the codebase changes).
-
-By abstracting it into an externally loadable file, things like ROLES for endpoints can be easily adjusted without requiring a restart of the service. Plus using functionality like webhooks, one can synchronize all services from a MASTER server. This allows for changes to API endpoint DATA on a distributed API architecture without restarting services.
+By abstracting it into an externally **reloadable file**, things like ROLES for endpoints can be easily adjusted without requiring a restart of the service. Plus using functionality like webhooks, one can synchronize all services from a MASTER server. This allows for changes to API endpoint DATA on a distributed API architecture without restarting services.
 
 Additionally, this also allow for the introduction of addition patterns like automated batching and 'API Chaining(tm)'
 
