@@ -34,7 +34,6 @@ apply plugin: 'io.spring.dependency-management'
 
 description = "The Beapi Springboot Starter for API Automation; automates and simplifies almost all API functionality and security"
 
-//archivesBaseName = 'beapi-spring-boot-autoconfigure'
 
 bootJar {
     enabled = false
@@ -208,16 +207,16 @@ nexusPublishing {
 //    from sourceSets.main.allSource
 //}
 
-def hasSigningKey = System.getenv("ORG_GRADLE_PROJECT_signingKeyId") || System.getenv("ORG_GRADLE_PROJECT_signingKey")
+def hasSigningKey = findProperty("signing.keyId") || findProperty("signing.key")
 if(hasSigningKey) {
     sign(project)
 }
 void sign(Project project) {
     project.signing {
         required { project.gradle.taskGraph.hasTask("publish") }
-        def signingKeyId = findProperty("signingKeyId")
-        def signingKey = findProperty("signingKey")
-        def signingPassword = findProperty("signingPassword")
+        def signingKeyId = findProperty("signing.keyId")
+        def signingKey = findProperty("signing.key")
+        def signingPassword = findProperty("signing.password")
 
         if (signingKeyId) {
             useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
