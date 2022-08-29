@@ -48,7 +48,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
  - API AUTOMATION
     - localized api caching (do first for benchmarking) 
     - automated versioning for urlmapping
-    - automated batching
+    - [automated batching](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-1)
     - api chaining&reg; 
       - 'blankchain'
       - 'prechain'
