@@ -8,7 +8,7 @@ In current architectures, DATA for endpoints is bound to FUNCTIONALITY ( see [Cr
 
 By abstracting it into an externally **reloadable file**, things like ROLES for endpoints can be easily adjusted without requiring a restart of the service. Plus using functionality like webhooks, one can synchronize all services from a MASTER server. This allows for changes to API endpoint DATA on a distributed API architecture without restarting services.
 
-Additionally, this also allow for the introduction of addition patterns like automated batching and 'API Chaining(tm)'
+Additionally, this creates new patterns like [automated batching](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-1) and '[Api Chaining&reg;](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-3) '
 
 **Springboot Version** - 2.6.2 (or greater)
 
