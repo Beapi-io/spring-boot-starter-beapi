@@ -47,13 +47,13 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 ## 0.5 (release Sept/2022)
  - API AUTOMATION
     - localized api caching (do first for benchmarking) 
-    - automated versioning for urlmapping
+    - [automated versioning for urlmapping](https://beapi-io.github.io/spring-boot-starter-beapi/adv_config.html#section-1)
     - [automated batching](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-1)
-    - api chaining&reg; 
+    - [api chaining&reg;](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-3) 
       - 'blankchain'
       - 'prechain'
       - 'postchain'
-    - separated I/O State for sharing/synchronizing of all endpoint rules
+    - [separated I/O State for sharing/synchronizing of all endpoint rules](https://beapi-io.github.io/spring-boot-starter-beapi/adv_config.html#section-2)
     - built-in performance tracing (partial)
   - SECURITY
     - network groups
