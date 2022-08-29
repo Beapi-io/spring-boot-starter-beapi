@@ -189,23 +189,7 @@ nexusPublishing {
 
 
 
-//artifacts {
-//    archives javadocJar, sourcesJar
-//}
 
-//signing {
-//    sign project.configurations.archives
-//}
-
-//task javadocJar(type: Jar) {
-//    classifier = 'javadoc'
-//    from javadoc
-//}
-
-//task sourcesJar(type: Jar) {
-//    classifier = 'sources'
-//    from sourceSets.main.allSource
-//}
 
 def hasSigningKey = findProperty("signing.keyId") || findProperty("signing.key")
 if(hasSigningKey) {
