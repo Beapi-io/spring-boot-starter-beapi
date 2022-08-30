@@ -189,8 +189,6 @@ nexusPublishing {
 
 
 
-
-
 def hasSigningKey = findProperty("signing.keyId") || findProperty("signing.key")
 if(hasSigningKey) {
     sign(project)

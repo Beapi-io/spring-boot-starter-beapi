@@ -53,7 +53,6 @@ public class ExchangeService extends ApiExchange{
     // [REQUEST]
     boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority){
         initVars(request,response,authority)
-		println("${this.controller}/${this.action}")
 		if(!validateMethod()){
 			writeErrorResponse(response,'405',request.getRequestURI());
 		}
@@ -64,7 +63,6 @@ public class ExchangeService extends ApiExchange{
 
     void apiResponse(HttpServletResponse response,ArrayList body){
         String output = parseOutput(body, responseFileType)
-
         if(method=='GET') {
             apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
         }

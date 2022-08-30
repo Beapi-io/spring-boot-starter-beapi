@@ -141,9 +141,8 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         //if(uriList[4]!='apidoc') {
             // get apiObject
             def cache = apiCacheService.getApiCache(uriList[4])
-            println('cache : '+cache.getClass())
             def temp = cache[uriList[3]]
-        println('temp : '+temp.getClass())
+
             //String defaultAction = (temp['defaultAction'])?temp['defaultAction']:'error'
             //this.action = (uriList[5])?uriList[5]:defaultAction
 
