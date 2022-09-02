@@ -92,7 +92,6 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
     - FIRST, You can only send ONE METHOD with a chain; you cannot send a PUT and POST method in the same call. But you can just default every other call to a SAFE call (ie GET) as long as client has AUTHORITY to the endpoint. SECOND, since it can only have one UNSAFE METHOD, you can only send ONE DATASET. We made it to be as simple as possible while encompassing the most commonly used calls thus simplifying the processing and the client call.
 - **Isn't it BAD to send form data with a GET request? I thought you could only send URI encoded data??**
     - Per W3C guidelines : 'A client SHOULD NOT generate content in a GET request unless it is made directly to an origin server that has previously indicated, in or out of band, that such a request has a purpose and will be adequately supported'. API Chaining(tm) is that direct connection with purpose. It provides the necessary backend checks and limits what can be sent.
-- **It looks like my controllers are being called twice?!!@!**
-    - They aren't. What is happening inb your tests is that Beapi uses SimpleUrlHandleMapping and in your implementation, you may be using a tool that may be using RequestMappingHandlerMapping. This secondary mapping attempts to map as well but fails. Spring boot attempts to apply ALL mappings that it currently has. This can be useful and confusing at the same time.
+
    
 
