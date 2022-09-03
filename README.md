@@ -1,7 +1,19 @@
 ![alt text](https://github.com/orubel/logos/blob/master/beapi_logo_large.png)
 # Beapi Spring Boot Starter
-# Current Stable Version - 0.5.1
-**( public version will be released under a [Reciprocal Public License]([https://en.wikipedia.org/wiki/Cross-cutting_concern](https://en.wikipedia.org/wiki/Reciprocal_Public_License)) )**
+
+**Current Stable Version** - 0.5.1
+
+**Springboot Version** - 2.6.2 (or greater)
+
+**JVM** - 17 (contact if you need a build for a lower version)
+
+**License** - [Reciprocal Public License](https://en.wikipedia.org/wiki/Reciprocal_Public_License)
+
+**Documentation** - [https://beapi-io.github.io/spring-boot-starter-beapi/](https://beapi-io.github.io/spring-boot-starter-beapi/)
+
+**Configuration Files** - https://github.com/orubel/spring-boot-starter-beapi-config (Note : Move these into your 'iostateDir' location as found in your demo-application/src/main/resources/beapi_api.yaml file)
+
+---
 
 **Beapi abstracts all RULES for API endpoints** so they can be **shared/syncronized with all services** in a distributed API architecture **without requiring restarts of all servers** to do so.
 
@@ -11,9 +23,7 @@ By abstracting it into an externally **reloadable file**, things like ROLES for 
 
 Additionally, this creates new patterns like [automated batching](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-1) and '[Api Chaining&reg;](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-3) '
 
-**Springboot Version** - 2.6.2 (or greater)
-
-**JVM** - 17 (contact if you need a build for a lower version)
+---
 
 **Gradle Implementation**
 ```
@@ -36,11 +46,7 @@ Then call your api normally:
 curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_token_here}" --request GET "http://localhost:8080/v{appVersion}/user/show/5"
 ```
 
-
-**Configuration Files** - https://github.com/orubel/spring-boot-starter-beapi-config (Note : Move these into your 'iostateDir' location as found in your demo-application/src/main/resources/beapi_api.yaml file)
-
-
-**Documentation** - [https://beapi-io.github.io/spring-boot-starter-beapi/](https://beapi-io.github.io/spring-boot-starter-beapi/)
+---
 
 ## 0.5
  - API AUTOMATION
@@ -84,6 +90,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
     - UI/UX tools (maybe)
       - build out demo application as an SDK(???) 
 
+---
 
 # Q&A
 - **Why Not bind the endpoints to the 'MODEL'?**
