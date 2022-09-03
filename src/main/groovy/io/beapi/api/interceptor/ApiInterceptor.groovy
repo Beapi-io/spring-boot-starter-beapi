@@ -49,7 +49,7 @@ import org.springframework.web.servlet.HandlerInterceptor
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
-
+import javax.servlet.DispatcherType
 import javax.json.*
 import org.springframework.security.web.header.*
 import groovyx.gpars.*
@@ -103,6 +103,10 @@ class ApiInterceptor implements HandlerInterceptor{
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+		//if (request.getDispatcherType() != DispatcherType.REQUEST) {
+		//	return true;
+		//}
+
 		//logger.info("preHandle(HttpServletRequest, HttpServletResponse, Object) : {}");
 
 		privateRoles = apiProperties.security.networkRoles['private'].collect() { k, v -> v }
@@ -113,19 +117,26 @@ class ApiInterceptor implements HandlerInterceptor{
 		switch(callType){
 			case 1:
 				exchangeService.apiRequest(request, response, this.authority)
+				return true
 				break
 			case 2:
 				if(apiProperties.batchingEnabled) {
 					batchService.batchRequest(request, response, this.authority)
+					return true
 				}else{
 					writeErrorResponse(response,'401',request.getRequestURI())
+					response.writer.flush()
+					return false
 				}
 				break
 			case 3:
 				if(apiProperties.chainingEnabled) {
-					return chainService.chainRequest(request, response, this.authority)
+					chainService.chainRequest(request, response, this.authority)
+					return true
 				}else{
 					writeErrorResponse(response,'401',request.getRequestURI())
+					response.writer.flush()
+					return false
 				}
 				break
 			//case 4:
@@ -138,10 +149,12 @@ class ApiInterceptor implements HandlerInterceptor{
 			case 5:
 				if(privateRoles.contains(authority)) {
 					traceExchangeService.apiRequest(request, response, this.authority)
+					return true
 				}
 				break
 			default:
 				writeErrorResponse(response,'400',request.getRequestURI())
+				response.writer.flush()
 				return false
 		}
 		return true
@@ -149,6 +162,7 @@ class ApiInterceptor implements HandlerInterceptor{
 
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mv) throws Exception {
+
 		//logger.info("postHandle(HttpServletRequest, HttpServletResponse, Object, ModelAndView) : {}")
 
 		ArrayList body = request.getSession().getAttribute('responseBody')
@@ -158,12 +172,14 @@ class ApiInterceptor implements HandlerInterceptor{
 			switch (callType){
 				case 1:
 					exchangeService.apiResponse(response,body)
+					response.writer.flush()
 					break
 			case 2:
 				if(apiProperties.batchingEnabled) {
 					batchService.batchResponse(request, response, body)
 				}else{
 					writeErrorResponse(response,'401',request.getRequestURI())
+					response.writer.flush()
 				}
 				break
 			case 3:
@@ -171,6 +187,7 @@ class ApiInterceptor implements HandlerInterceptor{
 					chainService.chainResponse(request, response, body)
 				}else{
 					writeErrorResponse(response,'401',request.getRequestURI())
+					response.writer.flush()
 				}
 				break
 			//case 4:
@@ -185,8 +202,10 @@ class ApiInterceptor implements HandlerInterceptor{
 					break
 				default:
 					writeErrorResponse(response, '400', request.getRequestURI())
+					response.writer.flush()
 			}
 		}
+		response.writer.flush()
 	}
 
 	// Todo : Move to exchangeService??

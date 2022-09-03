@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import io.beapi.api.service.TraceService
 import javax.servlet.RequestDispatcher
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 
 abstract class BeapiController implements HttpRequestHandler {
@@ -46,35 +48,69 @@ abstract class BeapiController implements HttpRequestHandler {
     boolean trace
     public String controller
     public String action
+    public String handler
     public String apiversion
     public int cores
     public LinkedHashMap<String,String> params = [:]
     //Object forwardUri
 
 
+
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         //logger.info("handleRequest(HttpServletRequest, HttpServletResponse) : {}");
         this.uList = request.getAttribute('uriList')
         this.uList = request.getAttribute('uriList')
         this.apiversion = uList[3]
         this.controller = request.getSession().getAttribute('controller')
         this.action = request.getSession().getAttribute('action')
+        this.handler=request.getSession().getAttribute('handler')
         this.trace = request.getSession().getAttribute('trace')
         this.cores = request.getAttribute('cores')
         this.params = request.getSession().getAttribute('params') as LinkedHashMap
 
         Class<?> classObj = this.getClass();
+        Class<?> handlerClass = Class.forName(handler);
         Object output
         Method method
 
         if(trace==true) {
             traceService.startTrace(this.controller, this.action, request.getSession().getId())
         }
-        
+
         // create method call
         try {
-            method = classObj.getMethod(this.action, HttpServletRequest.class, HttpServletResponse.class);
+            //method = classObj.getMethod(this.action, HttpServletRequest.class, HttpServletResponse.class);
+            method = handlerClass.getDeclaredMethod(this.action, HttpServletRequest.class, HttpServletResponse.class);
+            // invoke method
+            if(Objects.nonNull(method)) {
+                try {
+                    output = method.invoke(this, request, response)
+                } catch (IllegalArgumentException e) {
+                    //writeErrorResponse(response, '422', request.getRequestURI());
+                    throw Exception("[BeapiController > handleRequest] : IllegalArgumentException - full stack trace follows :",e);
+                } catch (IllegalAccessException e) {
+                    // shouldn't hit this
+                    //writeErrorResponse(response, '422', request.getRequestURI());
+                    throw Exception("[BeapiController > handleRequest] : IllegalAccessException - full stack trace follows :", e);
+                }
+            }
+
+            ArrayList result = []
+            if(output) {
+                if (trace == true) {
+                    Object trace = traceService.endAndReturnTrace(this.controller, this.action, request.getSession().getId())
+                    result = convertModel(trace)
+                } else {
+                    ArrayList tempResult = convertModel(output)
+                    result = parseResponseParams(tempResult, request.getSession().getAttribute('returnsList'))
+                }
+
+                request.getSession().setAttribute('responseBody', result)
+            }else{
+                writeErrorResponse(response,'404',request.getRequestURI())
+            }
         }catch(SecurityException e) {
             // bad privileges for endpoint; shouldn't hit this
             //writeErrorResponse(response,'422',request.getRequestURI());
@@ -85,35 +121,6 @@ abstract class BeapiController implements HttpRequestHandler {
             throw Exception("[BeapiController > handleRequest] : NoSuchMethodException - full stack trace follows :",e);
         }
 
-        // invoke method
-        if(Objects.nonNull(method)) {
-            try {
-                output = method.invoke(this, request, response)
-            } catch (IllegalArgumentException e) {
-                //writeErrorResponse(response, '422', request.getRequestURI());
-                throw Exception("[BeapiController > handleRequest] : IllegalArgumentException - full stack trace follows :",e);
-            } catch (IllegalAccessException e) {
-                // shouldn't hit this
-                //writeErrorResponse(response, '422', request.getRequestURI());
-                throw Exception("[BeapiController > handleRequest] : IllegalAccessException - full stack trace follows :", e);
-            }
-        }
-
-
-        ArrayList result = []
-        if(output) {
-            if (trace == true) {
-                Object trace = traceService.endAndReturnTrace(this.controller, this.action, request.getSession().getId())
-                result = convertModel(trace)
-            } else {
-                ArrayList tempResult = convertModel(output)
-                result = parseResponseParams(tempResult, request.getSession().getAttribute('returnsList'))
-            }
-
-            request.getSession().setAttribute('responseBody', result)
-        }else{
-            writeErrorResponse(response,'404',request.getRequestURI())
-        }
     }
 
     ArrayList convertModel(Object obj){

@@ -40,7 +40,6 @@ public class ExchangeService extends ApiExchange{
 	int cores
 	boolean overrideAutoMimeTypes = false
 
-
 	public ExchangeService(ApiCacheService apiCacheService) {
 		try {
 			this.apiCacheService = apiCacheService
@@ -70,7 +69,7 @@ public class ExchangeService extends ApiExchange{
         PrintWriter writer = response.getWriter();
         writer.write(output);
         writer.close()
-        response.writer.flush()
+        //response.writer.flush()
     }
 
 	void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
@@ -84,6 +83,7 @@ public class ExchangeService extends ApiExchange{
 		this.appversion = uList[2]
 		this.apiversion = uList[3]
 		this.controller = uList[4]
+
 		request.getSession().setAttribute('controller',this.controller)
 		this.action = uList[5]
 		request.getSession().setAttribute('action',this.action)
@@ -103,10 +103,13 @@ public class ExchangeService extends ApiExchange{
 
 		try {
 			//this.appVersion = request.getSession().getAttribute('version')
+
 			def temp = cache[this.apiversion]
 			this.defaultAction = temp['defaultAction']
 			this.deprecated = temp['deprecated'] as List
 			this.apiObject = temp[this.action]
+			this.handler = this.apiObject['handler']
+			request.getSession().setAttribute('handler',this.handler)
 			this.receives = this.apiObject.getReceives()
 			//this.receivesAuths = this.receives.keySet()
 			this.rturns = this.apiObject['returns'] as LinkedHashMap
@@ -132,7 +135,7 @@ public class ExchangeService extends ApiExchange{
 		response.setStatus(Integer.valueOf(statusCode))
 		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
 		response.getWriter().write(message)
-		response.writer.flush()
+		//response.writer.flush()
 	}
 
 	// Todo : Move to exchangeService??
@@ -150,6 +153,6 @@ public class ExchangeService extends ApiExchange{
 		}
 		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
 		response.getWriter().write(message)
-		response.writer.flush()
+		//response.writer.flush()
 	}
 }

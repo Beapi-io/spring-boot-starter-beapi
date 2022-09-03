@@ -202,7 +202,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         //ArrayList headers = Collections.list(request.getHeaderNames()).stream().collect(Collectors.toMap(Function.identity()), h -> Collections.list(request.getHeaders(h))))
 
         if (this.uriList[4] != 'apidoc') {
-
             if (this.apiObject) {
                 // todo : create public api list
                 if (this.method == 'GET') {
@@ -224,7 +223,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                             PrintWriter writer = response.getWriter();
                             writer.write(cachedResult);
                             writer.close()
-                            response.writer.flush()
+                            //response.writer.flush()
                             //return false
                         } else {
                             chain.doFilter(request, response)
@@ -245,9 +244,9 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     chain.doFilter(request, response)
                 }
             }
+        }else{
+            chain.doFilter(request, response)
         }
-
-        chain.doFilter(request, response)
     }
 
     /*

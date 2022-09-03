@@ -124,20 +124,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	}
 
 
-	//@Bean
-	//public ApiInterceptor apiInterceptor() {
-	//	return new ApiInterceptor(principleService, exchangeService, apiCacheService, apiProperties);
-	//}
-
-	//@Bean
-	//public BatchInterceptor batchInterceptor() {
-	//	return new BatchInterceptor(principleService, exchangeService, apiCacheService, apiProperties);
-	//}
-
-	//@Bean
-	//public ChainInterceptor chainInterceptor() {
-	//	return new ChainInterceptor(principle(), serviceConfig.apiCacheServicee(), apiProperties);
-	//}
 
 
 
@@ -264,7 +250,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 										urlMap.put(chain4, v);
 									}
 
-
+/*
 									String res1 = "/r${this.version}/${controller}/${action}/**" as String
 									urlMap.put(res1, v);
 									String res2 = "/r${this.version}-${k2}/${controller}/${action}/**" as String
@@ -273,6 +259,8 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 									urlMap.put(res3, v);
 									String res4 = "/r${this.version}-${k2}/${controller}/${action}/" as String
 									urlMap.put(res4, v);
+
+ */
 
 
 									String trace1 = "/t${this.version}/${controller}/${action}/**" as String
@@ -299,15 +287,9 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		mapping.setUrlMap(urlMap);
 		mapping.setOrder(1);
 		mapping.setInterceptors(new Object[]{
-				//if(validateLicense()){
-					//new EnterpriseInterceptor(exchangeService, batchService, chainService, apiProperties)
-				//}else{
-					//todo : remove chainService
-					new ApiInterceptor(exchangeService, batchService, chainService, traceExchangeService, principleService, apiProperties)
-				//}
+				new ApiInterceptor(exchangeService, batchService, chainService, traceExchangeService, principleService, apiProperties)
 		})
 		mapping.setApplicationContext(context);
-		//mapping.initApplicationContext()
 		//resourceCache.putAllResources(urlSet);
 
 		return mapping;

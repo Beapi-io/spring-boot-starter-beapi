@@ -77,6 +77,7 @@ abstract class ApiExchange{
     String version
     String controller
     String action
+    String handler
     String auth
     String cacheHash
     String responseFileType
