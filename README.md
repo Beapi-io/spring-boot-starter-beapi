@@ -83,7 +83,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 
 # Q&A
 - **Why Not bind the endpoints to the 'MODEL'?**
-    - API return data may be a mixture of two tables (or more), a file, a link to another api call, etc. By binding to your model, you are asking it to become the 'business logic','communication logic' as well as 'data handling'. This breaks rules of AOP, Separation of Control' and over complicates your build and testing. This also makes your entire environment slower and harder to scale.
+    - API return data may be a mixture of two tables (ie JOIN), a file, a link to another api, etc. By binding to your model, you are asking it to become the 'business logic','communication logic' as well as 'data handling' and limits what your API can return. This breaks rules of AOP, Separation of Control' and over complicates your build and testing. This also makes your entire environment slower and harder to scale.
 - **Why require a cache?**
     - It is complex to build dynamic properties and properties that represent MULTIPLE MAPS in a SINGLE PROPERTIES FILE. Cache is hence the simpler solution. Also many developers do not understand proper caching techniques (with API's).
 - **Why not just use @RequestMapping, @GetMapping, etc?**
