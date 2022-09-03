@@ -18,7 +18,7 @@ Additionally, this creates new patterns like [automated batching](https://beapi-
 ```
 dependencies {
     ...
-    implementation 'io.beapi:spring-boot-starter-beapi:0.4.1'
+    implementation 'io.beapi:spring-boot-starter-beapi:0.5.1'
     ...
 }
  ```
