@@ -42,7 +42,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 
 **Documentation** - [https://beapi-io.github.io/spring-boot-starter-beapi/](https://beapi-io.github.io/spring-boot-starter-beapi/)
 
-## 0.5 (release Sept/2022)
+## 0.5
  - API AUTOMATION
     - localized api caching (do first for benchmarking) 
     - [automated versioning for urlmapping](https://beapi-io.github.io/spring-boot-starter-beapi/adv_config.html#section-1)
@@ -59,7 +59,11 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
     - automated resolution for [API3:2019 Excessive Data Exposure](https://github.com/OWASP/API-Security/blob/master/2019/en/src/0xa3-excessive-data-exposure.md).
   - DEMO APPLICATION (separate application - link TB provided)
     - JWT token creation and authentication 
-   
+
+## 0.5.1
+ - stability fix
+ - fixed issue with filter double calling handlerinterceptor
+ - removal of attributes before resetting when chaining
 
 
  ## 0.6-PUBLIC-RELEASE (release Feb/2023)
