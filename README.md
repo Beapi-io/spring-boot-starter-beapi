@@ -1,5 +1,6 @@
 ![alt text](https://github.com/orubel/logos/blob/master/beapi_logo_large.png)
 # Beapi Spring Boot Starter
+# Current Stable Version - 0.5.1
 **( public version will be released under a [Reciprocal Public License]([https://en.wikipedia.org/wiki/Cross-cutting_concern](https://en.wikipedia.org/wiki/Reciprocal_Public_License)) )**
 
 **Beapi abstracts all RULES for API endpoints** so they can be **shared/syncronized with all services** in a distributed API architecture **without requiring restarts of all servers** to do so.
