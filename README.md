@@ -48,7 +48,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 
 ---
 
-## 0.5
+## 0.5 (released: 8/31/2022)
  - API AUTOMATION
     - localized api caching (do first for benchmarking) 
     - [automated versioning for urlmapping](https://beapi-io.github.io/spring-boot-starter-beapi/adv_config.html#section-1)
@@ -66,7 +66,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
   - DEMO APPLICATION (separate application - link TB provided)
     - JWT token creation and authentication 
 
-## 0.5.1
+## 0.5.1 (released: 9/3/2022)
  - stability fix
  - fixed issue with filter double calling handlerinterceptor
  - removal of attributes before resetting when chaining
