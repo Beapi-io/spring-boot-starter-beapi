@@ -76,12 +76,15 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
   - API AUTOMATION
     - automated apidocs 
     - automated webhooks
+    - io state reloading
     - rate limiting
     - automated CORS; uses whitelisted IP 'networkGrps' (see previous implementation)
  - BOOTSTRAPPING
     - automated I/O State generation
     - functional test scaffolding
     - automated controller scaffolding
+ - SCALABILITY
+    - extend DispatcherServlet for all front controller functionality (ie RequestInitializationFilter)
  - REPORTING
     - stats reporting
  - 3RD PARTY TOOLS
