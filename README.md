@@ -72,7 +72,10 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
  - removal of attributes before resetting when chaining
 
 
- ## 0.6 (projected release Feb/2023)
+ ## 0.6 (projected release Feb/2023) - ACTIVE CHANGELOG
+ - reflection for controllers/handlers added so they no longer need to be added to I/O State files
+ 
+ ## 0.6 (TASK LIST)
   - API AUTOMATION
     - automated apidocs 
     - automated webhooks
