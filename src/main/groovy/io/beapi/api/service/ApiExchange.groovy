@@ -100,6 +100,7 @@ abstract class ApiExchange{
         if(responseBody.size()<2) {
             output = parseBodyByFiletype(responseBody[0], responseFileType);
         }else{
+
             int inc = 0
             output = "["
             responseBody.each() { it2 ->

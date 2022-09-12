@@ -64,10 +64,13 @@ public class TraceExchangeService extends ApiExchange{
 
 		if(!validateMethod()){
 			writeErrorResponse(response,'405',request.getRequestURI());
+			return false
+		}else{
+			//parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(),uList[7])
+			// routing call to controller
+			return true
 		}
-        //parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(),uList[7])
-        // routing call to controller
-        return true
+
     }
 
     void apiResponse(HttpServletResponse response,ArrayList body){

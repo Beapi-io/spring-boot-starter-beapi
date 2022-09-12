@@ -146,7 +146,7 @@ class TraceCacheService {
 	 * Method to load the list of all object contained in the 'ApiCache' cache
 	 * @return A List of keys of all object names contained with the 'ApiCache'
 	 */
-	List getCacheKeys(){
+	ArrayList getCacheKeys(){
 		logger.debug("getCacheKeys() : {}")
 		//cacheManager.setTransactionAware(false);
 		net.sf.ehcache.Ehcache temp = cacheManager.getCache('Trace').getNativeCache()

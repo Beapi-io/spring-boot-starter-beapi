@@ -16,6 +16,7 @@
  */
 package io.beapi.api.config
 
+import io.beapi.api.controller.BeapiRequestHandler
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ExchangeService
@@ -41,12 +42,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.web.servlet.FilterRegistrationBean
+
+import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.ApplicationContext
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping
 import org.springframework.beans.factory.ListableBeanFactory
@@ -54,7 +57,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.BeansException
+import org.springframework.web.HttpRequestHandler
 
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
+//import io.beapi.api.servlets.ApiServlet;
 
 //@EnableWebMvc
 //@ConditionalOnBean(name = ["principleService","apiCacheService"])
@@ -123,29 +129,26 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return version
 	}
 
-
-
-
-
-	//@Bean
-	//@ConditionalOnBean(name = ["principle","apiCacheService"])
-	//BeapiResponseBodyAdvice beapiResponseAdvice(){
-	//	return new BeapiResponseBodyAdvice(principleService,apiCacheService)
-	//}
-
 	//@Override
-	//public void configureMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
-	//	messageConverters.add(mappingJackson2HttpMessageConverter());
-	//	messageConverters.add(new MappingJackson2HttpMessageConverter());
+	//public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+	//	configurer.enable();
 	//}
 
+	/*
+	@Bean
+	public ServletRegistrationBean exampleServletBean() {
+		ServletRegistrationBean bean = new ServletRegistrationBean(new ApiServlet(), "/v${this.version}/*");
+		bean.setLoadOnStartup(1);
+		return bean;
+	}
 
-	//public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-	//	MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
-	//	jsonConverter.setDefaultCharset(StandardCharsets.UTF_8);
-	//	return jsonConverter;
-	//}
-
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/resources/**")
+				.addResourceLocations("/resources/").setCachePeriod(3600)
+				.resourceChain(true).addResolver(new PathResourceResolver());
+	}
+	 */
 
 	@Bean
 	public MessageSource messageSource() {
@@ -177,31 +180,44 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	//	return new HttpRequestHandlerAdapter();
 	//}
 
+/*
+	@Bean(name="beapiRequestHandler")
+	public HttpRequestHandler dataFileServlet() {
+		return (request, response) -> {
+			// Handler implementation
+		};
+	}
 
+ */
+
+	//@Bean
+	//public HttpRequestHandler beapiRequestHandler() {
+	//	return new BeapiRequestHandler();
+	//}
 
 	/*
 	* Also create ApiInfo Object
 	 */
-	@Bean
-
+	@Bean(name='simpleUrlHandlerMapping')
 	public SimpleUrlHandlerMapping simpleUrlHandlerMapping() {
 		Map<String, Object> urlMap = new LinkedHashMap<>();
 
-		LinkedHashMap<String, Object> cont = this.listableBeanFactory.getBeansWithAnnotation(Controller.class)
+
+		LinkedHashMap<String, Object> cont = this.listableBeanFactory.getBeansWithAnnotation(org.springframework.stereotype.Controller.class)
 		cont.each() { k, v ->
 
-			String controllerName = k
-			String controller = controllerName.minus('Controller')
+			String controller = k
+			def cache = apiCacheService.getApiCache(controller)
+			if(cache) {
 
+				if (!apiProperties.nonmappedEndpoint.contains(controller)) {
+					ArrayList methodNames = []
+					for (Method method : v.getClass().getDeclaredMethods()) {
+						methodNames.add(method.getName())
+					}
 
-			if(!apiProperties.nonmappedEndpoint.contains(controller)) {
-				ArrayList methodNames = []
-				for (Method method : v.getClass().getDeclaredMethods()) {
-					methodNames.add(method.getName())
-				}
+					//def cache = apiCacheService.getApiCache(controller)
 
-				def cache = apiCacheService.getApiCache(controller)
-				if (cache) {
 					cache.each() { k2, v2 ->
 
 						if (!['values', 'currentstable', 'cacheversion'].contains(k2)) {
@@ -211,15 +227,15 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 
 								/*
-							* mapping need to include 4 'callTypes' for load balancing:
-							* v : regular api call
-							* b : batching call
-							* c : chain call
-							* r : resource call
-							*
-							* This allows us the ability to move different call to different servers (should we want/need)
-							* so they do not affect 'regular calls' (ie 'v' callType)
-							 */
+						* mapping need to include 4 'callTypes' for load balancing:
+						* v : regular api call
+						* b : batching call
+						* c : chain call
+						* r : resource call
+						*
+						* This allows us the ability to move different call to different servers (should we want/need)
+						* so they do not affect 'regular calls' (ie 'v' callType)
+						 */
 
 								String action = entry.getKey()
 								if (methodNames.contains(action)) {
@@ -227,6 +243,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 									urlMap.put(url1, v);
 									String url2 = "/v${this.version}-${k2}/${controller}/${action}/**" as String
 									urlMap.put(url2, v);
+
 
 									if (apiProperties.batchingEnabled) {
 										String batch1 = "/b${this.version}/${controller}/${action}/**" as String
@@ -251,17 +268,16 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 									}
 
 /*
-									String res1 = "/r${this.version}/${controller}/${action}/**" as String
-									urlMap.put(res1, v);
-									String res2 = "/r${this.version}-${k2}/${controller}/${action}/**" as String
-									urlMap.put(res2, v);
-									String res3 = "/r${this.version}/${controller}/${action}/" as String
-									urlMap.put(res3, v);
-									String res4 = "/r${this.version}-${k2}/${controller}/${action}/" as String
-									urlMap.put(res4, v);
+								String res1 = "/r${this.version}/${controller}/${action}/**" as String
+								urlMap.put(res1, v);
+								String res2 = "/r${this.version}-${k2}/${controller}/${action}/**" as String
+								urlMap.put(res2, v);
+								String res3 = "/r${this.version}/${controller}/${action}/" as String
+								urlMap.put(res3, v);
+								String res4 = "/r${this.version}-${k2}/${controller}/${action}/" as String
+								urlMap.put(res4, v);
 
- */
-
+*/
 
 									String trace1 = "/t${this.version}/${controller}/${action}/**" as String
 									urlMap.put(trace1, v);
@@ -278,9 +294,13 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 							}
 						}
 					}
+
 				}
 			}
 		}
+
+		// then map static services
+
 
 		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
 		mapping.registerHandlers(urlMap)
@@ -294,6 +314,9 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 		return mapping;
 	}
+
+
+
 
 
 }
