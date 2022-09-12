@@ -80,7 +80,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
  
  ## 0.6 (TASK LIST) - (projected release Feb/2023)
   - API AUTOMATION
-    - automated apidocs 
+    - automated apidocs (DONE)
     - automated webhooks
     - io state reloading
     - rate limiting
