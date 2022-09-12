@@ -1,0 +1,99 @@
+package io.beapi.api.config;
+
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+
+public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+
+    String version
+
+    public WebAppInitializer() {
+        this.version = getVersion()
+    }
+
+    //AbstractDispatcherServletInitializer override DEFAULT_SERVLET_NAME
+    @Override
+    protected String getServletName() {
+        return "dispatcher";
+    }
+
+    @Override
+    protected Class<?>[] getRootConfigClasses() {
+        return new Class[]{};
+    }
+
+    @Override
+    protected Class<?>[] getServletConfigClasses() {
+        return new Class[]{AppConfig.class};
+    }
+
+    @Override
+    protected String[] getServletMappings() {
+        ArrayList<String> mappings = [
+                "/v${this.version}/*",
+                "/v${this.version}-1/*",
+                "/v${this.version}-2/*",
+                "/v${this.version}-3/*",
+                "/v${this.version}-4/*",
+                "/v${this.version}-5/*",
+                "/v${this.version}-6/*",
+                "/v${this.version}-7/*",
+                "/v${this.version}-8/*",
+                "/v${this.version}-9/*",
+                "/b${this.version}/*",
+                "/b${this.version}-1/*",
+                "/b${this.version}-2/*",
+                "/b${this.version}-3/*",
+                "/b${this.version}-4/*",
+                "/b${this.version}-5/*",
+                "/b${this.version}-6/*",
+                "/b${this.version}-7/*",
+                "/b${this.version}-8/*",
+                "/b${this.version}-9/*",
+                "/c${this.version}/*",
+                "/c${this.version}-1/*",
+                "/c${this.version}-2/*",
+                "/c${this.version}-3/*",
+                "/c${this.version}-4/*",
+                "/c${this.version}-5/*",
+                "/c${this.version}-6/*",
+                "/c${this.version}-7/*",
+                "/c${this.version}-8/*",
+                "/c${this.version}-9/*",
+                "/r${this.version}/*",
+                "/r${this.version}-1/*",
+                "/r${this.version}-2/*",
+                "/r${this.version}-3/*",
+                "/r${this.version}-4/*",
+                "/r${this.version}-5/*",
+                "/r${this.version}-6/*",
+                "/r${this.version}-7/*",
+                "/r${this.version}-8/*",
+                "/r${this.version}-9/*",
+                "/t${this.version}/*",
+                "/t${this.version}-1/*",
+                "/t${this.version}-2/*",
+                "/t${this.version}-3/*",
+                "/t${this.version}-4/*",
+                "/t${this.version}-5/*",
+                "/t${this.version}-6/*",
+                "/t${this.version}-7/*",
+                "/t${this.version}-8/*",
+                "/t${this.version}-9/*"
+        ];
+        return mappings;
+    }
+
+    private String getVersion() throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL incoming = classLoader.getResource("META-INF/build-info.properties")
+
+        String version
+        if (incoming != null) {
+            Properties properties = new Properties();
+            properties.load(incoming.openStream());
+            version = properties.getProperty('build.version')
+        }
+        return version
+    }
+
+}
