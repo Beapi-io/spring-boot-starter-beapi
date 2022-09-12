@@ -38,8 +38,8 @@ class ApiDescriptor implements Serializable{
 	String defaultAction = ""
 	//ArrayList testOrder
 	//ArrayList deprecated
-
-	String handler
+	String type
+	//String handler
 
 	//@NotNull
 	String networkGrp
@@ -66,8 +66,9 @@ class ApiDescriptor implements Serializable{
 	LinkedHashMap cachedResult
 	//LinkedHashMap stats
 
-	ApiDescriptor(String handler, String networkGrp, String method, LinkedHashSet pkeys, LinkedHashSet fkeys, ArrayList roles,String name, String description, LinkedHashMap receives, LinkedHashMap returns) {
-		this.handler = handler
+	ApiDescriptor(String type, String networkGrp, String method, LinkedHashSet pkeys, LinkedHashSet fkeys, ArrayList roles,String name, String description, LinkedHashMap receives, LinkedHashMap returns) {
+		//this.handler = handler
+		this.type = type
 		this.networkGrp = networkGrp
 		this.method = method
 		this.pkeys=pkeys
@@ -79,8 +80,12 @@ class ApiDescriptor implements Serializable{
 		this.returns=returns as LinkedHashMap
 	}
 
-	public String getHandler() {
-		return this.handler;
+	//public String getHandler() {
+	//	return this.handler;
+	//}
+
+	public String getType() {
+		return this.type;
 	}
 
 	public String getMethod() {
@@ -136,7 +141,7 @@ class ApiDescriptor implements Serializable{
 	}
 
 	public LinkedHashMap toLinkedHashMap() {
-		return [handler:this.handler,networkGrp: this.networkGrp, method: this.method, pkeys: this.pkeys, fkeys: this.fkeys, roles: this.roles, name: this.name, description: this.description, receives: this.receives, returns: this.returns]
+		return [networkGrp: this.networkGrp, method: this.method, pkeys: this.pkeys, fkeys: this.fkeys, roles: this.roles, name: this.name, description: this.description, receives: this.receives, returns: this.returns]
 	}
 
 }

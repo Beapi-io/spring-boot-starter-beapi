@@ -26,6 +26,7 @@ import io.beapi.api.service.TraceExchangeService
 
 //import io.beapi.api.service.IoStateService
 //import io.beapi.api.properties.ApiProperties
+
 import io.beapi.api.service.PrincipleService
 import io.beapi.api.service.TraceCacheService
 import io.beapi.api.service.TraceService
@@ -98,6 +99,7 @@ public class BeapiServiceAutoConfiguration {
 	public PrincipleService principleService() throws IOException {
 		return new PrincipleService();
 	}
+
 
 	@Bean
 	@ConditionalOnMissingBean

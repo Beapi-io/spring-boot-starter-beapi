@@ -147,8 +147,8 @@ public class BatchExchangeService extends ApiExchange{
 			this.defaultAction = temp['defaultAction']
 			this.deprecated = temp['deprecated'] as List
 			this.apiObject = temp[this.action]
-			this.handler = this.apiObject['handler']
-			request.getSession().setAttribute('handler',this.handler)
+			//this.handler = this.apiObject['handler']
+			//request.getSession().setAttribute('handler',this.handler)
 			this.receives = this.apiObject.getReceives()
 			//this.receivesAuths = this.receives.keySet()
 			this.rturns = this.apiObject['returns'] as LinkedHashMap

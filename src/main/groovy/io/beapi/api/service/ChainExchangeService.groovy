@@ -143,7 +143,7 @@ public class ChainExchangeService extends ApiExchange{
 		this.chainParams = request.getSession().getAttribute('chainParams')
 
 		if (this.chainOrder.size()!=this.chainSize) {
-			['returnsList','uriList','handler'].each {
+			['returnsList','uriList'].each {
 				request.getSession().removeAttribute(it)
 			}
 			// reinitializationg for forward
@@ -156,8 +156,8 @@ public class ChainExchangeService extends ApiExchange{
 			this.deprecated = temp['deprecated'] as List
 
 			this.apiObject = temp[this.action]
-			this.handler = this.apiObject['handler']
-			request.getSession().setAttribute('handler',this.handler)
+			//this.handler = this.apiObject['handler']
+			//request.getSession().setAttribute('handler',this.handler)
 			this.receives = this.apiObject.getReceives()
 			this.rturns = this.apiObject['returns'] as LinkedHashMap
 			this.returnsAuths = this.rturns.keySet()
@@ -194,8 +194,8 @@ public class ChainExchangeService extends ApiExchange{
 			this.defaultAction = temp['defaultAction']
 			this.deprecated = temp['deprecated'] as List
 			this.apiObject = temp[this.action]
-			this.handler = this.apiObject['handler']
-			request.getSession().setAttribute('handler',this.handler)
+			//this.handler = this.apiObject['handler']
+			//request.getSession().setAttribute('handler',this.handler)
 			this.receives = this.apiObject.getReceives()
 			this.rturns = this.apiObject['returns'] as LinkedHashMap
 			this.returnsAuths = this.rturns.keySet()
@@ -268,8 +268,8 @@ public class ChainExchangeService extends ApiExchange{
 					String newCont = pathuri[0].uncapitalize()
 					String newAct = pathuri[1]
 
-					request.getSession()removeAttribute('controller')
-					request.getSession()removeAttribute('action')
+					request.getSession().removeAttribute('controller')
+					request.getSession().removeAttribute('action')
 					request.getSession().setAttribute('controller',pathuri[0].uncapitalize())
 					request.getSession().setAttribute('action',pathuri[1])
 

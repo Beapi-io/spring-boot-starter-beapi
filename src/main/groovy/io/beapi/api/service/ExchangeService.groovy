@@ -52,16 +52,22 @@ public class ExchangeService extends ApiExchange{
     // [REQUEST]
     boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority){
         initVars(request,response,authority)
-		if(!validateMethod()){
-			writeErrorResponse(response,'405',request.getRequestURI());
-		}
+
         //parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(),uList[7])
         // routing call to controller
-        return true
+
+		if(!validateMethod()){
+			writeErrorResponse(response,'405',request.getRequestURI());
+			return false
+		}else{
+			return true
+		}
+
     }
 
     void apiResponse(HttpServletResponse response,ArrayList body){
         String output = parseOutput(body, responseFileType)
+
         if(method=='GET') {
             apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
         }
@@ -101,15 +107,15 @@ public class ExchangeService extends ApiExchange{
 		// TODO : set 'max'
 		// TODO : set 'offset'
 
+
 		try {
 			//this.appVersion = request.getSession().getAttribute('version')
-
 			def temp = cache[this.apiversion]
 			this.defaultAction = temp['defaultAction']
 			this.deprecated = temp['deprecated'] as List
 			this.apiObject = temp[this.action]
-			this.handler = this.apiObject['handler']
-			request.getSession().setAttribute('handler',this.handler)
+			//this.handler = this.apiObject['handler']
+			//request.getSession().setAttribute('handler', this.handler)
 			this.receives = this.apiObject.getReceives()
 			//this.receivesAuths = this.receives.keySet()
 			this.rturns = this.apiObject['returns'] as LinkedHashMap
@@ -121,6 +127,7 @@ public class ExchangeService extends ApiExchange{
 		} catch (Exception e) {
 			throw new Exception("[ExchangeObject :: init] : Exception. full stack trace follows:", e)
 		}
+
 	}
 
 	// Todo : Move to exchangeService??

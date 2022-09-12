@@ -151,9 +151,9 @@ class ApiCacheService{
 			//cache["${apiversion}"][methodname]['stats'] = [] // [[code:200,cnt:56,time:123456789]]
 
 			// can only be generated upon first being called
-			//cache[apiversion][methodname]['doc'] = generateApiDoc(controllername, methodname,apiversion,cache)
-			//cache[apiversion][methodname]['doc']['hookRoles'] = cache[apiversion][methodname]['hookRoles']
-			//cache[apiversion][methodname]['doc']['batchRoles'] = cache[apiversion][methodname]['batchRoles']
+			cache[apiversion][methodname]['doc'] = generateApiDoc(controllername, methodname,apiversion,cache)
+			cache[apiversion][methodname]['doc']['hookRoles'] = cache[apiversion][methodname]['hookRoles']
+			cache[apiversion][methodname]['doc']['batchRoles'] = cache[apiversion][methodname]['batchRoles']
 
 			return cache
 		}catch(Exception e){
@@ -257,7 +257,7 @@ class ApiCacheService{
 	 */
 	LinkedHashMap generateApiDoc(String controllername, String actionname, String apiversion){
 		//logger.debug("generateApiDoc(String, String, String) : {}","${controllername}/${actionname}/v${apiversion}")
-		println('### generateApiDoc')
+
 		try{
 			LinkedHashMap doc = [:]
 			LinkedHashMap cache = getApiCache(controllername)
@@ -268,7 +268,6 @@ class ApiCacheService{
 			if(cache){
 				String path = "/${apiversion}/${controllername}/${actionname}"
 				doc = ['path':path,'method':cache[apiversion][actionname]['method'],'description':cache[apiversion][actionname]['description']]
-				println('doc:'+doc)
 				if(cache[apiversion][actionname]['receives']){
 					doc['receives'] = [:]
 					for(receiveVal in cache[apiversion][actionname]['receives']){
@@ -313,7 +312,7 @@ class ApiCacheService{
 				}
 
 			}
-			println('doc:'+doc)
+
 			return doc
 		}catch(Exception e){
 			throw new Exception("[ApiCacheService :: generateApiDoc] : Exception - full stack trace follows:",e)
@@ -348,7 +347,7 @@ class ApiCacheService{
 	 * Method to load the list of all object contained in the 'ApiCache' cache
 	 * @return A List of keys of all object names contained with the 'ApiCache'
 	 */
-	List<String> getCacheKeys(){
+	ArrayList<String> getCacheKeys(){
 		//logger.debug("getCacheKeys() : {}")
 		//cacheManager.setTransactionAware(false);
 		net.sf.ehcache.Ehcache temp = cacheManager.getCache('ApiCache').getNativeCache()

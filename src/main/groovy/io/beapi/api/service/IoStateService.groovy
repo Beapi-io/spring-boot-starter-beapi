@@ -18,6 +18,8 @@ package io.beapi.api.service
 
 
 import groovy.json.JsonSlurper
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ClassPathResource;
 import org.json.JSONObject
 import io.beapi.api.properties.ApiProperties
 import io.beapi.api.utils.ParamsDescriptor
@@ -31,8 +33,11 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.bind.annotation.RequestMethod
 
+import java.lang.reflect.UndeclaredThrowableException
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 
@@ -50,7 +55,7 @@ public class IoStateService{
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(IoStateService.class);
 
-	public IoStateService(ApiProperties apiProperties, ApplicationContext applicationContext, ApiCacheService apiCacheService, String version) {
+	public IoStateService(ApiProperties apiProperties, ApplicationContext applicationContext, ApiCacheService apiCacheService, String version)  throws Exception {
 		ApplicationContext ctx
 		this.version = version
 		try {
@@ -68,7 +73,7 @@ public class IoStateService{
 	}
 
 
-	private String getVersion() throws IOException {
+	private String getVersion(){
 		ClassLoader classLoader = getClass().getClassLoader();
 		URL incoming = classLoader.getResource("META-INF/build-info.properties")
 
@@ -102,28 +107,42 @@ public class IoStateService{
 				projDir += it+'/'
 			}
 
-			// first detect if dir exists and if not create it
-			//def iostateSrc = new File("${baseDir}/src/groovy/${projDir}iostate")
-			//def apiObjectFile = new File("${apiObjectSrc}")
-
-
-			//def ctx = applicationContext.getServletContext()
-			//ctx.setInitParameter("dispatchOptionsRequest", "true");
-
-			//doInitApiFrameworkInstall(applicationContext)
-
-			//def statsService = applicationContext.getBean('statsService')
-			//statsService.flushAllStatsCache()
-
 			parseFiles(apiObjectSrc.toString())
+
 		}catch(Exception e){
 			println("# IoStateService - initIoStateDir Exception - ${e}")
 			System.exit(0)
 		}
+
+		parseResource("Static.json")
 		//this.testLoadOrder = testAutomationService.createTestOrder()
 	}
 
-	private void parseFiles(String path){
+	private void parseResource(String path) throws IOException, UndeclaredThrowableException, IllegalArgumentException{
+		logger.debug("parseResource : {}")
+		LinkedHashMap methods = [:]
+
+		InputStream in = this.getClass().getClassLoader().getResourceAsStream(path);
+		String text = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)) .lines().collect(Collectors.joining("\n"));
+
+		if (text == null) {
+			throw new IllegalArgumentException("file not found! " + path);
+		} else {
+			def slurp = new JsonSlurper().parseText(text)
+			LinkedHashMap json = toToLinkedHashMap(slurp)
+			println(json)
+
+			try{
+				methods[json.NAME.toString()] = parseJson(json.NAME.toString(), json)
+				// Store these in cache
+			}catch(java.lang.reflect.UndeclaredThrowableException e){
+				println("#### [IoStateService] UndeclaredThrowableException :"+e)
+			}
+		}
+
+	}
+
+	private void parseFiles(String path) throws Exception{
 		logger.debug("parseFiles : {}")
 		LinkedHashMap methods = [:]
 
@@ -157,7 +176,6 @@ public class IoStateService{
 						} else {
 							logger.debug("parseFiles : {}","[Bad File Type ( ${tmp[1]} )] - Ignoring file : ${fileName}")
 						}
-
 				}
 			}
 
@@ -166,13 +184,13 @@ public class IoStateService{
 		}
 	}
 
-	LinkedHashMap parseJson(String apiName,LinkedHashMap json){
+	LinkedHashMap parseJson(String apiName,LinkedHashMap json) throws Exception{
 		logger.debug("parseJson : {}")
 
 		LinkedHashMap methods = [:]
 
-		String handler = json['HANDLER']
-		String networkGrp = json['NETWORKGRP']
+		String type = (json['TYPE'])?json['TYPE']:'controller'
+		String networkGrp = (json['NETWORKGRP'])?json['NETWORKGRP']:'public'
 
 
 		// TODO ; BOOTSTRAP TESTUSER AND ADD VARIABLE TO ALL IOSTATE FILES
@@ -256,7 +274,7 @@ public class IoStateService{
 
 					// TODO
 					try {
-						apiDescriptor = createApiDescriptor(handler, networkGrp, apiName, apiMethod, apiDescription, apiRoles, batchRoles, hookRoles, actionname, vals, apiVersion)
+						apiDescriptor = createApiDescriptor(type, networkGrp, apiName, apiMethod, apiDescription, apiRoles, batchRoles, hookRoles, actionname, vals, apiVersion)
 					} catch (Exception e) {
 						println("unable to create ApiDescriptor. Check your IO State Formatting  : " + e)
 					}
@@ -312,11 +330,11 @@ public class IoStateService{
 				cache["${versKey}"].each(){ key1,val1 ->
 					if(!['deprecated','defaultAction','testOrder'].contains(key1)){
 
-						try {
+						//try {
 							apiCacheService.setApiCache(apiName, key1, val1, versKey)
-						}catch(Exception e){
-							println("#### IoStateService Exception2 : "+e)
-						}
+						//}catch(Exception e){
+						//	println("#### IoStateService Exception2 : "+e)
+						//}
 
 						//apiCacheService.setApiCache(apiName,key1, val1, versKey)
 
@@ -332,7 +350,7 @@ public class IoStateService{
 		return methods
 	}
 
-	protected ApiDescriptor createApiDescriptor(String handler,String networkGrp, String apiname, String apiMethod, String apiDescription, ArrayList apiRoles, LinkedHashSet batchRoles, LinkedHashSet hookRoles, String uri, LinkedHashMap vals, LinkedHashMap json){
+	protected ApiDescriptor createApiDescriptor(String type, String networkGrp, String apiname, String apiMethod, String apiDescription, ArrayList apiRoles, LinkedHashSet batchRoles, LinkedHashSet hookRoles, String uri, LinkedHashMap vals, LinkedHashMap json) throws Exception{
 		logger.debug("createApiDescriptor : {}")
 
 		LinkedHashMap<String, ParamsDescriptor> apiObject = new LinkedHashMap()
@@ -417,13 +435,13 @@ public class IoStateService{
 		}
 
 		// lookup controller for 'handler'
-		try {
-			Class.forName(handler)
-		}catch(Exception e){
-			throw new Error("#### [IoStateService : createApiDescriptor] : Handler '${handler}' does not exist : Skipping endpoint creation for '${apiname}'",e)
-		}
+		//try {
+		//	Class.forName(handler)
+		//}catch(Exception e){
+		//	throw new Error("#### [IoStateService : createApiDescriptor] : Handler '${handler}' does not exist : Skipping endpoint creation for '${apiname}'",e)
+		//}
 
-		ApiDescriptor service = new ApiDescriptor(handler, networkGrp, apiMethod, pkeys, fkeys, apiRoles, apiname, apiDescription, receives, returns)
+		ApiDescriptor service = new ApiDescriptor(type, networkGrp, apiMethod, pkeys, fkeys, apiRoles, apiname, apiDescription, receives, returns)
 
 		// override networkRoles with 'DEFAULT' in IO State
 
@@ -542,7 +560,7 @@ public class IoStateService{
 	}
 
 
-	boolean validateRpcNamingConventions(ApplicationContext applicationContext,String version) {
+	boolean validateRpcNamingConventions(ApplicationContext applicationContext,String version) throws Exception {
 		try {
 			boolean result = true
 			ArrayList reservedControllerNames = ['authenticate', 'register', 'error', 'jwtAuthentication']

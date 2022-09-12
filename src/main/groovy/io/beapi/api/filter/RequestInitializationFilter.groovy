@@ -35,12 +35,17 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component
 import org.slf4j.LoggerFactory
 
+import java.lang.reflect.Method
 import java.nio.charset.StandardCharsets
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import io.beapi.api.utils.ApiDescriptor
 import org.apache.commons.io.IOUtils
 import com.google.common.hash.Hashing
+
+import org.springframework.beans.factory.BeanFactoryUtils
+import org.springframework.web.servlet.HandlerMapping
+
 
 /**
  * This class parses the URI attributes on initial request  &
@@ -60,6 +65,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
     @Autowired
     ApplicationContext ctx
+
 
     PrincipleService principle
     ApiCacheService apiCacheService
@@ -91,6 +97,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     String authority
     ArrayList deprecated
     String action
+    String handlerType
 
 
     public RequestInitializationFilter(PrincipleService principle, ApiProperties apiProperties, ApiCacheService apiCacheService, String version, ApplicationContext ctx) {
@@ -128,17 +135,36 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         //logger.debug("doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : {}");
+
         //this.networkGrpRoles = apiProperties.security.networkRoles
+
+        request.getSession().removeAttribute('handler')
+        request.getSession().removeAttribute('handlerName')
+        HandlerMapping handlerMappings = BeanFactoryUtils.beansOfTypeIncludingAncestors(this.ctx, HandlerMapping.class, true, false).get("simpleUrlHandlerMapping");
 
         this.authority = this.principle.authorities()
         this.uri = request.getRequestURI()
-        this.method = request.getMethod()
-        this.reservedUri = (apiProperties.reservedUris.contains(this.uri))?true:false
-        request.setAttribute('cores',this.cores)
         this.uriList = setUri(this.uri, this.version)
         request.setAttribute('uriList',uriList)
 
-        //if(uriList[4]!='apidoc') {
+        request.setAttribute('cores',this.cores)
+
+        def test  = handlerMappings.getHandler(request)?.getHandler()
+        String handler = test?.class?.getName()
+        String handlerName = test?.class?.getSimpleName()
+        String shortName = this.uriList[4].capitalize()+"Controller"
+
+        try{
+
+            if(test && shortName==handlerName) {
+                // controller naming
+                request.getSession().setAttribute('handler', handler)
+                request.getSession().setAttribute('handlerName', handlerName)
+            }
+
+            this.method = request.getMethod()
+            this.reservedUri = (apiProperties.reservedUris.contains(this.uri))?true:false
+
             // get apiObject
             def cache = apiCacheService.getApiCache(uriList[4])
             def temp = cache[uriList[3]]
@@ -150,6 +176,13 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
             if (cache) {
                 this.apiObject = temp[uriList[5]]
+
+                String handlerType = this.apiObject.getType()
+                if(request.getAttribute('handlerType')){
+                    request.removeAttribute('handlerType')
+                }
+                request.setAttribute('handlerType', handlerType)
+
                 this.receives = this.apiObject.getReceives()
                 this.rturns = this.apiObject['returns'] as LinkedHashMap
 
@@ -180,20 +213,19 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Request params do not match expect params for '${uri}'")
                 }
 
-
                 if (!checkRequestParams(request.getSession().getAttribute('params'))) {
                     writeErrorResponse(response, '400', request.getRequestURI());
                 }
 
-
                 // todo : test requestEncoding against apiProperties.encoding
-
             }
-        //}else{
-        //    println('calling apidoc...{1}')
-        //}
-        processFilterChain(request, response, chain)
 
+
+        } catch (Exception e) {
+            throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
+        }
+
+        processFilterChain(request, response, chain)
     }
 
 
@@ -201,52 +233,50 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     private void processFilterChain(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
         //ArrayList headers = Collections.list(request.getHeaderNames()).stream().collect(Collectors.toMap(Function.identity()), h -> Collections.list(request.getHeaders(h))))
 
-        if (this.uriList[4] != 'apidoc') {
-            if (this.apiObject) {
-                // todo : create public api list
-                if (this.method == 'GET') {
 
-                    setCacheHash(request.getSession().getAttribute('params'), this.receivesList)
+        if (this.apiObject) {
+            // todo : create public api list
+            if (this.method == 'GET') {
 
-                    // RETRIEVE CACHED RESULT (only if using 'GET' method)
-                    if ((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}" || apiObject?.cachedResult?."permitAll"?."${responseFileType}"?."${cacheHash}")) {
-                        String cachedResult
-                        try {
-                            cachedResult = (apiObject['cachedResult'][authority]) ? apiObject['cachedResult'][authority][responseFileType][cacheHash] : apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
-                        } catch (Exception e) {
-                            throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
-                        }
+                setCacheHash(request.getSession().getAttribute('params'), this.receivesList)
 
-                        if (cachedResult && cachedResult.size() > 0) {
-                            // PLACEHOLDER FOR APITHROTTLING
-                            response.setStatus(200);
-                            PrintWriter writer = response.getWriter();
-                            writer.write(cachedResult);
-                            writer.close()
-                            //response.writer.flush()
-                            //return false
-                        } else {
-                            chain.doFilter(request, response)
-                        }
-                    } else {
-                        /*
-                    if (deprecated) {
-                        boolean newresult = validateDeprecationDate(deprecated)
-                        if (newresult) {
-                            return newresult
-                        }
+                // RETRIEVE CACHED RESULT (only if using 'GET' method)
+                if ((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}" || apiObject?.cachedResult?."permitAll"?."${responseFileType}"?."${cacheHash}")) {
+                    String cachedResult
+                    try {
+                        cachedResult = (apiObject['cachedResult'][authority]) ? apiObject['cachedResult'][authority][responseFileType][cacheHash] : apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
+                    } catch (Exception e) {
+                        throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
                     }
 
-                     */
+                    if (cachedResult && cachedResult.size() > 0) {
+                        // PLACEHOLDER FOR APITHROTTLING
+                        response.setStatus(200);
+                        PrintWriter writer = response.getWriter();
+                        writer.write(cachedResult);
+                        writer.close()
+                        //response.writer.flush()
+                        //return false
+                    } else {
                         chain.doFilter(request, response)
                     }
                 } else {
+                    /*
+                if (deprecated) {
+                    boolean newresult = validateDeprecationDate(deprecated)
+                    if (newresult) {
+                        return newresult
+                    }
+                }
+
+                 */
                     chain.doFilter(request, response)
                 }
+            } else {
+                chain.doFilter(request, response)
             }
-        }else{
-            chain.doFilter(request, response)
         }
+
     }
 
     /*
@@ -449,7 +479,9 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         if(pairs) {
             pairs.each() { it ->
                 int idx = it.indexOf("=");
-                output.put(URLDecoder.decode(it.substring(0, idx), "UTF-8"), URLDecoder.decode(it.substring(idx + 1), "UTF-8"));
+                String key = URLDecoder.decode(it.substring(0, idx).toString(), "UTF-8");
+                String val = URLDecoder.decode(it.substring(idx + 1).toString(), "UTF-8");
+                output[key] = val;
             }
         }
         if(Objects.nonNull(id)){ output['id'] = id.toString() }

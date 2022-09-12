@@ -92,6 +92,7 @@ class ApiInterceptor implements HandlerInterceptor{
 	ArrayList privateRoles = []
 	int callType
 
+
 	public ApiInterceptor(ExchangeService exchangeService, BatchExchangeService batchService, ChainExchangeService chainService, TraceExchangeService traceService,PrincipleService principle, ApiProperties apiProperties) {
 		this.principle = principle
 		this.exchangeService = exchangeService
@@ -106,23 +107,21 @@ class ApiInterceptor implements HandlerInterceptor{
 		//if (request.getDispatcherType() != DispatcherType.REQUEST) {
 		//	return true;
 		//}
-
 		//logger.info("preHandle(HttpServletRequest, HttpServletResponse, Object) : {}");
 
 		privateRoles = apiProperties.security.networkRoles['private'].collect() { k, v -> v }
 		this.uList = request.getAttribute('uriList')
+
 		this.callType = uList[0]
 		this.authority = principle.authorities()
 
 		switch(callType){
 			case 1:
-				exchangeService.apiRequest(request, response, this.authority)
-				return true
+				return exchangeService.apiRequest(request, response, this.authority)
 				break
 			case 2:
 				if(apiProperties.batchingEnabled) {
-					batchService.batchRequest(request, response, this.authority)
-					return true
+					return batchService.batchRequest(request, response, this.authority)
 				}else{
 					writeErrorResponse(response,'401',request.getRequestURI())
 					response.writer.flush()
@@ -131,8 +130,7 @@ class ApiInterceptor implements HandlerInterceptor{
 				break
 			case 3:
 				if(apiProperties.chainingEnabled) {
-					chainService.chainRequest(request, response, this.authority)
-					return true
+					return chainService.chainRequest(request, response, this.authority)
 				}else{
 					writeErrorResponse(response,'401',request.getRequestURI())
 					response.writer.flush()
@@ -148,8 +146,7 @@ class ApiInterceptor implements HandlerInterceptor{
 			//	break
 			case 5:
 				if(privateRoles.contains(authority)) {
-					traceExchangeService.apiRequest(request, response, this.authority)
-					return true
+					return traceExchangeService.apiRequest(request, response, this.authority)
 				}
 				break
 			default:
@@ -157,15 +154,14 @@ class ApiInterceptor implements HandlerInterceptor{
 				response.writer.flush()
 				return false
 		}
-		return true
 	}
 
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mv) throws Exception {
-
 		//logger.info("postHandle(HttpServletRequest, HttpServletResponse, Object, ModelAndView) : {}")
-
 		ArrayList body = request.getSession().getAttribute('responseBody')
+
+
 		if(!body){
 			writeErrorResponse(response,'422',request.getRequestURI(),'No data returned for this call.')
 		}else {
