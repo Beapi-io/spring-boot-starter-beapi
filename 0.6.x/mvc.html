@@ -255,19 +255,19 @@
             <!-- colors -->
             <section id="section-2">
               <h2 class="section-title-2">The Controllers<a data-scroll href="#section-2" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
-              <p>When building a controller class, you require only two things : a <b>@Controller</b> annotation and to implement the <b>BeapiRequestHandler</b> class : </p>
+              <p>When building a controller class, you require only two things : a <b>@Controller</b> annotation and to 'extend'' the <b>BeapiRequestHandler</b> class : </p>
               <div class="row">
                 <div class="col">
                   <div class="card">
                     <div class="card-body" style="background-color:#000;">
-                      <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">import io.beapi.api.controller.BeapiController;
+                      <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">import io.beapi.api.controller.BeapiRequestHandler;
 import org.springframework.stereotype.Controller;
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller("your")
-public class YourController extends BeapiController {
+public class YourController extends BeapiRequestHandler {
                       ...
 }</code></pre>
                     </div>
