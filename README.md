@@ -36,7 +36,7 @@ dependencies {
 
 **Getting a Token and calling your api** - 
 
-This will get you your BEARER token to use in your calls/app:
+Using the [Java-demo implementation](https://github.com/Beapi-io/beapi-java-demo), this will get you your BEARER token to use in your calls/app:
 ```
 curl -v -H "Content-Type: application/json" -X POST -d '{"username":"admin","password":"@6m!nP@s5"}' http://localhost:8080/authenticate
 ```
