@@ -82,7 +82,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
  - (IMPLEMENTING)adding in handling for ROLE_ANONYMOUS
    - (IMPLEMENTING)'public' networkGrp accessible by persons without 'token'; principle assigned 'ROLE_ANONYMOUS'
  
- ## 0.6 (TASK LIST) - (projected release Feb/2023)
+ ## 0.6 - (projected release Feb/2023)
   - API AUTOMATION
     - automated apidocs (DONE)
     - automated webhooks
