@@ -79,8 +79,8 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
  - adding automated role-based apidocs; role based so user only sees docs they have access too (OWASP API COMPLIANT)
  - updating mapping to automate CORS whitelisting from beapi_api.yml
    - simplifying mapping in config
- - adding in handling for ROLE_ANONYMOUS
-   - 'public' networkGrp accessible by persons without 'token'; principle assigned 'ROLE_ANONYMOUS'
+ - (IMPLEMENTING)adding in handling for ROLE_ANONYMOUS
+   - (IMPLEMENTING)'public' networkGrp accessible by persons without 'token'; principle assigned 'ROLE_ANONYMOUS'
  
  ## 0.6 (TASK LIST) - (projected release Feb/2023)
   - API AUTOMATION
