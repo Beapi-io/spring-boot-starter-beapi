@@ -98,6 +98,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     ArrayList deprecated
     String action
     String handlerType
+    ArrayList networkGrps = []
 
 
     public RequestInitializationFilter(PrincipleService principle, ApiProperties apiProperties, ApiCacheService apiCacheService, String version, ApplicationContext ctx) {
@@ -119,9 +120,9 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         //logger.debug("shouldNotFilter(HttpServletRequest) : {}");
-        if(apiProperties.reservedUris.contains(request.getRequestURI())) {
-            return true
-        }
+       // if(apiProperties.reservedUris.contains(request.getRequestURI())) {
+        //    return true
+        //}
 
         return false
     }
@@ -136,152 +137,171 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         //logger.debug("doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : {}");
 
-        //this.networkGrpRoles = apiProperties.security.networkRoles
-
-        request.getSession().removeAttribute('handler')
-        request.getSession().removeAttribute('handlerName')
-        HandlerMapping handlerMappings = BeanFactoryUtils.beansOfTypeIncludingAncestors(this.ctx, HandlerMapping.class, true, false).get("simpleUrlHandlerMapping");
-
-        this.authority = this.principle.authorities()
         this.uri = request.getRequestURI()
-        this.uriList = setUri(this.uri, this.version)
-        request.setAttribute('uriList',uriList)
 
-        request.setAttribute('cores',this.cores)
+        if(apiProperties.reservedUris.contains(request.getRequestURI())) {
+            ArrayList uriVars = uri.split('/')
+            this.controller = uriVars[0]
+        }else{
+            request.getSession().removeAttribute('handler')
+            request.getSession().removeAttribute('handlerName')
 
-        def test  = handlerMappings.getHandler(request)?.getHandler()
-        String handler = test?.class?.getName()
-        String handlerName = test?.class?.getSimpleName()
-        String shortName = this.uriList[4].capitalize()+"Controller"
+            this.authority = this.principle.authorities()
+            this.uriList = setUri(this.uri, this.version)
 
-        try{
+            HandlerMapping handlerMappings = BeanFactoryUtils.beansOfTypeIncludingAncestors(this.ctx, HandlerMapping.class, true, false).get("simpleUrlHandlerMapping");
+            def test = handlerMappings.getHandler(request)?.getHandler()
+            String handler = test?.class?.getName()
+            String handlerName = test?.class?.getSimpleName()
+            String shortName = this.uriList[4].capitalize() + "Controller"
 
-            if(test && shortName==handlerName) {
-                // controller naming
-                request.getSession().setAttribute('handler', handler)
-                request.getSession().setAttribute('handlerName', handlerName)
+            request.setAttribute('uriList', uriList)
+            request.setAttribute('cores', this.cores)
+
+            try {
+                // make sure they exist as handler and in IO state
+                if (test && shortName == handlerName) {
+                    request.getSession().setAttribute('handler', handler)
+                    request.getSession().setAttribute('handlerName', handlerName)
+                }
+
+                this.method = request.getMethod()
+                this.reservedUri = (apiProperties.reservedUris.contains(this.uri)) ? true : false
+
+                // get apiObject
+                def cache = apiCacheService.getApiCache(uriList[4])
+                def temp = cache[uriList[3]]
+
+                //String defaultAction = (temp['defaultAction'])?temp['defaultAction']:'error'
+                //this.action = (uriList[5])?uriList[5]:defaultAction
+
+                this.deprecated = temp['deprecated'] as List
+
+                if (cache) {
+                    this.apiObject = temp[uriList[5]]
+
+                    String handlerType = this.apiObject.getType()
+                    if (request.getAttribute('handlerType')) { request.removeAttribute('handlerType') }
+                    request.setAttribute('handlerType', handlerType)
+
+                    this.receives = this.apiObject.getReceives()
+                    this.rturns = this.apiObject['returns'] as LinkedHashMap
+
+                    String networkGrp = this.apiObject['networkGrp']
+                    ArrayList networkRoles = this.networkGrpRoles[networkGrp].collect() { k, v -> v }
+                    LinkedHashMap corsNetworkGroups = apiProperties.security.corsNetworkGroups
+
+                    corsNetworkGroups[networkGrp].each { k, v -> this.networkGrps.add(v) }
+
+                    String temp2 = (request.getHeader('Accept') != null) ? request.getHeader('Accept') : request.getContentType()
+                    ArrayList tempMimeType = temp2.split(';')
+                    String requestMimeType = tempMimeType[0]
+                    String requestEncoding = tempMimeType[1]
+
+                    this.requestFileType = (SUPPORTED_MIME_TYPES.contains(requestMimeType)) ? getFormat(requestMimeType) : 'JSON'
+                    this.responseFileType = (this.requestFileType) ? this.requestFileType : getFormat(responseMimeType)
+                    String responseMimeType = requestMimeType
+
+                    request.setAttribute('responseMimeType', responseFileType)
+                    request.setAttribute('responseFileType', responseFileType)
+
+                    parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(), uriList[7])
+
+                    //validateMethod()
+                    if (checkNetworkGrp(networkRoles, this.authority)) {
+                        setReceivesList(request)
+                        setReturnsList(request)
+                    } else {
+                        throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Request params do not match expect params for '${uri}'")
+                    }
+
+                    if (!checkRequestParams(request.getSession().getAttribute('params'))) {
+                        writeErrorResponse(response, '400', request.getRequestURI());
+                    }
+
+                    // todo : test requestEncoding against apiProperties.encoding
+                }
+            } catch (Exception e) {
+                throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
             }
 
-            this.method = request.getMethod()
-            this.reservedUri = (apiProperties.reservedUris.contains(this.uri))?true:false
+            if (this.apiObject) {
+                // todo : create public api list
+                if (this.method == 'GET') {
 
-            // get apiObject
-            def cache = apiCacheService.getApiCache(uriList[4])
-            def temp = cache[uriList[3]]
+                    setCacheHash(request.getSession().getAttribute('params'), this.receivesList)
 
-            //String defaultAction = (temp['defaultAction'])?temp['defaultAction']:'error'
-            //this.action = (uriList[5])?uriList[5]:defaultAction
+                    // RETRIEVE CACHED RESULT (only if using 'GET' method)
+                    if ((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}" || apiObject?.cachedResult?."permitAll"?."${responseFileType}"?."${cacheHash}")) {
+                        String cachedResult
+                        try {
+                            cachedResult = (apiObject['cachedResult'][authority]) ? apiObject['cachedResult'][authority][responseFileType][cacheHash] : apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
+                        } catch (Exception e) {
+                            throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
+                        }
 
-            this.deprecated = temp['deprecated'] as List
-
-            if (cache) {
-                this.apiObject = temp[uriList[5]]
-
-                String handlerType = this.apiObject.getType()
-                if(request.getAttribute('handlerType')){
-                    request.removeAttribute('handlerType')
+                        if (cachedResult && cachedResult.size() > 0) {
+                            // PLACEHOLDER FOR APITHROTTLING
+                            response.setStatus(200);
+                            PrintWriter writer = response.getWriter();
+                            writer.write(cachedResult);
+                            writer.close()
+                            //response.writer.flush()
+                            //return false
+                        }
+                    }
                 }
-                request.setAttribute('handlerType', handlerType)
-
-                this.receives = this.apiObject.getReceives()
-                this.rturns = this.apiObject['returns'] as LinkedHashMap
-
-                String networkGrp = this.apiObject['networkGrp']
-                ArrayList networkRoles = this.networkGrpRoles[networkGrp].collect() { k, v -> v }
-
-
-                String temp2 = (request.getHeader('Accept') != null) ? request.getHeader('Accept') : request.getContentType()
-                ArrayList tempMimeType = temp2.split(';')
-                String requestMimeType = tempMimeType[0]
-                String requestEncoding = tempMimeType[1]
-
-                this.requestFileType = (SUPPORTED_MIME_TYPES.contains(requestMimeType)) ? getFormat(requestMimeType) : 'JSON'
-
-                this.responseFileType = (this.requestFileType) ? this.requestFileType : getFormat(responseMimeType)
-                String responseMimeType = requestMimeType
-
-                request.setAttribute('responseMimeType', responseFileType)
-                request.setAttribute('responseFileType', responseFileType)
-
-                parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(), uriList[7])
-
-                //validateMethod()
-                if (checkNetworkGrp(networkRoles, this.authority)) {
-                    setReceivesList(request)
-                    setReturnsList(request)
-                } else {
-                    throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Request params do not match expect params for '${uri}'")
-                }
-
-                if (!checkRequestParams(request.getSession().getAttribute('params'))) {
-                    writeErrorResponse(response, '400', request.getRequestURI());
-                }
-
-                // todo : test requestEncoding against apiProperties.encoding
             }
-
-
-        } catch (Exception e) {
-            throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
         }
 
         processFilterChain(request, response, chain)
     }
 
 
-    @CompileDynamic
     private void processFilterChain(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
         //ArrayList headers = Collections.list(request.getHeaderNames()).stream().collect(Collectors.toMap(Function.identity()), h -> Collections.list(request.getHeaders(h))))
 
+        boolean options = ('OPTIONS'==request.method.toUpperCase())
 
-        if (this.apiObject) {
-            // todo : create public api list
-            if (this.method == 'GET') {
-
-                setCacheHash(request.getSession().getAttribute('params'), this.receivesList)
-
-                // RETRIEVE CACHED RESULT (only if using 'GET' method)
-                if ((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}" || apiObject?.cachedResult?."permitAll"?."${responseFileType}"?."${cacheHash}")) {
-                    String cachedResult
-                    try {
-                        cachedResult = (apiObject['cachedResult'][authority]) ? apiObject['cachedResult'][authority][responseFileType][cacheHash] : apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
-                    } catch (Exception e) {
-                        throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
-                    }
-
-                    if (cachedResult && cachedResult.size() > 0) {
-                        // PLACEHOLDER FOR APITHROTTLING
-                        response.setStatus(200);
-                        PrintWriter writer = response.getWriter();
-                        writer.write(cachedResult);
-                        writer.close()
-                        //response.writer.flush()
-                        //return false
-                    } else {
-                        chain.doFilter(request, response)
-                    }
-                } else {
-                    /*
-                if (deprecated) {
-                    boolean newresult = validateDeprecationDate(deprecated)
-                    if (newresult) {
-                        return newresult
-                    }
-                }
-
-                 */
-                    chain.doFilter(request, response)
-                }
-            } else {
-                chain.doFilter(request, response)
+        if(!apiProperties.reservedUris.contains(request.getRequestURI())) {
+            if(!networkGrps){
+                String msg = "NETWORKGRP for IO State file :" + controller + " cannot be found. Please double check it against available NetworkGroups in the beapi_api.yml config file."
+                writeErrorResponse(response, '401', request.getRequestURI(), msg);
             }
         }
 
-    }
+        String origin = request.getHeader('Origin')
 
-    /*
-    * parse uri, set variables in arraylist to maintain order and share them in request attribute
-     */
+        if (options) {
+            response.addHeader('Allow', 'GET, HEAD, POST, PUT, DELETE, TRACE, PATCH, OPTIONS')
+            if (origin != 'null') {
+                //response.setHeader("Access-Control-Allow-Headers", "Cache-Control,  Pragma, WWW-Authenticate, Origin, X-Requested-With, authorization, Content-Type,Access-Control-Request-Headers,Access-Control-Request-Method,Access-Control-Allow-Credentials")
+                response.addHeader('Access-Control-Allow-Headers', 'Accept, Accept-Charset, Accept-Datetime, Accept-Encoding, Accept-Ext, Accept-Features, Accept-Language, Accept-Params, Accept-Ranges, Access-Control-Allow-Headers, Access-Control-Allow-Methods, Access-Control-Allow-Origin, Access-Control-Expose-Headers, Access-Control-Max-Age, Access-Control-Request-Headers, Access-Control-Request-Method, Age, Allow, Alternates, Authentication-Info, Authorization, C-Ext, C-Man, C-Opt, C-PEP, C-PEP-Info, CONNECT, Cache-Control, Compliance, Connection, Content-Base, Content-Disposition, Content-Encoding, Content-ID, Content-Language, Content-Length, Content-Location, Content-MD5, Content-Range, Content-Script-Type, Content-Security-Policy, Content-Style-Type, Content-Transfer-Encoding, Content-Type, Content-Version, Cookie, Cost, DAV, DELETE, DNT, DPR, Date, Default-Style, Delta-Base, Depth, Derived-From, Destination, Differential-ID, Digest, ETag, Expect, Expires, Ext, From, GET, GetProfile, HEAD, HTTP-date, Host, IM, If, If-Match, If-Modified-Since, If-None-Match, If-Range, If-Unmodified-Since, Keep-Alive, Label, Last-Event-ID, Last-Modified, Link, Location, Lock-Token, MIME-Version, Man, Max-Forwards, Media-Range, Message-ID, Meter, Negotiate, Non-Compliance, OPTION, OPTIONS, OWS, Opt, Optional, Ordering-Type, Origin, Overwrite, P3P, PEP, PICS-Label, POST, PUT, Pep-Info, Permanent, Position, Pragma, ProfileObject, Protocol, Protocol-Query, Protocol-Request, Proxy-Authenticate, Proxy-Authentication-Info, Proxy-Authorization, Proxy-Features, Proxy-Instruction, Public, RWS, Range, Referer, Refresh, Resolution-Hint, Resolver-Location, Retry-After, Safe, Sec-Websocket-Extensions, Sec-Websocket-Key, Sec-Websocket-Origin, Sec-Websocket-Protocol, Sec-Websocket-Version, Security-Scheme, Server, Set-Cookie, Set-Cookie2, SetProfile, SoapAction, Status, Status-URI, Strict-Transport-Security, SubOK, Subst, Surrogate-Capability, Surrogate-Control, TCN, TE, TRACE, Timeout, Title, Trailer, Transfer-Encoding, UA-Color, UA-Media, UA-Pixels, UA-Resolution, UA-Windowpixels, URI, Upgrade, User-Agent, Variant-Vary, Vary, Version, Via, Viewport-Width, WWW-Authenticate, Want-Digest, Warning, Width, xsrf-token, X-Content-Duration, X-Content-Security-Policy, X-Content-Type-Options, X-CustomHeader, X-DNSPrefetch-Control, X-Forwarded-For, X-Forwarded-Port, X-Forwarded-Proto, X-Frame-Options, X-Modified, X-OTHER, X-PING, X-PINGOTHER, X-Powered-By, X-Requested-With')
+                response.addHeader('Access-Control-Allow-Methods', 'POST, PUT, DELETE, TRACE, PATCH, OPTIONS')
+                response.addHeader('Access-Control-Expose-Headers', 'xsrf-token, Location,X-Auth-Token')
+                response.addHeader('Access-Control-Max-Age', '3600')
+            }
+        }
+
+        if (networkGrps && networkGrps.contains(origin)) {
+            request.setAttribute('CORS', true)
+            response.setHeader('Access-Control-Allow-Origin', origin)
+            response.addHeader('Access-Control-Allow-Credentials', 'true')
+        } else if (!networkGrps) { // no networkGrps??? white list all
+            // add CORS access control headers for all origins
+            if (origin) {
+                response.setHeader('Access-Control-Allow-Origin', origin)
+                response.addHeader('Access-Control-Allow-Credentials', 'true')
+            } else {
+                response.addHeader('Access-Control-Allow-Origin', '*')
+            }
+        }
+        //response.status = HttpStatus.OK.value()
+
+        if(!options ) {
+            chain.doFilter(request, response)
+        }
+    }
 
     protected String getFormat(String mimeType){
         String format
@@ -290,8 +310,8 @@ class RequestInitializationFilter extends OncePerRequestFilter{
             case 'application/json':
                 format = 'JSON'
                 break;
-            case 'application/xml':
             case 'text/xml':
+            case 'application/xml':
                 format = 'XML'
                 break;
             default:
@@ -304,7 +324,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     protected void setReceivesList(HttpServletRequest request){
         ArrayList result = []
         this.receives.each() { k, v ->
-            if(k==this.authority || k=='permitAll') {
+            if([this.authority,'permitAll'].contains(k)) {
                 v.each { it2 ->
                     if (!result.contains(it2['name'])) {
                         result.add(it2['name'])
@@ -319,7 +339,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     protected void setReturnsList(HttpServletRequest request){
         ArrayList result = []
         this.rturns.each() { k, v ->
-            if(k==this.authority || k=='permitAll') {
+            if([this.authority,'permitAll'].contains(k)) {
                 v.each() { it2 ->
                     if (!result.contains(it2['name'])) {
                         result.add(it2['name']) }
@@ -377,8 +397,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         this.cacheHash = Hashing.murmur3_32().hashString(hashString.toString(), StandardCharsets.UTF_8).toString()
     }
 
-
-
     protected boolean checkNetworkGrp(ArrayList networkRoles, String authority){
         return networkRoles.contains(authority)
     }
@@ -427,46 +445,35 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
         // set batchVars if they are present
         if(post['batchVars']){
-            if(!request.getSession().getAttribute('batchVars')) {
-                request.getSession().setAttribute('batchVars', post['batchVars'])
-            }
+            if(!request.getSession().getAttribute('batchVars')) { request.getSession().setAttribute('batchVars', post['batchVars']) }
             post.remove('batchVars')
         }
 
         if(post['chainOrder']){
-            if(!request.getSession().getAttribute('chainOrder')) {
-                request.getSession().setAttribute('chainOrder', post['chainOrder'])
-            }
+            if(!request.getSession().getAttribute('chainOrder')) { request.getSession().setAttribute('chainOrder', post['chainOrder']) }
             post.remove('chainOrder')
         }
 
         if(post['chainType']){
-            if(!request.getSession().getAttribute('chainType')) {
-                request.getSession().setAttribute('chainType', post['chainType'])
-            }
+            if(!request.getSession().getAttribute('chainType')) { request.getSession().setAttribute('chainType', post['chainType']) }
             post.remove('chainType')
         }
 
         if(post['chainKey']){
-            if(!request.getSession().getAttribute('chainKey')) {
-                request.getSession().setAttribute('chainKey', post['chainKey'])
-            }
+            if(!request.getSession().getAttribute('chainKey')) { request.getSession().setAttribute('chainKey', post['chainKey']) }
             post.remove('chainKey')
         }
 
         if(post['chainSize']){
-            if(!request.getSession().getAttribute('chainSize')) {
-                request.getSession().setAttribute('chainSize', post['chainSize'])
-            }
+            if(!request.getSession().getAttribute('chainSize')) { request.getSession().setAttribute('chainSize', post['chainSize']) }
             post.remove('chainSize')
         }
 
         if(post['chainParams']){
-            if(!request.getSession().getAttribute('chainParams')) {
-                request.getSession().setAttribute('chainParams', post['chainParams'])
-            }
+            if(!request.getSession().getAttribute('chainParams')) { request.getSession().setAttribute('chainParams', post['chainParams']) }
             post.remove('chainParams')
         }
+
         request.getSession().setAttribute('POST',post)
 
         LinkedHashMap<String,String> output = get + post
@@ -587,9 +594,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
         response.setContentType("application/json")
         response.setStatus(Integer.valueOf(statusCode))
-        if(msg.isEmpty()){
-            msg = ErrorCodes.codes[statusCode]['long']
-        }
+        if(msg.isEmpty()){ msg = ErrorCodes.codes[statusCode]['long'] }
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
         //response.writer.flush()

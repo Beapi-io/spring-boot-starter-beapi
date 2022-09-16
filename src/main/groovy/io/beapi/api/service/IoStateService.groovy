@@ -114,7 +114,7 @@ public class IoStateService{
 			System.exit(0)
 		}
 
-		parseResource("Static.json")
+		parseResource("Static.json.bkp")
 		//this.testLoadOrder = testAutomationService.createTestOrder()
 	}
 
