@@ -11,6 +11,8 @@
 
 **Documentation** - [https://beapi-io.github.io/spring-boot-starter-beapi/](https://beapi-io.github.io/spring-boot-starter-beapi/)
 
+** Demo Application** - [https://github.com/Beapi-io/beapi-java-demo](https://github.com/Beapi-io/beapi-java-demo)
+
 **Configuration Files** - https://github.com/orubel/spring-boot-starter-beapi-config (Note : Move these into your 'iostateDir' location as found in your demo-application/src/main/resources/beapi_api.yaml file)
 
 ---
@@ -63,7 +65,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
     - network groups
     - role checking
     - automated resolution for [API3:2019 Excessive Data Exposure](https://github.com/OWASP/API-Security/blob/master/2019/en/src/0xa3-excessive-data-exposure.md).
-  - DEMO APPLICATION (separate application - link TB provided)
+  - [DEMO APPLICATION](https://github.com/Beapi-io/beapi-java-demo)
     - JWT token creation and authentication 
 
 ## 0.5.1 (released: 9/3/2022)
