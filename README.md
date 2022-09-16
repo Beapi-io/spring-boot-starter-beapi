@@ -77,8 +77,8 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
    - corrected issue with reflection handler defaulting to alphabetically first handler if not found (bug in simpleUrlHandlerMapping)
    - stripped out staticMapping and using internal Controllers
  - adding automated role-based apidocs; role based so user only sees docs they have access too (OWASP API COMPLIANT)
- - updating mapping to automate CORS whitelisting from beapi_api.yml
-   - simplifying mapping in config
+ - updating mapping to automate CORS whitelisting per networkGrp
+ - simplifying mapping in config
  
  ## 0.6 - (projected release Feb/2023)
   - API AUTOMATION
