@@ -72,7 +72,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
  - removal of attributes before resetting when chaining
 
 
- ## 0.6.0-SNAPSHOT- ACTIVE CHANGELOG
+ ## 0.6.0-SNAPSHOT (ACTIVE CHANGELOG)
  - reflection for controllers/handlers added so they no longer need to be added to I/O State files
    - corrected issue with reflection handler defaulting to alphabetically first handler if not found (bug in simpleUrlHandlerMapping)
    - stripped out staticMapping and using internal Controllers
