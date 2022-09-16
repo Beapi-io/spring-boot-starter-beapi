@@ -73,7 +73,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //logger.info("handleRequest(HttpServletRequest, HttpServletResponse) : {}");
-        println("### BeapiController/handleRequest...")
 
         this.uList = request.getAttribute('uriList')
         this.uList = request.getAttribute('uriList')
@@ -100,7 +99,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
         // create method call
         try {
             //method = classObj.getMethod(this.action, HttpServletRequest.class, HttpServletResponse.class);
-            println("uri : ${this.controller}/${this.action}")
 
             method = handlerClass.getDeclaredMethod(this.action, HttpServletRequest.class, HttpServletResponse.class);
             // invoke method
@@ -286,7 +284,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
         }catch(Exception e){
             throw new Exception("[ApiExchange :: parseResponseParams] : Exception - full stack trace follows:",e)
         }
-        println("output : ${output}")
+
         return output
     }
 

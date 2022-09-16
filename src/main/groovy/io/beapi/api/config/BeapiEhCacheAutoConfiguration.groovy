@@ -96,29 +96,27 @@ public class BeapiEhCacheAutoConfiguration  implements CachingConfigurer {
             cacheConfig1.setName("ApiCache")
             cacheConfig1.eternal(true)
             cacheConfig1.overflowToDisk(true)
+            cacheConfig1.diskPersistent(true)
             cacheConfig1.diskExpiryThreadIntervalSeconds(120)
-            cacheConfig1.setMaxElementsInMemory(10000)
-            cacheConfig1.setMaxElementsOnDisk(100000)
-            cacheConfig1.maxEntriesLocalHeap(10000)
-            cacheConfig1.maxEntriesLocalDisk(100000)
-            //cacheConfig1.timeToLiveSeconds(0)
-            //cacheConfig1.timeToIdleSeconds(3000)
+            cacheConfig1.setMaxElementsInMemory(1000)
+            cacheConfig1.setMaxElementsOnDisk(5000)
+            cacheConfig1.maxEntriesLocalHeap(1000)
+            cacheConfig1.maxEntriesLocalDisk(5000)
             cacheConfig1.memoryStoreEvictionPolicy(net.sf.ehcache.store.MemoryStoreEvictionPolicy.FIFO)
 
 
-            // Stats
-            /*
+            // ApiCache
             CacheConfiguration cacheConfig2 = new CacheConfiguration()
-            cacheConfig2.setName("Stats")
-            cacheConfig2.eternal(false)
+            cacheConfig2.setName("HookCache")
+            cacheConfig2.eternal(true)
             cacheConfig2.overflowToDisk(true)
+            cacheConfig2.diskPersistent(true)
             cacheConfig2.diskExpiryThreadIntervalSeconds(120)
+            cacheConfig2.setMaxElementsInMemory(1000)
+            cacheConfig2.setMaxElementsOnDisk(5000)
             cacheConfig2.maxEntriesLocalHeap(1000)
             cacheConfig2.maxEntriesLocalDisk(5000)
-            cacheConfig2.timeToLiveSeconds(120)
-            cacheConfig2.timeToIdleSeconds(0)
-            cacheConfig2.memoryStoreEvictionPolicy(net.sf.ehcache.store.MemoryStoreEvictionPolicy.LRU)
-            */
+            cacheConfig2.memoryStoreEvictionPolicy(net.sf.ehcache.store.MemoryStoreEvictionPolicy.FIFO)
 
             // Throttle
             /*
@@ -150,7 +148,7 @@ public class BeapiEhCacheAutoConfiguration  implements CachingConfigurer {
 
             net.sf.ehcache.config.Configuration config = new net.sf.ehcache.config.Configuration()
             config.addCache(cacheConfig1)
-            //config.addCache(cacheConfig2)
+            config.addCache(cacheConfig2)
             //config.addCache(cacheConfig3)
             config.addCache(cacheConfig4)
             //config.addDiskStore(diskStoreConfiguration)
