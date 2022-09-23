@@ -81,6 +81,8 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
  - adding automated role-based apidocs; role based so user only sees docs they have access too (OWASP API COMPLIANT)
  - updating mapping to automate CORS whitelisting per networkGrp; this allows for separate frontends for each 'backend' environment thus separating api environments by networkgrp on front/backend
  - simplifying mapping in config
+ - added CORS functionality
+ - automated apidocs as backend controller
  
  ## 0.6 - (projected release Feb/2023)
   - API AUTOMATION
