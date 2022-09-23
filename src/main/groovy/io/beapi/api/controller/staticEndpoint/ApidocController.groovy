@@ -84,7 +84,7 @@ public class ApidocController extends BeapiRequestHandler{
 			}
 			methodList.each() { it2 ->
 				if(!['deprecated', 'defaultAction', 'testOrder'].contains(it2)) {
-					if (!controllerResults[it][apiversion][it2]) {
+					if (!controllerResults?.it?.apiversion?.it2) {
 						def apiObject = temp[it2]
 
 
@@ -112,7 +112,6 @@ public class ApidocController extends BeapiRequestHandler{
 						if (checkNetworkGrp(networkRoles)) {
 							ArrayList batchRoles = apiObject.getBatchRoles()
 							ArrayList hookRoles = apiObject.getHookRoles()
-
 
 
 							LinkedHashMap receives = apiObject.getReceives()
@@ -164,11 +163,9 @@ public class ApidocController extends BeapiRequestHandler{
 							result.remove('networkGrp')
 
 							controllerResults[it][apiversion][it2] = result
-						} else {
-							throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Request params do not match expect params for '${this.controller}/${this.action}'")
+						}else{
+							controllerResults.remove(it)
 						}
-
-
 					}
 				}
 			}
