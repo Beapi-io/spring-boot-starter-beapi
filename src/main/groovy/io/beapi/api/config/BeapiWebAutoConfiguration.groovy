@@ -16,7 +16,7 @@
  */
 package io.beapi.api.config
 
-import io.beapi.api.controller.BeapiRequestHandler
+
 //import io.beapi.api.filter.CorsSecurityFilter
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
@@ -25,7 +25,7 @@ import io.beapi.api.service.TraceExchangeService
 import io.beapi.api.service.TraceService
 import org.slf4j.LoggerFactory
 import java.lang.reflect.Method
-import org.springframework.stereotype.Controller
+
 import io.beapi.api.filter.RequestInitializationFilter
 import io.beapi.api.interceptor.ApiInterceptor
 import io.beapi.api.properties.ApiProperties
@@ -38,7 +38,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.ApplicationContext
@@ -51,8 +50,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.BeansException
-import org.springframework.web.HttpRequestHandler
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
+
+
 
 
 
@@ -89,6 +89,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 	@Autowired
 	TraceService traceService
+
 
 	String version
 
@@ -154,12 +155,25 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return bean;
 	}
 
+/*
+	@Bean
+	public FilterRegistrationBean securityFilterChain(@Qualifier(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME) Filter securityFilter) {
+		FilterRegistrationBean registrationBean = new FilterRegistrationBean(securityFilter);
+		registrationBean.setOrder(Integer.MAX_VALUE);
+		registrationBean.setName(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME);
+		return registrationBean;
+	}
+
+ */
+
+
 	@Bean
 	@ConditionalOnMissingBean
 	public FilterRegistrationBean<RequestInitializationFilter> requestInitializationFilter() {
 		FilterRegistrationBean<RequestInitializationFilter> registrationBean = new FilterRegistrationBean<>();
 		registrationBean.setFilter(new RequestInitializationFilter(principleService, apiProperties, apiCacheService, this.version, context));
-		registrationBean.setOrder(0)
+		registrationBean.setOrder(SecurityProperties.DEFAULT_FILTER_ORDER+1)
+		//registrationBean.setOrder(FilterRegistrationBean.REQUEST_WRAPPER_FILTER_MAX_ORDER-100)
 		registrationBean.addUrlPatterns("/*");
 		return registrationBean;
 	}
@@ -169,12 +183,15 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	@ConditionalOnMissingBean
 	public FilterRegistrationBean<CorsSecurityFilter> corsSecurityFilter() {
 		FilterRegistrationBean<CorsSecurityFilter> registrationBean = new FilterRegistrationBean<>();
-		registrationBean.setFilter(new CorsSecurityFilter(principleService, apiProperties, apiCacheService, this.version, context));
-		registrationBean.setOrder(0)
+		registrationBean.setFilter(new CorsSecurityFilter(apiProperties, apiCacheService));
+		registrationBean.setOrder(SecurityProperties.DEFAULT_FILTER_ORDER+2)
 		registrationBean.addUrlPatterns("/*");
 		return registrationBean;
 	}
+
 	 */
+
+
 
 
 	@Bean(name='simpleUrlHandlerMapping')
@@ -277,9 +294,11 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return urlMap
 	}
 
+
 	/*
 	* mapping for CORS; takes keySet from 'createMappings' and uses it to create CORS mappings
 	 */
+	/*
 	private Map createCorsMappings(Map corsMap, Set paths,String networkGrp) {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		LinkedHashMap corsNetworkGroups = apiProperties.security.corsNetworkGroups
@@ -297,7 +316,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return corsMap
 	}
 
-	/*
 	@Bean
 	CorsConfiguration corsConfig() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
@@ -310,8 +328,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 		corsConfiguration.setAllowedOrigins(networkGrps);
 
-
-
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -319,7 +335,8 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return source;
 	}
 
-	 */
+ */
+
 
 }
 

@@ -20,7 +20,6 @@ import org.json.JSONObject
 import io.beapi.api.properties.ApiProperties
 import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.PrincipleService
-import io.beapi.api.utils.ApiDescriptor
 import io.beapi.api.utils.ErrorCodes
 import io.beapi.api.utils.UriObject
 import org.springframework.context.ApplicationContext
@@ -29,23 +28,22 @@ import javax.servlet.FilterChain
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import groovy.transform.CompileDynamic
+
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component
-import org.slf4j.LoggerFactory
 
-import java.lang.reflect.Method
+
 import java.nio.charset.StandardCharsets
 import java.util.regex.Matcher
-import java.util.regex.Pattern
+
 import io.beapi.api.utils.ApiDescriptor
 import org.apache.commons.io.IOUtils
 import com.google.common.hash.Hashing
 
 import org.springframework.beans.factory.BeanFactoryUtils
 import org.springframework.web.servlet.HandlerMapping
-
+import org.springframework.http.HttpStatus
 
 /**
  * This class parses the URI attributes on initial request  &
@@ -100,7 +98,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     String handlerType
     ArrayList networkGrps = []
 
-
     public RequestInitializationFilter(PrincipleService principle, ApiProperties apiProperties, ApiCacheService apiCacheService, String version, ApplicationContext ctx) {
         this.apiProperties = apiProperties
         this.version = version
@@ -112,22 +109,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     }
 
     /**
-     * (overridden method) Given the HttpServletRequest, determines if URI is one of several pre-existing 'reserved' URI's
-     * @param HttpServletRequest Needed in order to get version of instantiated project mostly
-     * @param ApiProperties used for getting reservedUris to chack against
-     * @return boolean if is reservedURI (or this is a FORWARD & attributes already set), return true. Else false
-     */
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        //logger.debug("shouldNotFilter(HttpServletRequest) : {}");
-       // if(apiProperties.reservedUris.contains(request.getRequestURI())) {
-        //    return true
-        //}
-
-        return false
-    }
-
-    /**
      * (overridden method)
      * @param HttpServletRequest
      * @param HttpServletResponse
@@ -136,13 +117,19 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         //logger.debug("doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : {}");
+        //println("### RequestInitializationFilter")
+
 
         this.uri = request.getRequestURI()
 
+        // todo : will imporove in future version
         if(apiProperties.reservedUris.contains(request.getRequestURI())) {
+            // ### PUBLIC APIS ###
             ArrayList uriVars = uri.split('/')
             this.controller = uriVars[0]
+
         }else{
+            // ### APIS HANDLED BY THE STARTER ###
             request.getSession().removeAttribute('handler')
             request.getSession().removeAttribute('handlerName')
 
@@ -254,10 +241,12 @@ class RequestInitializationFilter extends OncePerRequestFilter{
             }
         }
 
-        processFilterChain(request, response, chain)
+        //processFilterChain(request, response, chain)
+        chain.doFilter(request, response)
     }
 
-
+/*
+    // Check CORS
     private void processFilterChain(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
         //ArrayList headers = Collections.list(request.getHeaderNames()).stream().collect(Collectors.toMap(Function.identity()), h -> Collections.list(request.getHeaders(h))))
 
@@ -273,7 +262,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         String origin = request.getHeader('Origin')
 
         if (options) {
-            response.addHeader('Allow', 'GET, HEAD, POST, PUT, DELETE, TRACE, PATCH, OPTIONS')
+            response.addHeader('Allow', 'GET, HEAD, POST, PUT, DELETE, TRACE, PATCH')
             if (origin != 'null') {
                 //response.setHeader("Access-Control-Allow-Headers", "Cache-Control,  Pragma, WWW-Authenticate, Origin, X-Requested-With, authorization, Content-Type,Access-Control-Request-Headers,Access-Control-Request-Method,Access-Control-Allow-Credentials")
                 response.addHeader('Access-Control-Allow-Headers', 'Accept, Accept-Charset, Accept-Datetime, Accept-Encoding, Accept-Ext, Accept-Features, Accept-Language, Accept-Params, Accept-Ranges, Access-Control-Allow-Headers, Access-Control-Allow-Methods, Access-Control-Allow-Origin, Access-Control-Expose-Headers, Access-Control-Max-Age, Access-Control-Request-Headers, Access-Control-Request-Method, Age, Allow, Alternates, Authentication-Info, Authorization, C-Ext, C-Man, C-Opt, C-PEP, C-PEP-Info, CONNECT, Cache-Control, Compliance, Connection, Content-Base, Content-Disposition, Content-Encoding, Content-ID, Content-Language, Content-Length, Content-Location, Content-MD5, Content-Range, Content-Script-Type, Content-Security-Policy, Content-Style-Type, Content-Transfer-Encoding, Content-Type, Content-Version, Cookie, Cost, DAV, DELETE, DNT, DPR, Date, Default-Style, Delta-Base, Depth, Derived-From, Destination, Differential-ID, Digest, ETag, Expect, Expires, Ext, From, GET, GetProfile, HEAD, HTTP-date, Host, IM, If, If-Match, If-Modified-Since, If-None-Match, If-Range, If-Unmodified-Since, Keep-Alive, Label, Last-Event-ID, Last-Modified, Link, Location, Lock-Token, MIME-Version, Man, Max-Forwards, Media-Range, Message-ID, Meter, Negotiate, Non-Compliance, OPTION, OPTIONS, OWS, Opt, Optional, Ordering-Type, Origin, Overwrite, P3P, PEP, PICS-Label, POST, PUT, Pep-Info, Permanent, Position, Pragma, ProfileObject, Protocol, Protocol-Query, Protocol-Request, Proxy-Authenticate, Proxy-Authentication-Info, Proxy-Authorization, Proxy-Features, Proxy-Instruction, Public, RWS, Range, Referer, Refresh, Resolution-Hint, Resolver-Location, Retry-After, Safe, Sec-Websocket-Extensions, Sec-Websocket-Key, Sec-Websocket-Origin, Sec-Websocket-Protocol, Sec-Websocket-Version, Security-Scheme, Server, Set-Cookie, Set-Cookie2, SetProfile, SoapAction, Status, Status-URI, Strict-Transport-Security, SubOK, Subst, Surrogate-Capability, Surrogate-Control, TCN, TE, TRACE, Timeout, Title, Trailer, Transfer-Encoding, UA-Color, UA-Media, UA-Pixels, UA-Resolution, UA-Windowpixels, URI, Upgrade, User-Agent, Variant-Vary, Vary, Version, Via, Viewport-Width, WWW-Authenticate, Want-Digest, Warning, Width, xsrf-token, X-Content-Duration, X-Content-Security-Policy, X-Content-Type-Options, X-CustomHeader, X-DNSPrefetch-Control, X-Forwarded-For, X-Forwarded-Port, X-Forwarded-Proto, X-Frame-Options, X-Modified, X-OTHER, X-PING, X-PINGOTHER, X-Powered-By, X-Requested-With')
@@ -296,12 +285,14 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                 response.addHeader('Access-Control-Allow-Origin', '*')
             }
         }
-        //response.status = HttpStatus.OK.value()
+        response.status = HttpStatus.OK.value()
 
         if(!options ) {
             chain.doFilter(request, response)
         }
+        //chain.doFilter(request, response)
     }
+ */
 
     protected String getFormat(String mimeType){
         String format

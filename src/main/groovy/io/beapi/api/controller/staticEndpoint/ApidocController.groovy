@@ -104,20 +104,59 @@ public class ApidocController extends BeapiRequestHandler{
 						* - returns
 						 */
 
+
+
 						String networkGrp = apiObject['networkGrp']
 						ArrayList networkRoles = networkGrpRoles[networkGrp].collect() { k, v -> v }
 
 						if (checkNetworkGrp(networkRoles)) {
-							LinkedHashMap rceives = apiObject.getReceives()
+							ArrayList batchRoles = apiObject.getBatchRoles()
+							ArrayList hookRoles = apiObject.getHookRoles()
+
+
+
+							LinkedHashMap receives = apiObject.getReceives()
 							LinkedHashMap rturns = apiObject['returns'] as LinkedHashMap
 
 							LinkedHashMap result = apiObject.toLinkedHashMap()
 
+							result['batch'] = false
+							result['hook'] = false
+
+							if(batchRoles.contains(this.authority)){
+								result['batch'] = true
+							}
+							result.remove('batchRoles')
+
+							if(hookRoles.contains(this.authority)){
+								result['hook'] = true
+							}
+							result.remove('hookRoles')
+
 							result.remove('receives')
-							result['receives'] = setReceivesList(rceives)
+							ArrayList receivesList = setReceivesList(receives)
+							ArrayList rec = []
+							receivesList.each(){ it5 ->
+								LinkedHashMap receivesMap = [:]
+								receivesMap['name'] = it5
+								receivesMap['type'] = cache.values[it5].type
+								receivesMap['desc'] = cache.values[it5].description
+								rec.add(receivesMap)
+							}
+							result['receives'] = rec
 
 							result.remove('returns')
-							result['returns'] = setReturnsList(rturns)
+							ArrayList returnsList = setReturnsList(rturns)
+							ArrayList ret = []
+							returnsList.each(){ it5 ->
+								LinkedHashMap returnsMap = [:]
+								returnsMap['name'] = it5
+								returnsMap['type'] = cache.values[it5].type
+								returnsMap['desc'] = cache.values[it5].description
+								ret.add(returnsMap)
+							}
+							result['returns'] = ret
+
 
 							result.remove('pkeys')
 							result.remove('fkeys')
@@ -135,7 +174,6 @@ public class ApidocController extends BeapiRequestHandler{
 			}
 		}
 		List returnData = [controllerResults]
-		println(returnData)
 
 		return returnData
 
