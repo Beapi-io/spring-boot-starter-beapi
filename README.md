@@ -90,7 +90,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
     - automated webhooks
     - io state reloading
     - rate limiting
-    - automated CORS; uses whitelisted IP 'networkGrps' (see previous implementation)
+    - automated CORS; uses whitelisted IP 'networkGrps' (handled at implementing app - need to send whitelisted networksgrps)
  - BOOTSTRAPPING
     - automated I/O State generation
     - functional test scaffolding
