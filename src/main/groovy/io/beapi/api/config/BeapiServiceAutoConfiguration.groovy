@@ -23,7 +23,6 @@ import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ExchangeService
 import io.beapi.api.service.TraceExchangeService
 //import io.beapi.api.service.EndpointMappingService
-
 //import io.beapi.api.service.IoStateService
 //import io.beapi.api.properties.ApiProperties
 
@@ -33,8 +32,6 @@ import io.beapi.api.service.TraceService
 
 
 //import io.beapi.api.filter.RequestInitializationFilter
-
-
 //import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
@@ -44,13 +41,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 //import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-
 import org.springframework.context.ApplicationContext
-//import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
-//import io.beapi.lib.interceptor.BeapiRequestBodyAdvice
-//import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice
 
-//import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
 
 //@ConditionalOnBean(name = ["principle","apiCacheService"])
 //@ConditionalOnClass( name = ['io.beapi.api.interceptor.ApiFrameworkInterceptor'] )
@@ -93,6 +85,7 @@ public class BeapiServiceAutoConfiguration {
 		}
 		return version
 	}
+
 
 	@Bean(name='principleService')
 	@ConditionalOnMissingBean
