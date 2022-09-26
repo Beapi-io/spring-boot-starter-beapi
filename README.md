@@ -50,7 +50,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 ---
 
 # Q&A
-- **Why Not bind the endpoints to the 'MODEL'?**
+- **Why Not bind the endpoints to the 'MODEL'(ie GraphQL)?**
     - API return data may be a mixture of two tables (ie JOIN), a file, a link to another api, etc. By binding to your model, you are asking it to become the 'business logic','communication logic' as well as 'data handling' and limits what your API can return. This breaks rules of AOP, Separation of Control' and over complicates your build and testing. This also makes your entire environment slower and harder to scale.
 - **Why require a cache?**
     - You cannot name an professional API implementation that does not use a cache.And many developers do not understand proper caching techniques (with API's). So we took that as an opportunity to handle that for you.
