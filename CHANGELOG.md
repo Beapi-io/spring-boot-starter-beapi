@@ -43,3 +43,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - allowing api data to be sent as FILE; can simplify batching and complex calls to put JSON/XML all in FILE to send, detect and auto-parse into params (which we then check to see if they match expected request data for endpoint)
 
 
+ ## 0.6 - (projected release Feb/2023)
+ 
+### Added
+    - automated webhooks
+    - io state reloading
+    - rate limiting
+    - automated I/O State generation
+    - functional test scaffolding
+    - automated controller scaffolding
+    - UI/UX tools (maybe)
+      - build out demo application as an SDK(???) 
+
