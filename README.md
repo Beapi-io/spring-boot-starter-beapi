@@ -84,6 +84,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
  - added CORS functionality
  - automated apidocs as backend controller
  - removing resource handling for file uploads except for supported mimetypes (JSON/XML); not a file server
+ - allowing api data to be sent as FILE; can simplify batching and complex calls to put JSON/XML all in FILE to send, detect and auto-parse into params (which we then check to see if they match expected request data for endpoint)
  
  ## 0.6 - (projected release Feb/2023)
   - API AUTOMATION
