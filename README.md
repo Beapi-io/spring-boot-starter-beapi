@@ -83,6 +83,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
  - simplifying mapping in config
  - added CORS functionality
  - automated apidocs as backend controller
+ - removing resource handling for file uploads except for supported mimetypes (JSON/XML); not a file server
  
  ## 0.6 - (projected release Feb/2023)
   - API AUTOMATION
