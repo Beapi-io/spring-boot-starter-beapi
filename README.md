@@ -80,7 +80,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
    - stripped out staticMapping and using internal Controllers
  - adding automated role-based apidocs; role based so user only sees docs they have access too (OWASP API COMPLIANT)
  - updating mapping to automate CORS whitelisting per networkGrp; this allows for separate frontends for each 'backend' environment thus separating api environments by networkgrp on front/backend
- - simplifying mapping in config
+ - simplifying mapping in config; improving reflection
  - added CORS functionality
  - automated apidocs as backend controller
  - removing resource handling for file uploads except for supported mimetypes (JSON/XML); not a file server
