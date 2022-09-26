@@ -3,6 +3,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+
+## 0.5 (released: 8/31/2022)
+
+### Added
+- [API AUTOMATION]
+- localized api caching (do first for benchmarking)
+- automated versioning for urlmapping
+- automated batching
+- api chaining®
+- separated I/O State for sharing/synchronizing of all endpoint rules
+- built-in performance tracing (partial)
+- [SECURITY]
+- network groups
+- role checking
+- automated resolution for API3:2019 Excessive Data Exposure.
+
+
+## 0.5.1 (released: 9/3/2022)
+
+### Changed
+- fixed issue with filter double calling handlerinterceptor
+- removal of attributes before resetting when chaining
+
+
 ## 0.6.X-SNAPSHOT
 
 ### Added
