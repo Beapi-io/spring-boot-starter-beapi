@@ -53,7 +53,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 - **Why Not bind the endpoints to the 'MODEL'?**
     - API return data may be a mixture of two tables (ie JOIN), a file, a link to another api, etc. By binding to your model, you are asking it to become the 'business logic','communication logic' as well as 'data handling' and limits what your API can return. This breaks rules of AOP, Separation of Control' and over complicates your build and testing. This also makes your entire environment slower and harder to scale.
 - **Why require a cache?**
-    - It is complex to build dynamic properties and properties that represent MULTIPLE MAPS in a SINGLE PROPERTIES FILE. Cache is hence the simpler solution. Also many developers do not understand proper caching techniques (with API's).
+    - You cannot name an professional API implementation that does not use a cache.And many developers do not understand proper caching techniques (with API's). So we took that as an opportunity to handle that for you.
 - **Why not just use @RequestMapping, @GetMapping, etc?**
     - The RequestMapping annotations create HARD CODED 'rules' to functionality; you cannot update/synchronize these 'rules' across your shared servers while the server is running. We abstract the rules away from the business logic so that they CAN be updated and shared with all running services WITHOUT requiring restarts. 
     - By abstracting this data from the functionality, we are better able to make LIVE CHANGES TO ENDPOINT RULES (when functionality hasn't changed). So for example if we want to disable privileges or change how a certain ROLE accesses endpoints, we can do that on the fly without taking down servers.
