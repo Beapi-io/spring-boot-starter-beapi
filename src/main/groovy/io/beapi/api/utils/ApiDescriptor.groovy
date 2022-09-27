@@ -66,9 +66,7 @@ class ApiDescriptor implements Serializable{
 	LinkedHashMap cachedResult
 	//LinkedHashMap stats
 
-	ApiDescriptor(String type, String networkGrp, String method, LinkedHashSet pkeys, LinkedHashSet fkeys, ArrayList roles,String name, String description, LinkedHashMap receives, LinkedHashMap returns) {
-		//this.handler = handler
-		this.type = type
+	ApiDescriptor(String networkGrp, String method, LinkedHashSet pkeys, LinkedHashSet fkeys, ArrayList roles,String name, String description, LinkedHashMap receives, LinkedHashMap returns) {
 		this.networkGrp = networkGrp
 		this.method = method
 		this.pkeys=pkeys
@@ -78,14 +76,6 @@ class ApiDescriptor implements Serializable{
 		this.description=description
 		this.receives=receives as LinkedHashMap
 		this.returns=returns as LinkedHashMap
-	}
-
-	//public String getHandler() {
-	//	return this.handler;
-	//}
-
-	public String getType() {
-		return this.type;
 	}
 
 	public String getMethod() {

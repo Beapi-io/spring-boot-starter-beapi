@@ -36,6 +36,7 @@ import javax.annotation.PostConstruct
  * A class for caching processed api calls and returning them
  * @author Owen Rubel
  */
+// NOTE : CALLTYPE = 4
 @Service
 //@EnableConfigurationProperties([ApiProperties.class])
 class TraceCacheService {

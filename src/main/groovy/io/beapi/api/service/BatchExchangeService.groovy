@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 
-// todo: rename as ExchangeService : encompasses both request/response methods for interceptor
+// NOTE : CALLTYPE = 2
 @Service
 public class BatchExchangeService extends ApiExchange{
 

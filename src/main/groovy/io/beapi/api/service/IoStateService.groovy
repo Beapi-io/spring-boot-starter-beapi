@@ -114,12 +114,14 @@ public class IoStateService{
 			System.exit(0)
 		}
 
-		parseResource("Static.json.bkp")
+		parseResource("apidoc.json")
+		parseResource("iostate.json")
 		//this.testLoadOrder = testAutomationService.createTestOrder()
 	}
 
 	private void parseResource(String path) throws IOException, UndeclaredThrowableException, IllegalArgumentException{
 		logger.debug("parseResource : {}")
+
 		LinkedHashMap methods = [:]
 
 		InputStream in = this.getClass().getClassLoader().getResourceAsStream(path);
@@ -130,10 +132,10 @@ public class IoStateService{
 		} else {
 			def slurp = new JsonSlurper().parseText(text)
 			LinkedHashMap json = toToLinkedHashMap(slurp)
-			println(json)
+
 
 			try{
-				methods[json.NAME.toString()] = parseJson(json.NAME.toString(), json)
+				parseJson(json.NAME.toString(), json)
 				// Store these in cache
 			}catch(java.lang.reflect.UndeclaredThrowableException e){
 				println("#### [IoStateService] UndeclaredThrowableException :"+e)
@@ -167,9 +169,7 @@ public class IoStateService{
 							//logger.debug("parseFiles : Loading file - {}","${path}/${fileName}")
 
 							try{
-								methods[json.NAME.toString()] = parseJson(json.NAME.toString(), json)
-								// Store these in cache
-
+								parseJson(json.IOSTATE.NAME.toString(), json.IOSTATE)
 							}catch(java.lang.reflect.UndeclaredThrowableException e){
 								println("#### [IoStateService] Exception :"+e)
 							}
@@ -184,14 +184,13 @@ public class IoStateService{
 		}
 	}
 
-	LinkedHashMap parseJson(String apiName,LinkedHashMap json) throws Exception{
+	void parseJson(String apiName,LinkedHashMap json) throws Exception{
 		logger.debug("parseJson : {}")
 
 		LinkedHashMap methods = [:]
 
 		String type = (json['TYPE'])?json['TYPE']:'controller'
 		String networkGrp = (json['NETWORKGRP'])?json['NETWORKGRP']:'public'
-
 
 		// TODO ; BOOTSTRAP TESTUSER AND ADD VARIABLE TO ALL IOSTATE FILES
 		//String testUser
@@ -202,7 +201,6 @@ public class IoStateService{
 
 
 		json['VERSION'].each(){ k, v ->
-
 			String versKey = k
 
 			LinkedHashMap apiVersion = v
@@ -274,7 +272,7 @@ public class IoStateService{
 
 					// TODO
 					try {
-						apiDescriptor = createApiDescriptor(type, networkGrp, apiName, apiMethod, apiDescription, apiRoles, batchRoles, hookRoles, actionname, vals, apiVersion)
+						apiDescriptor = createApiDescriptor(networkGrp, apiName, apiMethod, apiDescription, apiRoles, batchRoles, hookRoles, actionname, vals, apiVersion)
 					} catch (Exception e) {
 						println("unable to create ApiDescriptor. Check your IO State Formatting  : " + e)
 					}
@@ -329,12 +327,11 @@ public class IoStateService{
 
 				cache["${versKey}"].each(){ key1,val1 ->
 					if(!['deprecated','defaultAction','testOrder'].contains(key1)){
-
-						//try {
+						try {
 							apiCacheService.setApiCache(apiName, key1, val1, versKey)
-						//}catch(Exception e){
-						//	println("#### IoStateService Exception2 : "+e)
-						//}
+						}catch(Exception e){
+							println("#### IoStateService Exception2 : "+e)
+						}
 
 						//apiCacheService.setApiCache(apiName,key1, val1, versKey)
 
@@ -347,10 +344,10 @@ public class IoStateService{
 		//println("### METHODS : "+methods)
 
 
-		return methods
+		//return methods
 	}
 
-	protected ApiDescriptor createApiDescriptor(String type, String networkGrp, String apiname, String apiMethod, String apiDescription, ArrayList apiRoles, LinkedHashSet batchRoles, LinkedHashSet hookRoles, String uri, LinkedHashMap vals, LinkedHashMap json) throws Exception{
+	protected ApiDescriptor createApiDescriptor(String networkGrp, String apiname, String apiMethod, String apiDescription, ArrayList apiRoles, LinkedHashSet batchRoles, LinkedHashSet hookRoles, String uri, LinkedHashMap vals, LinkedHashMap json) throws Exception{
 		logger.debug("createApiDescriptor : {}")
 
 		LinkedHashMap<String, ParamsDescriptor> apiObject = new LinkedHashMap()
@@ -441,7 +438,7 @@ public class IoStateService{
 		//	throw new Error("#### [IoStateService : createApiDescriptor] : Handler '${handler}' does not exist : Skipping endpoint creation for '${apiname}'",e)
 		//}
 
-		ApiDescriptor service = new ApiDescriptor(type, networkGrp, apiMethod, pkeys, fkeys, apiRoles, apiname, apiDescription, receives, returns)
+		ApiDescriptor service = new ApiDescriptor(networkGrp, apiMethod, pkeys, fkeys, apiRoles, apiname, apiDescription, receives, returns)
 
 		// override networkRoles with 'DEFAULT' in IO State
 
@@ -469,8 +466,6 @@ public class IoStateService{
 		// TODO : APIOBJECT IS ALWAYS EMPTY; NEED TO FIX APIDESCRIPTOR ABOVE
 
 		LinkedHashMap<String,ParamsDescriptor> ioSet = [:]
-
-		// println("#### IO : "+io)
 
 		io.each(){ k,v ->
 			if (!ioSet[k]) {

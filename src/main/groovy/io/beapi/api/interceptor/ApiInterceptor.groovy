@@ -137,14 +137,7 @@ class ApiInterceptor implements HandlerInterceptor{
 					return false
 				}
 				break
-			//case 4:
-			//	if(apiProperties.resourcesEnabled) {
-			//		return exchangeService.resourceRequest(request, response)
-			//	}else{
-			//		writeErrorResponse(response,'401',request.getRequestURI())
-			//	}
-			//	break
-			case 5:
+			case 4:
 				if(privateRoles.contains(authority)) {
 					return traceExchangeService.apiRequest(request, response, this.authority)
 				}
@@ -186,19 +179,12 @@ class ApiInterceptor implements HandlerInterceptor{
 					response.writer.flush()
 				}
 				break
-			//case 4:
-			//	if(apiProperties.resourcesEnabled) {
-			//		exchangeService.resourceResponse(body, response)
-			//	}else{
-			//		writeErrorResponse(response,'401',request.getRequestURI())
-			//	}
-			//	break
-				case 5:
-					traceExchangeService.apiResponse(response,body)
-					break
-				default:
-					writeErrorResponse(response, '400', request.getRequestURI())
-					response.writer.flush()
+			case 4:
+				traceExchangeService.apiResponse(response,body)
+				break
+			default:
+				writeErrorResponse(response, '400', request.getRequestURI())
+				response.writer.flush()
 			}
 		}
 		response.writer.flush()
