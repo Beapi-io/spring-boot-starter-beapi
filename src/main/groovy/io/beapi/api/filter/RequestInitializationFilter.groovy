@@ -116,8 +116,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         //logger.debug("doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : {}");
-        println("### RequestInitializationFilter")
-
 
         this.uri = request.getRequestURI()
 
@@ -153,7 +151,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                 this.deprecated = temp['deprecated'] as List
 
                 if (cache) {
-                    println("has cache")
                     this.apiObject = temp[uriList[5]]
 
                     this.receives = this.apiObject.getReceives()
@@ -248,7 +245,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
 
     protected String getFormat(String mimeType){
-        println("## getFormat")
         String format
         switch(mimeType){
             case 'text/json':
@@ -440,7 +436,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     }
 
     private LinkedHashMap parsePutParams(String formData){
-        println("FORMDATA : "+formData)
         //String formData = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
         LinkedHashMap<String, String> output = [:]
         if (formData) {
