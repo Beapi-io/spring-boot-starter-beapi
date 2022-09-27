@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 
-// todo: rename as ExchangeService : encompasses both request/response methods for interceptor
+// NOTE : CALLTYPE = 1
 @Service
 public class ExchangeService extends ApiExchange{
 

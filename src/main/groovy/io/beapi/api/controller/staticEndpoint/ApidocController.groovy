@@ -47,7 +47,6 @@ public class ApidocController extends BeapiRequestHandler{
 	@Autowired
 	PrincipleService principle;
 
-
 	String authority
 
 	/*

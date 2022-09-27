@@ -44,6 +44,7 @@ import io.beapi.api.service.ApiCacheService
 import org.springframework.context.ApplicationContext
 import io.beapi.api.properties.ApiProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.web.context.support.WebApplicationContextUtils
 
 @EnableConfigurationProperties([ApiProperties.class])
 class BeapiRequestHandler implements HttpRequestHandler {
@@ -55,15 +56,11 @@ class BeapiRequestHandler implements HttpRequestHandler {
     @Autowired
     ApiProperties apiProperties
 
-    @Autowired
-    private ApplicationContext сontext;
 
     public ArrayList uList
     boolean trace
     public String controller
     public String action
-    public String handler
-    public String handlerName
     public String apiversion
     public int cores
     public LinkedHashMap<String,String> params = [:]
@@ -74,36 +71,40 @@ class BeapiRequestHandler implements HttpRequestHandler {
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //logger.info("handleRequest(HttpServletRequest, HttpServletResponse) : {}");
 
-        this.uList = request.getAttribute('uriList')
-        this.uList = request.getAttribute('uriList')
-        this.apiversion = uList[3]
-        this.controller = request.getSession().getAttribute('controller')
-        this.action = request.getSession().getAttribute('action')
-        this.handler=request.getSession().getAttribute('handler')
-        this.handlerName = request.getSession().getAttribute('handlerName')
-        this.trace = request.getSession().getAttribute('trace')
-        this.cores = request.getAttribute('cores')
-        this.params = request.getSession().getAttribute('params') as LinkedHashMap
+        ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
+
+        uList = request.getAttribute('uriList')
+        uList = request.getAttribute('uriList')
+        apiversion = uList[3]
+        controller = request.getSession().getAttribute('controller')
+        action = request.getSession().getAttribute('action')
+
+        // todo : fix handler
+
+
+        trace = request.getSession().getAttribute('trace')
+        cores = request.getAttribute('cores')
+        params = request.getSession().getAttribute('params') as LinkedHashMap
 
         ArrayList result = []
         Object output
-        Method method
+
 
         // CONTROLLER CALLS
         Class<?> classObj = this.getClass();
-        Class<?> handlerClass = Class.forName(handler);
+
 
         // TRACESERVICE CHECK
-        if (trace == true) { traceService.startTrace(this.controller, this.action, request.getSession().getId()) }
+        if (trace == true) { traceService.startTrace(controller, action, request.getSession().getId()) }
 
         // create method call
         try {
-            //method = classObj.getMethod(this.action, HttpServletRequest.class, HttpServletResponse.class);
+            Method method = classObj.getMethod(action, HttpServletRequest.class, HttpServletResponse.class);
 
-            method = handlerClass.getDeclaredMethod(this.action, HttpServletRequest.class, HttpServletResponse.class);
             // invoke method
             if (Objects.nonNull(method)) {
                 try {
+
                     output = method.invoke(this, request, response)
                 } catch (IllegalArgumentException e) {
                     //writeErrorResponse(response, '422', request.getRequestURI());
@@ -117,7 +118,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
 
             if (output) {
                 if (trace == true) {
-                    Object trace = traceService.endAndReturnTrace(this.controller, this.action, request.getSession().getId())
+                    Object trace = traceService.endAndReturnTrace(controller, action, request.getSession().getId())
                     result = convertModel(trace)
                 } else {
                     ArrayList tempResult = convertModel(output)
@@ -130,8 +131,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
                         result = tempResult
                     }
                 }
-
-
 
                 request.getSession().setAttribute('responseBody', result)
             } else {

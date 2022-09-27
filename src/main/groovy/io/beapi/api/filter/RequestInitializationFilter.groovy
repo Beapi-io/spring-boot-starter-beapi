@@ -57,9 +57,9 @@ import org.springframework.http.HttpStatus
 class RequestInitializationFilter extends OncePerRequestFilter{
 
     //private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RequestInitializationFilter.class);
-    private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml']
+    private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml','multipart/form-data']
     private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
-    private static final ArrayList CALL_TYPES = ['v','b','c','r','t']
+    private static final ArrayList CALL_TYPES = ['v','b','c','t']
 
     @Autowired
     ApplicationContext ctx
@@ -95,7 +95,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     String authority
     ArrayList deprecated
     String action
-    String handlerType
     ArrayList networkGrps = []
 
     public RequestInitializationFilter(PrincipleService principle, ApiProperties apiProperties, ApiCacheService apiCacheService, String version, ApplicationContext ctx) {
@@ -117,7 +116,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         //logger.debug("doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : {}");
-        //println("### RequestInitializationFilter")
+        println("### RequestInitializationFilter")
 
 
         this.uri = request.getRequestURI()
@@ -127,35 +126,24 @@ class RequestInitializationFilter extends OncePerRequestFilter{
             // ### PUBLIC APIS ###
             ArrayList uriVars = uri.split('/')
             this.controller = uriVars[0]
-
         }else{
-            // ### APIS HANDLED BY THE STARTER ###
-            request.getSession().removeAttribute('handler')
-            request.getSession().removeAttribute('handlerName')
+            // println("### APIS HANDLED BY THE STARTER ###")
 
             this.authority = this.principle.authorities()
             this.uriList = setUri(this.uri, this.version)
 
-            HandlerMapping handlerMappings = BeanFactoryUtils.beansOfTypeIncludingAncestors(this.ctx, HandlerMapping.class, true, false).get("simpleUrlHandlerMapping");
-            def test = handlerMappings.getHandler(request)?.getHandler()
-            String handler = test?.class?.getName()
-            String handlerName = test?.class?.getSimpleName()
-            String shortName = this.uriList[4].capitalize() + "Controller"
 
-            request.setAttribute('uriList', uriList)
+            request.setAttribute('uriList', this.uriList)
             request.setAttribute('cores', this.cores)
 
             try {
-                // make sure they exist as handler and in IO state
-                if (test && shortName == handlerName) {
-                    request.getSession().setAttribute('handler', handler)
-                    request.getSession().setAttribute('handlerName', handlerName)
-                }
+
 
                 this.method = request.getMethod()
                 this.reservedUri = (apiProperties.reservedUris.contains(this.uri)) ? true : false
 
                 // get apiObject
+
                 def cache = apiCacheService.getApiCache(uriList[4])
                 def temp = cache[uriList[3]]
 
@@ -165,11 +153,8 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                 this.deprecated = temp['deprecated'] as List
 
                 if (cache) {
+                    println("has cache")
                     this.apiObject = temp[uriList[5]]
-
-                    String handlerType = this.apiObject.getType()
-                    if (request.getAttribute('handlerType')) { request.removeAttribute('handlerType') }
-                    request.setAttribute('handlerType', handlerType)
 
                     this.receives = this.apiObject.getReceives()
                     this.rturns = this.apiObject['returns'] as LinkedHashMap
@@ -180,16 +165,31 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                     corsNetworkGroups[networkGrp].each { k, v -> this.networkGrps.add(v) }
 
-                    String temp2 = (request.getHeader('Accept') != null) ? request.getHeader('Accept') : request.getContentType()
-                    ArrayList tempMimeType = temp2.split(';')
-                    String requestMimeType = tempMimeType[0]
-                    String requestEncoding = tempMimeType[1]
+                    String temp2 = (request.getHeader('Accept') != null && request.getHeader('Accept') != "*/*") ? request.getHeader('Accept') : request.getContentType()
+                    ArrayList reqMime = temp2.split(';')
+                    ArrayList respMime = request.getContentType().split(';')
+
+                    String requestMimeType = reqMime[0]
+                    String requestEncoding = reqMime[1]
+
 
                     this.requestFileType = (SUPPORTED_MIME_TYPES.contains(requestMimeType)) ? getFormat(requestMimeType) : 'JSON'
-                    this.responseFileType = (this.requestFileType) ? this.requestFileType : getFormat(responseMimeType)
-                    String responseMimeType = requestMimeType
+                    if(!this.requestFileType){
+                        String msg = "Request MimeType must be one of the supported mimetypes (JSON/XML)"
+                        writeErrorResponse(response, '400', request.getRequestURI(),msg);
+                        throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Accept/Request mimetype unsupported")
+                    }
 
-                    request.setAttribute('responseMimeType', responseFileType)
+                    this.responseFileType = (this.requestFileType) ? this.requestFileType : getFormat(respMime[0])
+                    if(!this.responseFileType){
+                        String msg = "Response MimeType must be one of the supported mimetypes (JSON/XML)"
+                        writeErrorResponse(response, '400', request.getRequestURI(),msg);
+                        throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Content-type unsupported")
+                    }
+
+                    String responseMimeType = respMime[0]
+
+                    request.setAttribute('responseMimeType', responseMimeType)
                     request.setAttribute('responseFileType', responseFileType)
 
                     parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(), uriList[7])
@@ -204,6 +204,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                     if (!checkRequestParams(request.getSession().getAttribute('params'))) {
                         writeErrorResponse(response, '400', request.getRequestURI());
+                        throw new Exception("[RequestInitializationFilter :: checkRequestParams] : Requestparams do not match expected params for this endpoint")
                     }
 
                     // todo : test requestEncoding against apiProperties.encoding
@@ -245,56 +246,9 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         chain.doFilter(request, response)
     }
 
-/*
-    // Check CORS
-    private void processFilterChain(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
-        //ArrayList headers = Collections.list(request.getHeaderNames()).stream().collect(Collectors.toMap(Function.identity()), h -> Collections.list(request.getHeaders(h))))
-
-        boolean options = ('OPTIONS'==request.method.toUpperCase())
-
-        if(!apiProperties.reservedUris.contains(request.getRequestURI())) {
-            if(!networkGrps){
-                String msg = "NETWORKGRP for IO State file :" + controller + " cannot be found. Please double check it against available NetworkGroups in the beapi_api.yml config file."
-                writeErrorResponse(response, '401', request.getRequestURI(), msg);
-            }
-        }
-
-        String origin = request.getHeader('Origin')
-
-        if (options) {
-            response.addHeader('Allow', 'GET, HEAD, POST, PUT, DELETE, TRACE, PATCH')
-            if (origin != 'null') {
-                //response.setHeader("Access-Control-Allow-Headers", "Cache-Control,  Pragma, WWW-Authenticate, Origin, X-Requested-With, authorization, Content-Type,Access-Control-Request-Headers,Access-Control-Request-Method,Access-Control-Allow-Credentials")
-                response.addHeader('Access-Control-Allow-Headers', 'Accept, Accept-Charset, Accept-Datetime, Accept-Encoding, Accept-Ext, Accept-Features, Accept-Language, Accept-Params, Accept-Ranges, Access-Control-Allow-Headers, Access-Control-Allow-Methods, Access-Control-Allow-Origin, Access-Control-Expose-Headers, Access-Control-Max-Age, Access-Control-Request-Headers, Access-Control-Request-Method, Age, Allow, Alternates, Authentication-Info, Authorization, C-Ext, C-Man, C-Opt, C-PEP, C-PEP-Info, CONNECT, Cache-Control, Compliance, Connection, Content-Base, Content-Disposition, Content-Encoding, Content-ID, Content-Language, Content-Length, Content-Location, Content-MD5, Content-Range, Content-Script-Type, Content-Security-Policy, Content-Style-Type, Content-Transfer-Encoding, Content-Type, Content-Version, Cookie, Cost, DAV, DELETE, DNT, DPR, Date, Default-Style, Delta-Base, Depth, Derived-From, Destination, Differential-ID, Digest, ETag, Expect, Expires, Ext, From, GET, GetProfile, HEAD, HTTP-date, Host, IM, If, If-Match, If-Modified-Since, If-None-Match, If-Range, If-Unmodified-Since, Keep-Alive, Label, Last-Event-ID, Last-Modified, Link, Location, Lock-Token, MIME-Version, Man, Max-Forwards, Media-Range, Message-ID, Meter, Negotiate, Non-Compliance, OPTION, OPTIONS, OWS, Opt, Optional, Ordering-Type, Origin, Overwrite, P3P, PEP, PICS-Label, POST, PUT, Pep-Info, Permanent, Position, Pragma, ProfileObject, Protocol, Protocol-Query, Protocol-Request, Proxy-Authenticate, Proxy-Authentication-Info, Proxy-Authorization, Proxy-Features, Proxy-Instruction, Public, RWS, Range, Referer, Refresh, Resolution-Hint, Resolver-Location, Retry-After, Safe, Sec-Websocket-Extensions, Sec-Websocket-Key, Sec-Websocket-Origin, Sec-Websocket-Protocol, Sec-Websocket-Version, Security-Scheme, Server, Set-Cookie, Set-Cookie2, SetProfile, SoapAction, Status, Status-URI, Strict-Transport-Security, SubOK, Subst, Surrogate-Capability, Surrogate-Control, TCN, TE, TRACE, Timeout, Title, Trailer, Transfer-Encoding, UA-Color, UA-Media, UA-Pixels, UA-Resolution, UA-Windowpixels, URI, Upgrade, User-Agent, Variant-Vary, Vary, Version, Via, Viewport-Width, WWW-Authenticate, Want-Digest, Warning, Width, xsrf-token, X-Content-Duration, X-Content-Security-Policy, X-Content-Type-Options, X-CustomHeader, X-DNSPrefetch-Control, X-Forwarded-For, X-Forwarded-Port, X-Forwarded-Proto, X-Frame-Options, X-Modified, X-OTHER, X-PING, X-PINGOTHER, X-Powered-By, X-Requested-With')
-                response.addHeader('Access-Control-Allow-Methods', 'POST, PUT, DELETE, TRACE, PATCH, OPTIONS')
-                response.addHeader('Access-Control-Expose-Headers', 'xsrf-token, Location,X-Auth-Token')
-                response.addHeader('Access-Control-Max-Age', '3600')
-            }
-        }
-
-        if (networkGrps && networkGrps.contains(origin)) {
-            request.setAttribute('CORS', true)
-            response.setHeader('Access-Control-Allow-Origin', origin)
-            response.addHeader('Access-Control-Allow-Credentials', 'true')
-        } else if (!networkGrps) { // no networkGrps??? white list all
-            // add CORS access control headers for all origins
-            if (origin) {
-                response.setHeader('Access-Control-Allow-Origin', origin)
-                response.addHeader('Access-Control-Allow-Credentials', 'true')
-            } else {
-                response.addHeader('Access-Control-Allow-Origin', '*')
-            }
-        }
-        response.status = HttpStatus.OK.value()
-
-        if(!options ) {
-            chain.doFilter(request, response)
-        }
-        //chain.doFilter(request, response)
-    }
- */
 
     protected String getFormat(String mimeType){
+        println("## getFormat")
         String format
         switch(mimeType){
             case 'text/json':
@@ -306,7 +260,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                 format = 'XML'
                 break;
             default:
-                // todo : check if callType is 'resource'
                 break;
         }
         return format
@@ -350,8 +303,8 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         String tempVersion = uriVars[1].toLowerCase()
 
         switch(tempVersion){
-            case ~/([v|b|c|r|t])(${version})-([0-9]+)/:
-            case ~/([v|b|c|r|t])(${version})/:
+            case ~/([v|b|c|t])(${version})-([0-9]+)/:
+            case ~/([v|b|c|t])(${version})/:
                 def m = Matcher.lastMatcher
                 callType = (CALL_TYPES.indexOf(m[0][1])+1)
                 uriList.add(callType)
@@ -487,6 +440,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     }
 
     private LinkedHashMap parsePutParams(String formData){
+        println("FORMDATA : "+formData)
         //String formData = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
         LinkedHashMap<String, String> output = [:]
         if (formData) {

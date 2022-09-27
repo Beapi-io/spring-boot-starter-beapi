@@ -36,7 +36,7 @@ request.getSession().getAttribute('chainKey')
 request.getSession().getAttribute('chainSize')
 
  */
-// todo: rename as ExchangeService : encompasses both request/response methods for interceptor
+// NOTE : CALLTYPE = 3
 @Service
 public class ChainExchangeService extends ApiExchange{
 
@@ -68,6 +68,7 @@ public class ChainExchangeService extends ApiExchange{
 
 
 	boolean chainRequest(HttpServletRequest request, HttpServletResponse response, String authority) {
+		println("### chainRequest...")
 		//this.networkRoles = networkRoles
 		//initVars(request,response,authority)
 		//clearChainVars(request)
@@ -78,7 +79,7 @@ public class ChainExchangeService extends ApiExchange{
 
 	void chainResponse(HttpServletRequest request, HttpServletResponse response, ArrayList body){
 		// first compare to cache for ROLE and parse out appropriate data to return
-
+		println("### chainResponse...")
 		if (body) {
 			// STORE CACHED RESULT
 			//String authority = getUserRole(this.roles) as String

@@ -151,9 +151,9 @@ class ApiCacheService{
 			//cache["${apiversion}"][methodname]['stats'] = [] // [[code:200,cnt:56,time:123456789]]
 
 			// can only be generated upon first being called
-			cache[apiversion][methodname]['doc'] = generateApiDoc(controllername, methodname,apiversion,cache)
-			cache[apiversion][methodname]['doc']['hookRoles'] = cache[apiversion][methodname]['hookRoles']
-			cache[apiversion][methodname]['doc']['batchRoles'] = cache[apiversion][methodname]['batchRoles']
+			//cache[apiversion][methodname]['doc'] = generateApiDoc(controllername, methodname,apiversion,cache)
+			//cache[apiversion][methodname]['doc']['hookRoles'] = cache[apiversion][methodname]['hookRoles']
+			//cache[apiversion][methodname]['doc']['batchRoles'] = cache[apiversion][methodname]['batchRoles']
 
 			return cache
 		}catch(Exception e){
