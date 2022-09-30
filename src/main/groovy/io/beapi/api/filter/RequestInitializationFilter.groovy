@@ -16,6 +16,7 @@
  */
 package io.beapi.api.filter
 
+import groovy.json.JsonSlurper
 import org.json.JSONObject
 import io.beapi.api.properties.ApiProperties
 import io.beapi.api.service.ApiCacheService
@@ -136,13 +137,12 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
             try {
 
-
                 this.method = request.getMethod()
                 this.reservedUri = (apiProperties.reservedUris.contains(this.uri)) ? true : false
 
                 // get apiObject
 
-                def cache = apiCacheService.getApiCache(uriList[4])
+                def cache = apiCacheService?.getApiCache(uriList[4])
                 def temp = cache[uriList[3]]
 
                 //String defaultAction = (temp['defaultAction'])?temp['defaultAction']:'error'
@@ -150,10 +150,12 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                 this.deprecated = temp['deprecated'] as List
 
+
                 if (cache) {
+                    
                     this.apiObject = temp[uriList[5]]
 
-                    this.receives = this.apiObject.getReceives()
+                    this.receives = this.apiObject?.getReceives()
                     this.rturns = this.apiObject['returns'] as LinkedHashMap
 
                     String networkGrp = this.apiObject['networkGrp']
@@ -415,7 +417,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         }
 
         request.getSession().setAttribute('POST',post)
-
         LinkedHashMap<String,String> output = get + post
         request.getSession().setAttribute('params',output)
     }
@@ -439,23 +440,26 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         //String formData = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
         LinkedHashMap<String, String> output = [:]
         if (formData) {
-            JSONObject object
+            LinkedHashMap object
             try {
                 switch (this.requestFileType) {
                     case 'JSON':
-                        object = new JSONObject(formData)
+                        //object = new JSONObject(formData)
+                        Object temp = new JsonSlurper().parseText(formData)
+                        object = toToLinkedHashMap(temp)
                         break
                     case 'XML':
-                        object = XML.toJSONObject(formData)
+                        //object = XML.toJSONObject(formData)
                         break
                 }
             } catch (Exception e) {
                 throw new Exception("[RequestInitializationFilter :: parsePutParams] : Badly formatted '${this.requestFileType}'. Please check the syntax and try again")
             }
 
+
             if(object) {
-                Iterator<String> keys = object.keys();
                 Set<String> keyset = object.keySet()
+                Iterator keys = keyset.iterator();
 
                 switch(keyset){
                     case {it.contains('chain')}:
@@ -466,7 +470,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                                 LinkedHashMap chainOrder = [:]
                                 def temp2 = object.get('chain').remove('order').entrySet()
                                 temp2.each() { it ->
-                                    chainOrder[it.getKey()] = it.getValue().toString()
+                                    chainOrder[it.getKey()] = it.getValue()
                                 }
 
                                 output['chainOrder'] = chainOrder
@@ -474,7 +478,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                                 output['chainKey'] = object.get('chain')['initdata']
                                 output['chainSize'] = chainOrder.size()
                             }else{
-                                temp[key] = object.get(key).toString()
+                                temp[key] = object.get(key)
                             }
                         }
                         if(!temp.isEmpty()){
@@ -489,7 +493,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                             if (key.toString() == 'batch') {
                                 output['batchVars'] = object.get('batch') as LinkedList
                             }else{
-                                output[key] = object.get(key).toString()
+                                output[key] = object.get(key)
                             }
                         }
                         break;
@@ -497,7 +501,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                         while (keys.hasNext()) {
                             String key = keys.next();
                             if (!RESERVED_PARAM_NAMES.contains(key)) {
-                                output[key] = object.get(key).toString()
+                                output[key] = object.get(key)
                             } else {
                                 throw new Exception("[RequestInitializationFilter :: parsePutParams] : Batch/Chain call attempted on regular API endpoint without sending required params [ie batch/chain]")
                             }
@@ -507,6 +511,24 @@ class RequestInitializationFilter extends OncePerRequestFilter{
             }
         }
         return output
+    }
+
+    def toToLinkedHashMap(def obj) {
+        if (obj instanceof org.apache.groovy.json.internal.LazyMap) {
+            Map copy = [:];
+            for (pair in (obj as Map)) {
+                copy.put(pair.key.toString(), toToLinkedHashMap(pair.value));
+            }
+            return copy;
+        }
+        if (obj instanceof org.apache.groovy.json.internal.ValueList) {
+            List copy = [];
+            for (item in (obj as List)) {
+                copy.add(toToLinkedHashMap(item.toString()));
+            }
+            return copy;
+        }
+        return obj;
     }
 
     // Todo : Move to exchangeService??

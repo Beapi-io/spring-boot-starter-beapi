@@ -111,14 +111,12 @@ public class ChainExchangeService extends ApiExchange{
 
 			}else{
 				// concat output
-				//this.apiObject?.returns?.permitAll?.each(){ it -> this.returnsList.add(it.name) }
-				//request.getSession().removeAttribute('returnsList')
-				//request.getSession().setAttribute('returnsList',this.returnsList)
 
 				concatChainOutput(body, request, response, this.responseFileType)
 
 				def servletCtx = this.ctx.getServletContext()
 				def rd = servletCtx?.getRequestDispatcher(this.newPath)
+				println("newpath : "+this.newPath)
 				rd.forward(request, response)
 			}
 		}else{
