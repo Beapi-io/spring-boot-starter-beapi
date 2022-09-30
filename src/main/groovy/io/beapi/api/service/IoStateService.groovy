@@ -199,6 +199,11 @@ public class IoStateService{
 		//}
 
 
+		if(json['VERSION'] instanceof java.lang.String){
+			println("### VERSION: "+json['VERSION'])
+		}else{
+			println(json['VERSION'].getClass())
+		}
 
 		json['VERSION'].each(){ k, v ->
 			String versKey = k

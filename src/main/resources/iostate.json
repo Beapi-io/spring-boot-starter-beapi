@@ -2,6 +2,31 @@
     "NAME":"iostate",
     "NETWORKGRP": "private",
     "VALUES": {
+        "CURRENTSTABLE": {
+          "type": "String",
+          "description":"CurrentStable version",
+          "mockData":"1"
+        },
+        "VERSION": {
+          "type": "String",
+          "description":"version for set of API endpoints",
+          "mockData":"1"
+        },
+        "VALUES": {
+          "type": "List<Map>",
+          "description":"List<Map> of definitions used for receives/responds",
+          "mockData":""
+        },
+        "NAME": {
+          "type": "String",
+          "description":"Name of IOState file",
+          "mockData":""
+        },
+        "NETWORKGRP": {
+          "type": "String",
+          "description":"NetworkGrp for this IOState file",
+          "mockData":"private"
+        },
         "name": {
           "type": "String",
           "description":"IO State name",
@@ -65,10 +90,10 @@
                       "BATCH":["ROLE_ADMIN"]
                   },
                   "REQUEST": {
-                      "permitAll":["filename"]
+                      "permitAll":["CURRENTSTABLE", "VERSION", "VALUES", "NAME", "NETWORKGRP"]
                   },
                   "RESPONSE": {
-                      "permitAll":["name","cacheversion"]
+                      "permitAll":["NAME","VERSION"]
                   }
               }
             }
