@@ -36,7 +36,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - added CORS functionality
 - updating mapping to automate CORS whitelisting per networkGrp; this allows for separate frontends for each 'backend' environment thus separating api environments by networkgrp on front/backend
 - adding automated role-based apidocs; role based so user only sees docs they have access too (OWASP API COMPLIANT)
-- 
+- added IO state reloading functionality
+
 ### Changed
 - simplifying mapping in config
 - removing resource handling for file uploads except for supported mimetypes (JSON/XML); not a file server
