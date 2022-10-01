@@ -46,9 +46,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
  ## 0.6 - (projected release Feb/2023)
  
-### Added
+### todo
     - automated webhooks
-    - io state reloading
     - rate limiting
     - automated I/O State generation
     - functional test scaffolding
