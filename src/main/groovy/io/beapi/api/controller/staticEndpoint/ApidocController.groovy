@@ -63,116 +63,23 @@ public class ApidocController extends BeapiRequestHandler{
 	 */
 
 	List show(HttpServletRequest request, HttpServletResponse response){
+		println("apidoc/show")
 		this.authority = principle.authorities()
 
 		LinkedHashMap controllerResults = [:]
-		LinkedHashMap networkGrpRoles = apiProperties.security.networkRoles
 		ArrayList controllers = apiCacheService.getCacheKeys()
-
-		controllers.each(){
-			def cache = apiCacheService.getApiCache(it)
-			def temp = cache[apiversion]
-
-			ArrayList methodList = temp.keySet()
-
-			if(!controllerResults[it]) {
-				controllerResults[it] = [:]
+		List returnData = []
+		if(params.id){
+			returnData.add(createApidocs(params.id))
+			println("returnData:"+returnData)
+		}else{
+			controllers.each() {
+				def temp = createApidocs(it)
+				controllerResults[it] = temp[it]
 			}
-			if(!controllerResults[it][apiversion]){
-				controllerResults[it][apiversion] = [:]
-			}
-			methodList.each() { it2 ->
-				if(!['deprecated', 'defaultAction', 'testOrder'].contains(it2)) {
-					if (!controllerResults?.it?.apiversion?.it2) {
-						def apiObject = temp[it2]
-
-
-						// check if role  is in networkGrp
-						// if pass, get receivesList/returnsList
-						// get all uniques in receivesList/returnsList for compare against Values to see what needs to be removed
-
-						/*
-						* remove :
-						* - ROLES
-						* - networkGrp
-						* - pkeys
-						* - fkeys
-						*
-						* RESET
-						* - receives
-						* - returns
-						 */
-
-
-
-						String networkGrp = apiObject['networkGrp']
-						ArrayList networkRoles = networkGrpRoles[networkGrp].collect() { k, v -> v }
-
-						if (checkNetworkGrp(networkRoles)) {
-							ArrayList batchRoles = apiObject.getBatchRoles()
-							ArrayList hookRoles = apiObject.getHookRoles()
-
-
-							LinkedHashMap receives = apiObject.getReceives()
-							LinkedHashMap rturns = apiObject['returns'] as LinkedHashMap
-
-							LinkedHashMap result = apiObject.toLinkedHashMap()
-
-							result['batch'] = false
-							result['hook'] = false
-
-							if(batchRoles.contains(this.authority)){
-								result['batch'] = true
-							}
-							result.remove('batchRoles')
-
-							if(hookRoles.contains(this.authority)){
-								result['hook'] = true
-							}
-							result.remove('hookRoles')
-
-							result.remove('receives')
-							ArrayList receivesList = setReceivesList(receives)
-							ArrayList rec = []
-							receivesList.each(){ it5 ->
-								LinkedHashMap receivesMap = [:]
-								receivesMap['name'] = it5
-								receivesMap['type'] = cache.values[it5].type
-								receivesMap['desc'] = cache.values[it5].description
-								rec.add(receivesMap)
-							}
-							result['receives'] = rec
-
-							result.remove('returns')
-							ArrayList returnsList = setReturnsList(rturns)
-							ArrayList ret = []
-							returnsList.each(){ it5 ->
-								LinkedHashMap returnsMap = [:]
-								returnsMap['name'] = it5
-								returnsMap['type'] = cache.values[it5].type
-								returnsMap['desc'] = cache.values[it5].description
-								ret.add(returnsMap)
-							}
-							result['returns'] = ret
-
-
-							result.remove('pkeys')
-							result.remove('fkeys')
-							result.remove('roles')
-							result.remove('networkGrp')
-
-							controllerResults[it][apiversion][it2] = result
-						}else{
-							controllerResults.remove(it)
-						}
-					}
-				}
-			}
+			returnData = [controllerResults]
 		}
-		List returnData = [controllerResults]
-
 		return returnData
-
     }
 
 	protected boolean checkNetworkGrp(ArrayList networkRoles){
@@ -206,4 +113,103 @@ public class ApidocController extends BeapiRequestHandler{
 		return result
 	}
 
+	private LinkedHashMap createApidocs(String controller){
+		LinkedHashMap controllerResults = [:]
+
+		def cache = apiCacheService.getApiCache(controller)
+		def temp = cache[apiversion]
+
+		ArrayList methodList = temp.keySet()
+
+		if(!controllerResults[controller]) {
+			controllerResults[controller] = [:]
+		}
+		if(!controllerResults[controller][apiversion]){
+			controllerResults[controller][apiversion] = [:]
+		}
+		methodList.each() { it2 ->
+			if(!['deprecated', 'defaultAction', 'testOrder'].contains(it2)) {
+				if (!controllerResults?.it?.apiversion?.it2) {
+					def apiObject = temp[it2]
+
+					// check if role  is in networkGrp
+					// if pass, get receivesList/returnsList
+					// get all uniques in receivesList/returnsList for compare against Values to see what needs to be removed
+
+					/*
+                    * remove :
+                    * - ROLES
+                    * - networkGrp
+                    * - pkeys
+                    * - fkeys
+                    *
+                    * RESET
+                    * - receives
+                    * - returns
+                     */
+
+					ArrayList networkRoles = cache.networkGrpRoles
+
+					if (checkNetworkGrp(networkRoles)) {
+						ArrayList batchRoles = apiObject.getBatchRoles()
+						ArrayList hookRoles = apiObject.getHookRoles()
+
+
+						LinkedHashMap receives = apiObject.getReceives()
+						LinkedHashMap rturns = apiObject['returns'] as LinkedHashMap
+
+						LinkedHashMap result = apiObject.toLinkedHashMap()
+
+						result['batch'] = false
+						result['hook'] = false
+
+						if(batchRoles.contains(this.authority)){
+							result['batch'] = true
+						}
+						result.remove('batchRoles')
+
+						if(hookRoles.contains(this.authority)){
+							result['hook'] = true
+						}
+						result.remove('hookRoles')
+
+						result.remove('receives')
+						ArrayList receivesList = setReceivesList(receives)
+						ArrayList rec = []
+						receivesList.each(){ it5 ->
+							LinkedHashMap receivesMap = [:]
+							receivesMap['name'] = it5
+							receivesMap['type'] = cache.values[it5].type
+							receivesMap['desc'] = cache.values[it5].description
+							rec.add(receivesMap)
+						}
+						result['receives'] = rec
+
+						result.remove('returns')
+						ArrayList returnsList = setReturnsList(rturns)
+						ArrayList ret = []
+						returnsList.each(){ it5 ->
+							LinkedHashMap returnsMap = [:]
+							returnsMap['name'] = it5
+							returnsMap['type'] = cache.values[it5].type
+							returnsMap['desc'] = cache.values[it5].description
+							ret.add(returnsMap)
+						}
+						result['returns'] = ret
+
+
+						result.remove('pkeys')
+						result.remove('fkeys')
+						result.remove('roles')
+						result.remove('networkGrp')
+
+						controllerResults[controller][apiversion][it2] = result
+					}else{
+						controllerResults.remove(controller)
+					}
+				}
+			}
+		}
+		return controllerResults
+	}
 }

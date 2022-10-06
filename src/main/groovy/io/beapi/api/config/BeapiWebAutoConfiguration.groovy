@@ -22,7 +22,7 @@ import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ExchangeService
 import io.beapi.api.service.TraceExchangeService
-import io.beapi.api.service.TraceService
+//import io.beapi.api.service.TraceService
 import org.slf4j.LoggerFactory
 import java.lang.reflect.Method
 
@@ -87,9 +87,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	@Autowired
 	ApiProperties apiProperties
 
-	@Autowired
-	TraceService traceService
-
 
 	String version
 
@@ -119,27 +116,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return version
 	}
 
-	//@Override
-	//public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-	//	configurer.enable();
-	//}
-
-	/*
-	@Bean
-	public ServletRegistrationBean exampleServletBean() {
-		ServletRegistrationBean bean = new ServletRegistrationBean(new ApiServlet(), "/v${this.version}/*");
-		bean.setLoadOnStartup(1);
-		return bean;
-	}
-
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/resources/**")
-				.addResourceLocations("/resources/").setCachePeriod(3600)
-				.resourceChain(true).addResolver(new PathResourceResolver());
-	}
-	 */
-
 	@Bean
 	public MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
@@ -155,17 +131,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return bean;
 	}
 
-/*
-	@Bean
-	public FilterRegistrationBean securityFilterChain(@Qualifier(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME) Filter securityFilter) {
-		FilterRegistrationBean registrationBean = new FilterRegistrationBean(securityFilter);
-		registrationBean.setOrder(Integer.MAX_VALUE);
-		registrationBean.setName(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME);
-		return registrationBean;
-	}
-
- */
-
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -177,21 +142,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		registrationBean.addUrlPatterns("/*");
 		return registrationBean;
 	}
-
-	/*
-	@Bean
-	@ConditionalOnMissingBean
-	public FilterRegistrationBean<CorsSecurityFilter> corsSecurityFilter() {
-		FilterRegistrationBean<CorsSecurityFilter> registrationBean = new FilterRegistrationBean<>();
-		registrationBean.setFilter(new CorsSecurityFilter(apiProperties, apiCacheService));
-		registrationBean.setOrder(SecurityProperties.DEFAULT_FILTER_ORDER+2)
-		registrationBean.addUrlPatterns("/*");
-		return registrationBean;
-	}
-
-	 */
-
-
 
 
 	@Bean(name='simpleUrlHandlerMapping')
@@ -211,7 +161,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 					for (Method method : v.getClass().getDeclaredMethods()) { methodNames.add(method.getName()) }
 
 					cache.each() { k2, v2 ->
-						if (!['values', 'currentstable', 'cacheversion'].contains(k2)) {
+						if (!['values', 'currentstable', 'cacheversion','networkGrp','networkGrpRoles'].contains(k2)) {
 							for (Map.Entry<Integer, Object> entry : v2.entrySet()) {
 								String action = entry.getKey()
 
@@ -220,21 +170,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 									String path = "${controller}/${action}" as String
 									urlMap += createControllerMappings(path, k2, v)
-
-									//Set<String> paths =  urlMap.keySet()
-									//corsMap += createCorsMappings(corsMap, paths,v2[action].networkGrp)
-
-
-									/*
-									String res1 = "/r${this.version}/${controller}/${action}/**" as String
-									urlMap.put(res1, v);
-									String res2 = "/r${this.version}-${k2}/${controller}/${action}/**" as String
-									urlMap.put(res2, v);
-									String res3 = "/r${this.version}/${controller}/${action}/" as String
-									urlMap.put(res3, v);
-									String res4 = "/r${this.version}-${k2}/${controller}/${action}/" as String
-									urlMap.put(res4, v);
-									*/
 
 								} else {
 									logger.debug("simpleUrlHandlerMapping() : {}", "Connector URI '${action}' for connector '${controller}' does not match any given method. Try ${methodNames}")
@@ -253,7 +188,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		mapping.setUrlMap(urlMap);
 		mapping.setOrder(1);
 		mapping.setInterceptors(new Object[]{
-				new ApiInterceptor(exchangeService, batchService, chainService, traceExchangeService, principleService, apiProperties)
+				new ApiInterceptor(exchangeService, batchService, chainService, traceExchangeService, apiProperties)
 		})
 		mapping.setApplicationContext(context);
 		//resourceCache.putAllResources(urlSet);

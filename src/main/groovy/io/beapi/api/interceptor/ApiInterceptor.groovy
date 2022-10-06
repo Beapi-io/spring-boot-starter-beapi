@@ -93,12 +93,11 @@ class ApiInterceptor implements HandlerInterceptor{
 	int callType
 
 
-	public ApiInterceptor(ExchangeService exchangeService, BatchExchangeService batchService, ChainExchangeService chainService, TraceExchangeService traceService,PrincipleService principle, ApiProperties apiProperties) {
-		this.principle = principle
+	public ApiInterceptor(ExchangeService exchangeService, BatchExchangeService batchService, ChainExchangeService chainService, TraceExchangeService traceService, ApiProperties apiProperties) {
 		this.exchangeService = exchangeService
 		this.batchService = batchService
 		this.chainService = chainService
-		this.traceExchangeService = traceExchangeService
+		this.traceExchangeService = traceService
 		this.apiProperties = apiProperties
 	}
 
@@ -108,15 +107,16 @@ class ApiInterceptor implements HandlerInterceptor{
 		//	return true;
 		//}
 		//logger.info("preHandle(HttpServletRequest, HttpServletResponse, Object) : {}");
-
+		println("### prehandle")
 		privateRoles = apiProperties.security.networkRoles['private'].collect() { k, v -> v }
 		this.uList = request.getAttribute('uriList')
 
 		this.callType = uList[0]
-		this.authority = principle.authorities()
+		this.authority = request.getAttribute('principle')
 
 		switch(callType){
 			case 1:
+				println("### exchangeService")
 				return exchangeService.apiRequest(request, response, this.authority)
 				break
 			case 2:
@@ -124,7 +124,7 @@ class ApiInterceptor implements HandlerInterceptor{
 					return batchService.batchRequest(request, response, this.authority)
 				}else{
 					writeErrorResponse(response,'401',request.getRequestURI())
-					response.writer.flush()
+					//response.writer.flush()
 					return false
 				}
 				break
@@ -133,7 +133,7 @@ class ApiInterceptor implements HandlerInterceptor{
 					return chainService.chainRequest(request, response, this.authority)
 				}else{
 					writeErrorResponse(response,'401',request.getRequestURI())
-					response.writer.flush()
+					//response.writer.flush()
 					return false
 				}
 				break
@@ -144,7 +144,7 @@ class ApiInterceptor implements HandlerInterceptor{
 				break
 			default:
 				writeErrorResponse(response,'400',request.getRequestURI())
-				response.writer.flush()
+				//response.writer.flush()
 				return false
 		}
 	}
@@ -153,13 +153,14 @@ class ApiInterceptor implements HandlerInterceptor{
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mv) throws Exception {
 		//logger.info("postHandle(HttpServletRequest, HttpServletResponse, Object, ModelAndView) : {}")
 		ArrayList body = request.getSession().getAttribute('responseBody')
-
+		println("### posthandle")
 
 		if(!body){
 			writeErrorResponse(response,'422',request.getRequestURI(),'No data returned for this call.')
 		}else {
 			switch (callType){
 				case 1:
+					println('post exchange???')
 					exchangeService.apiResponse(response,body)
 					response.writer.flush()
 					break
@@ -220,6 +221,6 @@ class ApiInterceptor implements HandlerInterceptor{
 		}
 		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
 		response.getWriter().write(message)
-		//response.writer.flush()
+		response.writer.flush()
 	}
 }

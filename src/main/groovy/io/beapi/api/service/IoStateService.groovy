@@ -285,6 +285,21 @@ public class IoStateService{
 						methods["${versKey}"] = new LinkedHashMap()
 					}
 
+
+					if (!methods['networkGrp']) {
+						methods['networkGrp'] = networkGrp
+					}
+
+					LinkedHashMap networkGrpRoles = apiProperties.security.networkRoles
+
+					if (!methods['networkGrpRoles']) {
+						methods['networkGrpRoles'] = []
+						networkGrpRoles[networkGrp].each(){ it ->
+							methods['networkGrpRoles'].add(it.getValue().value.toString())
+						}
+						//networkGrpRoles[networkGrp].each(){ it-> it.getValue().value }
+					}
+
 					if (!methods['values']) {
 						methods['values'] = new LinkedHashMap()
 						// [cacheversion:1, 1:[deprecated:[], defaultAction:vehiclesByManufacturer, testOrder:[], testUser:null, vehiclesByManufacturer:io.beapi.api.utils.ApiDescriptor@5524b72f], values:{"name":{"type":"String","description":"vehicle name","mockData":"mockTest"},"manufacturer":{"type":"String","description":"manufacturer name","mockData":"mockTest"}}, currentStable:[value:1]]
@@ -428,10 +443,19 @@ public class IoStateService{
 		LinkedHashMap responseObj =json.URI[uri].RESPONSE
 
 		LinkedHashMap receives = [:]
+		LinkedHashMap receivesList = [:]
 		LinkedHashMap returns = [:]
+		LinkedHashMap returnsList = [:]
 		try {
 			receives = getIOSet(requestObj, apiObject, keys, apiname)
+			receives.each() { k, v ->
+				receivesList[k] = v.collect() { it -> it.name }
+			}
+
 			returns = getIOSet(responseObj, apiObject, keys, apiname)
+			returns.each() { k, v ->
+				returnsList[k] = v.collect() { it -> it.name }
+			}
 		}catch(Exception e){
 			throw new Error("#### [IoStateService : getIoSet] : Exception: ",e)
 		}
@@ -443,7 +467,10 @@ public class IoStateService{
 		//	throw new Error("#### [IoStateService : createApiDescriptor] : Handler '${handler}' does not exist : Skipping endpoint creation for '${apiname}'",e)
 		//}
 
-		ApiDescriptor service = new ApiDescriptor(networkGrp, apiMethod, pkeys, fkeys, apiRoles, apiname, apiDescription, receives, returns)
+		//receives
+		//returns
+
+		ApiDescriptor service = new ApiDescriptor(networkGrp, apiMethod, pkeys, fkeys, apiRoles, apiname, apiDescription, receives, receivesList, returns, returnsList)
 
 		// override networkRoles with 'DEFAULT' in IO State
 
@@ -464,6 +491,9 @@ public class IoStateService{
 
 		return service
 	}
+
+
+
 
 	private LinkedHashMap getIOSet(LinkedHashMap io, LinkedHashMap apiObject,List valueKeys,String apiName){
 		logger.debug("getIOSet : {}")
@@ -489,9 +519,7 @@ public class IoStateService{
 					}
 				}
 			}
-
 		}
-
 
 		def permitAll = ioSet['permitAll']
 
@@ -505,13 +533,16 @@ public class IoStateService{
 			}
 		}
 
+
 		//List ioKeys = []
 		ioSet.each(){ k, v ->
 			List ioKeys = v.collect(){ it -> it.name }
+
 			if (!ioKeys.minus(valueKeys).isEmpty()) {
 				throw new Exception("[Runtime :: getIOSet] : VALUES for IO State [" + apiName + "] do not match REQUEST/RESPONSE values for endpoints")
 			}
 		}
+
 
 
 		return ioSet

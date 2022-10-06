@@ -37,7 +37,7 @@ public class ExchangeService extends ApiExchange{
 	String cacheHash
 	ApiCacheService apiCacheService
 	PrincipleService principle
-	int cores
+
 	boolean overrideAutoMimeTypes = false
 
 	public ExchangeService(ApiCacheService apiCacheService) {
@@ -67,6 +67,7 @@ public class ExchangeService extends ApiExchange{
 
     void apiResponse(HttpServletResponse response,ArrayList body){
         String output = parseOutput(body, responseFileType)
+		println('output : '+output)
 
         if(method=='GET') {
             apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
@@ -81,7 +82,7 @@ public class ExchangeService extends ApiExchange{
 	void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
 		String accept = request.getHeader('Accept')
 		String contentType = request.getContentType()
-		this.cores = request.getAttribute('cores')
+
 		this.responseFileType = request.getAttribute('responseFileType')
 		this.uList = request.getAttribute('uriList')
 		this.callType = uList[0]
@@ -96,7 +97,6 @@ public class ExchangeService extends ApiExchange{
 		this.trace = uList[6]
 		this.id = uList[7]
 		this.method = request.getMethod()
-
 		this.authority = authority
 		this.cache = apiCacheService.getApiCache(this.controller)
 		this.method = request.getMethod()
@@ -109,21 +109,15 @@ public class ExchangeService extends ApiExchange{
 
 
 		try {
-			//this.appVersion = request.getSession().getAttribute('version')
 			def temp = cache[this.apiversion]
 			this.defaultAction = temp['defaultAction']
 			this.deprecated = temp['deprecated'] as List
 			this.apiObject = temp[this.action]
-			//this.handler = this.apiObject['handler']
-			//request.getSession().setAttribute('handler', this.handler)
 			this.receives = this.apiObject.getReceives()
-			//this.receivesAuths = this.receives.keySet()
 			this.rturns = this.apiObject['returns'] as LinkedHashMap
 			this.returnsAuths = this.rturns.keySet()
 			//this.networkGrp = this.apiObject['networkGrp']
 			this.method = request.getMethod()
-			//LinkedHashMap tempNetworkRoles = networkGrpRoles[this.networkGrp].each(){ it-> it.getValue() }
-			//this.networkRoles = tempNetworkRoles.collect{entry -> entry.value}
 		} catch (Exception e) {
 			throw new Exception("[ExchangeObject :: init] : Exception. full stack trace follows:", e)
 		}

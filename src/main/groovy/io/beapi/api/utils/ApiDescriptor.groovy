@@ -63,10 +63,12 @@ class ApiDescriptor implements Serializable{
 	LinkedHashMap doc
     LinkedHashMap<String,ParamsDescriptor> receives
     LinkedHashMap<String,ParamsDescriptor> returns
+	LinkedHashMap<String,ArrayList> receivesList
+	LinkedHashMap<String,ArrayList> returnsList
 	LinkedHashMap cachedResult
 	//LinkedHashMap stats
 
-	ApiDescriptor(String networkGrp, String method, LinkedHashSet pkeys, LinkedHashSet fkeys, ArrayList roles,String name, String description, LinkedHashMap receives, LinkedHashMap returns) {
+	ApiDescriptor(String networkGrp, String method, LinkedHashSet pkeys, LinkedHashSet fkeys, ArrayList roles,String name, String description, LinkedHashMap receives, LinkedHashMap receivesList, LinkedHashMap returns, LinkedHashMap returnsList) {
 		this.networkGrp = networkGrp
 		this.method = method
 		this.pkeys=pkeys
@@ -75,7 +77,9 @@ class ApiDescriptor implements Serializable{
 		this.name=name
 		this.description=description
 		this.receives=receives as LinkedHashMap
+		this.receivesList=receivesList as LinkedHashMap
 		this.returns=returns as LinkedHashMap
+		this.returnsList=returnsList as LinkedHashMap
 	}
 
 	public String getMethod() {
@@ -114,16 +118,20 @@ class ApiDescriptor implements Serializable{
 		return this.description;
 	}
 
-	public LinkedHashMap getDoc() {
-		return this.doc
-	}
-
 	public LinkedHashMap getReceives() {
 		return this.receives
 	}
 
+	public LinkedHashMap getReceivesList() {
+		return this.receivesList
+	}
+
 	public LinkedHashMap getReturns() {
 		return this.returns
+	}
+
+	public LinkedHashMap getReturnsList() {
+		return this.returnsList
 	}
 
 	public LinkedHashMap getCachedResult() {
