@@ -39,7 +39,7 @@ public class TraceExchangeService extends ApiExchange{
 	ApiCacheService apiCacheService
 	TraceService traceService
 	PrincipleService principle
-	int cores
+
 	boolean overrideAutoMimeTypes = false
 	String sessionId
 
@@ -90,7 +90,7 @@ public class TraceExchangeService extends ApiExchange{
 	void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
 		String accept = request.getHeader('Accept')
 		String contentType = request.getContentType()
-		this.cores = request.getAttribute('cores')
+
 		this.responseFileType = request.getAttribute('responseFileType')
 		this.uList = request.getAttribute('uriList')
 		this.callType = uList[0]

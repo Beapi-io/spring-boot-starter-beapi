@@ -43,7 +43,7 @@ abstract class ApiExchange{
     protected String defaultAction
     protected String appversion
     protected String apiversion
-    public int cores
+
     String requestFormat
     protected String requestMimeType
     protected String requestFileType
@@ -83,7 +83,7 @@ abstract class ApiExchange{
     String method
     boolean trace
     public String id
-    int cores
+
 
 
     boolean validateMethod(){

@@ -159,7 +159,7 @@ public class ChainExchangeService extends ApiExchange{
 			// initial call
 			String accept = request.getHeader('Accept')
 			String contentType = request.getContentType()
-			this.cores = request.getAttribute('cores')
+
 			this.responseFileType = request.getAttribute('responseFileType')
 
 			this.uList = request.getAttribute('uriList')

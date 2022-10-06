@@ -62,7 +62,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
     public String controller
     public String action
     public String apiversion
-    public int cores
+
     public LinkedHashMap<String,String> params = [:]
 
 
@@ -74,30 +74,24 @@ class BeapiRequestHandler implements HttpRequestHandler {
         ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
 
         uList = request.getAttribute('uriList')
-        uList = request.getAttribute('uriList')
         apiversion = uList[3]
         controller = request.getSession().getAttribute('controller')
         action = request.getSession().getAttribute('action')
-
-        // todo : fix handler
-
-
         trace = request.getSession().getAttribute('trace')
-        cores = request.getAttribute('cores')
         params = request.getSession().getAttribute('params') as LinkedHashMap
 
-        ArrayList result = []
         Object output
 
 
-        // CONTROLLER CALLS
-        Class<?> classObj = this.getClass();
+
+
 
 
         // TRACESERVICE CHECK
         if (trace == true) { traceService.startTrace(controller, action, request.getSession().getId()) }
 
         // create method call
+        Class<?> classObj = this.getClass();
         try {
             Method method = classObj.getMethod(action, HttpServletRequest.class, HttpServletResponse.class);
 
@@ -117,6 +111,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
             }
 
             if (output) {
+                ArrayList result = []
                 if (trace == true) {
                     Object trace = traceService.endAndReturnTrace(controller, action, request.getSession().getId())
                     result = convertModel(trace)
@@ -152,7 +147,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
         try{
             //traceService.startTrace('ControllerUtil','convertModel')
             ArrayList output = []
-
             if(obj){
                 switch(obj){
                     case {it.getClass().getAnnotation(Entity.class) != null}:
