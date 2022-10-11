@@ -39,6 +39,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - added IO state reloading functionality
 - lack of 'action' for mapping will default to 'apidocs/show' for only THAT controller; this makes it so if you dont know what you are calling, it provides fast/automated lookup
 - apicalls with no 'action' will send back apidocs for endpoints for that controller that TOKEN has access to
+- added receivesList/returnsList to ApiDescriptor
+- added 'getApiDescriptor()' to IoStateService
 
 ### Changed
 - simplifying mapping in config
