@@ -132,7 +132,6 @@ class ApiCacheService{
 	LinkedHashMap setApiCache(String controllername, String methodname, ApiDescriptor apidoc, String apiversion){
 		//logger.debug("setApiCache(String ,String ,ApiDescriptor ,String) : {}","${controllername}/${methodname}")
 		try{
-
 			LinkedHashMap cache = getApiCache(controllername)
 
 			if(!cache["${apiversion}"]){
@@ -144,7 +143,7 @@ class ApiCacheService{
 			}
 
 			cache["${apiversion}"][methodname]['name'] = apidoc.name
-			cache["${apiversion}"][methodname]['description'] = apidoc.description
+			//cache["${apiversion}"][methodname]['description'] = apidoc.description
 			cache["${apiversion}"][methodname]['receives'] = apidoc.receives
 			cache["${apiversion}"][methodname]['returns'] = apidoc.returns
 
@@ -248,76 +247,7 @@ class ApiCacheService{
 
 
 
-	/**
-	 * Method to autogenerate the apidoc data set from loaded IO state files
-	 * @param String controllername for designated endpoint
-	 * @param String actionname for designated endpoint
-	 * @param String apiversion of current application
-	 * @return A LinkedHashMap of all apidoc information for all roles which can be easily traversed
-	 */
-	LinkedHashMap generateApiDoc(String controllername, String actionname, String apiversion){
-		//logger.debug("generateApiDoc(String, String, String) : {}","${controllername}/${actionname}/v${apiversion}")
 
-		try{
-			LinkedHashMap doc = [:]
-			LinkedHashMap cache = getApiCache(controllername)
-
-            // TODO : GET CURRENT APP VERSION
-			//String apiPrefix = "v${this.version}"
-
-			if(cache){
-				String path = "/${apiversion}/${controllername}/${actionname}"
-				doc = ['path':path,'method':cache[apiversion][actionname]['method'],'description':cache[apiversion][actionname]['description']]
-				if(cache[apiversion][actionname]['receives']){
-					doc['receives'] = [:]
-					for(receiveVal in cache[apiversion][actionname]['receives']){
-						if(receiveVal?.key) {
-							doc['receives']["$receiveVal.key"] = receiveVal.value
-						}
-					}
-				}
-
-				if(cache[apiversion][actionname]['pkey']) {
-					doc['pkey'] = []
-					cache[apiversion][actionname]['pkey'].each(){
-							doc['pkey'].add(it)
-					}
-				}
-
-				if(cache[apiversion][actionname]['fkeys']) {
-					doc['fkeys'] = [:]
-					for(fkeyVal in cache[apiversion][actionname]['fkeys']){
-						if(fkeyVal?.key) {
-							doc['fkeys']["$fkeyVal.key"] = JsonOutput.toJson(fkeyVal.value)
-						}
-					}
-				}
-
-				doc['receives'] = [:]
-				if(cache[apiversion][actionname]['receives']){
-					for(returnVal in cache[apiversion][actionname]['receives']){
-						if(returnVal?.key) {
-							doc['receives']["$returnVal.key"] = returnVal.value
-						}
-					}
-				}
-
-				doc['returns'] = [:]
-				if(cache[apiversion][actionname]['returns']){
-					for(returnVal in cache[apiversion][actionname]['returns']){
-						if(returnVal?.key) {
-							doc['returns']["$returnVal.key"] = returnVal.value
-						}
-					}
-				}
-
-			}
-
-			return doc
-		}catch(Exception e){
-			throw new Exception("[ApiCacheService :: generateApiDoc] : Exception - full stack trace follows:",e)
-		}
-	}
 
 	/**
 	 * Method to get the 'ApiCache' cache object
@@ -334,6 +264,32 @@ class ApiCacheService{
 				// do check; check with put
 				LinkedHashMap cache2 = temp.get(controllername)?.getObjectValue()
 				return cache2
+			} catch (Exception e) {
+				throw new Exception("[ApiCacheService :: getApiCache] : no cache found for handler '${controllername}'. full stack trace follows:", e)
+			}
+		}else{
+			throw new Exception("[ApiCacheService :: getApiCache] : no cache found for 'NULL_HANDLER' '${controllername}'.")
+		}
+		return [:]
+	}
+
+	/**
+	 * Method to get the 'ApiCache' cache object
+	 * @param String controller name for designated endpoint
+	 * @return A LinkedHashMap of Cached data associated with controllername
+	 */
+	//@Cacheable(value='ApiCache',key="#controllername",sync=false)
+	ApiDescriptor getApiDescriptor(String controllername, String version, String action){
+		//logger.debug("getApiCache(String) : {}",controllername)
+		if(controllername!=null) {
+			try {
+				//cacheManager.setTransactionAware(false);
+				net.sf.ehcache.Ehcache temp = cacheManager?.getCache('ApiCache')?.getNativeCache()
+				// do check; check with put
+				LinkedHashMap cache2 = temp.get(controllername)?.getObjectValue()
+				def temp2 = cache2[version]
+				ApiDescriptor apiObject = temp2[action]
+				return apiObject
 			} catch (Exception e) {
 				throw new Exception("[ApiCacheService :: getApiCache] : no cache found for handler '${controllername}'. full stack trace follows:", e)
 			}

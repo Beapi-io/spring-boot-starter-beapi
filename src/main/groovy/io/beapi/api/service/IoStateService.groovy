@@ -148,7 +148,7 @@ public class IoStateService{
 		logger.debug("parseFiles : {}")
 		LinkedHashMap methods = [:]
 
-		println ' ### Loading IO State Files'
+		println(' ### Loading IO State Files : '+path)
 
 		try {
 			new File(path).eachFile() { file ->
@@ -170,7 +170,7 @@ public class IoStateService{
 
 							try{
 								parseJson(json.IOSTATE.NAME.toString(), json.IOSTATE)
-							}catch(java.lang.reflect.UndeclaredThrowableException e){
+							}catch(Exception e){
 								println("#### [IoStateService] Exception :"+e)
 							}
 						} else {
@@ -199,11 +199,6 @@ public class IoStateService{
 		//}
 
 
-		if(json['VERSION'] instanceof java.lang.String){
-			println("### VERSION: "+json['VERSION'])
-		}else{
-			println(json['VERSION'].getClass())
-		}
 
 		json['VERSION'].each(){ k, v ->
 			String versKey = k
@@ -242,7 +237,6 @@ public class IoStateService{
 
 
 					String apiMethod = RequestMethod.valueOf(uriObject.METHOD).toString()
-					String apiDescription = uriObject.DESCRIPTION
 
 
 					ArrayList apiRoles = []
@@ -277,10 +271,11 @@ public class IoStateService{
 
 					// TODO
 					try {
-						apiDescriptor = createApiDescriptor(networkGrp, apiName, apiMethod, apiDescription, apiRoles, batchRoles, hookRoles, actionname, vals, apiVersion)
+						apiDescriptor = createApiDescriptor(networkGrp, apiName, apiMethod, apiRoles, batchRoles, hookRoles, actionname, vals, apiVersion)
 					} catch (Exception e) {
 						println("unable to create ApiDescriptor. Check your IO State Formatting  : " + e)
 					}
+
 					if (!methods["${versKey}"]) {
 						methods["${versKey}"] = new LinkedHashMap()
 					}
@@ -291,13 +286,11 @@ public class IoStateService{
 					}
 
 					LinkedHashMap networkGrpRoles = apiProperties.security.networkRoles
-
+					
 					if (!methods['networkGrpRoles']) {
 						methods['networkGrpRoles'] = []
-						networkGrpRoles[networkGrp].each(){ it ->
-							methods['networkGrpRoles'].add(it.getValue().value.toString())
-						}
-						//networkGrpRoles[networkGrp].each(){ it-> it.getValue().value }
+						ArrayList temp = networkGrpRoles[networkGrp].values()
+						methods['networkGrpRoles'] = temp
 					}
 
 					if (!methods['values']) {
@@ -348,7 +341,7 @@ public class IoStateService{
 				cache["${versKey}"].each(){ key1,val1 ->
 					if(!['deprecated','defaultAction','testOrder'].contains(key1)){
 						try {
-							apiCacheService.setApiCache(apiName, key1, val1, versKey)
+							def test = apiCacheService.setApiCache(apiName, key1, val1, versKey)
 						}catch(Exception e){
 							println("#### IoStateService Exception2 : "+e)
 						}
@@ -367,7 +360,7 @@ public class IoStateService{
 		//return methods
 	}
 
-	protected ApiDescriptor createApiDescriptor(String networkGrp, String apiname, String apiMethod, String apiDescription, ArrayList apiRoles, LinkedHashSet batchRoles, LinkedHashSet hookRoles, String uri, LinkedHashMap vals, LinkedHashMap json) throws Exception{
+	protected ApiDescriptor createApiDescriptor(String networkGrp, String apiname, String apiMethod, ArrayList apiRoles, LinkedHashSet batchRoles, LinkedHashSet hookRoles, String uri, LinkedHashMap vals, LinkedHashMap json) throws Exception{
 		logger.debug("createApiDescriptor : {}")
 
 		LinkedHashMap<String, ParamsDescriptor> apiObject = new LinkedHashMap()
@@ -412,9 +405,6 @@ public class IoStateService{
 					}
 
 				}
-
-				String hasDescription = (v?.description) ? v.description : ''
-				param.setDescription(hasDescription)
 
 				if (v.mockData!=null) {
 					if(v.mockData.isEmpty()){
@@ -470,7 +460,7 @@ public class IoStateService{
 		//receives
 		//returns
 
-		ApiDescriptor service = new ApiDescriptor(networkGrp, apiMethod, pkeys, fkeys, apiRoles, apiname, apiDescription, receives, receivesList, returns, returnsList)
+		ApiDescriptor service = new ApiDescriptor(networkGrp, apiMethod, pkeys, fkeys, apiRoles, apiname, receives, receivesList, returns, returnsList)
 
 		// override networkRoles with 'DEFAULT' in IO State
 

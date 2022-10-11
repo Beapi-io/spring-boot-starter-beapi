@@ -77,14 +77,14 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     String cacheHash
 
     // todo : parse headers
-    LinkedHashMap<String, List<String>> headers = [:]
+    //LinkedHashMap<String, List<String>> headers = [:]
 
 
     ArrayList uriList
     String uri
-    UriObject uriObject
+    //UriObject uriObject
     LinkedHashMap receives = [:]
-    ArrayList receivesList = []
+    Set receivesList = []
     LinkedHashMap rturns = [:]
     String method
     String controller
@@ -125,39 +125,22 @@ class RequestInitializationFilter extends OncePerRequestFilter{
             ArrayList uriVars = uri.split('/')
             this.controller = uriVars[0]
         }else{
-            // println("### APIS HANDLED BY THE STARTER ###")
-
+            // ### APIS HANDLED BY THE STARTER ###
             this.authority = this.principle.authorities()
             this.uriList = setUri(this.uri, this.version)
 
-            // no action; show apidocs for controller
-            if(!this.uriList[5]){
-                println(this.uriList[5])
-                this.uriList[7] = this.uriList[4]
-                this.uriList[4] = 'apidoc'
-                this.uriList[5] = 'show'
-                println(uriList)
-                apidocFwd = true
-            }
-
-
-
-            if(!request.getAttribute('principle')) {
-                request.setAttribute('principle', this.authority)
-            }
+            if(!request.getAttribute('principle')) { request.setAttribute('principle', this.authority) }
 
             try {
                 this.method = request.getMethod()
                 this.reservedUri = (apiProperties.reservedUris.contains(this.uri)) ? true : false
 
                 // get apiObject
-
-                def cache = apiCacheService?.getApiCache(uriList[4])
+                def cache = apiCacheService.getApiCache(uriList[4])
                 def temp = cache[uriList[3]]
-                this.deprecated = temp['deprecated'] as List
 
-                // todo : if no action, default to apidoc/show/id
-
+                //this.deprecated = temp['deprecated'] as List
+                //if(!request.getAttribute('deprecated')){ request.setAttribute('deprecated', this.deprecated) }
 
                 if (cache) {
                     this.apiObject = temp[uriList[5]]
@@ -165,50 +148,34 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                     ArrayList networkRoles = cache.networkGrpRoles
                     if (checkNetworkGrp(networkRoles, this.authority)) {
-                        LinkedHashMap tmp1 = this.apiObject?.getReceivesList()
-                        this.receivesList = (tmp1[this.authority]) ? tmp1[this.authority] : tmp1['permitAll']
+                        // setReceivesList
+                        LinkedHashMap receives = this.apiObject?.getReceivesList()
+                        this.receivesList = (receives[this.authority]) ? receives[this.authority] : receives['permitAll']
+                        //request.setAttribute('receivesList', receivesList)
 
-
-
-                        request.getSession().setAttribute('receivesList', this.receivesList)
-
+                        // setReturnsList
                         LinkedHashMap rturn = this.apiObject?.getReturnsList()
-                        ArrayList returnsList = (rturn[this.authority]) ? rturn[this.authority] : rturn['permitAll']
-                        request.getSession().setAttribute('returnsList', returnsList)
+                        Set returnsList = (rturn[this.authority]) ? rturn[this.authority] : rturn['permitAll']
+                        //request.setAttribute('returnsList', returnsList)
                     } else {
                         throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Request params do not match expect params for '${uri}'")
                     }
 
                     if(uriList[7]) {
-                        println('has id')
-                        println(this.receivesList)
-                        println(apidocFwd)
                         if (!this.receivesList?.contains('id') && apidocFwd==false) {
-                            println("##### receiveslist rejection")
                             writeErrorResponse(response, '400', request.getRequestURI());
                         }
                     }
-
-
-                    parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(), uriList[7])
-                    if (!checkRequestParams(request.getSession().getAttribute('params'))) {
-                        println("### bad checkRequestParams")
-                        writeErrorResponse(response, '400', request.getRequestURI());
-                        throw new Exception("[RequestInitializationFilter :: checkRequestParams] : Requestparams do not match expected params for this endpoint")
-                    }
-
 
                     String temp2 = (request.getHeader('Accept') != null && request.getHeader('Accept') != "*/*") ? request.getHeader('Accept') : request.getContentType()
                     ArrayList reqMime = temp2.split(';')
                     ArrayList respMime = request.getContentType().split(';')
 
                     String requestMimeType = reqMime[0]
-                    String requestEncoding = reqMime[1]
-
+                    //String requestEncoding = reqMime[1]
 
                     this.requestFileType = (SUPPORTED_MIME_TYPES.contains(requestMimeType)) ? getFormat(requestMimeType) : 'JSON'
                     if (!this.requestFileType) {
-                        println("### bad requestFileType")
                         String msg = "Request MimeType must be one of the supported mimetypes (JSON/XML)"
                         writeErrorResponse(response, '400', request.getRequestURI(), msg);
                         throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Accept/Request mimetype unsupported")
@@ -216,18 +183,27 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                     this.responseFileType = (this.requestFileType) ? this.requestFileType : getFormat(respMime[0])
                     if (!this.responseFileType) {
-                        println("### bad responseFileType")
                         String msg = "Response MimeType must be one of the supported mimetypes (JSON/XML)"
                         writeErrorResponse(response, '400', request.getRequestURI(), msg);
                         throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Content-type unsupported")
                     }
 
-                    String responseMimeType = respMime[0]
+                    parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(), uriList[7])
+                    if (!checkRequestParams(request.getAttribute('params'))) {
+                        writeErrorResponse(response, '400', request.getRequestURI());
+                        throw new Exception("[RequestInitializationFilter :: checkRequestParams] : Requestparams do not match expected params for this endpoint")
+                    }
 
+
+
+
+
+                    String responseMimeType = respMime[0]
                     request.setAttribute('responseMimeType', responseMimeType)
                     request.setAttribute('responseFileType', responseFileType)
 
-
+                    // todo : remove
+                    //if(!request.getAttribute('apiObject')){ request.setAttribute('apiObject', this.apiObject) }
                 }
                 // todo : test requestEncoding against apiProperties.encoding
 
@@ -237,45 +213,16 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
             request.setAttribute('uriList', this.uriList)
 
-            if (this.apiObject) {
-                // todo : create public api list
-                if (this.method == 'GET') {
-
-                    setCacheHash(request.getSession().getAttribute('params'), this.receivesList)
-
-                    // RETRIEVE CACHED RESULT (only if using 'GET' method)
-                    if ((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}" || apiObject?.cachedResult?."permitAll"?."${responseFileType}"?."${cacheHash}")) {
-                        String cachedResult
-                        try {
-                            cachedResult = (apiObject['cachedResult'][authority]) ? apiObject['cachedResult'][authority][responseFileType][cacheHash] : apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
-                        } catch (Exception e) {
-                            throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
-                        }
-
-                        if (cachedResult && cachedResult.size() > 0) {
-                            // PLACEHOLDER FOR APITHROTTLING
-                            response.setStatus(200);
-                            PrintWriter writer = response.getWriter();
-                            writer.write(cachedResult);
-                            writer.close()
-                            //response.writer.flush()
-                            //return false
-                        }
-                    }
-                }
-            }
         }
 
         if(apidocFwd){
             def servletCtx = this.ctx.getServletContext()
             String newPath = "/v${uriList[2]}/${uriList[4]}/${uriList[5]}/${uriList[4]}"
             def rd = servletCtx?.getRequestDispatcher(newPath)
-            println("newpath : "+newPath)
             rd.forward(request, response)
         }else{
             chain.doFilter(request, response)
         }
-
     }
 
 
@@ -318,37 +265,28 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                 uriList.add(uriVars[2])
                 uriList.add(uriVars[3])
 
-                if(callType==5){ trace=true }
+                if(callType==4){ trace=true }
                 uriList.add(trace)
 
-
-                if(uriVars[4]){ uriList.add(URLDecoder.decode(uriVars[4], StandardCharsets.UTF_8.toString())) }
+                if(uriVars[4]){
+                    uriList.add(URLDecoder.decode(uriVars[4], StandardCharsets.UTF_8.toString()))
+                }
                 break
+        }
+
+        if(!uriList[5]){
+            uriList[7] = uriList[4]
+            uriList[4] = 'apidoc'
+            uriList[5] = 'show'
+            this.apidocFwd = true
         }
 
         return uriList
     }
 
-    /**
-     * Returns concatenated IDS as a HASH used as ID for the API cache
-     * @see io.beapi.api.interceptor.ApiInterceptor#before()
-     * @see BatchInterceptor#before()
-     * @see ChainInterceptor#before()
-     * @param LinkedHashMap List of ids required when making request to endpoint
-     * @return a hash from all id's needed when making request to endpoint
-     */
-    protected void setCacheHash(LinkedHashMap params,ArrayList receivesList){
-        StringBuilder hashString = new StringBuilder('')
-        receivesList.each(){ it ->
-            hashString.append(params[it])
-            hashString.append("/")
-        }
-        this.cacheHash = Hashing.murmur3_32().hashString(hashString.toString(), StandardCharsets.UTF_8).toString()
-    }
+
 
     protected boolean checkNetworkGrp(ArrayList networkRoles, String authority){
-        println("networkRoles: "+networkRoles)
-        println("auth : "+authority)
         return networkRoles.contains(authority)
     }
 
@@ -376,9 +314,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     // remove reservedNames from List
                     reservedNames.each() { paramsList.remove(it) }
 
-                    println("paramlist : "+paramsList)
-                    println("checklist : "+checkList)
-
                     if (paramsList.size() == checkList?.intersect(paramsList).size()) {
                         return true
                     }
@@ -398,43 +333,47 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
     protected void parseParams(HttpServletRequest request, String formData, String uriData, String id){
         LinkedHashMap<String,String> get = parseGetParams(uriData, id)
-        request.getSession().setAttribute('GET',get)
+        request.setAttribute('GET',get)
+
         LinkedHashMap<String,String> post = parsePutParams(formData)
 
         // set batchVars if they are present
+        /*
         if(post['batchVars']){
-            if(!request.getSession().getAttribute('batchVars')) { request.getSession().setAttribute('batchVars', post['batchVars']) }
+            if(!request.getAttribute('batchVars')) { request.setAttribute('batchVars', post['batchVars']) }
             post.remove('batchVars')
         }
 
         if(post['chainOrder']){
-            if(!request.getSession().getAttribute('chainOrder')) { request.getSession().setAttribute('chainOrder', post['chainOrder']) }
+            if(!request.getAttribute('chainOrder')) { request.setAttribute('chainOrder', post['chainOrder']) }
             post.remove('chainOrder')
         }
 
         if(post['chainType']){
-            if(!request.getSession().getAttribute('chainType')) { request.getSession().setAttribute('chainType', post['chainType']) }
+            if(!request.getAttribute('chainType')) { request.setAttribute('chainType', post['chainType']) }
             post.remove('chainType')
         }
 
         if(post['chainKey']){
-            if(!request.getSession().getAttribute('chainKey')) { request.getSession().setAttribute('chainKey', post['chainKey']) }
+            if(!request.getAttribute('chainKey')) { request.setAttribute('chainKey', post['chainKey']) }
             post.remove('chainKey')
         }
 
         if(post['chainSize']){
-            if(!request.getSession().getAttribute('chainSize')) { request.getSession().setAttribute('chainSize', post['chainSize']) }
+            if(!request.getAttribute('chainSize')) { request.setAttribute('chainSize', post['chainSize']) }
             post.remove('chainSize')
         }
 
         if(post['chainParams']){
-            if(!request.getSession().getAttribute('chainParams')) { request.getSession().setAttribute('chainParams', post['chainParams']) }
+            if(!request.getAttribute('chainParams')) { request.setAttribute('chainParams', post['chainParams']) }
             post.remove('chainParams')
         }
 
-        request.getSession().setAttribute('POST',post)
-        LinkedHashMap<String,String> output = get + post
-        request.getSession().setAttribute('params',output)
+         */
+
+        request.setAttribute('POST',post)
+        //LinkedHashMap<String,String> output = get + post
+        //request.setAttribute('params',output)
     }
 
     private LinkedHashMap parseGetParams(String uriData, String id){
@@ -480,7 +419,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
             if(object) {
                 Set<String> keyset = object.keySet()
                 Iterator keys = keyset.iterator();
-
                 switch(keyset){
                     case {it.contains('chain')}:
                         LinkedHashMap temp = [:]

@@ -117,7 +117,7 @@ public class BeapiServiceAutoConfiguration {
 	@Bean(name='traceService')
 	@ConditionalOnMissingBean
 	public TraceService traceService() throws IOException {
-		return new TraceService(traceCacheService, applicationContext)
+		return new TraceService(traceCacheService)
 	}
 
 	@Bean(name='traceExchangeService')

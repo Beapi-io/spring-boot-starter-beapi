@@ -28,12 +28,11 @@ import org.springframework.web.context.request.RequestAttributes
 @Service
 public class TraceService{
 
-	ApplicationContext ctx
+
 	TraceCacheService traceCacheService
 
-	public TraceService(TraceCacheService traceCacheService, ApplicationContext applicationContext) {
+	public TraceService(TraceCacheService traceCacheService) {
 		this.traceCacheService = traceCacheService
-		this.ctx = applicationContext
 	}
 
 	private HttpServletRequest getRequest(){
