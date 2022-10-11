@@ -37,12 +37,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - updating mapping to automate CORS whitelisting per networkGrp; this allows for separate frontends for each 'backend' environment thus separating api environments by networkgrp on front/backend
 - adding automated role-based apidocs; role based so user only sees docs they have access too (OWASP API COMPLIANT)
 - added IO state reloading functionality
+- lack of 'action' for mapping will default to 'apidocs/show' for only THAT controller; this makes it so if you dont know what you are calling, it provides fast/automated lookup
 - apicalls with no 'action' will send back apidocs for endpoints for that controller that TOKEN has access to
 
 ### Changed
 - simplifying mapping in config
 - removing resource handling for file uploads except for supported mimetypes (JSON/XML); not a file server
 - allowing api data to be sent as FILE; can simplify batching and complex calls to put JSON/XML all in FILE to send, detect and auto-parse into params (which we then check to see if they match expected request data for endpoint)
+- performance improvements
 
 
  ## 0.6 - (projected release Feb/2023)
