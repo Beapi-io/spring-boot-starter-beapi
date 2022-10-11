@@ -51,13 +51,25 @@ public class BatchExchangeService extends ApiExchange{
 	}
 
 	boolean batchRequest(HttpServletRequest request, HttpServletResponse response, String authority) {
+		def post = request.getAttribute('POST')
+		def get = request.getAttribute('GET')
+
+		if(post['batchVars']){
+			if(!request.getAttribute('batchVars')) { request.setAttribute('batchVars', post['batchVars']) }
+			post.remove('batchVars')
+		}
+
+		LinkedHashMap<String,String> output = get + post
+		request.setAttribute('params',output)
+
+
 		initVars(request,response,authority)
 		setBatchParams(request)
 		if(!validateMethod()){
 			writeErrorResponse(response,'405',request.getRequestURI());
 		}
 
-		if (!checkRequestParams(request.getSession().getAttribute('params'))) {
+		if (!checkRequestParams(request.getAttribute('params'))) {
 			writeErrorResponse(response, '400', request.getRequestURI());
 		}
 
@@ -67,7 +79,7 @@ public class BatchExchangeService extends ApiExchange{
 
 	void batchResponse(HttpServletRequest request, HttpServletResponse response, ArrayList body){
 		if (body) {
-			if(request.getSession().getAttribute('batchVars').isEmpty()) {
+			if(request.getAttribute('batchVars').isEmpty()) {
 				// concat and return
 				parseBatchOutput(body, request, response, this.responseFileType)
 			}else{
@@ -113,6 +125,7 @@ public class BatchExchangeService extends ApiExchange{
 		}
 	}
 
+
 	void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
 		String accept = request.getHeader('Accept')
 		String contentType = request.getContentType()
@@ -124,9 +137,9 @@ public class BatchExchangeService extends ApiExchange{
 		this.appversion = uList[2]
 		this.apiversion = uList[3]
 		this.controller = uList[4]
-		request.getSession().setAttribute('controller',this.controller)
+		request.setAttribute('controller',this.controller)
 		this.action = uList[5]
-		request.getSession().setAttribute('action',this.action)
+		request.setAttribute('action',this.action)
 		this.trace = uList[6]
 		this.id = uList[7]
 		this.method = request.getMethod()
@@ -135,20 +148,26 @@ public class BatchExchangeService extends ApiExchange{
 		this.cache = apiCacheService.getApiCache(this.controller)
 		this.method = request.getMethod()
 		this.uri = request.getRequestURI()
-		this.receivesList = request.getSession().getAttribute('receivesList')
-		this.returnsList = request.getSession().getAttribute('returnsList')
+		//this.receivesList = request.getAttribute('receivesList')
+		//this.returnsList = request.getAttribute('returnsList')
 
 		// TODO : set 'max'
 		// TODO : set 'offset'
 
 		try {
-			//this.appVersion = request.getSession().getAttribute('version')
+			//this.appVersion = request.getAttribute('version')
 			def temp = cache[this.apiversion]
 			this.defaultAction = temp['defaultAction']
 			this.deprecated = temp['deprecated'] as List
-			this.apiObject = temp[this.action]
+			//this.apiObject = temp[this.action]
+
+			this.apiObject = apiCacheService.getApiDescriptor(this.controller, this.apiversion, this.action)
+			this.receivesList = (this.apiObject.receivesList[this.authority]) ? this.apiObject.receivesList[this.authority] : this.apiObject.receivesList['permitAll']
+			this.returnsList = (this.apiObject.returnsList[this.authority]) ? this.apiObject.returnsList[this.authority] : this.apiObject.returnsList['permitAll']
+			if(!request.getAttribute('responseList')){ request.setAttribute('responseList',this.returnsList) }
+
 			//this.handler = this.apiObject['handler']
-			//request.getSession().setAttribute('handler',this.handler)
+			//request.setAttribute('handler',this.handler)
 			this.receives = this.apiObject.getReceives()
 			//this.receivesAuths = this.receives.keySet()
 			this.rturns = this.apiObject['returns'] as LinkedHashMap
@@ -165,7 +184,7 @@ public class BatchExchangeService extends ApiExchange{
 	void parseBatchOutput(ArrayList responseBody, HttpServletRequest request, HttpServletResponse response, String responseFileType){
 		this.batch.add(responseBody[0])
 
-		if(request.getSession().getAttribute('batchVars').isEmpty()) {
+		if(request.getAttribute('batchVars').isEmpty()) {
 			String output = "["
 			int inc = 0
 			this.batch.each(){ it ->
@@ -198,17 +217,16 @@ public class BatchExchangeService extends ApiExchange{
 
 	void setBatchParams(HttpServletRequest request){
 		try {
-			if(request.getSession().getAttribute('batchVars')) {
+			if(request.getAttribute('batchVars')) {
 				LinkedHashMap output = [:]
-				def temp = request.getSession().getAttribute('batchVars').remove(0).entrySet()
+				def temp = request.getAttribute('batchVars').remove(0).entrySet()
 				temp.each(){ output[it.key] = it.value }
 
 				// todo : check keys against against 'receivesList' in IO State for role
-
-				request.getSession().setAttribute('params',output)
+				request.setAttribute('params',output)
 			}
 		} catch (Exception e) {
-			throw new Exception("[ApiExchange :: setBatchParams] : Exception - full stack trace follows:", e)
+			throw new Exception("[BatchExchangeService :: setBatchParams] : Exception - full stack trace follows:", e)
 		}
 	}
 

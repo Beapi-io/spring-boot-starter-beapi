@@ -98,10 +98,10 @@ public class BeapiEhCacheAutoConfiguration  implements CachingConfigurer {
             cacheConfig1.overflowToDisk(true)
             cacheConfig1.diskPersistent(true)
             cacheConfig1.diskExpiryThreadIntervalSeconds(120)
-            cacheConfig1.setMaxElementsInMemory(1000)
-            cacheConfig1.setMaxElementsOnDisk(5000)
-            cacheConfig1.maxEntriesLocalHeap(1000)
-            cacheConfig1.maxEntriesLocalDisk(5000)
+            cacheConfig1.setMaxElementsInMemory(10000)
+            cacheConfig1.setMaxElementsOnDisk(10000)
+            cacheConfig1.maxEntriesLocalHeap(10000)
+            cacheConfig1.maxEntriesLocalDisk(10000)
             cacheConfig1.memoryStoreEvictionPolicy(net.sf.ehcache.store.MemoryStoreEvictionPolicy.FIFO)
 
 

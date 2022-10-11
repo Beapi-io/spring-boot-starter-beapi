@@ -17,6 +17,8 @@ import org.json.JSONObject
 import io.beapi.api.utils.ApiDescriptor
 import javax.servlet.forward.*
 import groovyx.gpars.*
+import com.google.common.hash.Hashing
+import java.nio.charset.StandardCharsets
 
 
 /**
@@ -51,10 +53,10 @@ abstract class ApiExchange{
     protected String responseFileType
     protected LinkedHashMap receives = [:]
     protected ArrayList receivesAuths = []
-    protected ArrayList receivesList = []
+    protected Set receivesList = []
     protected LinkedHashMap rturns = [:]
     protected ArrayList returnsAuths = []
-    protected ArrayList returnsList = []
+    protected Set returnsList = []
     // [CACHE]
     LinkedHashMap cache
     protected ApiDescriptor apiObject
@@ -94,23 +96,18 @@ abstract class ApiExchange{
         return result
     }
 
-    String parseOutput(ArrayList responseBody, String responseFileType){
-        String output = ''
+    protected String parseOutput(ArrayList responseBody, String responseFileType){
         if(responseBody.size()<2) {
-            output = parseBodyByFiletype(responseBody[0], responseFileType);
+            String output = parseBodyByFiletype(responseBody[0], responseFileType);
+            return output
         }else{
-
             int inc = 0
-            output = "["
-            responseBody.each() { it2 ->
-                if (inc > 0) { output += ',' }
-                output += parseBodyByFiletype(it2, responseFileType)
-                inc += 1
-            }
-            output += "]"
+            Set output = responseBody.collect() { it2 -> parseBodyByFiletype(it2, responseFileType) }
+            return output.toString()
         }
-        return output
+        return ''
     }
+
 
     protected String parseBodyByFiletype(LinkedHashMap responseBody, String responseFileType){
         String test
@@ -169,7 +166,7 @@ abstract class ApiExchange{
         return false
     }
 
-
+/*
     protected ArrayList getReturnsList(LinkedHashMap rturns){
         ArrayList result = []
         rturns.each() { k, v ->
@@ -197,5 +194,22 @@ abstract class ApiExchange{
         return result
     }
 
+ */
 
+    /**
+     * Returns concatenated IDS as a HASH used as ID for the API cache
+     * @see io.beapi.api.interceptor.ApiInterceptor#before()
+     * @see BatchInterceptor#before()
+     * @see ChainInterceptor#before()
+     * @param LinkedHashMap List of ids required when making request to endpoint
+     * @return a hash from all id's needed when making request to endpoint
+     */
+    protected void setCacheHash(LinkedHashMap params,Set receivesList){
+        StringBuilder hashString = new StringBuilder('')
+        receivesList.each(){ it ->
+            hashString.append(params[it])
+            hashString.append("/")
+        }
+        this.cacheHash = Hashing.murmur3_32().hashString(hashString.toString(), StandardCharsets.UTF_8).toString()
+    }
 }

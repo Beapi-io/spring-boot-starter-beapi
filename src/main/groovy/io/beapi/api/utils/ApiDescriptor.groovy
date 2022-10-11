@@ -57,10 +57,6 @@ class ApiDescriptor implements Serializable{
 	//@Size(max = 200)
 	String name
 
-	//@Size(max = 1000)
-    String description
-
-	LinkedHashMap doc
     LinkedHashMap<String,ParamsDescriptor> receives
     LinkedHashMap<String,ParamsDescriptor> returns
 	LinkedHashMap<String,ArrayList> receivesList
@@ -68,14 +64,13 @@ class ApiDescriptor implements Serializable{
 	LinkedHashMap cachedResult
 	//LinkedHashMap stats
 
-	ApiDescriptor(String networkGrp, String method, LinkedHashSet pkeys, LinkedHashSet fkeys, ArrayList roles,String name, String description, LinkedHashMap receives, LinkedHashMap receivesList, LinkedHashMap returns, LinkedHashMap returnsList) {
+	ApiDescriptor(String networkGrp, String method, LinkedHashSet pkeys, LinkedHashSet fkeys, ArrayList roles,String name, LinkedHashMap receives, LinkedHashMap receivesList, LinkedHashMap returns, LinkedHashMap returnsList) {
 		this.networkGrp = networkGrp
 		this.method = method
 		this.pkeys=pkeys
 		this.fkeys=fkeys
 		this.roles=roles
 		this.name=name
-		this.description=description
 		this.receives=receives as LinkedHashMap
 		this.receivesList=receivesList as LinkedHashMap
 		this.returns=returns as LinkedHashMap
@@ -114,8 +109,13 @@ class ApiDescriptor implements Serializable{
 		return this.name;
 	}
 
-	public String getDesc() {
-		return this.description;
+	public boolean receivesRoleExists(String role){
+		Set keys = this.receives.keySet()
+		boolean out = false
+		if(keys.contains(role)){
+			out = true
+		}
+		return out
 	}
 
 	public LinkedHashMap getReceives() {
@@ -139,7 +139,7 @@ class ApiDescriptor implements Serializable{
 	}
 
 	public LinkedHashMap toLinkedHashMap() {
-		return [networkGrp: this.networkGrp, method: this.method, pkeys: this.pkeys, fkeys: this.fkeys, roles: this.roles, name: this.name, description: this.description, receives: this.receives, returns: this.returns]
+		return [networkGrp: this.networkGrp, method: this.method, pkeys: this.pkeys, fkeys: this.fkeys, roles: this.roles, name: this.name, receives: this.receives, receivesList: this.receivesList, returns: this.returns, returnsList: this.returnsList]
 	}
 
 }

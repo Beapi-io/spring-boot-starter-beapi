@@ -53,8 +53,8 @@ class BeapiRequestHandler implements HttpRequestHandler {
     @Autowired
     TraceService traceService
 
-    @Autowired
-    ApiProperties apiProperties
+    //@Autowired
+    //ApiProperties apiProperties
 
 
     public ArrayList uList
@@ -62,7 +62,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
     public String controller
     public String action
     public String apiversion
-
+    public String authority
     public LinkedHashMap<String,String> params = [:]
 
 
@@ -72,19 +72,15 @@ class BeapiRequestHandler implements HttpRequestHandler {
         //logger.info("handleRequest(HttpServletRequest, HttpServletResponse) : {}");
 
         ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
-
-        uList = request.getAttribute('uriList')
-        apiversion = uList[3]
-        controller = request.getSession().getAttribute('controller')
-        action = request.getSession().getAttribute('action')
-        trace = request.getSession().getAttribute('trace')
-        params = request.getSession().getAttribute('params') as LinkedHashMap
+        this.authority = request.getAttribute('principle')
+        this.uList = request.getAttribute('uriList')
+        this.apiversion = uList[3]
+        this.controller = request.getAttribute('controller')
+        this.action = request.getAttribute('action')
+        trace = uList[6]
+        this.params = request.getAttribute('params') as LinkedHashMap
 
         Object output
-
-
-
-
 
 
         // TRACESERVICE CHECK
@@ -98,7 +94,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
             // invoke method
             if (Objects.nonNull(method)) {
                 try {
-
                     output = method.invoke(this, request, response)
                 } catch (IllegalArgumentException e) {
                     //writeErrorResponse(response, '422', request.getRequestURI());
@@ -119,7 +114,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
                     ArrayList tempResult = convertModel(output)
 
                     // todo : tempResult is good; problem lies with parseResponseParams
-                    ArrayList responseList = request.getSession().getAttribute('returnsList')
+                    Set responseList = request.getAttribute('responseList')
                     if(!responseList.contains("*")) {
                         result = parseResponseParams(tempResult, responseList)
                     }else{
@@ -127,7 +122,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
                     }
                 }
 
-                request.getSession().setAttribute('responseBody', result)
+                request.setAttribute('responseBody', result)
             } else {
                 writeErrorResponse(response, '404', request.getRequestURI())
             }
@@ -223,7 +218,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
         }catch(Exception e){
             throw new Exception("[BeapiController > formatEntity] : Exception formatting Response Entity - full stack trace follows :",e)
         }
-        if(trace==true) { traceService.endTrace('BeapiController', 'formatEntity') }
+        //if(trace==true) { traceService.endTrace('BeapiController', 'formatEntity') }
 
         return map
     }
@@ -250,14 +245,14 @@ class BeapiRequestHandler implements HttpRequestHandler {
                 }
             }
         }
-        if(trace==true) { traceService.endTrace('BeapiController', 'formatMap') }
+        //if(trace==true) { traceService.endTrace('BeapiController', 'formatMap') }
         return newMap
     }
 
     /*
     * checks multiple return sets(bodyList) against expected returns keyset(responseList)
     */
-    ArrayList parseResponseParams(ArrayList bodyList, ArrayList responseList){
+    ArrayList parseResponseParams(ArrayList bodyList, Set responseList){
         ArrayList output = []
         try {
             bodyList.each() { body ->
@@ -279,42 +274,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
         }
 
         return output
-    }
-
-    protected String parseOutput(ArrayList responseBody, String responseFileType){
-        String output = ''
-        if(responseBody.size()<2) {
-            output = parseBodyByFiletype(responseBody[0], responseFileType);
-        }else{
-            int inc = 0
-            output = "["
-            responseBody.each() { it2 ->
-                if (inc > 0) { output += ',' }
-                output += parseBodyByFiletype(it2, responseFileType)
-                inc += 1
-            }
-            output += "]"
-        }
-        return output
-    }
-
-    protected String parseBodyByFiletype(LinkedHashMap responseBody, String responseFileType){
-        String test
-        switch(responseFileType){
-            case 'JSON':
-                test = new JSONObject(responseBody).toString()
-                break;
-            case 'XML':
-                // TODO : move to an XMLService(??)
-                //'XML'
-                return '[]'
-                break;
-            default:
-                // unsupported mimetype
-                return ''
-                break;
-        }
-        return test
     }
 
     // Todo : Move to exchangeService??

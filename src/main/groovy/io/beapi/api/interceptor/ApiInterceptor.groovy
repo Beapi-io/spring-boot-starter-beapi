@@ -103,11 +103,9 @@ class ApiInterceptor implements HandlerInterceptor{
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		//if (request.getDispatcherType() != DispatcherType.REQUEST) {
-		//	return true;
-		//}
 		//logger.info("preHandle(HttpServletRequest, HttpServletResponse, Object) : {}");
-		println("### prehandle")
+		//println("### prehandle")
+
 		privateRoles = apiProperties.security.networkRoles['private'].collect() { k, v -> v }
 		this.uList = request.getAttribute('uriList')
 
@@ -116,7 +114,6 @@ class ApiInterceptor implements HandlerInterceptor{
 
 		switch(callType){
 			case 1:
-				println("### exchangeService")
 				return exchangeService.apiRequest(request, response, this.authority)
 				break
 			case 2:
@@ -152,15 +149,16 @@ class ApiInterceptor implements HandlerInterceptor{
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mv) throws Exception {
 		//logger.info("postHandle(HttpServletRequest, HttpServletResponse, Object, ModelAndView) : {}")
-		ArrayList body = request.getSession().getAttribute('responseBody')
-		println("### posthandle")
+		//println("### posthandle")
+
+		ArrayList body = request.getAttribute('responseBody')
+
 
 		if(!body){
 			writeErrorResponse(response,'422',request.getRequestURI(),'No data returned for this call.')
 		}else {
 			switch (callType){
 				case 1:
-					println('post exchange???')
 					exchangeService.apiResponse(response,body)
 					response.writer.flush()
 					break

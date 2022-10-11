@@ -58,6 +58,12 @@ public class TraceExchangeService extends ApiExchange{
     boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority){
 		String sessionId = request.getSession().getId()
 
+		def post = request.getAttribute('POST')
+		def get = request.getAttribute('GET')
+
+		LinkedHashMap<String,String> output = get + post
+		request.setAttribute('params',output)
+
 		traceService.startTrace('ApiInterceptor','initVars',sessionId)
         initVars(request,response,authority)
 		traceService.endTrace('ApiInterceptor','initVars',sessionId)
@@ -76,9 +82,9 @@ public class TraceExchangeService extends ApiExchange{
     void apiResponse(HttpServletResponse response,ArrayList body){
         String output = parseOutput(body, responseFileType)
 
-        if(method=='GET') {
-            apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
-        }
+        //if(method=='GET') {
+        //    apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
+        //}
 
         PrintWriter writer = response.getWriter();
         writer.write(output);
@@ -98,9 +104,9 @@ public class TraceExchangeService extends ApiExchange{
 		this.appversion = uList[2]
 		this.apiversion = uList[3]
 		this.controller = uList[4]
-		request.getSession().setAttribute('controller',this.controller)
+		request.setAttribute('controller',this.controller)
 		this.action = uList[5]
-		request.getSession().setAttribute('action',this.action)
+		request.setAttribute('action',this.action)
 		this.trace = uList[6]
 		this.id = uList[7]
 		this.method = request.getMethod()
@@ -109,14 +115,14 @@ public class TraceExchangeService extends ApiExchange{
 		this.cache = apiCacheService.getApiCache(this.controller)
 		this.method = request.getMethod()
 		this.uri = request.getRequestURI()
-		this.receivesList = request.getSession().getAttribute('receivesList')
-		this.returnsList = request.getSession().getAttribute('returnsList')
+		this.receivesList = request.getAttribute('receivesList')
+		this.returnsList = request.getAttribute('returnsList')
 
 		// TODO : set 'max'
 		// TODO : set 'offset'
 
 		try {
-			//this.appVersion = request.getSession().getAttribute('version')
+			//this.appVersion = request.getAttribute('version')
 			def temp = cache[this.apiversion]
 			this.defaultAction = temp['defaultAction']
 			this.deprecated = temp['deprecated'] as List

@@ -34,9 +34,9 @@ public class ExchangeService extends ApiExchange{
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ExchangeService.class);
 	private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
-	String cacheHash
+
 	ApiCacheService apiCacheService
-	PrincipleService principle
+	//PrincipleService principle
 
 	boolean overrideAutoMimeTypes = false
 
@@ -51,10 +51,47 @@ public class ExchangeService extends ApiExchange{
 
     // [REQUEST]
     boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority){
+		def post = request.getAttribute('POST')
+		def get = request.getAttribute('GET')
+
+		LinkedHashMap<String,String> output = get + post
+		request.setAttribute('params',output)
+
         initVars(request,response,authority)
 
         //parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(),uList[7])
         // routing call to controller
+
+
+
+		if(this.apiObject) {
+			// todo : create public api list
+			if(this.method == 'GET') {
+
+				setCacheHash(request.getAttribute('params'), this.receivesList)
+
+				// RETRIEVE CACHED RESULT (only if using 'GET' method)
+				if((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}")) {
+					String cachedResult
+					try {
+						cachedResult = (apiObject['cachedResult'][authority][responseFileType][cacheHash])?apiObject['cachedResult'][authority][responseFileType][cacheHash]:apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
+					} catch (Exception e) {
+						throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
+					}
+
+					if (cachedResult && cachedResult.size() > 0) {
+						// PLACEHOLDER FOR APITHROTTLING
+						response.setStatus(200);
+						PrintWriter writer = response.getWriter();
+						writer.write(cachedResult);
+						writer.close()
+						//response.writer.flush()
+						return false
+					}
+				}
+			}
+		}
+
 
 		if(!validateMethod()){
 			writeErrorResponse(response,'405',request.getRequestURI());
@@ -67,7 +104,6 @@ public class ExchangeService extends ApiExchange{
 
     void apiResponse(HttpServletResponse response,ArrayList body){
         String output = parseOutput(body, responseFileType)
-		println('output : '+output)
 
         if(method=='GET') {
             apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
@@ -91,35 +127,40 @@ public class ExchangeService extends ApiExchange{
 		this.apiversion = uList[3]
 		this.controller = uList[4]
 
-		request.getSession().setAttribute('controller',this.controller)
+		request.setAttribute('controller',this.controller)
 		this.action = uList[5]
-		request.getSession().setAttribute('action',this.action)
+		request.setAttribute('action',this.action)
 		this.trace = uList[6]
 		this.id = uList[7]
 		this.method = request.getMethod()
 		this.authority = authority
-		this.cache = apiCacheService.getApiCache(this.controller)
+		//this.cache = apiCacheService.getApiCache(this.controller)
+
 		this.method = request.getMethod()
 		this.uri = request.getRequestURI()
-		this.receivesList = request.getSession().getAttribute('receivesList')
-		this.returnsList = request.getSession().getAttribute('returnsList')
+		//this.receivesList = request.getAttribute('receivesList')
+		//this.returnsList = request.getAttribute('returnsList')
 
 		// TODO : set 'max'
 		// TODO : set 'offset'
 
 
 		try {
-			def temp = cache[this.apiversion]
-			this.defaultAction = temp['defaultAction']
-			this.deprecated = temp['deprecated'] as List
-			this.apiObject = temp[this.action]
-			this.receives = this.apiObject.getReceives()
-			this.rturns = this.apiObject['returns'] as LinkedHashMap
-			this.returnsAuths = this.rturns.keySet()
+			//def temp = cache[this.apiversion]
+			//this.defaultAction = request.getAttribute('defaultAction')
+			//this.deprecated = request.getAttribute('deprecated')
+			//this.apiObject = request.getAttribute('apiObject')
+			this.apiObject = apiCacheService.getApiDescriptor(this.controller, this.apiversion, this.action)
+			this.receivesList = (this.apiObject.receivesList[this.authority]) ? this.apiObject.receivesList[this.authority] : this.apiObject.receivesList['permitAll']
+			this.returnsList = (this.apiObject.returnsList[this.authority]) ? this.apiObject.returnsList[this.authority] : this.apiObject.returnsList['permitAll']
+			if(!request.getAttribute('responseList')){ request.setAttribute('responseList',this.returnsList) }
+
+			//this.rturns = this.apiObject['returns'] as LinkedHashMap
+			//this.returnsAuths = this.rturns.keySet()
 			//this.networkGrp = this.apiObject['networkGrp']
 			this.method = request.getMethod()
 		} catch (Exception e) {
-			throw new Exception("[ExchangeObject :: init] : Exception. full stack trace follows:", e)
+			throw new Exception("[ExchangeService :: init] : Exception. full stack trace follows:", e)
 		}
 
 	}
