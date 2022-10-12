@@ -47,6 +47,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - removing resource handling for file uploads except for supported mimetypes (JSON/XML); not a file server
 - allowing api data to be sent as FILE; can simplify batching and complex calls to put JSON/XML all in FILE to send, detect and auto-parse into params (which we then check to see if they match expected request data for endpoint)
 - performance improvements
+- fixed issue with pkeys/fkeys not being stored in cache properly
 
 
  ## 0.6 - (projected release Feb/2023)
