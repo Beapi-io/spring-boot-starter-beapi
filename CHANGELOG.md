@@ -23,7 +23,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ## 0.5.1 (released: 9/3/2022)
 
 ### Changed
-- fixed issue with filter double calling handlerinterceptor
+- fixed issue with filter calling handlerinterceptor more than once
 - removal of attributes before resetting when chaining
 
 
