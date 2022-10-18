@@ -15,10 +15,20 @@ package io.beapi.api.service
 
 import org.json.JSONObject
 import io.beapi.api.utils.ApiDescriptor
+
+
 import javax.servlet.forward.*
 import groovyx.gpars.*
 import com.google.common.hash.Hashing
 import java.nio.charset.StandardCharsets
+
+// AES/CTR encryption
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.KeyGenerator;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.SecureRandom;
 
 
 /**
@@ -37,8 +47,8 @@ abstract class ApiExchange{
     private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
     boolean overrideAutoMimeTypes = false
 
-    private static final ArrayList formats = ['XML','JSON']
-    private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml']
+    //private static final ArrayList formats = ['XML','JSON']
+    //private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml']
 
     int callType
     protected String method
@@ -54,6 +64,7 @@ abstract class ApiExchange{
     protected LinkedHashMap receives = [:]
     protected ArrayList receivesAuths = []
     protected Set receivesList = []
+    protected Set keyList = []
     protected LinkedHashMap rturns = [:]
     protected ArrayList returnsAuths = []
     protected Set returnsList = []
@@ -142,7 +153,7 @@ abstract class ApiExchange{
     boolean checkRequestParams(LinkedHashMap methodParams){
         ArrayList checkList = this.receivesList
         ArrayList paramsList
-        ArrayList reservedNames = ['batchLength','batchInc','chainInc','apiChain','batch','_','max','offset','chaintype']
+        Set reservedNames = ['batchLength','batchInc','chainInc','apiChain','batch','_','max','offset','chaintype']
 
         try {
             if(checkList.contains('*')) {
@@ -166,35 +177,6 @@ abstract class ApiExchange{
         return false
     }
 
-/*
-    protected ArrayList getReturnsList(LinkedHashMap rturns){
-        ArrayList result = []
-        rturns.each() { k, v ->
-            if(k==this.authority || k=='permitAll') {
-                v.each() { it2 ->
-                    if (!result.contains(it2['name'])) {
-                        result.add(it2['name']) }
-                }
-            }
-        }
-        return result
-    }
-
-    protected ArrayList getReceivesList(LinkedHashMap receives){
-        ArrayList result = []
-        receives.each() { k, v ->
-            if(k==this.authority || k=='permitAll') {
-                v.each { it2 ->
-                    if (!result.contains(it2['name'])) {
-                        result.add(it2['name'])
-                    }
-                }
-            }
-        }
-        return result
-    }
-
- */
 
     /**
      * Returns concatenated IDS as a HASH used as ID for the API cache
@@ -212,4 +194,8 @@ abstract class ApiExchange{
         }
         this.cacheHash = Hashing.murmur3_32().hashString(hashString.toString(), StandardCharsets.UTF_8).toString()
     }
+
+
+
+
 }

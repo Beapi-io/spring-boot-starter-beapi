@@ -51,16 +51,17 @@ public class ExchangeService extends ApiExchange{
 
     // [REQUEST]
     boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority){
-		def post = request.getAttribute('POST')
-		def get = request.getAttribute('GET')
+		//def post = request.getAttribute('POST')
+		//def get = request.getAttribute('GET')
 
-		LinkedHashMap<String,String> output = get + post
-		request.setAttribute('params',output)
+		initVars(request,response,authority)
 
-        initVars(request,response,authority)
+		//LinkedHashMap<String,String> output = get + post
 
-        //parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(),uList[7])
-        // routing call to controller
+		//hashIds()
+
+		//request.setAttribute('params',output)
+
 
 
 
@@ -72,14 +73,23 @@ public class ExchangeService extends ApiExchange{
 
 				// RETRIEVE CACHED RESULT (only if using 'GET' method)
 				if((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}")) {
+
+					println("### has cachedResult")
 					String cachedResult
-					try {
-						cachedResult = (apiObject['cachedResult'][authority][responseFileType][cacheHash])?apiObject['cachedResult'][authority][responseFileType][cacheHash]:apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
-					} catch (Exception e) {
-						throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
-					}
+					//try {
+						if(apiObject['cachedResult'][authority][responseFileType][cacheHash]){
+							cachedResult = apiObject['cachedResult'][authority][responseFileType][cacheHash]
+						}else{
+							println("### authority : "+authority)
+							println("### cachedResult auths : "+apiObject.cachedResult.keySet())
+							cachedResult = apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
+						}
+					//} catch (Exception e) {
+					//	throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
+					//}
 
 					if (cachedResult && cachedResult.size() > 0) {
+						println("### returning cachedResult")
 						// PLACEHOLDER FOR APITHROTTLING
 						response.setStatus(200);
 						PrintWriter writer = response.getWriter();
@@ -116,8 +126,8 @@ public class ExchangeService extends ApiExchange{
     }
 
 	void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
-		String accept = request.getHeader('Accept')
-		String contentType = request.getContentType()
+		//String accept = request.getHeader('Accept')
+		//String contentType = request.getContentType()
 
 		this.responseFileType = request.getAttribute('responseFileType')
 		this.uList = request.getAttribute('uriList')
@@ -134,12 +144,11 @@ public class ExchangeService extends ApiExchange{
 		this.id = uList[7]
 		this.method = request.getMethod()
 		this.authority = authority
-		//this.cache = apiCacheService.getApiCache(this.controller)
+
 
 		this.method = request.getMethod()
 		this.uri = request.getRequestURI()
-		//this.receivesList = request.getAttribute('receivesList')
-		//this.returnsList = request.getAttribute('returnsList')
+
 
 		// TODO : set 'max'
 		// TODO : set 'offset'
@@ -151,8 +160,12 @@ public class ExchangeService extends ApiExchange{
 			//this.deprecated = request.getAttribute('deprecated')
 			//this.apiObject = request.getAttribute('apiObject')
 			this.apiObject = apiCacheService.getApiDescriptor(this.controller, this.apiversion, this.action)
-			this.receivesList = (this.apiObject.receivesList[this.authority]) ? this.apiObject.receivesList[this.authority] : this.apiObject.receivesList['permitAll']
-			this.returnsList = (this.apiObject.returnsList[this.authority]) ? this.apiObject.returnsList[this.authority] : this.apiObject.returnsList['permitAll']
+
+			LinkedHashMap receives = this.apiObject?.getReceivesList()
+			this.receivesList = (receives[this.authority]) ? receives[this.authority] : receives['permitAll']
+
+			LinkedHashMap returns = this.apiObject?.getReturnsList()
+			this.returnsList = (returns[this.authority]) ? returns[this.authority] : returns['permitAll']
 			if(!request.getAttribute('responseList')){ request.setAttribute('responseList',this.returnsList) }
 
 			//this.rturns = this.apiObject['returns'] as LinkedHashMap
