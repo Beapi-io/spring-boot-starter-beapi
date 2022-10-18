@@ -127,6 +127,9 @@ public class TraceExchangeService extends ApiExchange{
 			this.defaultAction = temp['defaultAction']
 			this.deprecated = temp['deprecated'] as List
 			this.apiObject = temp[this.action]
+
+			this.keyList = this.apiObject?.getKeyList()
+
 			this.receives = this.apiObject.getReceives()
 			//this.receivesAuths = this.receives.keySet()
 			this.rturns = this.apiObject['returns'] as LinkedHashMap

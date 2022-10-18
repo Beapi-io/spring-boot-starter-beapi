@@ -59,11 +59,11 @@ public class BatchExchangeService extends ApiExchange{
 			post.remove('batchVars')
 		}
 
+		initVars(request,response,authority)
+
 		LinkedHashMap<String,String> output = get + post
 		request.setAttribute('params',output)
 
-
-		initVars(request,response,authority)
 		setBatchParams(request)
 		if(!validateMethod()){
 			writeErrorResponse(response,'405',request.getRequestURI());
@@ -162,6 +162,9 @@ public class BatchExchangeService extends ApiExchange{
 			//this.apiObject = temp[this.action]
 
 			this.apiObject = apiCacheService.getApiDescriptor(this.controller, this.apiversion, this.action)
+
+			this.keyList = this.apiObject?.getKeyList()
+
 			this.receivesList = (this.apiObject.receivesList[this.authority]) ? this.apiObject.receivesList[this.authority] : this.apiObject.receivesList['permitAll']
 			this.returnsList = (this.apiObject.returnsList[this.authority]) ? this.apiObject.returnsList[this.authority] : this.apiObject.returnsList['permitAll']
 			if(!request.getAttribute('responseList')){ request.setAttribute('responseList',this.returnsList) }

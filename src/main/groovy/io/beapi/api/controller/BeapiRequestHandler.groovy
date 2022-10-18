@@ -16,12 +16,8 @@
  */
 package io.beapi.api.controller
 
-import io.beapi.api.properties.ApiProperties
-import io.beapi.api.service.ApiCacheService
-import io.beapi.api.utils.ApiDescriptor
+
 import io.beapi.api.utils.ErrorCodes
-import org.springframework.core.env.Environment;
-import io.beapi.api.utils.UriObject
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -58,11 +54,12 @@ class BeapiRequestHandler implements HttpRequestHandler {
 
 
     public ArrayList uList
-    boolean trace
+    protected boolean trace
     public String controller
     public String action
     public String apiversion
     public String authority
+    protected Set keyList = []
     public LinkedHashMap<String,String> params = [:]
 
 
@@ -75,10 +72,14 @@ class BeapiRequestHandler implements HttpRequestHandler {
         this.authority = request.getAttribute('principle')
         this.uList = request.getAttribute('uriList')
         this.apiversion = uList[3]
+
+        // NOTE : CONTROLLER and ACTION can be reset in batchexchange/chainexchange so DONT USE URILIST!!!!
         this.controller = request.getAttribute('controller')
         this.action = request.getAttribute('action')
+
         trace = uList[6]
         this.params = request.getAttribute('params') as LinkedHashMap
+        this.keyList = request.getAttribute('keyList')
 
         Object output
 
@@ -99,7 +100,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
                     //writeErrorResponse(response, '422', request.getRequestURI());
                     throw Exception("[BeapiController > handleRequest] : IllegalArgumentException - full stack trace follows :", e);
                 } catch (IllegalAccessException e) {
-                    // shouldn't hit this
                     //writeErrorResponse(response, '422', request.getRequestURI());
                     throw Exception("[BeapiController > handleRequest] : IllegalAccessException - full stack trace follows :", e);
                 }
@@ -115,11 +115,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
 
                     // todo : tempResult is good; problem lies with parseResponseParams
                     Set responseList = request.getAttribute('responseList')
-                    if(!responseList.contains("*")) {
-                        result = parseResponseParams(tempResult, responseList)
-                    }else{
-                        result = tempResult
-                    }
+                    result = (!responseList.contains("*"))? parseResponseParams(tempResult, responseList): tempResult
                 }
 
                 request.setAttribute('responseBody', result)
@@ -140,7 +136,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
 
     ArrayList convertModel(Object obj){
         try{
-            //traceService.startTrace('ControllerUtil','convertModel')
             ArrayList output = []
             if(obj){
                 switch(obj){
@@ -210,7 +205,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
      * @return LinkedHashMap commonly formatted linkedhashmap
      */
     LinkedHashMap formatEntity(Object obj){
-        if(trace==true) { traceService.startTrace('BeapiController', 'formatEntity') }
         ObjectMapper omapper = new ObjectMapper()
         LinkedHashMap<String,Object> map = [:]
         try{
@@ -218,7 +212,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
         }catch(Exception e){
             throw new Exception("[BeapiController > formatEntity] : Exception formatting Response Entity - full stack trace follows :",e)
         }
-        //if(trace==true) { traceService.endTrace('BeapiController', 'formatEntity') }
 
         return map
     }
@@ -245,7 +238,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
                 }
             }
         }
-        //if(trace==true) { traceService.endTrace('BeapiController', 'formatMap') }
         return newMap
     }
 
@@ -255,14 +247,16 @@ class BeapiRequestHandler implements HttpRequestHandler {
     ArrayList parseResponseParams(ArrayList bodyList, Set responseList){
         ArrayList output = []
         try {
+
             bodyList.each() { body ->
                 ArrayList paramsList = (body.size() == 0) ? [:] : body.keySet() as ArrayList
-
                     paramsList.each() { it2 ->
+                        String tmp = it2.toString()
                         if (!responseList.contains(it2)) {
                             body.remove(it2.toString())
                         }
                     }
+
                     if (responseList.size()==body.keySet().size()) {
                         output.add(body)
                     }

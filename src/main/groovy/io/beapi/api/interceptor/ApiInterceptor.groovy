@@ -36,12 +36,12 @@ import io.beapi.api.service.PrincipleService
 import io.beapi.api.service.TraceService
 import io.beapi.api.utils.ErrorCodes
 
-import io.beapi.api.utils.UriObject
 import org.slf4j.LoggerFactory;
-import groovyx.gpars.*
+
 
 import io.beapi.api.properties.ApiProperties
 
+import javax.crypto.KeyGenerator
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -52,10 +52,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import javax.servlet.DispatcherType
 import javax.json.*
 import org.springframework.security.web.header.*
-import groovyx.gpars.*
+//import groovyx.gpars.*
 import javax.servlet.RequestDispatcher
 import java.nio.charset.StandardCharsets
 import org.apache.commons.io.IOUtils
+
+import javax.crypto.KeyGenerator;
 
 /**
  *
@@ -86,11 +88,11 @@ class ApiInterceptor implements HandlerInterceptor{
 	//int cores
 	//LinkedHashMap networkGrpRoles
 	LinkedHashMap cache
-	UriObject uObj
 	ArrayList uList
 	String authority
 	ArrayList privateRoles = []
 	int callType
+	KeyGenerator keyGenerator
 
 
 	public ApiInterceptor(ExchangeService exchangeService, BatchExchangeService batchService, ChainExchangeService chainService, TraceExchangeService traceService, ApiProperties apiProperties) {
@@ -152,7 +154,6 @@ class ApiInterceptor implements HandlerInterceptor{
 		//println("### posthandle")
 
 		ArrayList body = request.getAttribute('responseBody')
-
 
 		if(!body){
 			writeErrorResponse(response,'422',request.getRequestURI(),'No data returned for this call.')

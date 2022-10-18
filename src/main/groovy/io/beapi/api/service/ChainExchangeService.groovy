@@ -176,6 +176,9 @@ public class ChainExchangeService extends ApiExchange{
 			this.deprecated = temp['deprecated'] as List
 
 			this.apiObject = temp[this.action]
+
+			this.keyList = this.apiObject?.getKeyList()
+
 			//this.handler = this.apiObject['handler']
 			//request.setAttribute('handler',this.handler)
 			this.receives = this.apiObject.getReceives()

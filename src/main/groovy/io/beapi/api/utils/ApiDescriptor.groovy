@@ -49,6 +49,7 @@ class ApiDescriptor implements Serializable{
 	String method
 	LinkedHashSet pkeys
 	LinkedHashSet fkeys
+	Set keyList
 	ArrayList roles
 	ArrayList batchRoles
 	ArrayList hookRoles
@@ -58,7 +59,9 @@ class ApiDescriptor implements Serializable{
 	String name
 
     LinkedHashMap<String,ParamsDescriptor> receives
+	Set receivesKeys
     LinkedHashMap<String,ParamsDescriptor> returns
+	Set returnsKeys
 	LinkedHashMap<String,ArrayList> receivesList
 	LinkedHashMap<String,ArrayList> returnsList
 	LinkedHashMap cachedResult
@@ -69,12 +72,23 @@ class ApiDescriptor implements Serializable{
 		this.method = method
 		this.pkeys=pkeys
 		this.fkeys=fkeys
+		this.keyList = pkeys+fkeys
 		this.roles=roles
 		this.name=name
 		this.receives=receives as LinkedHashMap
 		this.receivesList=receivesList as LinkedHashMap
+		this.receivesList.each(){ it->
+			if(keyList.contains(it)){
+				receivesKeys.add(it)
+			}
+		}
 		this.returns=returns as LinkedHashMap
 		this.returnsList=returnsList as LinkedHashMap
+		this.returnsList.each(){ it->
+			if(keyList.contains(it)){
+				returnsKeys.add(it)
+			}
+		}
 	}
 
 	public String getMethod() {
@@ -85,12 +99,8 @@ class ApiDescriptor implements Serializable{
 		return this.networkGrp;
 	}
 
-	public LinkedHashMap getPkeys() {
-		return this.pkeys
-	}
-
-	public LinkedHashMap getFkeys() {
-		return this.fkeys
+	public Set getKeyList() {
+		return this.keyList
 	}
 
 	public ArrayList getRoles() {
@@ -111,15 +121,15 @@ class ApiDescriptor implements Serializable{
 
 	public boolean receivesRoleExists(String role){
 		Set keys = this.receives.keySet()
-		boolean out = false
-		if(keys.contains(role)){
-			out = true
-		}
-		return out
+		return keys.contains(role)
 	}
 
 	public LinkedHashMap getReceives() {
 		return this.receives
+	}
+
+	public Set getReceivesKeys(){
+		return this.receivesKeys
 	}
 
 	public LinkedHashMap getReceivesList() {
@@ -128,6 +138,10 @@ class ApiDescriptor implements Serializable{
 
 	public LinkedHashMap getReturns() {
 		return this.returns
+	}
+
+	public Set getReturnsKeys(){
+		return this.returnsKeys
 	}
 
 	public LinkedHashMap getReturnsList() {
@@ -139,7 +153,7 @@ class ApiDescriptor implements Serializable{
 	}
 
 	public LinkedHashMap toLinkedHashMap() {
-		return [networkGrp: this.networkGrp, method: this.method, pkeys: this.pkeys, fkeys: this.fkeys, roles: this.roles, name: this.name, receives: this.receives, receivesList: this.receivesList, returns: this.returns, returnsList: this.returnsList]
+		return [networkGrp: this.networkGrp, method: this.method, roles: this.roles, name: this.name, receives: this.receives, receivesList: this.receivesList, returns: this.returns, returnsList: this.returnsList]
 	}
 
 }

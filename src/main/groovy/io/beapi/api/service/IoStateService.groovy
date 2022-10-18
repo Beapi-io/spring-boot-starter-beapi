@@ -361,8 +361,7 @@ public class IoStateService{
 	}
 
 	protected ApiDescriptor createApiDescriptor(String networkGrp, String apiname, String apiMethod, ArrayList apiRoles, LinkedHashSet batchRoles, LinkedHashSet hookRoles, String uri, LinkedHashMap vals, LinkedHashMap json) throws Exception{
-		logger.debug("createApiDescriptor : {}")
-
+		//logger.debug("createApiDescriptor : {}")
 		LinkedHashMap<String, ParamsDescriptor> apiObject = new LinkedHashMap()
 		ApiParams param = new ApiParams()
 
@@ -380,13 +379,14 @@ public class IoStateService{
 				String hasKey = (v?.key) ? v.key : null
 
 				if (hasKey != null) {
+
 					param.setKey(hasKey)
 
 					String hasReference = (v?.reference) ? v.reference : 'self'
 					param.setReference(hasReference)
 
 
-					if (['FOREIGN', 'INDEX', 'PRIMARY'].contains(v.key?.toUpperCase())) {
+					if (['FKEY', 'INDEX', 'PKEY'].contains(v.key?.toUpperCase())) {
 						switch (v.key) {
 							case 'INDEX':
 								if (v.reference != 'self') {
@@ -394,17 +394,18 @@ public class IoStateService{
 									fkeys.add(fkey)
 								}
 								break;
-							case 'FOREIGN':
+							case 'FKEY':
 								LinkedHashMap fkey = ["${k}": "${v.reference}"]
 								fkeys.add(fkey)
 								break;
-							case 'PRIMARY':
+							case 'PKEY':
 								pkeys.add(k)
 								break;
 						}
 					}
 
 				}
+
 
 				if (v.mockData!=null) {
 					if(v.mockData.isEmpty()){
@@ -459,7 +460,7 @@ public class IoStateService{
 
 		//receives
 		//returns
-
+		Set keyList = pkeys+fkeys
 		ApiDescriptor service = new ApiDescriptor(networkGrp, apiMethod, pkeys, fkeys, apiRoles, apiname, receives, receivesList, returns, returnsList)
 
 		// override networkRoles with 'DEFAULT' in IO State
