@@ -58,7 +58,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - rate limiting
     - automated I/O State generation
     - functional test scaffolding
-    - automated controller scaffolding
+    - controller scaffolding
+    - repository/service scaffolding
     - UI/UX tools (maybe)
       - build out demo application as an SDK(???) 
 
