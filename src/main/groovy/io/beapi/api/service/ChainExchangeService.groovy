@@ -16,15 +16,13 @@
  */
 package io.beapi.api.service
 
-import io.beapi.api.service.ApiExchange
+
 import org.json.JSONObject
-import io.beapi.api.utils.ErrorCodes
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.context.ApplicationContext
 import javax.json.*
 import org.springframework.security.web.header.*
-import groovyx.gpars.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -40,7 +38,7 @@ import javax.servlet.http.HttpServletResponse
 @Service
 public class ChainExchangeService extends ApiExchange{
 
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ChainExchangeService.class);
+	//private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ChainExchangeService.class);
 
 	LinkedHashMap networkRoles
 	LinkedList chain = []
@@ -68,37 +66,6 @@ public class ChainExchangeService extends ApiExchange{
 
 
 	boolean chainRequest(HttpServletRequest request, HttpServletResponse response, String authority) {
-		def post = request.getAttribute('POST')
-		def get = request.getAttribute('GET')
-
-		if(post['chainOrder']){
-			if(!request.getAttribute('chainOrder')) { request.setAttribute('chainOrder', post['chainOrder']) }
-			post.remove('chainOrder')
-		}
-
-		if(post['chainType']){
-			if(!request.getAttribute('chainType')) { request.setAttribute('chainType', post['chainType']) }
-			post.remove('chainType')
-		}
-
-		if(post['chainKey']){
-			if(!request.getAttribute('chainKey')) { request.setAttribute('chainKey', post['chainKey']) }
-			post.remove('chainKey')
-		}
-
-		if(post['chainSize']){
-			if(!request.getAttribute('chainSize')) { request.setAttribute('chainSize', post['chainSize']) }
-			post.remove('chainSize')
-		}
-
-		if(post['chainParams']){
-			if(!request.getAttribute('chainParams')) { request.setAttribute('chainParams', post['chainParams']) }
-			post.remove('chainParams')
-		}
-
-		LinkedHashMap<String,String> output = get + post
-		request.setAttribute('params',output)
-
 
 		initChainVars(request, response,authority)
 
@@ -396,37 +363,5 @@ public class ChainExchangeService extends ApiExchange{
 		request.setAttribute('params',this.params)
 	}
 
-	// Todo : Move to exchangeService??
-	/**
-	 * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
-	 * @param HttpServletResponse response
-	 * @param String statusCode
-	 * @return LinkedHashMap commonly formatted linkedhashmap
-	 */
-	void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
 
-		response.setContentType("application/json")
-		response.setStatus(Integer.valueOf(statusCode))
-		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
-		response.getWriter().write(message)
-		response.writer.flush()
-	}
-
-	// Todo : Move to exchangeService??
-	/**
-	 * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
-	 * @param HttpServletResponse response
-	 * @param String statusCode
-	 * @return LinkedHashMap commonly formatted linkedhashmap
-	 */
-	void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
-		response.setContentType("application/json")
-		response.setStatus(Integer.valueOf(statusCode))
-		if(msg.isEmpty()){
-			msg = ErrorCodes.codes[statusCode]['long']
-		}
-		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
-		response.getWriter().write(message)
-		response.writer.flush()
-	}
 }

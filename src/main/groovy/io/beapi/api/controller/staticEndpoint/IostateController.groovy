@@ -17,16 +17,13 @@
 package io.beapi.api.controller.staticEndpoint
 
 
-import groovyx.gpars.*
 import io.beapi.api.controller.BeapiRequestHandler
 import io.beapi.api.service.ApiCacheService
-import io.beapi.api.service.PrincipleService
 import io.beapi.api.service.IoStateService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.web.header.*
 import org.springframework.stereotype.Controller
-import org.json.JSONObject
 import javax.json.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse

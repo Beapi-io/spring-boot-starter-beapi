@@ -17,13 +17,10 @@
 package io.beapi.api.service
 
 
-import io.beapi.api.service.ApiExchange
-import io.beapi.api.utils.ErrorCodes
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import javax.json.*
 import org.springframework.security.web.header.*
-import groovyx.gpars.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -36,7 +33,6 @@ public class ExchangeService extends ApiExchange{
 	private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
 
 	ApiCacheService apiCacheService
-	//PrincipleService principle
 
 	boolean overrideAutoMimeTypes = false
 
@@ -51,18 +47,8 @@ public class ExchangeService extends ApiExchange{
 
     // [REQUEST]
     boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority){
-		//def post = request.getAttribute('POST')
-		//def get = request.getAttribute('GET')
 
 		initVars(request,response,authority)
-
-		//LinkedHashMap<String,String> output = get + post
-
-		//hashIds()
-
-		//request.setAttribute('params',output)
-
-
 
 
 		if(this.apiObject) {
@@ -74,14 +60,11 @@ public class ExchangeService extends ApiExchange{
 				// RETRIEVE CACHED RESULT (only if using 'GET' method)
 				if((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}")) {
 
-					println("### has cachedResult")
 					String cachedResult
 					//try {
 						if(apiObject['cachedResult'][authority][responseFileType][cacheHash]){
 							cachedResult = apiObject['cachedResult'][authority][responseFileType][cacheHash]
 						}else{
-							println("### authority : "+authority)
-							println("### cachedResult auths : "+apiObject.cachedResult.keySet())
 							cachedResult = apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
 						}
 					//} catch (Exception e) {
@@ -89,7 +72,6 @@ public class ExchangeService extends ApiExchange{
 					//}
 
 					if (cachedResult && cachedResult.size() > 0) {
-						println("### returning cachedResult")
 						// PLACEHOLDER FOR APITHROTTLING
 						response.setStatus(200);
 						PrintWriter writer = response.getWriter();
@@ -155,10 +137,6 @@ public class ExchangeService extends ApiExchange{
 
 
 		try {
-			//def temp = cache[this.apiversion]
-			//this.defaultAction = request.getAttribute('defaultAction')
-			//this.deprecated = request.getAttribute('deprecated')
-			//this.apiObject = request.getAttribute('apiObject')
 			this.apiObject = apiCacheService.getApiDescriptor(this.controller, this.apiversion, this.action)
 
 			LinkedHashMap receives = this.apiObject?.getReceivesList()
@@ -168,9 +146,6 @@ public class ExchangeService extends ApiExchange{
 			this.returnsList = (returns[this.authority]) ? returns[this.authority] : returns['permitAll']
 			if(!request.getAttribute('responseList')){ request.setAttribute('responseList',this.returnsList) }
 
-			//this.rturns = this.apiObject['returns'] as LinkedHashMap
-			//this.returnsAuths = this.rturns.keySet()
-			//this.networkGrp = this.apiObject['networkGrp']
 			this.method = request.getMethod()
 		} catch (Exception e) {
 			throw new Exception("[ExchangeService :: init] : Exception. full stack trace follows:", e)
@@ -178,36 +153,5 @@ public class ExchangeService extends ApiExchange{
 
 	}
 
-	// Todo : Move to exchangeService??
-	/**
-	 * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
-	 * @param HttpServletResponse response
-	 * @param String statusCode
-	 * @return LinkedHashMap commonly formatted linkedhashmap
-	 */
-	void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
-		response.setContentType("application/json")
-		response.setStatus(Integer.valueOf(statusCode))
-		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
-		response.getWriter().write(message)
-		//response.writer.flush()
-	}
 
-	// Todo : Move to exchangeService??
-	/**
-	 * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
-	 * @param HttpServletResponse response
-	 * @param String statusCode
-	 * @return LinkedHashMap commonly formatted linkedhashmap
-	 */
-	void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
-		response.setContentType("application/json")
-		response.setStatus(Integer.valueOf(statusCode))
-		if(msg.isEmpty()){
-			msg = ErrorCodes.codes[statusCode]['long']
-		}
-		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
-		response.getWriter().write(message)
-		//response.writer.flush()
-	}
 }

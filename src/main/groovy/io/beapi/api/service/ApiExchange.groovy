@@ -13,10 +13,12 @@
  */
 package io.beapi.api.service
 
+import io.beapi.api.utils.ErrorCodes
 import org.json.JSONObject
 import io.beapi.api.utils.ApiDescriptor
 
-
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 import javax.servlet.forward.*
 import groovyx.gpars.*
 import com.google.common.hash.Hashing
@@ -196,6 +198,37 @@ abstract class ApiExchange{
     }
 
 
+    // Todo : Move to exchangeService??
+    /**
+     * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
+     * @param HttpServletResponse response
+     * @param String statusCode
+     * @return LinkedHashMap commonly formatted linkedhashmap
+     */
+    void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
+        response.setContentType("application/json")
+        response.setStatus(Integer.valueOf(statusCode))
+        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
+        response.getWriter().write(message)
+        //response.writer.flush()
+    }
 
+    // Todo : Move to exchangeService??
+    /**
+     * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
+     * @param HttpServletResponse response
+     * @param String statusCode
+     * @return LinkedHashMap commonly formatted linkedhashmap
+     */
+    void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
+        response.setContentType("application/json")
+        response.setStatus(Integer.valueOf(statusCode))
+        if(msg.isEmpty()){
+            msg = ErrorCodes.codes[statusCode]['long']
+        }
+        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
+        response.getWriter().write(message)
+        //response.writer.flush()
+    }
 
 }

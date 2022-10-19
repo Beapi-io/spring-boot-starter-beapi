@@ -18,23 +18,15 @@ package io.beapi.api.controller
 
 
 import io.beapi.api.utils.ErrorCodes
-
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.ServletException;
-import org.json.JSONObject
-import java.lang.reflect.Method
 import org.springframework.beans.factory.annotation.Autowired
 import com.fasterxml.jackson.databind.ObjectMapper
-import groovyx.gpars.*
 import javax.persistence.Entity
 import org.springframework.web.HttpRequestHandler
 import org.slf4j.LoggerFactory;
 import io.beapi.api.service.TraceService
-//import io.beapi.api.service.ApidocService
-import javax.servlet.RequestDispatcher
-import io.beapi.api.utils.ApiDescriptor
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import io.beapi.api.service.ApiCacheService
 import org.springframework.context.ApplicationContext
