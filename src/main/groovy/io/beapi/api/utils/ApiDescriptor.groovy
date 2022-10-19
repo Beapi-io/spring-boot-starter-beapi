@@ -17,9 +17,9 @@
 package io.beapi.api.utils
 
 import java.io.Serializable
-import javax.validation.constraints.Size
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Pattern
+//import javax.validation.constraints.Size
+//import javax.validation.constraints.NotNull
+//import javax.validation.constraints.Pattern
 
 /**
  *

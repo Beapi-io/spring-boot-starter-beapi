@@ -1,63 +1,29 @@
-buildscript {
-    repositories {
-        mavenLocal() {
-            metadataSources {
-                mavenPom()
-                artifact()
-            }
-        }
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath("io.github.gradle-nexus:publish-plugin:1.0.0")
-    }
-}
-
-
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    //id "signing"
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
     id 'maven-publish'
-    id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
     id 'groovy'
+    //id "ca.cutterslade.analyze"
 }
-
 
 apply plugin: "maven-publish"
-apply plugin: 'signing'
-apply plugin: 'io.github.gradle-nexus.publish-plugin'
-apply plugin: 'groovy'
-apply plugin: 'io.spring.dependency-management'
 
+//archivesBaseName = 'beapi-spring-boot-autoconfigure'
 
-description = "The Beapi Springboot Starter for API Automation; automates and simplifies almost all API functionality and security"
+java {
+    withSourcesJar()
+}
 
+description = "Starter for using Beapi's blah blah blah ..."
 
 bootJar {
     enabled = false
 }
 
-group = "io.beapi"
-archivesBaseName = "spring-boot-starter-beapi"
+group = "${group}"
 version = "${version}"
 
 sourceCompatibility = "${sourceCompatibility}"
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
-        }
-    }
-}
-
-
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
 
 repositories {
     mavenCentral()
@@ -65,39 +31,56 @@ repositories {
 
 dependencies {
 
-    implementation("org.springframework.boot:spring-boot-starter:${springBootVersion}"){
-        exclude group:'org.springframework.boot', module:'spring-boot-starter-logging'
-    }
+    //implementation("org.springframework.boot:spring-boot-starter:${springBootVersion}"){
+    //    exclude group:'org.springframework.boot', module:'spring-boot-starter-logging'
+    //}
 
     // Gradle 4.6 and later
     annotationProcessor "org.springframework.boot:spring-boot-autoconfigure-processor:${springBootVersion}"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
     implementation "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+
+    implementation "jakarta.persistence:jakarta.persistence-api:2.2.3"
+    implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.3"
+    implementation "org.apache.tomcat.embed:tomcat-embed-core:9.0.56"
+    implementation "org.codehaus.groovy:groovy:3.0.9"
+    implementation "org.slf4j:slf4j-api:1.7.32"
+    implementation "org.springframework.boot:spring-boot-autoconfigure:2.6.2"
+    implementation "org.springframework.security:spring-security-core:5.6.1"
+    implementation "org.springframework:spring-beans:5.3.14"
+    implementation "org.springframework:spring-context:5.3.14"
+    implementation "org.springframework:spring-core:5.3.14"
+    implementation "org.springframework:spring-web:5.3.14"
+    implementation "org.springframework:spring-webmvc:5.3.14"
+
+
     implementation "org.springframework.boot:spring-boot:${springBootVersion}"
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+    //implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    //implementation("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+
+
 
     //implementation("org.springframework.boot:spring-boot-starter-web:${springBootVersion}"){
     //    exclude group:'org.springframework', module:'spring-web'
     //}
 
     //implementation 'org.projectlombok:lombok:1.18.20'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+    //implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
     implementation 'org.json:json:20210307'
-    implementation 'com.google.code.gson:gson:2.8.9'
+    //implementation 'com.google.code.gson:gson:2.8.8'
 
     // LOGGING
     //implementation 'org.slf4j:slf4j-api:1.7.15'
     runtimeOnly 'org.slf4j:slf4j-api:1.7.15'
 
     // SECURITY
-    implementation "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
-    implementation "com.fasterxml.jackson.core:jackson-core:2.13.3"
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.13.3"
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    //implementation "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
+    //implementation "com.fasterxml.jackson.core:jackson-core:2.12.0"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.12.0"
+    //implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
     // LOGGING FOR GRAFANA/ GRAPHITE / CARBON
-    implementation "io.micrometer:micrometer-registry-graphite:1.3.0"
+    //implementation "io.micrometer:micrometer-registry-graphite:1.3.0"
 
     // GROOVY
     implementation("org.codehaus.groovy:groovy-ant"){
@@ -111,114 +94,61 @@ dependencies {
         exclude group:'org.codehaus.groovy', module: 'groovy-all'
     }
 
+    //implementation "org.reflections:reflections:0.10.2"
+
     // IOUTILS
     implementation 'commons-io:commons-io:2.8.0'
 
-    implementation "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}"
+    //implementation "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}"
 
-    implementation('org.projectlombok:lombok:1.18.2')
+    //implementation('org.projectlombok:lombok:1.18.2')
     annotationProcessor 'org.projectlombok:lombok:1.18.2'
 
     // CACHING
     implementation 'org.springframework:spring-context-support:5.3.3'
-    implementation 'org.springframework.boot:spring-boot-starter-cache:2.7.0'
-    implementation 'org.hibernate:hibernate-ehcache:5.4.15.Final'
+    //implementation 'org.springframework.boot:spring-boot-starter-cache:2.7.0'
+    //implementation 'org.hibernate:hibernate-ehcache:5.4.15.Final'
+    implementation 'net.sf.ehcache:ehcache:2.9.1'
     implementation group: 'com.google.guava', name: 'guava', version: '14.0'
 
     // FOR NONNULL ANNOTATION
-    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
+    //implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 
     //compileOnly('org.projectlombok:lombok:1.18.2')
 
-    // TEST
-    //implementation('org.springframework:spring-test:5.3.20')
-    //testImplementation('org.spockframework:spock-core:2.0-M3-groovy-3.0')
-    //testImplementation('org.spockframework:spock-spring:2.0-M3-groovy-3.0')
-    //testImplementation('org.springframework.boot:spring-boot-starter-test') {
-    //    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    //}
-    implementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    // pretty things up??? Maybe
+    //implementation 'com.diogonunes:JColor:5.5.1'
+
+    //implementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
 
 }
 
+afterEvaluate {
 
-project.plugins.withType(MavenPublishPlugin).all {
-    PublishingExtension publishing = project.extensions.getByType(PublishingExtension)
-    publishing.publications.withType(MavenPublication).all { mavenPublication ->
-        mavenPublication.pom {
-            name = "${project.group}:${project.name}"
-            description = "The Beapi Springboot Starter for API Automation; automates and simplifies almost all API functionality and security"
-            url = "https://github.com/orubel/spring-boot-starter-beapi"
-            licenses {
-                license {
-                    name = "Reciprocal Public License (RPL-1.5)"
-                    url = "https://opensource.org/licenses/RPL-1.5"
+    println("Components: " + components*.name)
+    println("project : ${rootProject.name}/${project.name}")
+
+    publishing {
+        repositories {
+            maven {
+                //name = "spring-boot-starter-beapi"
+                url = "https://maven.pkg.github.com/orubel/spring-boot-starter-beapi"
+                credentials {
+                    username = 'orubel'
+                    password = System.getenv("GITHUB_TOKEN")
                 }
             }
-            developers {
-                developer {
-                    id = "orubel"
-                    name = "Owen Rubel"
-                    email = "orubel+spam@gmail.com"
-                }
-            }
-            scm {
-                connection = "https://github.com/orubel/spring-boot-starter-beapi.git"
-                developerConnection = "https://github.com/orubel/spring-boot-starter-beapi.git"
-                url = "https://github.com/orubel/spring-boot-starter-beapi"
+        }
+        publications {
+            gpr(MavenPublication) {
+                //groupId = 'io.beapi'
+                //artifactId = 'spring-boot-starter-beapi'
+                //version = version
+                from project.components.java
             }
         }
     }
-}
 
-nexusPublishing {
-    repositories {
-        sonatype {
-            username = System.getenv("ORG_GRADLE_PROJECT_ossrhUsername")
-            password = System.getenv("ORG_GRADLE_PROJECT_ossrhPassword")
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-        }
-    }
-
-    // these are not strictly required. The default timeouts are set to 1 minute. But Sonatype can be really slow.
-    // If you get the error "java.net.SocketTimeoutException: timeout", these lines will help.
-    connectTimeout = Duration.ofMinutes(3)
-    clientTimeout = Duration.ofMinutes(3)
-}
-
-publishing {
-    repositories {
-        maven {
-            name = "local"
-            // change URLs to point to your repos, e.g. http://my.org/repo
-            def releasesRepoUrl = "$buildDir/repos/releases"
-            def snapshotsRepoUrl = "$buildDir/repos/snapshots"
-            url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
-        }
-    }
-}
-
-
-
-def hasSigningKey = findProperty("signing.keyId") || findProperty("signing.key")
-if(hasSigningKey) {
-    sign(project)
-}
-void sign(Project project) {
-    project.signing {
-        required { project.gradle.taskGraph.hasTask("publish") }
-        def signingKeyId = findProperty("signing.keyId")
-        def signingKey = findProperty("signing.key")
-        def signingPassword = findProperty("signing.password")
-
-        if (signingKeyId) {
-            useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-        } else if (signingKey) {
-            useInMemoryPgpKeys(signingKey, signingPassword)
-        }
-        sign publishing.publications.maven
-    }
 }
 
 

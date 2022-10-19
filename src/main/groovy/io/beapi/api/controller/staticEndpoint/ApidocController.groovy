@@ -16,17 +16,10 @@
  */
 package io.beapi.api.controller.staticEndpoint
 
-import io.beapi.api.controller.BeapiRequestHandler
+
 import org.springframework.beans.factory.annotation.Autowired
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-import groovyx.gpars.*
-import io.beapi.api.properties.ApiProperties
-import io.beapi.api.service.ApiExchange
-import io.beapi.api.utils.ErrorCodes
 import org.slf4j.LoggerFactory
 import org.springframework.security.web.header.*
-import org.springframework.stereotype.Service
 import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.PrincipleService
 import io.beapi.api.controller.BeapiRequestHandler;

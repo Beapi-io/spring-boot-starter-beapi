@@ -20,16 +20,16 @@ import io.beapi.api.properties.yaml.factory.YamlPropertySourceFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.test.context.TestPropertySource;
+//import org.springframework.test.context.TestPropertySource;
 
 //import lombok.Data;
-import lombok.Getter
-import lombok.Setter
+//import lombok.Getter
+//import lombok.Setter
 
 
 @Configuration
-@Getter
-@Setter
+//@Getter
+//@Setter
 @ConfigurationProperties(prefix="api")
 //@TestPropertySource(properties = ["apiConfigPath = ${user.home}/.boot/${env}/beapi_api.yaml"])
 @PropertySource(value = "classpath:/beapi_api.yaml", factory = YamlPropertySourceFactory.class)
