@@ -1,5 +1,5 @@
 ---
-name: 'BUG: <your issue>'
+name: 'BUG: your issue'
 about: Create a report to help us improve
 title: 'BUG : <Your Issue>'
 labels: bug
