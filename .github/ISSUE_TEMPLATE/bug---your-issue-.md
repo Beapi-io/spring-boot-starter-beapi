@@ -7,9 +7,9 @@ assignees: orubel
 
 ---
 
-**Java Version:** <supply your java version here>
-**Gradle Version:** <supply your gradle version here>
-**App Version:** <supply your app version here>
+**Java Version:** your java version
+**Gradle Version:** your gradle version
+**App Version:** your app version
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -22,7 +22,7 @@ Steps to reproduce the behavior:
 4. See error
 
 **Expected behavior**
-<A clear and concise description of what you expected to happen.>
+A clear and concise description of what you expected to happen
 
 **Stacktrace Error**
-<Include stacktrace output here>
+Include stacktrace output here
