@@ -1,28 +1,59 @@
+buildscript {
+    repositories {
+        mavenLocal() {
+            metadataSources {
+                mavenPom()
+                artifact()
+            }
+        }
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("io.github.gradle-nexus:publish-plugin:1.0.0")
+    }
+}
+
 plugins {
     id 'org.springframework.boot' version "${springBootVersion}"
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'maven-publish'
+    id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
     id 'groovy'
 }
 
 apply plugin: "maven-publish"
+apply plugin: 'signing'
+apply plugin: 'io.github.gradle-nexus.publish-plugin'
+apply plugin: 'groovy'
+apply plugin: 'io.spring.dependency-management'
 
-//archivesBaseName = 'beapi-spring-boot-autoconfigure'
-
-java {
-    withSourcesJar()
-}
-
-description = "Starter for using Beapi's blah blah blah ..."
+description = "The Beapi Springboot Starter for API Automation; automates and simplifies almost all API functionality and security"
 
 bootJar {
     enabled = false
 }
 
-group = "${group}"
+group = "io.beapi"
+archivesBaseName = "spring-boot-starter-beapi"
 version = "${version}"
 
 sourceCompatibility = "${sourceCompatibility}"
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 
 repositories {
     mavenCentral()
@@ -127,40 +158,80 @@ dependencies {
 }
 
 
-afterEvaluate {
-
-    //println("Components: " + components*.name)
-    //println("project : ${rootProject.name}/${project.name}")
-
-    publishing {
-        repositories {
-            maven {
-                //name = "spring-boot-starter-beapi"
-                url = "https://maven.pkg.github.com/orubel/spring-boot-starter-beapi"
-                credentials {
-                    username = 'orubel'
-                    password = System.getenv("GITHUB_TOKEN")
+project.plugins.withType(MavenPublishPlugin).all {
+    PublishingExtension publishing = project.extensions.getByType(PublishingExtension)
+    publishing.publications.withType(MavenPublication).all { mavenPublication ->
+        mavenPublication.pom {
+            name = "${project.group}:${project.name}"
+            description = "The Beapi Springboot Starter for API Automation; automates and simplifies almost all API functionality and security"
+            url = "https://github.com/orubel/spring-boot-starter-beapi"
+            licenses {
+                license {
+                    name = "Reciprocal Public License (RPL-1.5)"
+                    url = "https://opensource.org/licenses/RPL-1.5"
                 }
             }
-        }
-        publications {
-            gpr(MavenPublication) {
-                //groupId = 'io.beapi'
-                //artifactId = 'spring-boot-starter-beapi'
-                //version = version
-                from project.components.java
+            developers {
+                developer {
+                    id = "orubel"
+                    name = "Owen Rubel"
+                    email = "orubel+spam@gmail.com"
+                }
+            }
+            scm {
+                connection = "https://github.com/orubel/spring-boot-starter-beapi.git"
+                developerConnection = "https://github.com/orubel/spring-boot-starter-beapi.git"
+                url = "https://github.com/orubel/spring-boot-starter-beapi"
             }
         }
     }
 }
 
+nexusPublishing {
+    repositories {
+        sonatype {
+            username = System.getenv("ORG_GRADLE_PROJECT_ossrhUsername")
+            password = System.getenv("ORG_GRADLE_PROJECT_ossrhPassword")
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+        }
+    }
 
+    // these are not strictly required. The default timeouts are set to 1 minute. But Sonatype can be really slow.
+    // If you get the error "java.net.SocketTimeoutException: timeout", these lines will help.
+    connectTimeout = Duration.ofMinutes(3)
+    clientTimeout = Duration.ofMinutes(3)
+}
 
+publishing {
+    repositories {
+        maven {
+            name = "local"
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = "$buildDir/repos/releases"
+            def snapshotsRepoUrl = "$buildDir/repos/snapshots"
+            url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
+}
 
+def hasSigningKey = findProperty("signing.keyId") || findProperty("signing.key")
+if(hasSigningKey) {
+    sign(project)
+}
+void sign(Project project) {
+    project.signing {
+        required { project.gradle.taskGraph.hasTask("publish") }
+        def signingKeyId = findProperty("signing.keyId")
+        def signingKey = findProperty("signing.key")
+        def signingPassword = findProperty("signing.password")
 
-
-
-
-
-
+        if (signingKeyId) {
+            useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+        } else if (signingKey) {
+            useInMemoryPgpKeys(signingKey, signingPassword)
+        }
+        sign publishing.publications.maven
+    }
+}
 
