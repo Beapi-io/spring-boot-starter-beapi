@@ -146,6 +146,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 	@Bean(name='simpleUrlHandlerMapping')
 	public SimpleUrlHandlerMapping simpleUrlHandlerMapping() {
+
 		Map<String, Object> urlMap = new LinkedHashMap<>();
 		Map<String, CorsConfiguration> corsMap = new LinkedHashMap<>();
 
