@@ -1,9 +1,8 @@
 plugins {
-    id 'org.springframework.boot'
-    id 'io.spring.dependency-management'
+    id 'org.springframework.boot' version "${springBootVersion}"
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'maven-publish'
     id 'groovy'
-    //id "ca.cutterslade.analyze"
 }
 
 apply plugin: "maven-publish"
@@ -28,6 +27,10 @@ sourceCompatibility = "${sourceCompatibility}"
 repositories {
     mavenCentral()
 }
+
+
+
+
 
 dependencies {
 
@@ -123,10 +126,11 @@ dependencies {
 
 }
 
+
 afterEvaluate {
 
-    println("Components: " + components*.name)
-    println("project : ${rootProject.name}/${project.name}")
+    //println("Components: " + components*.name)
+    //println("project : ${rootProject.name}/${project.name}")
 
     publishing {
         repositories {
@@ -148,7 +152,6 @@ afterEvaluate {
             }
         }
     }
-
 }
 
 
