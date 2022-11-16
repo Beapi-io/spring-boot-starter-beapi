@@ -29,6 +29,16 @@ Additionally, this creates new patterns like [automated batching](https://beapi-
 
 **Gradle Implementation**
 ```
+repositories {
+	mavenLocal()
+	mavenCentral()
+	maven {
+		url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+	}
+}
+
+...
+
 dependencies {
     ...
     implementation 'io.beapi:spring-boot-starter-beapi:0.6.0-SNAPSHOT'
