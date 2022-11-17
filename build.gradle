@@ -234,17 +234,3 @@ task doLast(){
         HttpResponse response = client.execute(request);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
