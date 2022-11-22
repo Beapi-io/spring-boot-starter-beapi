@@ -360,9 +360,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     // remove reservedNames from List
                     reservedNames.each() { paramsList.remove(it) }
 
-                    //println("paramlist : "+paramsList)
-                    //println("checklist : "+checkList)
-
                     if (paramsList.size() == checkList?.intersect(paramsList).size()) {
                         return true
                     }
@@ -412,7 +409,10 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         }
 
         if(post['chainParams']){
-            if(!request.getAttribute('chainParams')) { request.setAttribute('chainParams', post['chainParams']) }
+            if(!request.getAttribute('chainParams')) {
+                LinkedHashMap newMap = post['chainParams'].collectEntries{key, value -> [key, value.toString()]}
+                request.setAttribute('chainParams', newMap)
+            }
             post.remove('chainParams')
         }
 
@@ -505,7 +505,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                         while (keys.hasNext()) {
                             String key = keys.next();
                             if (!RESERVED_PARAM_NAMES.contains(key)) {
-                                output[key] = object.get(key)
+                                output[key] = object.get(key).toString()
                             } else {
                                 throw new Exception("[RequestInitializationFilter :: parsePutParams] : Batch/Chain call attempted on regular API endpoint without sending required params [ie batch/chain]")
                             }
@@ -532,6 +532,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
             }
             return copy;
         }
+
         return obj;
     }
 

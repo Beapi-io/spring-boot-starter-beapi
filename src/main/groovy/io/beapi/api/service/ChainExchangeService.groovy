@@ -66,7 +66,6 @@ public class ChainExchangeService extends ApiExchange{
 
 
 	boolean chainRequest(HttpServletRequest request, HttpServletResponse response, String authority) {
-
 		initChainVars(request, response,authority)
 
 		return true
@@ -115,7 +114,6 @@ public class ChainExchangeService extends ApiExchange{
 
 				def servletCtx = this.ctx.getServletContext()
 				def rd = servletCtx?.getRequestDispatcher(this.newPath)
-				println("newpath : "+this.newPath)
 				rd.forward(request, response)
 			}
 		}else{
@@ -129,10 +127,18 @@ public class ChainExchangeService extends ApiExchange{
 		this.chainOrder = request.getAttribute('chainOrder')
 		this.chainParams = request.getAttribute('chainParams')
 
+		this.uList = request.getAttribute('uriList')
+		this.callType = uList[0]
+		this.version = uList[1]
+		this.appversion = uList[2]
+		this.apiversion = uList[3]
+
+
 		if (this.chainOrder.size()!=this.chainSize) {
-			['returnsList','uriList'].each {
+			['returnsList'].each {
 				request.removeAttribute(it)
 			}
+
 			// reinitializationg for forward
 			this.controller =  request.getAttribute('controller')
 			this.action = request.getAttribute('action')
@@ -149,14 +155,19 @@ public class ChainExchangeService extends ApiExchange{
 			//this.handler = this.apiObject['handler']
 			//request.setAttribute('handler',this.handler)
 			this.receives = this.apiObject.getReceives()
-			this.rturns = this.apiObject['returns'] as LinkedHashMap
+			this.rturns = this.apiObject?.getReturnsList()
 			this.returnsAuths = this.rturns.keySet()
 
 			this.uri = request.getRequestURI()
 
-			this.receivesList = getReceivesList(this.receives)
-			this.returnsList = getReturnsList(this.rturns)
-			request.setAttribute('returnsList',this.returnsList)
+			this.receivesList = (receives[this.authority]) ? receives[this.authority] : receives['permitAll']
+
+			if(rturns[this.authority]){
+				this.returnsList = rturns[this.authority]
+			}else{
+				this.returnsList = rturns['permitAll']
+			}
+
 		}else{
 			// initial call
 			String accept = request.getHeader('Accept')
@@ -164,7 +175,6 @@ public class ChainExchangeService extends ApiExchange{
 
 			this.responseFileType = request.getAttribute('responseFileType')
 
-			this.uList = request.getAttribute('uriList')
 			this.controller = uList[4]
 			request.setAttribute('controller',this.controller)
 			this.action = uList[5]
@@ -187,12 +197,25 @@ public class ChainExchangeService extends ApiExchange{
 			//this.handler = this.apiObject['handler']
 			//request.setAttribute('handler',this.handler)
 			this.receives = this.apiObject.getReceives()
-			this.rturns = this.apiObject['returns'] as LinkedHashMap
+			this.rturns = this.apiObject?.getReturnsList()
 			this.returnsAuths = this.rturns.keySet()
 
 			this.uri = request.getRequestURI()
-			this.receivesList = request.getAttribute('receivesList')
-			this.returnsList = request.getAttribute('returnsList')
+			this.receivesList = (receives[this.authority]) ? receives[this.authority] : receives['permitAll']
+			if(rturns[this.authority]){
+				this.returnsList = rturns[this.authority]
+			}else{
+				this.returnsList = rturns['permitAll']
+			}
+
+			if(!request.getAttribute('responseList')){
+				request.setAttribute('responseList',this.returnsList)
+			}
+		}
+
+		if(request.getAttribute('responseList')){
+			request.removeAttribute('responseList')
+			request.setAttribute('responseList',this.returnsList)
 		}
 
 		if (request.getMethod() != 'GET') {
@@ -231,7 +254,6 @@ public class ChainExchangeService extends ApiExchange{
 			}
 		}
 	}
-
 
 	void clearChainVars(HttpServletRequest request){
 		['controller','action','receivesList','returnsList','uriList'].each {

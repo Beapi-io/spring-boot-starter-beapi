@@ -5,7 +5,7 @@ api:
     documentationUrl: 'http://orubel.github.io/Beapi-API-Framework/'
     views: ['admin','apidoc','api','login','logout']
     reserveduris: ['/authenticate','/register','/error','/login','/logout']
-    nonmappedEndpoint: ['jwtAuthentication','beapiError']
+    publicEndpoint: ['jwtAuthentication','beapiError']
     apiServer: 'http://localhost:8080'
     apichainLimit: 3
     postcrement: false

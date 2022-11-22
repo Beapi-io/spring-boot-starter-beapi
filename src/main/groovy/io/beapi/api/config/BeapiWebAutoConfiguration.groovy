@@ -156,7 +156,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 			String controller = k
 			def cache = apiCacheService.getApiCache(controller)
 			if(cache) {
-				if (!apiProperties.nonmappedEndpoint.contains(controller)) {
+				if (!apiProperties.publicEndpoint.contains(controller)) {
 
 					ArrayList methodNames = []
 					for (Method method : v.getClass().getDeclaredMethods()) { methodNames.add(method.getName()) }

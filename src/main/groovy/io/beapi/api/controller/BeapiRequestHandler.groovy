@@ -107,7 +107,12 @@ class BeapiRequestHandler implements HttpRequestHandler {
 
                     // todo : tempResult is good; problem lies with parseResponseParams
                     Set responseList = request.getAttribute('responseList')
-                    result = (!responseList.contains("*"))? parseResponseParams(tempResult, responseList): tempResult
+
+                    if(!responseList.contains("*")){
+                        result = parseResponseParams(tempResult, responseList)
+                    }else{
+                        result = tempResult
+                    }
                 }
 
                 request.setAttribute('responseBody', result)
@@ -243,7 +248,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
             bodyList.each() { body ->
                 ArrayList paramsList = (body.size() == 0) ? [:] : body.keySet() as ArrayList
                     paramsList.each() { it2 ->
-                        String tmp = it2.toString()
                         if (!responseList.contains(it2)) {
                             body.remove(it2.toString())
                         }

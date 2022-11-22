@@ -41,7 +41,7 @@ public class ApiProperties{
         private String documentationUrl
         private ArrayList views
         private ArrayList reservedUris
-        private ArrayList nonmappedEndpoint
+        private ArrayList publicEndpoint
         private String apiServer
         private ArrayList entities
         private Integer apichainLimit
@@ -65,7 +65,7 @@ public class ApiProperties{
         String getDocumentationUrl() { return documentationUrl }
         ArrayList getViews() { return views }
         ArrayList getReservedUris() { return reservedUris }
-        ArrayList getNonmappedEndpoint() { return nonmappedEndpoint }
+        ArrayList getPublicEndpoint() { return publicEndpoint }
         String getApiServer() { return apiServer }
         ArrayList getEntities() { return entities }
         Integer getApichainLimit() { return apichainLimit }
@@ -85,7 +85,7 @@ public class ApiProperties{
         void setDocumentationUrl(String documentationUrl) { this.documentationUrl = documentationUrl }
         void setViews(ArrayList views) { this.views = views }
         void setReservedUris(ArrayList reservedUris) { this.reservedUris = reservedUris }
-        void setNonmappedEndpoint(ArrayList nonmappedEndpoint) { this.nonmappedEndpoint = nonmappedEndpoint }
+        void setPublicEndpoint(ArrayList publicEndpoint) { this.publicEndpoint = publicEndpoint }
         void setApiServer(String apiServer) { this.apiServer = apiServer }
         void setEntities(ArrayList entities) { this.entities = entities }
         void setApichainLimit(Integer apichainLimit) { this.apichainLimit = apichainLimit }
