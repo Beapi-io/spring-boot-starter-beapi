@@ -49,6 +49,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - performance improvements
 - fixed issue with pkeys/fkeys not being stored in cache properly
 - improvements to ApiDescriptor; better checking for request/response keys
+- renamed nonmappedEndpoint to 'publicEndpoints'
 
 
  ## 0.6 - (projected release Feb/2023)
