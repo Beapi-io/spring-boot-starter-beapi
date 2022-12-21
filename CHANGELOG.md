@@ -41,7 +41,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - apicalls with no 'action' will send back apidocs for endpoints for that controller that TOKEN has access to
 - added receivesList/returnsList to ApiDescriptor
 - added 'getApiDescriptor()' to IoStateService
-- connector/iostate reloading working; started the renaming
 
 ### Changed
 - simplifying mapping in config
