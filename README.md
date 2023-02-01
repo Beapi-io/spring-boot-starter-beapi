@@ -28,16 +28,16 @@ Additionally, this creates new patterns like [automated batching](https://beapi-
 
 ---
 
-**Functionality**
-- Security
+## Functionality
+- **Security**
   - Automated [Role Based Access Control (RBAC)](https://digitalguardian.com/blog/what-role-based-access-control-rbac-examples-benefits-and-more)
   - Full OWASP API Security Compliance
   - Automated RBAC+OWASP checks on request/response parameters per endpoint
   - Automated RBAC+OWASP checks on cache
-- Configuration Management
+- **Configuration Management**
   - Reloadable API RULES (ie connectors)
   - Automated synchronization of API RULES w/ services
-- Automation
+- **Automation**
   - Automated Role-based Batching
   - Automated Role-based Webhooks
   - API Chaining(R)
