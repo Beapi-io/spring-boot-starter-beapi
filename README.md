@@ -27,8 +27,6 @@ Additionally, this creates new patterns like [automated batching](https://beapi-
 
 ---
 
----
-
 **Functionality**
 - Security
   - Automated Role Based Access Contro
