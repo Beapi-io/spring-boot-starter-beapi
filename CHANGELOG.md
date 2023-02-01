@@ -53,7 +53,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - renamed nonmappedEndpoint to 'publicEndpoints'
 
 
- ## 0.6 - (projected release Feb/2023)
+ ## 0.6 - (projected release 03/01/2023)
+ - automated webhooks (final piece)
  
 ### todo
     - optional JMS service/config
