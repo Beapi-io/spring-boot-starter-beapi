@@ -41,7 +41,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - apicalls with no 'action' will send back apidocs for endpoints for that controller that TOKEN has access to
 - added receivesList/returnsList to ApiDescriptor
 - added 'getApiDescriptor()' to IoStateService
-- added HookCacheService for implementing application does not have to create/manage domain for webhooks
+- (REMOVED - adding to SDK) added HookCacheService for implementing application does not have to create/manage domain for webhooks
 
 ### Changed
 - simplifying mapping in config
@@ -54,16 +54,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 
  ## 0.6 - (projected release 03/01/2023)
- - automated webhooks (final piece)
+ - (REMOVED - adding to SDK) automated webhooks
  
 ### todo
-    - optional JMS service/config
-    - automated webhooks (in progress)
     - rate limiting
-    - automated I/O State generation
-    - functional test scaffolding
     - controller scaffolding
     - repository/service scaffolding
-    - UI/UX tools (maybe)
-      - build out demo application as an SDK(???) 
+    - automated I/O State generation
+    - functional test scaffolding
+    - (REMOVED - adding to SDK) optional JMS service/config
+    - (REMOVED - adding to SDK) automated webhooks
+    - (REMOVED - adding to SDK) UI/UX tools (maybe)
 
