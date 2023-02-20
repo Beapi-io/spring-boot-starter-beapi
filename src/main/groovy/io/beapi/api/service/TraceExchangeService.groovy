@@ -44,7 +44,7 @@ public class TraceExchangeService extends ApiExchange{
 			this.apiCacheService = apiCacheService
 			this.traceService = traceService
 		} catch (Exception e) {
-			println("# [Beapi] IoStateService - initialization Exception - ${e}")
+			println("# [Beapi] TraceExchangeService - initialization Exception - ${e}")
 			System.exit(0)
 		}
 	}
@@ -89,7 +89,7 @@ public class TraceExchangeService extends ApiExchange{
     }
 
 
-	void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
+	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
 		String accept = request.getHeader('Accept')
 		String contentType = request.getContentType()
 

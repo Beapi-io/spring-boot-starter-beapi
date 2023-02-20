@@ -32,6 +32,7 @@ import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ExchangeService
 import io.beapi.api.service.TraceExchangeService
+//import io.beapi.api.service.HookExchangeService
 import io.beapi.api.service.PrincipleService
 import io.beapi.api.service.TraceService
 import io.beapi.api.utils.ErrorCodes
@@ -85,6 +86,7 @@ class ApiInterceptor implements HandlerInterceptor{
 	BatchExchangeService batchService
 	ChainExchangeService chainService
 	TraceExchangeService traceExchangeService
+	//HookExchangeService hookExchangeService
 	//int cores
 	//LinkedHashMap networkGrpRoles
 	LinkedHashMap cache
@@ -120,7 +122,7 @@ class ApiInterceptor implements HandlerInterceptor{
 				break
 			case 2:
 				if(apiProperties.batchingEnabled) {
-					return batchService.batchRequest(request, response, this.authority)
+					return batchService.apiRequest(request, response, this.authority)
 				}else{
 					writeErrorResponse(response,'401',request.getRequestURI())
 					//response.writer.flush()
@@ -129,7 +131,7 @@ class ApiInterceptor implements HandlerInterceptor{
 				break
 			case 3:
 				if(apiProperties.chainingEnabled) {
-					return chainService.chainRequest(request, response, this.authority)
+					return chainService.apiRequest(request, response, this.authority)
 				}else{
 					writeErrorResponse(response,'401',request.getRequestURI())
 					//response.writer.flush()
@@ -141,6 +143,9 @@ class ApiInterceptor implements HandlerInterceptor{
 					return traceExchangeService.apiRequest(request, response, this.authority)
 				}
 				break
+			//case 5:
+			//	return hookExchangeService.apiRequest(request, response, this.authority)
+			//	break
 			default:
 				writeErrorResponse(response,'400',request.getRequestURI())
 				//response.writer.flush()
@@ -159,10 +164,10 @@ class ApiInterceptor implements HandlerInterceptor{
 			writeErrorResponse(response,'422',request.getRequestURI(),'No data returned for this call.')
 		}else {
 			switch (callType){
-				case 1:
-					exchangeService.apiResponse(response,body)
-					response.writer.flush()
-					break
+			case 1:
+				exchangeService.apiResponse(response,body)
+				response.writer.flush()
+				break
 			case 2:
 				if(apiProperties.batchingEnabled) {
 					batchService.batchResponse(request, response, body)
@@ -182,6 +187,10 @@ class ApiInterceptor implements HandlerInterceptor{
 			case 4:
 				traceExchangeService.apiResponse(response,body)
 				break
+			//case 5:
+			//	hookExchangeService.apiResponse(response,body)
+			//	response.writer.flush()
+			//	break
 			default:
 				writeErrorResponse(response, '400', request.getRequestURI())
 				response.writer.flush()

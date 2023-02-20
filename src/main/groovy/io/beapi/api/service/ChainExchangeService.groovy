@@ -58,14 +58,14 @@ public class ChainExchangeService extends ApiExchange{
 			this.apiCacheService = apiCacheService
 			this.ctx = applicationContext
 		} catch (Exception e) {
-			println("# [Beapi] IoStateService - initialization Exception - ${e}")
+			println("# [Beapi] ChainExchangeService - initialization Exception - ${e}")
 			System.exit(0)
 		}
 	}
 
 
 
-	boolean chainRequest(HttpServletRequest request, HttpServletResponse response, String authority) {
+	boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority) {
 		initChainVars(request, response,authority)
 
 		return true
@@ -121,7 +121,7 @@ public class ChainExchangeService extends ApiExchange{
 		}
 	}
 
-	void initChainVars(HttpServletRequest request, HttpServletResponse response, String authority){
+	private void initChainVars(HttpServletRequest request, HttpServletResponse response, String authority){
 		this.chainType = request.getAttribute('chainType')
 		this.chainSize = request.getAttribute('chainSize')
 		this.chainOrder = request.getAttribute('chainOrder')
@@ -255,13 +255,13 @@ public class ChainExchangeService extends ApiExchange{
 		}
 	}
 
-	void clearChainVars(HttpServletRequest request){
+	private void clearChainVars(HttpServletRequest request){
 		['controller','action','receivesList','returnsList','uriList'].each {
 			request.removeAttribute(it)
 		}
 	}
 
-	void setNewChainPath(HttpServletRequest request, ArrayList body){
+	private void setNewChainPath(HttpServletRequest request, ArrayList body){
 		String method = request.getMethod()
 		LinkedHashMap chainParams = [:]
 		String newPath
@@ -328,7 +328,7 @@ public class ChainExchangeService extends ApiExchange{
 		this.newPath = newPath
 	}
 
-	void concatChainOutput(ArrayList responseBody, HttpServletRequest request, HttpServletResponse response, String responseFileType){
+	private void concatChainOutput(ArrayList responseBody, HttpServletRequest request, HttpServletResponse response, String responseFileType){
 		this.chain.add(responseBody[0])
 		if(request.getAttribute('chainOrder').isEmpty()) {
 			String temp = ""
@@ -344,7 +344,7 @@ public class ChainExchangeService extends ApiExchange{
 		}
 	}
 
-	String parseBodyByFiletype(LinkedHashMap responseBody, String responseFileType){
+	protected String parseBodyByFiletype(LinkedHashMap responseBody, String responseFileType){
 		switch(responseFileType){
 			case 'JSON':
 				return new JSONObject(responseBody).toString()
@@ -360,7 +360,7 @@ public class ChainExchangeService extends ApiExchange{
 		}
 	}
 
-	void setChainParams(HttpServletRequest request) {
+	private void setChainParams(HttpServletRequest request) {
 		if (request.getAttribute('params')){
 			this.params = request.getAttribute('params')
 		}

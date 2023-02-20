@@ -59,7 +59,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     //private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RequestInitializationFilter.class);
     private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml','multipart/form-data']
     private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
-    private static final ArrayList CALL_TYPES = ['v','b','c','t']
+    private static final ArrayList CALL_TYPES = ['v','b','c','t','h']
 
     @Autowired
     ApplicationContext ctx
@@ -186,10 +186,10 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                         throw new Exception("[RequestInitializationFilter :: checkRequestParams] : Requestparams do not match expected params for this endpoint")
                     }
 
+                    String temp2 = (request.getHeader('Accept') != null && request.getHeader('Accept') != "*/*") ? request.getHeader('Accept') : (request.getContentType()==null)?'application/json':request.getContentType()
 
-                    String temp2 = (request.getHeader('Accept') != null && request.getHeader('Accept') != "*/*") ? request.getHeader('Accept') : request.getContentType()
                     ArrayList reqMime = temp2.split(';')
-                    ArrayList respMime = request.getContentType().split(';')
+                    ArrayList respMime = reqMime
 
                     String requestMimeType = reqMime[0]
                     String requestEncoding = reqMime[1]
@@ -264,7 +264,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
     }
 
-
     protected String getFormat(String mimeType){
         String format
         switch(mimeType){
@@ -284,7 +283,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
 
     public ArrayList setUri(String uri, String version){
-        // [callType, version, appVersion, apiVersion, controller, action, trace, id]
+        // [callType, sent appVersion, default appVersion(for comparison), apiVersion, controller, action, trace, id]
         Integer callType
         boolean trace = false
         ArrayList uriList = []
@@ -297,6 +296,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
             case ~/([v|b|c|t])(${version})/:
                 def m = Matcher.lastMatcher
                 callType = (CALL_TYPES.indexOf(m[0][1])+1)
+
                 uriList.add(callType)
                 uriList.add(m[0][2])
                 uriList.add(this.version)
@@ -307,13 +307,48 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                 if(callType==5){ trace=true }
                 uriList.add(trace)
 
-
                 if(uriVars[4]){ uriList.add(URLDecoder.decode(uriVars[4], StandardCharsets.UTF_8.toString())) }
                 break
+            /*
+            case ~/([h])(${version})-([0-9]+)/:
+            case ~/([h])(${version})/:
+                def m = Matcher.lastMatcher
+                callType = (CALL_TYPES.indexOf(m[0][1])+1)
+                String action
+                ArrayList uriList2 = []
+                switch(request.getMethod()){
+                    case 'GET':
+                        action = 'show'
+                        break;
+                    case 'PUT':
+                        action = 'create'
+                        break;
+                    case 'POST':
+                        action = 'update'
+                        break;
+                    case 'DELETE':
+                        action = 'delete'
+                        break;
+                    default:
+                        break;
+                }
+
+                uriList.add(callType)
+                uriList.add(m[0][2])
+                uriList.add(this.version)
+                uriList.add(((m[0][3])?m[0][3]:'1'))
+                uriList.add('hook')
+                uriList.add(action)
+                uriList.add(null)
+                if(uriVars[4]){ uriList.add(URLDecoder.decode(uriVars[4], StandardCharsets.UTF_8.toString())) }
+                break
+
+             */
         }
 
         return uriList
     }
+
 
     /**
      * Returns concatenated IDS as a HASH used as ID for the API cache
@@ -380,6 +415,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     protected void parseParams(HttpServletRequest request, String formData, String uriData, String id){
         LinkedHashMap<String,String> get = parseGetParams(uriData, id)
         request.setAttribute('GET',get)
+        //LinkedHashMap<String,String> post = parsePutParams(formData)
         LinkedHashMap<String,String> post = parsePutParams(formData)
 
         // set batchVars if they are present
@@ -444,13 +480,13 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         //String formData = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
         LinkedHashMap<String, String> output = [:]
         if (formData) {
-            LinkedHashMap object
+
+            //LinkedHashMap object
+            JSONObject object
             try {
                 switch (this.requestFileType) {
                     case 'JSON':
-                        //object = new JSONObject(formData)
-                        Object temp = new JsonSlurper().parseText(formData)
-                        object = toToLinkedHashMap(temp)
+                        object = new JSONObject(formData)
                         break
                     case 'XML':
                         //object = XML.toJSONObject(formData)
@@ -501,6 +537,11 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                             }
                         }
                         break;
+                    case {it.contains('IOSTATE')}:
+                        def slurp = new JsonSlurper().parseText(formData)
+                        LinkedHashMap json = toToLinkedHashMap(slurp)
+                        output = json
+                        break;
                     default:
                         while (keys.hasNext()) {
                             String key = keys.next();
@@ -528,7 +569,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         if (obj instanceof org.apache.groovy.json.internal.ValueList) {
             List copy = [];
             for (item in (obj as List)) {
-                copy.add(toToLinkedHashMap(item.toString()));
+                copy.add(toToLinkedHashMap(item));
             }
             return copy;
         }

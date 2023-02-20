@@ -42,12 +42,12 @@ public class BatchExchangeService extends ApiExchange{
 			this.apiCacheService = apiCacheService
 			this.ctx = applicationContext
 		} catch (Exception e) {
-			println("# [Beapi] IoStateService - initialization Exception - ${e}")
+			println("# [Beapi] BatchExchangeService - initialization Exception - ${e}")
 			System.exit(0)
 		}
 	}
 
-	boolean batchRequest(HttpServletRequest request, HttpServletResponse response, String authority) {
+	boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority) {
 
 		initVars(request,response,authority)
 
@@ -114,7 +114,7 @@ public class BatchExchangeService extends ApiExchange{
 	}
 
 
-	void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
+	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
 		String accept = request.getHeader('Accept')
 		String contentType = request.getContentType()
 

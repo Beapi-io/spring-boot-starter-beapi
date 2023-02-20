@@ -100,7 +100,10 @@ abstract class ApiExchange{
     public String id
 
 
-
+    /*
+    * Validates request method in interceptors for each type of functionality;
+    * validating here to better handle routing (filter is 'once per request')
+     */
     boolean validateMethod(){
         boolean result = false
         if(this.apiObject['method'].toUpperCase() == this.method){

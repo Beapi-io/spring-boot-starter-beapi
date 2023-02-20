@@ -44,6 +44,17 @@ class BeapiRequestHandler implements HttpRequestHandler {
     //@Autowired
     //ApiProperties apiProperties
 
+    private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml','multipart/form-data']
+    private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
+
+    /*
+    * v : 'regular api call'
+    * b : batch
+    * c : api chain
+    * t : trace
+    * h : webhook CRUD
+     */
+    private static final ArrayList CALL_TYPES = ['v','b','c','t','h']
 
     public ArrayList uList
     protected boolean trace

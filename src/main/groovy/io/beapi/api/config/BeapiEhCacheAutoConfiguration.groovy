@@ -17,11 +17,11 @@
 package io.beapi.api.config
 
 import io.beapi.api.properties.ApiProperties
-//import io.beapi.api.service.ApiCacheService
+
 import io.beapi.api.service.IoStateService
 import io.beapi.api.service.TraceCacheService
 import net.sf.ehcache.config.CacheConfiguration
-//import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.annotation.CachingConfigurer
@@ -37,21 +37,20 @@ import org.springframework.beans.factory.annotation.Autowired
 //import org.springframework.boot.info.BuildProperties
 
 import net.sf.ehcache.config.DiskStoreConfiguration
-//import org.springframework.stereotype.Component;
+//import net.sf.ehcache.config.PersistenceConfiguration
+//import net.sf.ehcache.config.PersistenceConfiguration.Strategy;
 
-
-//import org.springframework.boot.autoconfigure.info.ProjectInfoProperties.Build
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-//import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration
+
 
 import io.beapi.api.service.ApiCacheService
 
-//import java.beans.beancontext.BeanContext
+
 
 
 @Configuration(proxyBeanMethods = false)
@@ -96,7 +95,7 @@ public class BeapiEhCacheAutoConfiguration  implements CachingConfigurer {
             cacheConfig1.setName("ApiCache")
             cacheConfig1.eternal(true)
             cacheConfig1.overflowToDisk(true)
-            cacheConfig1.diskPersistent(true)
+            // cacheConfig1.diskPersistent(true)
             cacheConfig1.diskExpiryThreadIntervalSeconds(120)
             cacheConfig1.setMaxElementsInMemory(10000)
             cacheConfig1.setMaxElementsOnDisk(10000)
@@ -105,17 +104,22 @@ public class BeapiEhCacheAutoConfiguration  implements CachingConfigurer {
             cacheConfig1.memoryStoreEvictionPolicy(net.sf.ehcache.store.MemoryStoreEvictionPolicy.FIFO)
 
 
-            // ApiCache
+            // (Enterprise ehcache only)
+            //PersistenceConfiguration persistConfig = new PersistenceConfiguration();
+            //persistConfig.strategy(Strategy.LOCALRESTARTABLE);
+
+            // HookCache
             CacheConfiguration cacheConfig2 = new CacheConfiguration()
             cacheConfig2.setName("HookCache")
             cacheConfig2.eternal(true)
-            cacheConfig2.overflowToDisk(true)
+            cacheConfig1.overflowToDisk(true)
             cacheConfig2.diskPersistent(true)
-            cacheConfig2.diskExpiryThreadIntervalSeconds(120)
-            cacheConfig2.setMaxElementsInMemory(1000)
-            cacheConfig2.setMaxElementsOnDisk(5000)
-            cacheConfig2.maxEntriesLocalHeap(1000)
-            cacheConfig2.maxEntriesLocalDisk(5000)
+            //cacheConfig2.persistence(persistConfig);
+            cacheConfig2.diskExpiryThreadIntervalSeconds(-1)
+            //cacheConfig2.setMaxElementsInMemory(1000)
+            cacheConfig2.setMaxElementsOnDisk(100000)
+            cacheConfig2.maxEntriesLocalHeap(0)
+            cacheConfig2.maxEntriesLocalDisk(100000)
             cacheConfig2.memoryStoreEvictionPolicy(net.sf.ehcache.store.MemoryStoreEvictionPolicy.FIFO)
 
             // Throttle

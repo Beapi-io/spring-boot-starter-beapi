@@ -20,7 +20,10 @@ package io.beapi.api.service
 import groovy.json.JsonSlurper
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ClassPathResource;
+
+import groovy.json.JsonSlurper
 import org.json.JSONObject
+
 import io.beapi.api.properties.ApiProperties
 import io.beapi.api.utils.ParamsDescriptor
 import io.beapi.api.utils.ApiDescriptor
@@ -38,6 +41,8 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
+
+import org.springframework.core.io.Resource;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 
@@ -58,17 +63,17 @@ public class IoStateService{
 	public IoStateService(ApiProperties apiProperties, ApplicationContext applicationContext, ApiCacheService apiCacheService, String version)  throws Exception {
 		ApplicationContext ctx
 		this.version = version
-		try {
+		//try {
 			ctx = applicationContext
 			this.apiProperties = apiProperties
 			this.apiCacheService = apiCacheService
 			initIoStateDir()
 			ego()
 			validateRpcNamingConventions(ctx,version)
-		}catch(Exception e){
-			println("# [Beapi] IoStateService - initialization Exception - ${e}")
-			System.exit(0)
-		}
+		//}catch(Exception e){
+		//	println("# [Beapi] IoStateService - initialization Exception - ${e}")
+		//	System.exit(0)
+		//}
 
 	}
 
@@ -109,21 +114,21 @@ public class IoStateService{
 
 			parseFiles(apiObjectSrc.toString())
 
+
 		}catch(Exception e){
 			println("# IoStateService - initIoStateDir Exception - ${e}")
 			System.exit(0)
 		}
 
 		parseResource("apidoc.json")
-		parseResource("iostate.json")
-		//this.testLoadOrder = testAutomationService.createTestOrder()
+		parseResource("connector.json")
+
 	}
 
 	private void parseResource(String path) throws IOException, UndeclaredThrowableException, IllegalArgumentException{
 		logger.debug("parseResource : {}")
 
 		LinkedHashMap methods = [:]
-
 		InputStream in = this.getClass().getClassLoader().getResourceAsStream(path);
 		String text = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)) .lines().collect(Collectors.joining("\n"));
 
@@ -152,6 +157,7 @@ public class IoStateService{
 
 		try {
 			new File(path).eachFile() { file ->
+
 				if(!file.isDirectory()) {
 					String fileName = file.name.toString()
 
@@ -183,6 +189,7 @@ public class IoStateService{
 			println('[IoStateService] : No IO State Files found for initialization :'+e)
 		}
 	}
+
 
 	void parseJson(String apiName,LinkedHashMap json) throws Exception{
 		logger.debug("parseJson : {}")
@@ -332,7 +339,7 @@ public class IoStateService{
 				// TODO : SETUP CACHE
 				def cache
 				try {
-					println("#### Initializing cache for '${apiName}'")
+					println("#### Initializing connector cache for '${apiName}'")
 					cache = apiCacheService.setApiCache(apiName, methods)
 				}catch(Exception e){
 					println("#### IoStateService Exception1 : "+e)
@@ -486,7 +493,7 @@ public class IoStateService{
 
 
 
-	private LinkedHashMap getIOSet(LinkedHashMap io, LinkedHashMap apiObject,List valueKeys,String apiName){
+	private LinkedHashMap getIOSet(LinkedHashMap io, LinkedHashMap apiObject, List valueKeys, String apiName){
 		logger.debug("getIOSet : {}")
 
 		// TODO : APIOBJECT IS ALWAYS EMPTY; NEED TO FIX APIDESCRIPTOR ABOVE
