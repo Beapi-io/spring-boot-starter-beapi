@@ -114,7 +114,10 @@ dependencies {
         exclude group:'org.multiverse', module:'multiverse-core'
         exclude group:'org.codehaus.groovy', module: 'groovy-all'
     }
-
+    implementation('org.codehaus.groovy:groovy-cli-commons'){
+        exclude group:'org.codehaus.groovy', module: 'groovy-all'
+    }
+    
     // [IOUTILS]
     implementation 'commons-io:commons-io:2.8.0'
 
