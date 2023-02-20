@@ -1,3 +1,5 @@
+#!/usr/bin/env groovy
+
 /*
  * Copyright 2013-2023 Beapi.io
  *
@@ -10,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.beapi.api.cli
+//package io.beapi.api.cli
 
 //@Grab(group='commons-cli', module='commons-cli', version='1.4')
 
