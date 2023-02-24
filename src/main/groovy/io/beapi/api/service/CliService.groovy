@@ -36,43 +36,27 @@ class CliService {
 		//this.apiProperties = apiProperties
 	}
 
-	LinkedHashMap parse(String args) {
-
-		/*
-		try {
-			if (options.d) {
-				if (options.controller) {
-					try {
-						createController()
-					} catch (Exception e) {
-						throw new Exception('Scaffold Value must not be NULL. Please provide ARG value of \'-controller/domain/connector\'.', e)
+	LinkedHashMap parse(ArrayList args) {
+		ArrayList validArgKeys = ['controller','connector','domain']
+		LinkedHashMap vars = [:]
+		try{
+			args.each(){
+				ArrayList temp = it.split('=')
+				if(validArgKeys.contains(temp[0])){
+					if(temp[1] ==~ /[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]/) {
+						vars[temp[0]] = temp[1]
+					}else{
+						throw new Exception("Invalid package name. Package name for '"+temp[0]+"' is not recognized as a valid package name", e)
 					}
+				}else{
+					throw new Exception('Invalid ARG sent. Please provide ARG values of \'controller/connector\' and \'domain\'.', e)
 				}
-
-				if (options.domain) {
-					try {
-						createDomain()
-					} catch (Exception e) {
-						throw new Exception('Scaffold Value must not be NULL. Please provide ARG value of \'-controller/domain/connector\'.', e)
-					}
-				}
-
-				if (options.connector) {
-					try {
-						createConnector()
-					} catch (Exception e) {
-						throw new Exception('Scaffold Value must not be NULL. Please provide ARG value of \'-controller/domain/connector\'.', e)
-					}
-				}
-			} else {
-				throw new Exception('Method (-d/--domainname) is REQUIRED for Beapi to work. Please try again.\n')
 			}
 		} catch (Exception e) {
 			System.err << e
 			System.exit 1
 		}
-
-		 */
+		return vars
 	}
 
 }
