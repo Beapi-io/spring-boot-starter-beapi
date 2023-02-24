@@ -30,6 +30,7 @@ class BeapiCli {
 			ArrayList temp = it.split('=')
 			if(validArgKeys.contains(temp[0])){
 				if(temp[1] ==~ /[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]/) {
+					println("${temp[0]} = ${temp[1]}")
 					vars[temp[0]] = temp[1]
 				}else{
 					System.err << "Invalid package name. Package name for '"+temp[0]+"' is not recognized as a valid package name"
@@ -40,6 +41,7 @@ class BeapiCli {
 				System.exit 1
 			}
 		}
+		println(vars)
 		return vars
 	}
 
