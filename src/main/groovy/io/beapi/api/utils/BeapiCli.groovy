@@ -14,25 +14,12 @@
  * @author Owen Rubel (orubel@gmail.com)
  *
  */
-package io.beapi.api.service
+package io.beapi.api.utils
 
 
-import io.beapi.api.properties.ApiProperties
-import org.springframework.cache.annotation.*
-import org.springframework.stereotype.Service
-import org.springframework.beans.factory.annotation.Autowired
-import org.slf4j.LoggerFactory
+class BeapiCli {
 
-
-@Service
-class CliService {
-
-	@Autowired
-	ApiProperties apiProperties
-
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PrincipleService.class);
-
-	public CliService() {
+	public BeapiCli() {
 		//this.apiProperties = apiProperties
 	}
 

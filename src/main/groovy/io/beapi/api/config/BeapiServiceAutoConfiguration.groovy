@@ -87,13 +87,6 @@ public class BeapiServiceAutoConfiguration {
 		return version
 	}
 
-
-	@Bean(name='cliService')
-	@ConditionalOnMissingBean
-	public CliService cliService() throws IOException {
-		return new CliService();
-	}
-
 	@Bean(name='principleService')
 	@ConditionalOnMissingBean
 	public PrincipleService principleService() throws IOException {
