@@ -20,7 +20,6 @@ import io.beapi.api.properties.ApiProperties
 import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
-import io.beapi.api.service.CliService
 import io.beapi.api.service.ExchangeService
 import io.beapi.api.service.TraceExchangeService
 //import io.beapi.api.service.EndpointMappingService
