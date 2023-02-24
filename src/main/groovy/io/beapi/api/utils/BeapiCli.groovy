@@ -23,7 +23,7 @@ class BeapiCli {
 		//this.apiProperties = apiProperties
 	}
 
-	LinkedHashMap parse(ArrayList args) {
+	LinkedHashMap parse(Set<String> args) {
 		ArrayList validArgKeys = ['controller','connector','domain']
 		LinkedHashMap vars = [:]
 		try{
