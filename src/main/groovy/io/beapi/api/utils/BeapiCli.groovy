@@ -26,22 +26,19 @@ class BeapiCli {
 	LinkedHashMap parse(Set<String> args) {
 		ArrayList validArgKeys = ['controller','connector','domain']
 		LinkedHashMap vars = [:]
-		try{
-			args.each(){
-				ArrayList temp = it.split('=')
-				if(validArgKeys.contains(temp[0])){
-					if(temp[1] ==~ /[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]/) {
-						vars[temp[0]] = temp[1]
-					}else{
-						throw new Exception("Invalid package name. Package name for '"+temp[0]+"' is not recognized as a valid package name", e)
-					}
+		args.each(){
+			ArrayList temp = it.split('=')
+			if(validArgKeys.contains(temp[0])){
+				if(temp[1] ==~ /[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]/) {
+					vars[temp[0]] = temp[1]
 				}else{
-					throw new Exception('Invalid ARG sent. Please provide ARG values of \'controller/connector\' and \'domain\'.', e)
+					System.err << "Invalid package name. Package name for '"+temp[0]+"' is not recognized as a valid package name"
+					System.exit 1
 				}
+			}else{
+				System.err << "Invalid ARG sent. Please provide ARG values of \'controller/connector\' and \'domain\'."
+				System.exit 1
 			}
-		} catch (Exception e) {
-			System.err << e
-			System.exit 1
 		}
 		return vars
 	}
