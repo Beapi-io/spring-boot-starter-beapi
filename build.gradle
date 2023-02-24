@@ -237,3 +237,18 @@ task doLast(){
         HttpResponse response = client.execute(request);
     }
 }
+
+if (project.hasProperty("scaffold")) {
+    ext.cmdargs = project.getProperty("scaffold")
+} else {
+    ext.cmdargs = ""
+}
+
+// --Pscaffold="controller=package.name, domain=full.class.name"
+task cmdLineJavaExec(type: JavaExec) {
+    group = "Execution"
+    description = "Run the main class with JavaExecTask"
+    classpath = sourceSets.main.runtimeClasspath
+    main = javaMainClass
+    args cmdargs.split()
+}
