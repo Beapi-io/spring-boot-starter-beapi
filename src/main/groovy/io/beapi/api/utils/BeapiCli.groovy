@@ -28,8 +28,9 @@ class BeapiCli {
 	//@PersistenceContext
 	//private EntityManager entityManager;
 
-	private LinkedHashMap scaffoldArg = [:]
-	private LinkedHashMap domainArg = [:]
+	private String controllerArg
+	private String connectorArg
+	private String domainArg
 
 	public BeapiCli(Set<String> args) {
 		parse(args)
@@ -42,26 +43,37 @@ class BeapiCli {
 		LinkedHashMap vars = [:]
 		args.each(){
 			ArrayList temp = it.split('=')
-			if(validArgKeys.contains(temp[0])){
+			if(validArgKeys.contains(temp[0].toLowerCase())){
 				if(temp[1] ==~ /[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]/) {
-					if(scaffoldKeys.contains(temp[0])){
-						if(scaffoldArg==[:]) {
-							scaffoldArg[temp[0]] = temp[1]
-						}else{
-							System.err << "Scaffold value for '"+scaffoldArg[0]+"' has already been set. Send ONLY ONE OF controller/connector with a domain setting."
-							System.exit 1
-						}
+					switch(temp[0].toLowerCase()){
+						case 'controller':
+							if(controllerArg!=null){
+								System.err << "Controller value has already been set. Please try again."
+								System.exit
+							}else{
+								controllerArg = temp[1]
+							}
+							break
+						case 'connector':
+							if(connectorArg!=null){
+								System.err << "Connector value has already been set. Please try again."
+								System.exit
+							}else{
+								connectorArg = temp[1]
+							}
+							break
+						case 'domain':
+							if(domainArg!=null){
+								System.err << "Domain value has already been set. Please try again."
+								System.exit
+							}else{
+								domainArg = temp[1]
+							}
+							break
+						default:
+							System.err << "Sent argument is unsupported. Please try again."
+							System.exit
 					}
-					if(domainKey.contains(temp[0])){
-						if(domainArg==[:]){
-							domainArg[temp[0]] = temp[1]
-						}else{
-							System.err << "Domain sent twice. Send only domain setting only once."
-							System.exit 1
-						}
-					}
-					println("${scaffoldArg[0]} = ${scaffoldArg[1]}")
-					println("${domainArg[0]} = ${domainArg[1]}")
 				}else{
 					System.err << "Invalid package name. Package name for '"+temp[0]+"' is not recognized as a valid package name"
 					System.exit 1
@@ -72,12 +84,12 @@ class BeapiCli {
 			}
 		}
 
-		if(domainArg==[:]){
+		if(domainArg==null){
 			System.err << "No valid domain value sent. Please try again."
 			System.exit 1
 		}
 
-		if(domainArg==[:]){
+		if(controllerArg==null && connectorArg==null){
 			System.err << "No valid scaffold value sent (ie controller/connector). Please try again."
 			System.exit 1
 		}
