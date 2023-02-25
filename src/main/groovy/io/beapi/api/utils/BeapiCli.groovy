@@ -19,11 +19,13 @@ package io.beapi.api.utils
 
 class BeapiCli {
 
-	public BeapiCli() {
-		//this.apiProperties = apiProperties
+	private LinkedHashMap args
+
+	public BeapiCli(Set<String> args) {
+		parse(args)
 	}
 
-	LinkedHashMap parse(Set<String> args) {
+	private void parse(Set<String> args) {
 		ArrayList validArgKeys = ['controller','connector','domain']
 		LinkedHashMap vars = [:]
 		args.each(){
@@ -41,8 +43,7 @@ class BeapiCli {
 				System.exit 1
 			}
 		}
-		println(vars)
-		return vars
+		this.args = vars
 	}
 
 }
