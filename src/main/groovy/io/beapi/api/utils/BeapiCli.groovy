@@ -93,6 +93,9 @@ class BeapiCli {
 			System.err << "No valid scaffold value sent (ie controller/connector). Please try again."
 			System.exit 1
 		}
+		println("domain : "+domainArg)
+		println("controller : "+controllerArg)
+		println("connector : "+connectorArg)
 	}
 
 	// NOTE : This has to be called separately in the 'runner'
