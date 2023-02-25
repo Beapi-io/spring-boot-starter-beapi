@@ -25,6 +25,9 @@ import groovy.text.GStringTemplateEngine
 
 class BeapiCli {
 
+	//@PersistenceContext
+	//private EntityManager entityManager;
+
 	private LinkedHashMap scaffoldArg = [:]
 	private LinkedHashMap domainArg = [:]
 
