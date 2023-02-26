@@ -97,21 +97,20 @@ class BeapiCli {
 	public scaffold(ApplicationContext context){
 		def entityManager = context.getBean('entityManagerFactory')
 		Set<EntityType<?>> entities = entityManager.getMetamodel().getEntities();
-
-		switch(scaffoldArg[0].toLowerCase()){
-			case 'controller':
+		if(domainArg) {
+			if (controllerArg) {
 				for (EntityType tempEntityType : entities) {
 					println(tempEntityType.getJavaType())
 					println(tempEntityType.getName())
 					//entityClasses.add(tempEntityType.getJavaType());
 				}
 				//createController()
-				break;
-			case 'connector':
+			} else if (connectorArg) {
 				//createConnector()
-				break;
-			default:
+			} else {
+				default:
 				error(1, "Unrecognized arg. Please try again.")
+			}
 		}
 	}
 
