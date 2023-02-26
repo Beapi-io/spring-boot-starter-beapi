@@ -108,7 +108,6 @@ class BeapiCli {
 			} else if (connectorArg) {
 				//createConnector()
 			} else {
-				default:
 				error(1, "Unrecognized arg. Please try again.")
 			}
 		}
