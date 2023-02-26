@@ -22,6 +22,9 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.io.File
 import groovy.text.GStringTemplateEngine
+import org.springframework.context.ApplicationContext
+import javax.persistence.EntityManager
+import javax.persistence.metamodel.EntityType
 
 class BeapiCli {
 
@@ -48,50 +51,42 @@ class BeapiCli {
 					switch(temp[0].toLowerCase()){
 						case 'controller':
 							if(controllerArg!=null){
-								System.err << "Controller value has already been set. Please try again."
-								System.exit
+								error(1, "'controller' value has already been set. Please try again.")
 							}else{
 								controllerArg = temp[1]
 							}
 							break
 						case 'connector':
 							if(connectorArg!=null){
-								System.err << "Connector value has already been set. Please try again."
-								System.exit
+								error(1, "'connector' value has already been set. Please try again.")
 							}else{
 								connectorArg = temp[1]
 							}
 							break
 						case 'domain':
 							if(domainArg!=null){
-								System.err << "Domain value has already been set. Please try again."
-								System.exit
+								error(1, "'domain' value has already been set. Please try again.")
 							}else{
 								domainArg = temp[1]
 							}
 							break
 						default:
-							System.err << "Sent argument is unsupported. Please try again."
-							System.exit
+							error(1, "Unrecognized arg. Please try again.")
 					}
 				}else{
-					System.err << "Invalid package name. Package name for '"+temp[0]+"' is not recognized as a valid package name"
-					System.exit 1
+					error(1, "Invalid package name. Package name for '"+temp[0]+"' is not recognized as a valid package name")
 				}
 			}else{
-				System.err << "Invalid ARG sent. Please provide ARG values of \'controller/connector\' and \'domain\'."
-				System.exit 1
+				error(1, "Invalid ARG sent. Please provide ARG values of 'controller/connector' and 'domain'.")
 			}
 		}
 
 		if(domainArg==null){
-			System.err << "No valid domain value sent. Please try again."
-			System.exit 1
+			error(1, "Missing valid domain value sent. Please try again.")
 		}
 
 		if(controllerArg==null && connectorArg==null){
-			System.err << "No valid scaffold value sent (ie controller/connector). Please try again."
-			System.exit 1
+			error(1, "Missing valid scaffold value sent (ie controller/connector). Please try again.")
 		}
 		println("domain : "+domainArg)
 		println("controller : "+controllerArg)
@@ -99,23 +94,30 @@ class BeapiCli {
 	}
 
 	// NOTE : This has to be called separately in the 'runner'
-	public scaffold(){
+	public scaffold(ApplicationContext context){
+		def entityManager = context.getBean('entityManagerFactory')
+		Set<EntityType<?>> entities = entityManager.getMetamodel().getEntities();
+
 		switch(scaffoldArg[0].toLowerCase()){
 			case 'controller':
-				createController()
+				for (EntityType tempEntityType : entities) {
+					println(tempEntityType.getJavaType())
+					println(tempEntityType.getName())
+					//entityClasses.add(tempEntityType.getJavaType());
+				}
+				//createController()
 				break;
 			case 'connector':
-				createConnector()
+				//createConnector()
 				break;
 			default:
-				System.err << "Unrecognized arg. Please try again."
-				System.exit 1
+				error(1, "Unrecognized arg. Please try again.")
 		}
 	}
 
 	private void createController(){
 		// look for 'entity'' first and try to get match
-		entityManager.getMetamodel().getEntities();
+
 
 		// next make sure controller does not exist
 
@@ -226,6 +228,11 @@ class BeapiCli {
 				return ['String':'java.lang.String']
 				break
 		}
+	}
+
+	private void error(int i, String msg){
+		System.err << "${msg}"
+		System.exit i
 	}
 }
 
