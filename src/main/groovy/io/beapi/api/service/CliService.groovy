@@ -35,7 +35,7 @@ import javax.persistence.metamodel.EntityType
 public class CliService {
 
 	@Value("\${sun.java.command}")
-	private List<String> tempArgs;
+	private List<String> argsString;
 
 	ApplicationContext ctx
 
@@ -51,14 +51,10 @@ public class CliService {
 
 	static transactional = false
 
-	//void parse() {
-	//	println(argsList)
-	//}
-
 	void parse() {
-		println(tempArgs.size())
-		Set<String> args = new HashSet<>(tempArgs);
-		println(args.size())
+		println(argsString.size())
+		//Set<String> args = new HashSet<>(argsString);
+		ArrayList args = argsString[0].split(" ")
 
 		ArrayList validArgKeys = ['controller','connector','domain']
 		ArrayList scaffoldKeys = ['controller','connector']
