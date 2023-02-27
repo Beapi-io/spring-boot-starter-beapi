@@ -28,6 +28,9 @@ import org.springframework.beans.factory.annotation.Value;
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
 @Service
 public class CliService {
+	
+	@Value("#{'${sun.java.command}'.split(' ')}")
+	private List<String> argsList;
 
 	ApplicationContext ctx
 
@@ -40,10 +43,10 @@ public class CliService {
 
 	static transactional = false
 
-	//@Value('scaffold')
+
 	void test() {
-		//println(scaffold)
-		
+		println(argsList)
+
 	}
 
 }
