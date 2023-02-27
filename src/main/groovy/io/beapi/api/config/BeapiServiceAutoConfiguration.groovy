@@ -29,7 +29,7 @@ import io.beapi.api.service.TraceExchangeService
 import io.beapi.api.service.PrincipleService
 import io.beapi.api.service.TraceCacheService
 import io.beapi.api.service.TraceService
-
+import io.beapi.api.service.CliService
 
 //import io.beapi.api.filter.RequestInitializationFilter
 //import org.springframework.boot.context.properties.EnableConfigurationProperties
