@@ -34,13 +34,16 @@ public class CliService {
 
 	ApplicationContext ctx
 
+	private String controllerArg
+	private String connectorArg
+	private String domainArg
+
 	//Integer cores = Holders.grailsApplication.config.apitoolkit.procCores as Integer
 
 	public CliService(ApplicationContext applicationContext) {
 		this.ctx = applicationContext
 	}
-
-
+	
 	static transactional = false
 
 	//void parse() {
