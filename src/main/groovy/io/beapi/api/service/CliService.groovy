@@ -101,29 +101,35 @@ public class CliService {
 			}
 		}
 
-		//if(domainArg==null){
-		//	error(1, "Missing valid domain value sent. Please try again.")
-		//}
+		if(domainArg==null){
+			error(1, "Missing valid domain value sent. Please try again.")
+		}
 
-		//if(controllerArg==null && connectorArg==null){
-		//	error(1, "Missing valid scaffold value sent (ie controller/connector). Please try again.")
-		//}
-		println("domain : "+domainArg)
-		println("controller : "+controllerArg)
-		println("connector : "+connectorArg)
+		if(controllerArg==null && connectorArg==null){
+			error(1, "Missing valid scaffold value sent (ie controller/connector). Please try again.")
+		}
+
+		if(domainArg){
+			def entityManager = ctx.getBean('entityManagerFactory')
+			Set<EntityType<?>> entities = entityManager.getMetamodel().getEntities();
+			for (EntityType tempEntityType : entities) {
+				println(tempEntityType.getJavaType())
+				println(tempEntityType.getName())
+				//entityClasses.add(tempEntityType.getJavaType());
+			}
+			if(controllerArg){
+				//createController()
+			}else if(connectorArg){
+				//createConnector()
+			}
+		}
 	}
 
 	// NOTE : This has to be called separately in the 'runner'
 	public scaffold(ApplicationContext context){
-		def entityManager = context.getBean('entityManagerFactory')
-		Set<EntityType<?>> entities = entityManager.getMetamodel().getEntities();
+
 		if(domainArg) {
 			if (controllerArg) {
-				for (EntityType tempEntityType : entities) {
-					println(tempEntityType.getJavaType())
-					println(tempEntityType.getName())
-					//entityClasses.add(tempEntityType.getJavaType());
-				}
 				//createController()
 			} else if (connectorArg) {
 				//createConnector()
