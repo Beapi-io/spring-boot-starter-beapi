@@ -42,6 +42,7 @@ public class CliService {
 	private String controllerArg
 	private String connectorArg
 	private String domainArg
+	private boolean domainFound = false;
 
 	//Integer cores = Holders.grailsApplication.config.apitoolkit.procCores as Integer
 
@@ -60,11 +61,10 @@ public class CliService {
 		ArrayList domainKey = ['domain']
 		LinkedHashMap vars = [:]
 		args.each(){
-			println("test:"+it)
+
 			ArrayList temp = it.split('=')
-			println(temp[0].toLowerCase())
 			if(validArgKeys.contains(temp[0].toLowerCase())){
-				println("has valid arg : ${println(temp[0])}")
+
 				if(temp[1] ==~ /[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]/) {
 					switch(temp[0].toLowerCase()){
 						case 'controller':
@@ -109,49 +109,33 @@ public class CliService {
 			error(1, "Missing valid scaffold value sent (ie controller/connector). Please try again.")
 		}
 
-		if(domainArg){
+		if(domainArg) {
 			def entityManager = ctx.getBean('entityManagerFactory')
 			Set<EntityType<?>> entities = entityManager.getMetamodel().getEntities();
 			for (EntityType tempEntityType : entities) {
-				println(tempEntityType.getJavaType().getCanonicalName())
-				println(tempEntityType.getName())
-				//entityClasses.add(tempEntityType.getJavaType());
+				if (tempEntityType.getJavaType().getCanonicalName() == domainArg) {
+					domainFound = true
+				}
+				//println(tempEntityType.getName())
 			}
-			if(controllerArg){
-				//createController()
-			}else if(connectorArg){
-				//createConnector()
-			}
-		}
-	}
-
-	// NOTE : This has to be called separately in the 'runner'
-	public scaffold(ApplicationContext context){
-
-		if(domainArg) {
-			if (controllerArg) {
-				//createController()
-			} else if (connectorArg) {
-				//createConnector()
-			} else {
-				error(1, "Unrecognized arg. Please try again.")
+			if (domainFound) {
+				if (controllerArg) {
+					createController()
+				} else if (connectorArg) {
+					createConnector()
+				}
 			}
 		}
 	}
 
 	private void createController(){
-		// look for 'entity'' first and try to get match
-
-
-		// next make sure controller does not exist
-
-	}
-
-	private void createDomain(){
+		println("### creating controller...")
+		// next make sure controller does not exist already
 
 	}
 
 	private void createConnector(){
+		println("### creating connector...")
 
 	}
 
