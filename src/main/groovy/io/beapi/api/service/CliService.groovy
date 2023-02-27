@@ -63,7 +63,7 @@ public class CliService {
 		LinkedHashMap vars = [:]
 		args.each(){
 			ArrayList temp = it.split('=')
-
+			println(temp[0].toLowerCase())
 			if(validArgKeys.contains(temp[0].toLowerCase())){
 				println("has valid arg : ${println(temp[0])}")
 				if(temp[1] ==~ /[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]/) {
