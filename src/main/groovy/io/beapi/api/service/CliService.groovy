@@ -52,9 +52,8 @@ public class CliService {
 	static transactional = false
 
 	void parse() {
-		println(argsString.size())
-		//Set<String> args = new HashSet<>(argsString);
 		ArrayList args = argsString[0].split(" ")
+		args.remove(0)
 
 		ArrayList validArgKeys = ['controller','connector','domain']
 		ArrayList scaffoldKeys = ['controller','connector']
