@@ -28,8 +28,8 @@ import org.springframework.beans.factory.annotation.Value;
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
 @Service
 public class CliService {
-	
-	@Value("#{'${sun.java.command}'.split(' ')}")
+
+	@Value("\${sun.java.command}")
 	private List<String> argsList;
 
 	ApplicationContext ctx
