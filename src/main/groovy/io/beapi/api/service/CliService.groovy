@@ -56,8 +56,10 @@ public class CliService {
 	//}
 
 	void parse() {
+		println(tempArgs.size())
 		Set<String> args = new HashSet<>(tempArgs);
-		println(args)
+		println(args.size())
+
 		ArrayList validArgKeys = ['controller','connector','domain']
 		ArrayList scaffoldKeys = ['controller','connector']
 		ArrayList domainKey = ['domain']
