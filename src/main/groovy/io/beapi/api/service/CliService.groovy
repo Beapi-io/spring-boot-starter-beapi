@@ -18,12 +18,17 @@ package io.beapi.api.service
 
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
-import org.springframework.web.context.request.RequestAttributes
-import org.springframework.web.context.request.RequestContextHolder as RCH
-import org.springframework.web.context.request.ServletRequestAttributes
-import static groovyx.gpars.GParsPool.withPool
-import javax.servlet.http.HttpServletRequest
+
+import java.util.jar.JarEntry
+import java.util.jar.JarFile
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import java.io.File
+import groovy.text.GStringTemplateEngine
+import org.springframework.context.ApplicationContext
 import org.springframework.beans.factory.annotation.Value;
+import javax.persistence.EntityManager
+import javax.persistence.metamodel.EntityType
 
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
 @Service
@@ -43,7 +48,7 @@ public class CliService {
 	public CliService(ApplicationContext applicationContext) {
 		this.ctx = applicationContext
 	}
-	
+
 	static transactional = false
 
 	//void parse() {
@@ -105,4 +110,143 @@ public class CliService {
 		println("connector : "+connectorArg)
 	}
 
+	// NOTE : This has to be called separately in the 'runner'
+	public scaffold(ApplicationContext context){
+		def entityManager = context.getBean('entityManagerFactory')
+		Set<EntityType<?>> entities = entityManager.getMetamodel().getEntities();
+		if(domainArg) {
+			if (controllerArg) {
+				for (EntityType tempEntityType : entities) {
+					println(tempEntityType.getJavaType())
+					println(tempEntityType.getName())
+					//entityClasses.add(tempEntityType.getJavaType());
+				}
+				//createController()
+			} else if (connectorArg) {
+				//createConnector()
+			} else {
+				error(1, "Unrecognized arg. Please try again.")
+			}
+		}
+	}
+
+	private void createController(){
+		// look for 'entity'' first and try to get match
+
+
+		// next make sure controller does not exist
+
+	}
+
+	private void createDomain(){
+
+	}
+
+	private void createConnector(){
+
+	}
+
+	private void checkDirectory(contDir) {
+		def ant = new AntBuilder()
+		def cfile = new File(contDir)
+		if (!cfile.exists()) {
+			ant.mkdir(dir: contDir)
+		}
+		return
+	}
+
+	private boolean fileExists(String path){
+		def cfile = new File(path)
+		if (cfile.exists()) {
+			return true
+		}
+		return false
+	}
+
+	private LinkedHashMap hibernateTypeConverter(String type){
+		switch(type){
+			case 'class org.hibernate.type.CharacterType':
+				return ['Character':'java.lang.Character']
+				break
+			case 'class org.hibernate.type.NumericBooleanType':
+			case 'class org.hibernate.type.YesNoType':
+			case 'class org.hibernate.type.TrueFalseType':
+			case 'class org.hibernate.type.BooleanType':
+				return ['Boolean':'java.lang.Boolean']
+				break
+			case 'class org.hibernate.type.ByteType':
+				return ['Byte':'java.lang.Byte']
+				break
+			case 'class org.hibernate.type.ShortType':
+				return ['Short':'java.lang.Short']
+				break
+			case 'class org.hibernate.type.IntegerTypes':
+				return ['Integer':'java.lang.Integer']
+				break
+			case 'class org.hibernate.type.LongType':
+				return ['Long':'java.lang.Long']
+				break
+			case 'class org.hibernate.type.FloatType':
+				return ['Float':'java.lang.Float']
+				break
+			case 'class org.hibernate.type.DoubleType':
+				return ['Double':'java.lang.Double']
+				break
+			case 'class org.hibernate.type.BigIntegerType':
+				return ['BigInteger':'java.math.BigInteger']
+				break
+			case 'class org.hibernate.type.BigDecimalType':
+				return ['BigDecimal':'java.math.BigDecimal']
+				break
+			case 'class org.hibernate.type.TimestampType':
+				return ['Timestamp':'java.sql.Timestamp']
+				break
+			case 'class org.hibernate.type.TimeType':
+				return ['Time':'java.sql.Time']
+				break
+			case 'class org.hibernate.type.CalendarDateType':
+			case 'class org.hibernate.type.DateType':
+				return ['Date':'java.sql.Date']
+				break
+			case 'class org.hibernate.type.CalendarType':
+				return ['Calendar':'java.util.Calendar']
+				break
+			case 'class org.hibernate.type.CurrencyType':
+				return ['Currency':'java.util.Currency']
+				break
+			case 'class org.hibernate.type.LocaleType':
+				return ['Locale':'java.util.Locale']
+				break
+			case 'class org.hibernate.type.TimeZoneType':
+				return ['TimeZone':'java.util.TimeZone']
+				break
+			case 'class org.hibernate.type.UrlType':
+				return ['URL':'java.net.URL']
+				break
+			case 'class org.hibernate.type.ClassType':
+				return ['Class':'java.lang.Class']
+				break
+			case 'class org.hibernate.type.MaterializedBlobType':
+			case 'class org.hibernate.type.BlobType':
+				return ['Blob':'java.sql.Blob']
+				break
+			case 'class org.hibernate.type.ClobType':
+				return ['Clob':'java.sql.Clob']
+				break
+			case 'class org.hibernate.type.PostgresUUIDType':
+			case 'class org.hibernate.type.UUIDBinaryType':
+				return ['UUID':'java.util.UUID']
+				break
+			case 'class org.hibernate.type.TextType':
+			case 'class org.hibernate.type.StringType':
+			default:
+				return ['String':'java.lang.String']
+				break
+		}
+	}
+
+	private void error(int i, String msg){
+		System.err << "${msg}"
+		System.exit i
+	}
 }
