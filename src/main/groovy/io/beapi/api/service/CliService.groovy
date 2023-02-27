@@ -124,6 +124,8 @@ public class CliService {
 				} else if (connectorArg) {
 					createConnector()
 				}
+			}else{
+				error(1, "Entity name '${domainArg}' not found. Please try again.")
 			}
 		}
 	}
@@ -131,11 +133,12 @@ public class CliService {
 	private void createController(){
 		println("### creating controller...")
 		// next make sure controller does not exist already
-
+		error(42, "")
 	}
 
 	private void createConnector(){
 		println("### creating connector...")
+		error(42, "")
 
 	}
 
@@ -238,8 +241,10 @@ public class CliService {
 		}
 	}
 
-	private void error(int i, String msg){
-		System.err << "${msg}"
+	private void error(int i, String msg) {
+		if (msg != "") {
+			System.err << "${msg}"
+		}
 		System.exit i
 	}
 }
