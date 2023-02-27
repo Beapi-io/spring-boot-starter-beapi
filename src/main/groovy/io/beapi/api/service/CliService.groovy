@@ -113,7 +113,7 @@ public class CliService {
 			def entityManager = ctx.getBean('entityManagerFactory')
 			Set<EntityType<?>> entities = entityManager.getMetamodel().getEntities();
 			for (EntityType tempEntityType : entities) {
-				println(tempEntityType.getJavaType())
+				println(tempEntityType.getJavaType().getCanonicalName())
 				println(tempEntityType.getName())
 				//entityClasses.add(tempEntityType.getJavaType());
 			}
