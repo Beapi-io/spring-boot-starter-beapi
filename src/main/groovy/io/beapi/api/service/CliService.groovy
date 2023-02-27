@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
 public class CliService {
 
 	@Value("\${sun.java.command}")
-	private List<String> argsList;
+	private List<String> args;
 
 	ApplicationContext ctx
 
@@ -42,13 +42,12 @@ public class CliService {
 
 
 	static transactional = false
-	
+
 	//void parse() {
 	//	println(argsList)
 	//}
 
 	void parse() {
-		ArrayList args = argsList.split(' ')
 		args.remove(0)
 		ArrayList validArgKeys = ['controller','connector','domain']
 		ArrayList scaffoldKeys = ['controller','connector']
