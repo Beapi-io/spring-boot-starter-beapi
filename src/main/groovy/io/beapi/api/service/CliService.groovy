@@ -247,6 +247,6 @@ public class CliService {
 
 	private void error(int i, String msg){
 		System.err << "${msg}"
-		//System.exit i
+		System.exit i
 	}
 }
