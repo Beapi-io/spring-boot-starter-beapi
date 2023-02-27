@@ -56,12 +56,14 @@ public class CliService {
 	//}
 
 	void parse() {
+		println(args)
 		args.remove(0)
 		ArrayList validArgKeys = ['controller','connector','domain']
 		ArrayList scaffoldKeys = ['controller','connector']
 		ArrayList domainKey = ['domain']
 		LinkedHashMap vars = [:]
 		args.each(){
+			println(it)
 			ArrayList temp = it.split('=')
 			println(temp[0].toLowerCase())
 			if(validArgKeys.contains(temp[0].toLowerCase())){
@@ -102,13 +104,13 @@ public class CliService {
 			}
 		}
 
-		if(domainArg==null){
-			error(1, "Missing valid domain value sent. Please try again.")
-		}
+		//if(domainArg==null){
+		//	error(1, "Missing valid domain value sent. Please try again.")
+		//}
 
-		if(controllerArg==null && connectorArg==null){
-			error(1, "Missing valid scaffold value sent (ie controller/connector). Please try again.")
-		}
+		//if(controllerArg==null && connectorArg==null){
+		//	error(1, "Missing valid scaffold value sent (ie controller/connector). Please try again.")
+		//}
 		println("domain : "+domainArg)
 		println("controller : "+controllerArg)
 		println("connector : "+connectorArg)
