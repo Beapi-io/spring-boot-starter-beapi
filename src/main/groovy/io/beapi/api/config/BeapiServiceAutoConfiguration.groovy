@@ -92,6 +92,11 @@ public class BeapiServiceAutoConfiguration {
 		return new PrincipleService();
 	}
 
+	@Bean
+	@ConditionalOnMissingBean
+	public CliService cliService() throws IOException {
+		return new CliService(applicationContext);
+	}
 
 	@Bean
 	@ConditionalOnMissingBean
