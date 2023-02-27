@@ -35,7 +35,7 @@ import javax.persistence.metamodel.EntityType
 public class CliService {
 
 	@Value("\${sun.java.command}")
-	private List<String> args;
+	private List<String> tempArgs;
 
 	ApplicationContext ctx
 
@@ -56,14 +56,14 @@ public class CliService {
 	//}
 
 	void parse() {
+		Set<String> args = new HashSet<>(tempArgs);
 		println(args)
-		args.remove(0)
 		ArrayList validArgKeys = ['controller','connector','domain']
 		ArrayList scaffoldKeys = ['controller','connector']
 		ArrayList domainKey = ['domain']
 		LinkedHashMap vars = [:]
 		args.each(){
-			println(it)
+			println("test:"+it)
 			ArrayList temp = it.split('=')
 			println(temp[0].toLowerCase())
 			if(validArgKeys.contains(temp[0].toLowerCase())){
