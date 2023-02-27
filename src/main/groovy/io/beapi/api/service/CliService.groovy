@@ -63,10 +63,13 @@ public class CliService {
 		LinkedHashMap vars = [:]
 		args.each(){
 			ArrayList temp = it.split('=')
+
 			if(validArgKeys.contains(temp[0].toLowerCase())){
+				println("has valid arg : ${println(temp[0])}")
 				if(temp[1] ==~ /[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]/) {
 					switch(temp[0].toLowerCase()){
 						case 'controller':
+							println('controllerMatch')
 							if(controllerArg!=null){
 								error(1, "'controller' value has already been set. Please try again.")
 							}else{
@@ -81,6 +84,7 @@ public class CliService {
 							}
 							break
 						case 'domain':
+							println('domainMatch')
 							if(domainArg!=null){
 								error(1, "'domain' value has already been set. Please try again.")
 							}else{
