@@ -65,7 +65,7 @@ public class CliService {
 			ArrayList temp = it.split('=')
 			if(validArgKeys.contains(temp[0].toLowerCase())){
 
-				if(temp[1] ==~ /[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]/) {
+				if(temp[1] ==~ /[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_]/) {
 					switch(temp[0].toLowerCase()){
 						case 'controller':
 							println('controllerMatch')
