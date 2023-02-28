@@ -138,8 +138,7 @@ public class CliService {
 		Map<String, Object> controllers = listableBeanFactory.getBeansWithAnnotation(Controller.class)
 		//ArrayList controllers = ctx.getBeanNamesForAnnotation(Controller.class) as ArrayList
 		controllers.each(){ k, v ->
-			println("${k} / ${v}")
-			println("${k.getClass()} / ${v.getClass()}")
+			println("${k} / ${v.getCanonicalName()}")
 		}
 
 		// next make sure controller does not exist already
