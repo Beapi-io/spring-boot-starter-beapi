@@ -40,14 +40,28 @@ public class CliService {
 	private List<String> argsString;
 
 	@Autowired
-	ListableBeanFactory listableBeanFactory;
+	private ListableBeanFactory listableBeanFactory;
 
-	ApplicationContext ctx
+	private ApplicationContext ctx
 
 	private String controllerArg
 	private String connectorArg
 	private String domainArg
+
+	private boolean connectorFound = false
+	private boolean controllerFound = false
 	private boolean domainFound = false;
+
+	private LinkedHashMap createData = [:]
+	private LinkedHashMap updateData = [:]
+
+	/*
+	 * BOOTSTRAP DATA
+	 */
+	String realName
+	String realPackageName
+	private LinkedHashMap data = [:]
+	private Object obj;
 
 	//Integer cores = Holders.grailsApplication.config.apitoolkit.procCores as Integer
 
@@ -116,11 +130,21 @@ public class CliService {
 			def entityManager = ctx.getBean('entityManagerFactory')
 			Set<EntityType<?>> entities = entityManager.getMetamodel().getEntities();
 			for (EntityType tempEntityType : entities) {
-				if (tempEntityType.getJavaType().getCanonicalName() == domainArg) {
-					domainFound = true
+				if(!domainFound){
+					if (tempEntityType.getJavaType().getCanonicalName() == domainArg) {
+						//println("domain : "+tempEntityType.getJavaType().getName())
+						//println("domain : "+tempEntityType.getJavaType().getPackage().getName())
+						domainFound = true
+
+						// todo : should this be camelCase????
+						realName = realPackageName.toLowerCase()
+						data[realName] = [:]
+
+						break
+					}
 				}
-				//println(tempEntityType.getName())
 			}
+
 			if (domainFound) {
 				if (controllerArg) {
 					createController()
@@ -136,12 +160,28 @@ public class CliService {
 	private void createController(){
 		println("### creating controller...")
 		Map<String, Object> controllers = listableBeanFactory.getBeansWithAnnotation(Controller.class)
-		//ArrayList controllers = ctx.getBeanNamesForAnnotation(Controller.class) as ArrayList
+
+		// check to see if it exists
 		controllers.each(){ k, v ->
-			println("${k} / ${v.getCanonicalName()}")
+			if(!connectorFound) {
+				if (v.getClass().getPackage().getName() == controllerArg) {
+					connectorFound = true
+					obj = v
+					data[realName]['packageName'] = controllerArg
+				}
+			}
 		}
 
-		// next make sure controller does not exist already
+		// todo : maybe this is the first one; check for a directory structure before throwing an error
+		//dirExists("grails-app/controllers/${packageName}")
+		if(dirExists("${buildDir}")){
+			PRINTLN("### BUILDDIR EXISTS!!! [ ${buildDir} ] ###")
+		}
+		if(!controllerFound){
+			error(42, "Sent controller class did not match any existing class packages using the 'Controller' annotation. Please try again with the full package and class name.")
+		}
+
+
 		error(42, "")
 	}
 
@@ -151,13 +191,14 @@ public class CliService {
 
 	}
 
-	private void checkDirectory(contDir) {
+	private boolean dirExists(String contDir) {
 		def ant = new AntBuilder()
 		def cfile = new File(contDir)
 		if (!cfile.exists()) {
-			ant.mkdir(dir: contDir)
+			return false
+			//ant.mkdir(dir: contDir)
 		}
-		return
+		return true
 	}
 
 	private boolean fileExists(String path){
