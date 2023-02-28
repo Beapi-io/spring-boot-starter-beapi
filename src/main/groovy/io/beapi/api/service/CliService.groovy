@@ -16,9 +16,9 @@
  */
 package io.beapi.api.service
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
-
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.regex.Matcher
@@ -38,6 +38,9 @@ public class CliService {
 
 	@Value("\${sun.java.command}")
 	private List<String> argsString;
+
+	@Autowired
+	ListableBeanFactory listableBeanFactory;
 
 	ApplicationContext ctx
 
@@ -132,10 +135,10 @@ public class CliService {
 
 	private void createController(){
 		println("### creating controller...")
-		//Map<String, Object> controllers = listableBeanFactory.getBeansWithAnnotation(Controller.class)
-		ArrayList controllers = ctx.getBeanNamesForAnnotation(Controller.class) as ArrayList
+		Map<String, Object> controllers = listableBeanFactory.getBeansWithAnnotation(Controller.class)
+		//ArrayList controllers = ctx.getBeanNamesForAnnotation(Controller.class) as ArrayList
 		controllers.each(){
-			println(it)
+			println(it.getClass())
 		}
 
 		// next make sure controller does not exist already
