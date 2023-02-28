@@ -29,6 +29,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.beans.factory.annotation.Value;
 import javax.persistence.EntityManager
 import javax.persistence.metamodel.EntityType
+import org.springframework.beans.factory.ListableBeanFactory
 
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
 @Service
@@ -68,7 +69,6 @@ public class CliService {
 				if(temp[1] ==~ /[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_]/) {
 					switch(temp[0].toLowerCase()){
 						case 'controller':
-							println('controllerMatch')
 							if(controllerArg!=null){
 								error(1, "'controller' value has already been set. Please try again.")
 							}else{
@@ -83,7 +83,6 @@ public class CliService {
 							}
 							break
 						case 'domain':
-							println('domainMatch')
 							if(domainArg!=null){
 								error(1, "'domain' value has already been set. Please try again.")
 							}else{
@@ -132,6 +131,12 @@ public class CliService {
 
 	private void createController(){
 		println("### creating controller...")
+		//Map<String, Object> controllers = listableBeanFactory.getBeansWithAnnotation(Controller.class)
+		ArrayList controllers = ctx.getBeanNamesForAnnotation(Annotation.class) as ArrayList
+		controllers.each(){
+			println(it)
+		}
+
 		// next make sure controller does not exist already
 		error(42, "")
 	}
