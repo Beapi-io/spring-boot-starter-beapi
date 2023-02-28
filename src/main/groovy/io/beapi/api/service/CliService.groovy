@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
 import javax.persistence.EntityManager
 import javax.persistence.metamodel.EntityType
 import org.springframework.beans.factory.ListableBeanFactory
+import org.springframework.stereotype.Controller
 
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
 @Service
@@ -132,7 +133,7 @@ public class CliService {
 	private void createController(){
 		println("### creating controller...")
 		//Map<String, Object> controllers = listableBeanFactory.getBeansWithAnnotation(Controller.class)
-		ArrayList controllers = ctx.getBeanNamesForAnnotation(Annotation.class) as ArrayList
+		ArrayList controllers = ctx.getBeanNamesForAnnotation(Controller.class) as ArrayList
 		controllers.each(){
 			println(it)
 		}
