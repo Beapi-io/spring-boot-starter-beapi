@@ -1,5 +1,6 @@
 {
     "NAME": "apidoc",
+    "NETWORKGRP": "public",
     "VALUES": {
         "*": {
             "type": "String",

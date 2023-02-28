@@ -40,7 +40,7 @@ public class ExchangeService extends ApiExchange{
 		try {
 			this.apiCacheService = apiCacheService
 		} catch (Exception e) {
-			println("# [Beapi] IoStateService - initialization Exception - ${e}")
+			println("# [Beapi] ExchangeService - initialization Exception - ${e}")
 			System.exit(0)
 		}
 	}
@@ -107,7 +107,7 @@ public class ExchangeService extends ApiExchange{
         //response.writer.flush()
     }
 
-	void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
+	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
 		//String accept = request.getHeader('Accept')
 		//String contentType = request.getContentType()
 

@@ -174,6 +174,7 @@ public class ApidocController extends BeapiRequestHandler{
 							receivesMap['name'] = it5
 							receivesMap['type'] = cache.values[it5].type
 							receivesMap['desc'] = cache.values[it5].description
+							receivesMap['mockData'] = cache.values[it5].mockData
 							rec.add(receivesMap)
 						}
 						result['receives'] = rec
@@ -186,6 +187,7 @@ public class ApidocController extends BeapiRequestHandler{
 							returnsMap['name'] = it5
 							returnsMap['type'] = cache.values[it5].type
 							returnsMap['desc'] = cache.values[it5].description
+							returnsMap['mockData'] = cache.values[it5].mockData
 							ret.add(returnsMap)
 						}
 						result['returns'] = ret

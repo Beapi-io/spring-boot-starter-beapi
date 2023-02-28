@@ -44,6 +44,17 @@ class BeapiRequestHandler implements HttpRequestHandler {
     //@Autowired
     //ApiProperties apiProperties
 
+    private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml','multipart/form-data']
+    private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
+
+    /*
+    * v : 'regular api call'
+    * b : batch
+    * c : api chain
+    * t : trace
+    * h : webhook CRUD
+     */
+    private static final ArrayList CALL_TYPES = ['v','b','c','t','h']
 
     public ArrayList uList
     protected boolean trace
@@ -107,7 +118,12 @@ class BeapiRequestHandler implements HttpRequestHandler {
 
                     // todo : tempResult is good; problem lies with parseResponseParams
                     Set responseList = request.getAttribute('responseList')
-                    result = (!responseList.contains("*"))? parseResponseParams(tempResult, responseList): tempResult
+
+                    if(!responseList.contains("*")){
+                        result = parseResponseParams(tempResult, responseList)
+                    }else{
+                        result = tempResult
+                    }
                 }
 
                 request.setAttribute('responseBody', result)
@@ -243,7 +259,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
             bodyList.each() { body ->
                 ArrayList paramsList = (body.size() == 0) ? [:] : body.keySet() as ArrayList
                     paramsList.each() { it2 ->
-                        String tmp = it2.toString()
                         if (!responseList.contains(it2)) {
                             body.remove(it2.toString())
                         }
