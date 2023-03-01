@@ -62,6 +62,7 @@ public class CliService {
 	String realPackageName
 	private LinkedHashMap data = [:]
 	private Object obj;
+	String dirPath
 
 	//Integer cores = Holders.grailsApplication.config.apitoolkit.procCores as Integer
 
@@ -132,12 +133,16 @@ public class CliService {
 			for (EntityType tempEntityType : entities) {
 				if(!domainFound){
 					if (tempEntityType.getJavaType().getCanonicalName() == domainArg) {
-						//println("domain : "+tempEntityType.getJavaType().getName())
-						//println("domain : "+tempEntityType.getJavaType().getPackage().getName())
+						println("domain : "+tempEntityType.getJavaType().getCanonicalName())
+						println("domain : "+tempEntityType.getJavaType().getName())
+						println("domain : "+tempEntityType.getJavaType().getPackage().getName())
 						domainFound = true
 
 						// todo : should this be camelCase????
+						realPackageName =  tempEntityType.getJavaType().getCanonicalName() - (tempEntityType.getJavaType().getPackage().getName()+".")
 						realName = realPackageName.toLowerCase()
+						println(realPackageName)
+						println(realName)
 						data[realName] = [:]
 
 						break
@@ -172,15 +177,13 @@ public class CliService {
 			}
 		}
 
-		// todo : maybe this is the first one; check for a directory structure before throwing an error
-		//dirExists("grails-app/controllers/${packageName}")
-		if(dirExists("${buildDir}")){
-			PRINTLN("### BUILDDIR EXISTS!!! [ ${buildDir} ] ###")
-		}
-		if(!controllerFound){
-			error(42, "Sent controller class did not match any existing class packages using the 'Controller' annotation. Please try again with the full package and class name.")
+		// check directory structure (in case this is FIRST controller)
+		String controllerPath = controllerArg.replaceAll("\\.","/");
+		if(!controllerFound && !dirExists(controllerPath)){
+			error(42, "Sent controller class did not match any existing package using the 'Controller' annotation NOR directory structure. Please try again with the full package.")
 		}
 
+		//start scaffold process
 
 		error(42, "")
 	}
@@ -191,14 +194,28 @@ public class CliService {
 
 	}
 
-	private boolean dirExists(String contDir) {
-		def ant = new AntBuilder()
-		def cfile = new File(contDir)
-		if (!cfile.exists()) {
-			return false
-			//ant.mkdir(dir: contDir)
+	private boolean dirExists(String path) {
+		boolean exists = false
+
+		// src/main/groovy
+		String groovyPath = System.getProperty("user.dir")+"/src/main/groovy/${path}"
+		//def ant = new AntBuilder()
+		def gfile = new File(groovyPath)
+		if (gfile.exists()) {
+			exists = true
+			dirPath = groovyPath
+			return exists
 		}
-		return true
+
+		// src/main/java
+		String javaPath = System.getProperty("user.dir")+"/src/main/java/${path}"
+		def jfile = new File(javaPath)
+		if (jfile.exists()) {
+			exists = true
+			dirPath = javaPath
+			return exists
+		}
+		return exists
 	}
 
 	private boolean fileExists(String path){
