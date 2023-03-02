@@ -29,6 +29,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.beans.factory.annotation.Value;
 import javax.persistence.EntityManager
 import javax.persistence.metamodel.EntityType
+import javax.persistence.metamodel.Attribute
 import org.springframework.beans.factory.ListableBeanFactory
 import org.springframework.stereotype.Controller
 
@@ -133,19 +134,51 @@ public class CliService {
 			for (EntityType tempEntityType : entities) {
 				if(!domainFound){
 					if (tempEntityType.getJavaType().getCanonicalName() == domainArg) {
+
+						println("domain : "+tempEntityType.getJavaType())
 						println("domain : "+tempEntityType.getJavaType().getCanonicalName())
 						println("domain : "+tempEntityType.getJavaType().getName())
 						println("domain : "+tempEntityType.getJavaType().getPackage().getName())
+						println("domain : "+tempEntityType.getDeclaredAttributes())
+
 						domainFound = true
+
+						//entityType.getSimpleName().toLowerCase().concat("s");
+
+
 
 						// todo : should this be camelCase????
 						realPackageName =  tempEntityType.getJavaType().getCanonicalName() - (tempEntityType.getJavaType().getPackage().getName()+".")
 						realName = realPackageName.toLowerCase()
 						println(realPackageName)
 						println(realName)
-						data[realName] = [:]
 
-						break
+						data[realName] = [:]
+						data[realName]['values'] = [:]
+
+						LinkedHashMap attVals = [:]
+						Set<Attribute> atts = tempEntityType.getDeclaredAttributes()
+						atts.each(){ att ->
+							String tempName = att.getName()
+							String tempType = att.getJavaType()
+							//println("${att.getName()} / ${att.getJavaType().getCanonicalName()}")
+							data[realName]['values']["${att.getName()}"] = att.getJavaType().getCanonicalName()
+
+							String attName = att.getJavaType().getCanonicalName() as String
+							attVals[attName] = [:]
+							if(att.isAssociation()){
+								String keyType = (['id','ID'].contains(attName))? 'PKEY':'FKEY'
+								attVals[attName].put('key',keyType)
+								if(keyType=='FKEY'){
+									attVals[attName].put('reference',att.getJavaType().getSimpleName())
+								}
+							}else {
+								attVals[attName].put('type',att.getJavaType().getSimpleName())
+								attVals[attName].put('description',"<put your description here>")
+								attVals[attName].put('mockData',"<put your mock data here>")
+							}
+						}
+						data[realName]['values'] = attVals
 					}
 				}
 			}
@@ -226,92 +259,83 @@ public class CliService {
 		return false
 	}
 
-	private LinkedHashMap hibernateTypeConverter(String type){
-		switch(type){
-			case 'class org.hibernate.type.CharacterType':
-				return ['Character':'java.lang.Character']
-				break
-			case 'class org.hibernate.type.NumericBooleanType':
-			case 'class org.hibernate.type.YesNoType':
-			case 'class org.hibernate.type.TrueFalseType':
-			case 'class org.hibernate.type.BooleanType':
-				return ['Boolean':'java.lang.Boolean']
-				break
-			case 'class org.hibernate.type.ByteType':
-				return ['Byte':'java.lang.Byte']
-				break
-			case 'class org.hibernate.type.ShortType':
-				return ['Short':'java.lang.Short']
-				break
-			case 'class org.hibernate.type.IntegerTypes':
-				return ['Integer':'java.lang.Integer']
-				break
-			case 'class org.hibernate.type.LongType':
-				return ['Long':'java.lang.Long']
-				break
-			case 'class org.hibernate.type.FloatType':
-				return ['Float':'java.lang.Float']
-				break
-			case 'class org.hibernate.type.DoubleType':
-				return ['Double':'java.lang.Double']
-				break
-			case 'class org.hibernate.type.BigIntegerType':
-				return ['BigInteger':'java.math.BigInteger']
-				break
-			case 'class org.hibernate.type.BigDecimalType':
-				return ['BigDecimal':'java.math.BigDecimal']
-				break
-			case 'class org.hibernate.type.TimestampType':
-				return ['Timestamp':'java.sql.Timestamp']
-				break
-			case 'class org.hibernate.type.TimeType':
-				return ['Time':'java.sql.Time']
-				break
-			case 'class org.hibernate.type.CalendarDateType':
-			case 'class org.hibernate.type.DateType':
-				return ['Date':'java.sql.Date']
-				break
-			case 'class org.hibernate.type.CalendarType':
-				return ['Calendar':'java.util.Calendar']
-				break
-			case 'class org.hibernate.type.CurrencyType':
-				return ['Currency':'java.util.Currency']
-				break
-			case 'class org.hibernate.type.LocaleType':
-				return ['Locale':'java.util.Locale']
-				break
-			case 'class org.hibernate.type.TimeZoneType':
-				return ['TimeZone':'java.util.TimeZone']
-				break
-			case 'class org.hibernate.type.UrlType':
-				return ['URL':'java.net.URL']
-				break
-			case 'class org.hibernate.type.ClassType':
-				return ['Class':'java.lang.Class']
-				break
-			case 'class org.hibernate.type.MaterializedBlobType':
-			case 'class org.hibernate.type.BlobType':
-				return ['Blob':'java.sql.Blob']
-				break
-			case 'class org.hibernate.type.ClobType':
-				return ['Clob':'java.sql.Clob']
-				break
-			case 'class org.hibernate.type.PostgresUUIDType':
-			case 'class org.hibernate.type.UUIDBinaryType':
-				return ['UUID':'java.util.UUID']
-				break
-			case 'class org.hibernate.type.TextType':
-			case 'class org.hibernate.type.StringType':
-			default:
-				return ['String':'java.lang.String']
-				break
-		}
-	}
-
 	private void error(int i, String msg) {
 		if (msg != "") {
 			System.err << "${msg}"
 		}
 		System.exit i
+	}
+
+
+	LinkedHashMap entityTypeConverter(String type){
+		switch(type){
+			case 'char':
+			case 'java.lang.Character':
+				return ['Character': type]
+				break
+			case 'bool':
+			case 'java.lang.Boolean':
+				return ['Boolean':'java.lang.Boolean']
+				break
+			case 'byte':
+			case 'java.lang.Byte':
+				return ['Byte':'java.lang.Byte']
+				break
+			case 'short':
+			case 'java.lang.Short':
+				return ['Short':'java.lang.Short']
+				break
+			case 'int':
+			case 'java.lang.Integer':
+				return ['Integer':'java.lang.Integer']
+				break
+			case 'long':
+			case 'java.lang.Long':
+				return ['Long':'java.lang.Long']
+				break
+			case 'float':
+			case 'java.lang.Float':
+				return ['Float':'java.lang.Float']
+				break
+			case 'double':
+			case 'java.lang.Double':
+				return ['Double':'java.lang.Double']
+				break
+			case 'java.math.BigInteger':
+				return ['BigInteger':'java.math.BigInteger']
+				break
+			case 'java.math.BigDecimal':
+				return ['BigDecimal':'java.math.BigDecimal']
+				break
+			case 'java.sql.Timestamp':
+				return ['Timestamp':'java.sql.Timestamp']
+				break
+			case 'java.sql.Date':
+			case 'java.util.Date':
+				return ['Date':'java.util.Date']
+				break
+			case 'java.util.Calendar':
+				return ['Calendar':'java.util.Calendar']
+				break
+			case 'java.util.Currency':
+				return ['Currency':'java.util.Currency']
+				break
+			case 'java.util.Locale':
+				return ['Locale':'java.util.Locale']
+				break
+			case 'java.util.TimeZone':
+				return ['TimeZone':'java.util.TimeZone']
+				break
+			case 'java.net.URL':
+				return ['URL':'java.net.URL']
+				break
+			case 'java.util.UUID':
+				return ['UUID':'java.util.UUID']
+				break
+			case 'java.lang.String':
+			default:
+				return ['String':'java.lang.String']
+				break
+		}
 	}
 }
