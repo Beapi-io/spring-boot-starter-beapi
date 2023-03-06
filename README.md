@@ -60,7 +60,7 @@ repositories {
 
 dependencies {
     ...
-    implementation 'io.beapi:spring-boot-starter-beapi:0.6.0-SNAPSHOT'
+    implementation 'io.beapi:spring-boot-starter-beapi:0.6.0-STABLE'
     ...
 }
  ```
