@@ -27,7 +27,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - removal of attributes before resetting when chaining
 
 
-## 0.6.X-SNAPSHOT
+## 0.6.0-STABLE
 
 ### Added
 - reflection for controllers/handlers added so they no longer need to be added to I/O State files
@@ -53,16 +53,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - renamed nonmappedEndpoint to 'publicEndpoints'
 
 
- ## 0.6 - (projected release 03/01/2023)
- - (REMOVED - adding to SDK) automated webhooks
+ ## 0.7.X - (projected release 08/01/2023)
  
-### todo
-    - rate limiting
+ ### Added
+ - CLI service for reading in args in order to scaffold
+ - Added templates for scaffolded controllers/connectors
+ - 
+ ### Changed
+ - nothing yet
+ - 
+ ### todo
     - controller scaffolding
-    - repository/service scaffolding
-    - automated I/O State generation
+    - connector scaffolding
+    - rate limiting
     - functional test scaffolding
-    - (REMOVED - adding to SDK) optional JMS service/config
-    - (REMOVED - adding to SDK) automated webhooks
-    - (REMOVED - adding to SDK) UI/UX tools (maybe)
+    - (SDK) optional JMS service/config ??
+    - (SDK) automated webhooks ?? 
+    - (SDK) UI/UX tools ??
 
