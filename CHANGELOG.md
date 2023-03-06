@@ -58,10 +58,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Added
  - CLI service for reading in args in order to scaffold
  - Added templates for scaffolded controllers/connectors
- - 
+ 
  ### Changed
  - nothing yet
- - 
+ 
  ### todo
     - controller scaffolding
     - connector scaffolding
