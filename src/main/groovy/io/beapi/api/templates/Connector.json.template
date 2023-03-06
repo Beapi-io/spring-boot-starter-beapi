@@ -1,0 +1,180 @@
+{
+	"NAME": "${realName}",
+	"NETWORKGRP": "public",
+	"VALUES": { 
+		${attList}
+		"firstName": {
+			"type": "String",
+			"description": "",
+			"mockData": "null_fname",
+			"constraints": {"order":3,"isNullable":false},
+		},
+		"passwordExpired": {
+			"type": "boolean",
+			"description": "",
+			"mockData": "false",
+			"constraints": {"order":9,"isNullable":false},
+		},
+		"accountExpired": {
+			"type": "boolean",
+			"description": "",
+			"mockData": "false",
+			"constraints": {"order":10,"isNullable":false},
+		},
+		"oauthProvider": {
+			"type": "String",
+			"description": "",
+			"mockData": "",
+			"constraints": {"order":7,"isNullable":true},
+		},
+		"username": {
+			"type": "String",
+			"description": "",
+			"mockData": "test",
+			"constraints": {"isUnique":true,"order":1,"isBlank":false,"isNullable":false},
+		},
+		"accountLocked": {
+			"type": "boolean",
+			"description": "",
+			"mockData": "false",
+			"constraints": {"order":11,"isNullable":false},
+		},
+		"password": {
+			"type": "String",
+			"description": "",
+			"mockData": "password",
+			"constraints": {"order":2,"isBlank":false,"isNullable":false},
+		},
+		"lastName": {
+			"type": "String",
+			"description": "",
+			"mockData": "null_lname",
+			"constraints": {"order":4,"isNullable":false},
+		},
+		"oauthId": {
+			"type": "String",
+			"description": "",
+			"mockData": "",
+			"constraints": {"order":6,"isNullable":true},
+		},
+		"enabled": {
+			"type": "boolean",
+			"description": "",
+			"mockData": "true",
+			"constraints": {"order":12,"isNullable":false},
+		},
+		"avatarUrl": {
+			"type": "String",
+			"description": "",
+			"mockData": "",
+			"constraints": {"order":8,"isNullable":true},
+		},
+		"email": {
+			"type": "String",
+			"description": "",
+			"mockData": "test@test.com",
+			"constraints": {"isUnique":true,"maxSize":100,"order":5,"isEmail":true,"isNullable":false},
+		},
+		"id": {
+			"key": "PKEY",
+			"type": "Long",
+			"description": "",
+			"mockData": "112",
+			"constraints": {},
+		},
+		"version": {
+			"type": "Long",
+			"description": "",
+			"mockData": "0",
+			"constraints": {},
+		},
+	},
+	"CURRENTSTABLE": "1",
+	"VERSION": {
+		"1": {
+			"DEFAULTACTION":"list",
+			"URI": { 
+				"show": {
+					"METHOD": "GET",
+					"DESCRIPTION": "Description for show",
+				    	"ROLES": {
+					    "BATCH": ["ROLE_ADMIN"]
+					},
+					"REQUEST": {
+					    "permitAll":[],
+					    "ROLE_ADMIN":["id"]
+					},
+					"RESPONSE": {
+						"permitAll":["id","version","username","email","enabled","accountExpired"]
+					}
+				},
+				"getByUsername": {
+					"METHOD": "GET",
+					"DESCRIPTION": "Description for getByUsername",
+				    	"ROLES": {
+					    "BATCH": ["ROLE_ADMIN"]
+					},
+					"REQUEST": {
+						"permitAll":["username"]
+					},
+					"RESPONSE": {
+						"permitAll":["firstName","passwordExpired","accountExpired","oauthProvider","username","accountLocked","password","lastName","oauthId","enabled","avatarUrl","email","id","version"]
+					}
+				},
+				"update": {
+					"METHOD": "PUT",
+					"DESCRIPTION": "Description for update",
+				    	"ROLES": {
+					    "BATCH": ["ROLE_ADMIN"]
+					},
+					"REQUEST": {
+						"permitAll":["firstName","passwordExpired","accountExpired","oauthProvider","username","accountLocked","password","lastName","oauthId","enabled","avatarUrl","email","id","version"]
+					},
+					"RESPONSE": {
+						"permitAll":["id"]
+					}
+				},
+				"create": {
+					"METHOD": "POST",
+					"DESCRIPTION": "Description for create",
+				    	"ROLES": {
+					    "BATCH": ["ROLE_ADMIN"]
+					},
+					"REQUEST": {
+						"permitAll":["firstName","passwordExpired","accountExpired","oauthProvider","username","accountLocked","password","lastName","oauthId","enabled","avatarUrl","email","id","version"]
+					},
+					"RESPONSE": {
+						"permitAll":["id"]
+					}
+				},
+				"list": {
+					"METHOD": "GET",
+					"DESCRIPTION": "Description for list",
+				    	"ROLES": {
+					    "BATCH": ["ROLE_ADMIN"]
+					},
+					"REQUEST": {
+						"ROLE_ADMIN":[]
+					},
+					"RESPONSE": {
+						"ROLE_ADMIN":["firstName","passwordExpired","accountExpired","oauthProvider","username","accountLocked","password","lastName","oauthId","enabled","avatarUrl","email","id","version"]
+					}
+				},
+				"delete": {
+					"METHOD": "DELETE",
+					"DESCRIPTION": "Description for delete",
+				    	"ROLES": {
+					    "BATCH": ["ROLE_ADMIN"]
+					},
+					"REQUEST": {
+						"permitAll":["id"]
+					},
+					"RESPONSE": {
+						"permitAll":["id"]
+					}
+				},
+
+			}
+		}
+	}
+}

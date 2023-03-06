@@ -32,6 +32,7 @@ import javax.persistence.metamodel.EntityType
 import javax.persistence.metamodel.Attribute
 import org.springframework.beans.factory.ListableBeanFactory
 import org.springframework.stereotype.Controller
+import java.lang.reflect.Field;
 
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
 @Service
@@ -145,8 +146,6 @@ public class CliService {
 
 						//entityType.getSimpleName().toLowerCase().concat("s");
 
-
-
 						// todo : should this be camelCase????
 						realPackageName =  tempEntityType.getJavaType().getCanonicalName() - (tempEntityType.getJavaType().getPackage().getName()+".")
 						realName = realPackageName.toLowerCase()
@@ -154,15 +153,33 @@ public class CliService {
 						println(realName)
 
 						data[realName] = [:]
+						data[realName]['className'] = realPackageName
 						data[realName]['values'] = [:]
 
 						LinkedHashMap attVals = [:]
 						Set<Attribute> atts = tempEntityType.getDeclaredAttributes()
 						atts.each(){ att ->
+
 							String tempName = att.getName()
+
+							// TEST
+							//Field identifiereField = getDeclaredField(entityClass, propertyName);
+							Field field = tempEntityType.getJavaType().getDeclaredField(tempName);
+							if(field.isAnnotationPresent(ReflectionCaller.getClassPlain("javax.persistence.Column", cl))) {
+								ReflectionCaller columnAnno = new ReflectionCaller(field.getAnnotation(ReflectionCaller.getClassPlain("javax.persistence.Column", cl)), false);
+								String columnName = (String) columnAnno.callMethod("name").getCallee();
+
+								if (null != columnName)
+								{
+									identifierColumnName = columnName;
+								}
+							}
+							// END TEST
+
+
 							String tempType = att.getJavaType()
 							//println("${att.getName()} / ${att.getJavaType().getCanonicalName()}")
-							data[realName]['values']["${att.getName()}"] = att.getJavaType().getCanonicalName()
+							data[realName]['values']["${attName}"] = att.getJavaType().getCanonicalName()
 
 							String attName = att.getJavaType().getCanonicalName() as String
 							attVals[attName] = [:]
