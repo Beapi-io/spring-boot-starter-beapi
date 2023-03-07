@@ -33,6 +33,7 @@ import javax.persistence.metamodel.Attribute
 import org.springframework.beans.factory.ListableBeanFactory
 import org.springframework.stereotype.Controller
 import java.lang.reflect.Field;
+import java.lang.annotation.Annotation;
 
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
 @Service
@@ -156,60 +157,63 @@ public class CliService {
 						data[realName]['className'] = realPackageName
 						data[realName]['values'] = [:]
 
-						LinkedHashMap attVals = [:]
-						Set<Attribute> atts = tempEntityType.getDeclaredAttributes()
-						atts.each(){ att ->
+						Field[] fields = tempEntityType.getJavaType().getDeclaredFields()
+						fields.each(){
 
-							String tempName = att.getName()
+							String attName = it.getName()
+							println("${it.getType().getCanonicalName()} / ${attName}")
 
-							// TEST
-							//Field identifiereField = getDeclaredField(entityClass, propertyName);
-							Field field = tempEntityType.getJavaType().getDeclaredField(tempName);
-							if(field.isAnnotationPresent(ReflectionCaller.getClassPlain("javax.persistence.Column", cl))) {
-								ReflectionCaller columnAnno = new ReflectionCaller(field.getAnnotation(ReflectionCaller.getClassPlain("javax.persistence.Column", cl)), false);
-								String columnName = (String) columnAnno.callMethod("name").getCallee();
+							Annotation anno = it.getAnnotation(javax.persistence.Column.class);
+							LinkedHashMap constraints = [:]
 
-								if (null != columnName)
-								{
-									identifierColumnName = columnName;
+							String keyType = null
+							String reference = null
+							if(attName!='serialVersionUID') {
+								Attribute att = tempEntityType.getDeclaredAttribute(attName)
+								if (att.isAssociation()) {
+									keyType = (['id', 'ID'].contains(attName)) ? 'PKEY' : 'FKEY'
+									if (keyType == 'FKEY') {
+										reference = att.getJavaType().getSimpleName()
+									}
 								}
 							}
-							// END TEST
 
-
-							String tempType = att.getJavaType()
-							//println("${att.getName()} / ${att.getJavaType().getCanonicalName()}")
-							data[realName]['values']["${attName}"] = att.getJavaType().getCanonicalName()
-
-							String attName = att.getJavaType().getCanonicalName() as String
-							attVals[attName] = [:]
-							if(att.isAssociation()){
-								String keyType = (['id','ID'].contains(attName))? 'PKEY':'FKEY'
-								attVals[attName].put('key',keyType)
-								if(keyType=='FKEY'){
-									attVals[attName].put('reference',att.getJavaType().getSimpleName())
+							if(anno!=null){
+								constraints['nullable'] = anno.nullable()
+								constraints['unique'] = anno.unique()
+								if(keyType){
+									if(reference){
+										//FKEY
+										data[realName]['values'][it.getType().getName()] = ['key':keyType,'reference':reference,'type':it.getType().getCanonicalName(),'constraints':constraints,'description':'<put your description here>','mockData':'<put your mock data here>']
+									}else{
+										//PKEY
+										data[realName]['values'][it.getType().getName()] = ['key':keyType,'type':it.getType().getCanonicalName(),'constraints':constraints,'description':'<put your description here>','mockData':'<put your mock data here>']
+									}
+								}else{
+									data[realName]['values'][it.getType().getName()] = ['type':it.getType().getCanonicalName(),'constraints':constraints,'description':'<put your description here>','mockData':'<put your mock data here>']
 								}
-							}else {
-								attVals[attName].put('type',att.getJavaType().getSimpleName())
-								attVals[attName].put('description',"<put your description here>")
-								attVals[attName].put('mockData',"<put your mock data here>")
+							}else{
+								data[realName]['values'][it.getType().getName()] = ['type':it.getType().getCanonicalName(),'constraints':null,'description':'<put your description here>','mockData':'<put your mock data here>']
 							}
 						}
-						data[realName]['values'] = attVals
 					}
 				}
 			}
 
 			if (domainFound) {
 				if (controllerArg) {
-					createController()
+					createController(data)
 				} else if (connectorArg) {
-					createConnector()
+					createConnector(data)
 				}
 			}else{
 				error(1, "Entity name '${domainArg}' not found. Please try again.")
 			}
 		}
+	}
+
+	private boolean isFkey(){
+
 	}
 
 	private void createController(){
