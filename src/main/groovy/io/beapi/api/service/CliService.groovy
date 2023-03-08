@@ -13,6 +13,11 @@
  *
  * @author Owen Rubel (orubel@gmail.com)
  *
+ *
+ * ##### USAGE ####
+ * for scaffolding a connector : gradle  scaffold -Pargs="domain=demo.application.domain.Company"
+ * for scaffolding a controller: gradle  scaffold -Pargs="domain=demo.application.domain.Company controller=demo.application.controller"
+ *
  */
 package io.beapi.api.service
 
@@ -41,6 +46,9 @@ public class CliService {
 
 	@Value("\${sun.java.command}")
 	private List<String> argsString;
+
+	@Value("\${api.iostateDir}")
+	private connectorDir
 
 	@Autowired
 	private ListableBeanFactory listableBeanFactory;
@@ -97,13 +105,6 @@ public class CliService {
 								controllerArg = temp[1]
 							}
 							break
-						case 'connector':
-							if(connectorArg!=null){
-								error(1, "'connector' value has already been set. Please try again.")
-							}else{
-								connectorArg = temp[1]
-							}
-							break
 						case 'domain':
 							if(domainArg!=null){
 								error(1, "'domain' value has already been set. Please try again.")
@@ -127,7 +128,7 @@ public class CliService {
 		}
 
 		if(controllerArg==null && connectorArg==null){
-			error(1, "Missing valid scaffold value sent (ie controller/connector). Please try again.")
+			connectorArg = connectorDir
 		}
 
 		if(domainArg) {
@@ -212,11 +213,7 @@ public class CliService {
 		}
 	}
 
-	private boolean isFkey(){
-
-	}
-
-	private void createController(){
+	private void createController(LinkedHashMap data){
 		println("### creating controller...")
 		Map<String, Object> controllers = listableBeanFactory.getBeansWithAnnotation(Controller.class)
 
@@ -242,10 +239,10 @@ public class CliService {
 		error(42, "")
 	}
 
-	private void createConnector(){
+	private void createConnector(LinkedHashMap data){
 		println("### creating connector...")
+		println(data)
 		error(42, "")
-
 	}
 
 	private boolean dirExists(String path) {
