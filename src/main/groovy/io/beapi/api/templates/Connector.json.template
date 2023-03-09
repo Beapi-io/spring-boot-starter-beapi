@@ -101,24 +101,10 @@
 					    "BATCH": ["ROLE_ADMIN"]
 					},
 					"REQUEST": {
-					    "permitAll":[],
-					    "ROLE_ADMIN":["id"]
+					    "permitAll":${showRequestParamsList}
 					},
 					"RESPONSE": {
-						"permitAll":["id","version","username","email","enabled","accountExpired"]
-					}
-				},
-				"getByUsername": {
-					"METHOD": "GET",
-					"DESCRIPTION": "Description for getByUsername",
-				    	"ROLES": {
-					    "BATCH": ["ROLE_ADMIN"]
-					},
-					"REQUEST": {
-						"permitAll":["username"]
-					},
-					"RESPONSE": {
-						"permitAll":["firstName","passwordExpired","accountExpired","oauthProvider","username","accountLocked","password","lastName","oauthId","enabled","avatarUrl","email","id","version"]
+					    "permitAll":${showResponseParamsList}
 					}
 				},
 				"update": {
@@ -128,10 +114,10 @@
 					    "BATCH": ["ROLE_ADMIN"]
 					},
 					"REQUEST": {
-						"permitAll":["firstName","passwordExpired","accountExpired","oauthProvider","username","accountLocked","password","lastName","oauthId","enabled","avatarUrl","email","id","version"]
+						"permitAll":${updateRequestParamsList}
 					},
 					"RESPONSE": {
-						"permitAll":["id"]
+						"permitAll":${updateResponseParamsList}
 					}
 				},
 				"create": {
@@ -141,10 +127,10 @@
 					    "BATCH": ["ROLE_ADMIN"]
 					},
 					"REQUEST": {
-						"permitAll":["firstName","passwordExpired","accountExpired","oauthProvider","username","accountLocked","password","lastName","oauthId","enabled","avatarUrl","email","id","version"]
+						"permitAll":${createRequestParamsList}
 					},
 					"RESPONSE": {
-						"permitAll":["id"]
+						"permitAll":${createResponseParamsList}
 					}
 				},
 				"list": {
@@ -154,10 +140,10 @@
 					    "BATCH": ["ROLE_ADMIN"]
 					},
 					"REQUEST": {
-						"ROLE_ADMIN":[]
+						"ROLE_ADMIN":${listRequestParamsList}
 					},
 					"RESPONSE": {
-						"ROLE_ADMIN":["firstName","passwordExpired","accountExpired","oauthProvider","username","accountLocked","password","lastName","oauthId","enabled","avatarUrl","email","id","version"]
+						"ROLE_ADMIN":${listResponseParamsList}
 					}
 				},
 				"delete": {
@@ -167,13 +153,12 @@
 					    "BATCH": ["ROLE_ADMIN"]
 					},
 					"REQUEST": {
-						"permitAll":["id"]
+						"permitAll":${delRequestParamsList}
 					},
 					"RESPONSE": {
-						"permitAll":["id"]
+						"permitAll":${delResponseParamsList}
 					}
 				},
-
 			}
 		}
 	}

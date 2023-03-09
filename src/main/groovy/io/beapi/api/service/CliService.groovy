@@ -85,143 +85,151 @@ public class CliService {
 
 	void parse() {
 		ArrayList args = argsString[0].split(" ")
-		args.remove(0)
-
-		ArrayList validArgKeys = ['controller','connector','domain']
-		ArrayList scaffoldKeys = ['controller','connector']
-		ArrayList domainKey = ['domain']
-		LinkedHashMap vars = [:]
-		args.each(){
-
-			ArrayList temp = it.split('=')
-			if(validArgKeys.contains(temp[0].toLowerCase())){
-
-				if(temp[1] ==~ /[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_]/) {
-					switch(temp[0].toLowerCase()){
-						case 'controller':
-							if(controllerArg!=null){
-								error(1, "'controller' value has already been set. Please try again.")
-							}else{
-								controllerArg = temp[1]
-							}
-							break
-						case 'domain':
-							if(domainArg!=null){
-								error(1, "'domain' value has already been set. Please try again.")
-							}else{
-								domainArg = temp[1]
-							}
-							break
-						default:
-							error(1, "Unrecognized arg. Please try again.")
-					}
-				}else{
-					error(1, "Invalid package name. Package name for '"+temp[0]+"' is not recognized as a valid package name")
-				}
-			}else{
-				error(1, "Invalid ARG sent. Please provide ARG values of 'controller/connector' and 'domain'.")
+		if(args.size()>0) {
+			args.remove(0)
+			ArrayList validArgKeys = ['controller', 'domain']
+			LinkedHashMap temp = [:]
+			args.each() {
+				ArrayList z = it.split('=')
+				temp.put(z[0],z[1])
 			}
-		}
 
-		if(domainArg==null){
-			error(1, "Missing valid domain value sent. Please try again.")
-		}
+			ArrayList keys = temp.keySet()
+			keys.removeAll(validArgKeys);
+			if(args.size()>0 && keys.size()==0 && keys.isEmpty()) {
+				temp.each() { k, v ->
+					if (validArgKeys.contains(k.toLowerCase())) {
 
-		if(controllerArg==null && connectorArg==null){
-			connectorArg = connectorDir
-		}
+						if (v ==~ /[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_]/) {
 
-		if(domainArg) {
-			def entityManager = ctx.getBean('entityManagerFactory')
-			Set<EntityType<?>> entities = entityManager.getMetamodel().getEntities();
-			for (EntityType tempEntityType : entities) {
-				if(!domainFound){
-					if (tempEntityType.getJavaType().getCanonicalName() == domainArg) {
-
-						println("domain : "+tempEntityType.getJavaType())
-						println("domain : "+tempEntityType.getJavaType().getCanonicalName())
-						println("domain : "+tempEntityType.getJavaType().getName())
-						println("domain : "+tempEntityType.getJavaType().getPackage().getName())
-						println("domain : "+tempEntityType.getDeclaredAttributes())
-
-						domainFound = true
-
-						//entityType.getSimpleName().toLowerCase().concat("s");
-
-						// todo : should this be camelCase????
-						realPackageName =  tempEntityType.getJavaType().getCanonicalName() - (tempEntityType.getJavaType().getPackage().getName()+".")
-						realName = realPackageName.toLowerCase()
-						println(realPackageName)
-						println(realName)
-
-						data[realName] = [:]
-						data[realName]['className'] = realPackageName
-						data[realName]['values'] = [:]
-
-						Field[] fields = tempEntityType.getJavaType().getDeclaredFields()
-						fields.each(){
-
-							String attName = it.getName()
-							println("${it.getType().getCanonicalName()} / ${attName}")
-
-							Annotation anno = it.getAnnotation(javax.persistence.Column.class);
-							LinkedHashMap constraints = [:]
-
-							String keyType = null
-							String reference = null
-							if(attName!='serialVersionUID') {
-								Attribute att = tempEntityType.getDeclaredAttribute(attName)
-								if (att.isAssociation()) {
-									keyType = (['id', 'ID'].contains(attName)) ? 'PKEY' : 'FKEY'
-									if (keyType == 'FKEY') {
-										reference = att.getJavaType().getSimpleName()
+							switch (k.toLowerCase()) {
+								case 'controller':
+									if (controllerArg != null) {
+										error(1, "'controller' value has already been set. Please try again.")
+									} else {
+										controllerArg = v
 									}
-								}
+									break
+								case 'domain':
+									if (domainArg != null) {
+										error(1, "'domain' value has already been set. Please try again.")
+									} else {
+										domainArg = v
+									}
+									break
+								default:
+									error(1, "Unrecognized arg. Please try again.")
 							}
+						} else {
+							error(1, "Invalid package name. Package name for '" + k + "' is not recognized as a valid package name")
+						}
+					} else {
+						error(1, "Invalid ARG sent. Please provide ARG values of 'controller/connector' and 'domain'.")
+					}
 
-							if(anno!=null){
-								constraints['nullable'] = anno.nullable()
-								constraints['unique'] = anno.unique()
-								if(keyType){
-									if(reference){
-										//FKEY
-										data[realName]['values'][it.getType().getName()] = ['key':keyType,'reference':reference,'type':it.getType().getCanonicalName(),'constraints':constraints,'description':'<put your description here>','mockData':'<put your mock data here>']
-									}else{
-										//PKEY
-										data[realName]['values'][it.getType().getName()] = ['key':keyType,'type':it.getType().getCanonicalName(),'constraints':constraints,'description':'<put your description here>','mockData':'<put your mock data here>']
+
+					if (domainArg == null) {
+						error(1, "Missing valid domain value sent. Please try again.")
+					}
+
+					if (controllerArg == null && connectorArg == null) {
+						connectorArg = connectorDir
+					}
+				}
+
+				if (domainArg) {
+					def entityManager = ctx.getBean('entityManagerFactory')
+					Set<EntityType<?>> entities = entityManager.getMetamodel().getEntities();
+					for (EntityType tempEntityType : entities) {
+						if (!domainFound) {
+							if (tempEntityType.getJavaType().getCanonicalName() == domainArg) {
+
+//println("domain : " + tempEntityType.getJavaType())
+//println("domain : " + tempEntityType.getJavaType().getCanonicalName())
+//println("domain : " + tempEntityType.getJavaType().getName())
+//println("domain : " + tempEntityType.getJavaType().getPackage().getName())
+//println("domain : " + tempEntityType.getDeclaredAttributes())
+
+								domainFound = true
+
+								//entityType.getSimpleName().toLowerCase().concat("s");
+
+								// todo : should this be camelCase????
+								realPackageName = tempEntityType.getJavaType().getCanonicalName() - (tempEntityType.getJavaType().getPackage().getName() + ".")
+								realName = realPackageName.toLowerCase()
+//println(realPackageName)
+//println(realName)
+
+								data[realName] = [:]
+								data[realName]['className'] = realPackageName
+								data[realName]['values'] = [:]
+
+								Field[] fields = tempEntityType.getJavaType().getDeclaredFields()
+								fields.each() {
+
+									String attName = it.getName()
+									println("${it.getType().getCanonicalName()} / ${attName}")
+
+									Annotation anno = it.getAnnotation(javax.persistence.Column.class);
+									LinkedHashMap constraints = [:]
+
+									String keyType = null
+									String reference = null
+									if (attName != 'serialVersionUID') {
+										Attribute att = tempEntityType.getDeclaredAttribute(attName)
+										if (att.isAssociation()) {
+											keyType = (['id', 'ID'].contains(attName)) ? 'PKEY' : 'FKEY'
+											if (keyType == 'FKEY') {
+												reference = att.getJavaType().getSimpleName()
+											}
+										}
 									}
-								}else{
-									data[realName]['values'][it.getType().getName()] = ['type':it.getType().getCanonicalName(),'constraints':constraints,'description':'<put your description here>','mockData':'<put your mock data here>']
+
+									if (anno != null) {
+										constraints['nullable'] = anno.nullable()
+										constraints['unique'] = anno.unique()
+										if (keyType) {
+											if (reference) {
+												//FKEY
+												data[realName]['values'][it.getType().getName()] = ['key': keyType, 'reference': reference, 'type': it.getType().getCanonicalName(), 'constraints': constraints, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
+											} else {
+												//PKEY
+												data[realName]['values'][it.getType().getName()] = ['key': keyType, 'type': it.getType().getCanonicalName(), 'constraints': constraints, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
+											}
+										} else {
+											data[realName]['values'][it.getType().getName()] = ['type': it.getType().getCanonicalName(), 'constraints': constraints, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
+										}
+									} else {
+										data[realName]['values'][it.getType().getName()] = ['type': it.getType().getCanonicalName(), 'constraints': null, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
+									}
 								}
-							}else{
-								data[realName]['values'][it.getType().getName()] = ['type':it.getType().getCanonicalName(),'constraints':null,'description':'<put your description here>','mockData':'<put your mock data here>']
 							}
 						}
 					}
-				}
-			}
 
-			if (domainFound) {
-				if (controllerArg) {
-					createController(data)
-				} else if (connectorArg) {
-					createConnector(data)
+					if (domainFound) {
+						if (controllerArg) {
+							createController(data)
+						} else if (connectorArg) {
+							createConnector(data)
+						}
+					} else {
+						error(1, "Entity name '${domainArg}' not found. Please try again.")
+					}
 				}
-			}else{
-				error(1, "Entity name '${domainArg}' not found. Please try again.")
 			}
 		}
 	}
 
 	private void createController(LinkedHashMap data){
 		println("### creating controller...")
-		Map<String, Object> controllers = listableBeanFactory.getBeansWithAnnotation(Controller.class)
 
 		// check to see if it exists
+		Map<String, Object> controllers = listableBeanFactory.getBeansWithAnnotation(Controller.class)
 		controllers.each(){ k, v ->
-			if(!connectorFound) {
+			if(!controllerFound) {
 				if (v.getClass().getPackage().getName() == controllerArg) {
-					connectorFound = true
+					controllerFound = true
 					obj = v
 					data[realName]['packageName'] = controllerArg
 				}
@@ -230,26 +238,36 @@ public class CliService {
 
 		// check directory structure (in case this is FIRST controller)
 		String controllerPath = controllerArg.replaceAll("\\.","/");
-		if(!controllerFound && !dirExists(controllerPath)){
-			error(42, "Sent controller class did not match any existing package using the 'Controller' annotation NOR directory structure. Please try again with the full package.")
+		String groovyPath = System.getProperty("user.dir")+"/src/main/groovy/${path}"
+		if(!controllerFound && !dirExists(groovyPath)){
+			error(1, "Sent controller class did not match any existing package using the 'Controller' annotation NOR directory structure. Please try again with the full package.")
 		}
 
 		//start scaffold process
 
-		error(42, "")
+		error(0, "")
 	}
 
 	private void createConnector(LinkedHashMap data){
 		println("### creating connector...")
+		println(System.getProperty('user.home'))
+
+		String connectorPath = System.getProperty('user.home')+"${connectorDir}"
+		println(connectorPath)
+		if(!dirExists(connectorPath)){
+			println("need to create path...")
+			//error(1, "Sent controller class did not match any existing package using the 'Controller' annotation NOR directory structure. Please try again with the full package.")
+		}
+
 		println(data)
-		error(42, "")
+		error(0, "")
 	}
 
 	private boolean dirExists(String path) {
 		boolean exists = false
 
 		// src/main/groovy
-		String groovyPath = System.getProperty("user.dir")+"/src/main/groovy/${path}"
+
 		//def ant = new AntBuilder()
 		def gfile = new File(groovyPath)
 		if (gfile.exists()) {
