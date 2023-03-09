@@ -22,7 +22,7 @@
 
 In current architectures, DATA for endpoints is bound to FUNCTIONALITY ( see [Cross Cutting Concern](https://en.wikipedia.org/wiki/Cross-cutting_concern) ) through things like 'annotations'; this makes it so that you have to **duplicate this DATA everywhere**(see OpenApi) as said data is hardcoded into functionality via those annotations. And UNFORTUNATE. existing tools (like OpenAPI) [refuse to copy/include RBAC rules](https://www.flickr.com/photos/orubel/50695726007/in/dateposted-public/) making it so other services become insecure when using tools like OpenApi.
 
-By abstracting it into an externally **reloadable file**, things like RBAC/ROLES for endpoints can be easily adjusted without requiring a restart of services. Plus using functionality like webhooks, one can synchronize all services from a MASTER server. This allows for changes to API endpoint DATA on a distributed API architecture without restarting services.
+By abstracting it into an externally **reloadable file**, things like [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control)/ROLES for endpoints can be easily adjusted without requiring a restart of services. Plus using functionality like webhooks, one can synchronize all services from a MASTER server. This allows for changes to API endpoint DATA on a distributed API architecture without restarting services.
 
 Additionally, this creates new patterns like [automated batching](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-1) and '[Api Chaining&reg;](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-3) '
 
