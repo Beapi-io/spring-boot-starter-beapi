@@ -160,41 +160,41 @@ public class CliService {
 								fields.each() {
 
 									String attName = it.getName()
+
 									Annotation anno = it.getAnnotation(javax.persistence.Column.class);
 									LinkedHashMap constraints = [:]
 
 									String keyType = null
 									String reference = null
 									if (attName != 'serialVersionUID') {
+
 										Attribute att = tempEntityType.getDeclaredAttribute(attName)
+										if(['id', 'ID'].contains(attName)){
+											keyType = 'PKEY'
+										}
+
 										if (att.isAssociation()) {
-											keyType = (['id', 'ID'].contains(attName)) ? 'PKEY' : 'FKEY'
-											if (keyType == 'FKEY') {
-												reference = att.getJavaType().getSimpleName()
-											}
+											keyType = 'FKEY'
+											reference = att.getJavaType().getSimpleName()
 										}
 									}
 
 									if(attName != 'serialVersionUID') {
 										variables.add("${attName}")
 										if (anno != null) {
-
 											constraints['nullable'] = anno.nullable()
 											constraints['unique'] = anno.unique()
+											values[attName] = ['type': it.getType().getCanonicalName(), 'constraints': constraints, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
+										} else {
 											if (keyType) {
-
-												if (reference) {
-													//FKEY
+												if(reference) {
 													values[attName] = ['key': keyType, 'reference': reference, 'type': it.getType().getCanonicalName(), 'constraints': constraints, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
 												} else {
-													//PKEY
 													values[attName] = ['key': keyType, 'type': it.getType().getCanonicalName(), 'constraints': constraints, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
 												}
 											} else {
-												values[attName] = ['type': it.getType().getCanonicalName(), 'constraints': constraints, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
+												values[attName] = ['type': it.getType().getCanonicalName(), 'constraints': null, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
 											}
-										} else {
-											values[attName] = ['type': it.getType().getCanonicalName(), 'constraints': null, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
 										}
 									}
 								}
@@ -205,7 +205,6 @@ public class CliService {
 					// create attList
 					data['realName'] = realName
 					if(connectorArg) {
-						println(values)
 						data['attList'] = createAttList(values)
 					}
 
@@ -260,7 +259,6 @@ public class CliService {
 		LinkedHashMap<String, Object> cont = listableBeanFactory.getBeansWithAnnotation(org.springframework.stereotype.Controller.class)
 		cont.each() { k, v ->
 			if(k == controllerName){
-				println(v.getClass())
 
 				Method[] actions = v.getClass().getMethods()
 				// get methods as 'actions'
@@ -317,19 +315,19 @@ public class CliService {
 
 
 String uri = """
-\t\t\t\t\"${it4.getName()}\": {
-\t\t\t\t\t\"METHOD\": "${method}",
-\t\t\t\t\t\"DESCRIPTION\": \"Description for ${it4.getName()}\",
-\t\t\t\t\t"ROLES\": {
-\t\t\t\t\t\t"BATCH\": [\"ROLE_ADMIN\"]
-\t\t\t\t\t},
-\t\t\t\t\t\"REQUEST\": {
-\t\t\t\t\t\t\"permitAll\": ${req}
-\t\t\t\t\t},
-\t\t\t\t\t\"RESPONSE\": {
-\t\t\t\t\t\t\"permitAll\": ${resp}
-\t\t\t\t\t}
-\t\t\t\t},"""
+\t\t\t\t\t\"${it4.getName()}\": {
+\t\t\t\t\t\t\"METHOD\": "${method}",
+\t\t\t\t\t\t\"DESCRIPTION\": \"Description for ${it4.getName()}\",
+\t\t\t\t\t\t"ROLES\": {
+\t\t\t\t\t\t\t"BATCH\": [\"ROLE_ADMIN\"]
+\t\t\t\t\t\t},
+\t\t\t\t\t\t\"REQUEST\": {
+\t\t\t\t\t\t\t\"permitAll\": ${req}
+\t\t\t\t\t\t},
+\t\t\t\t\t\t\"RESPONSE\": {
+\t\t\t\t\t\t\t\"permitAll\": ${resp}
+\t\t\t\t\t\t}
+\t\t\t\t\t},"""
 						uris <<= uri
 					}
 				}
@@ -358,29 +356,31 @@ String uri = """
 		int inc=1
 		values.each() { k, v ->
 json += """
-\t\t"${k}": {"""
-			if (v.keyType == 'PKEY') {
-				json += "\t\t\t\"key\": \"${v.keyType}\","
-			} else if (v.keyType == 'FKEY') {
-json += """\t\t\t\t"key": "${v.keyType}",
-\t\t\t\t"references": "","""
+\t\t\t"${k}": {"""
+			if (v.key == 'PKEY') {
+json += """
+\t\t\t\t"key": "${v.key}","""
+			} else if (v.key == 'FKEY') {
+json += """
+\t\t\t\t"key": "${v.key}",
+\t\t\t\t\t"references": "","""
 			}
 
 json += """
-\t\t\t"type": "${entityTypeConverter(v.type)}",
-\t\t\t"description": \"\",
-\t\t\t"mockData": \"\","""
+\t\t\t\t"type": "${entityTypeConverter(v.type)}",
+\t\t\t\t"description": \"\",
+\t\t\t\t"mockData": \"\","""
 
 			if(v.constraints){
 json += """
-\t\t\t\"constraints\": {\"order\":${inc},\"isNullable\":${v.constraints.nullable}, \"isUnique\":${v.constraints.unique}},"""
+\t\t\t\t\"constraints\": {\"order\":${inc},\"isNullable\":${v.constraints.nullable}, \"isUnique\":${v.constraints.unique}},"""
 			}else{
 json += """
-\t\t\t\"constraints\": {\"order\":${inc}},"""
+\t\t\t\t\"constraints\": {\"order\":${inc}},"""
 			}
 
 json += """
-\t\t},"""
+\t\t\t},"""
 			inc++
 		}
 
@@ -388,8 +388,6 @@ json += """
 	}
 
 	private void createController(LinkedHashMap data){
-		println("### creating controller...")
-
 		// check to see if it exists
 		Map<String, Object> controllers = listableBeanFactory.getBeansWithAnnotation(Controller.class)
 		controllers.each(){ k, v ->
@@ -417,15 +415,11 @@ json += """
 	}
 
 	private void createConnector(LinkedHashMap data){
-		println("### creating connector...")
-		println(System.getProperty('user.home'))
-
 		String connectorPath = "${System.getProperty('user.home')}/${connectorDir}"
 		if(!dirExists(connectorPath)){
 			// need to create path
 			error(1, "The 'iostateDir' in your 'beapi_api.yml' file is not porperly defined as the directory does not exist. Please check and try again.")
 		}
-
 
 		writeConnector("templates/Connector.json.template", "${System.getProperty('user.home')}/${connectorDir}/${realPackageName}.json", data)
 
