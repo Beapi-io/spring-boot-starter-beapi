@@ -52,6 +52,14 @@ bootJar {
     enabled = false
 }
 
+jar {
+    baseName = 'analytics'
+    from('src/main/groovy/io/beapi/api') {
+        include 'templates/*.*.template'
+    }
+}
+
+
 group = "${group}"
 archivesBaseName = "spring-boot-starter-beapi"
 version = "${version}"
