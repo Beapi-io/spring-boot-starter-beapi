@@ -55,9 +55,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ## 0.7.X - (projected release 05/01/2023)
  
  ### Added
- - CLI service for reading in args in order to scaffold
- - Added templates for scaffolded controllers/connectors
- - Scaffolding for connectors/IO State
+ - Added CLI service for reading in args in order to scaffold 
+ - Added templates for scaffolded connectors
+ - Scaffolding for connectors/IO State; allows users to scaffold connectors based on data from an existing entity/controller
  
  ### Changed
  - nothing yet
