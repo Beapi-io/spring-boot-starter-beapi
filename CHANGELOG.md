@@ -41,7 +41,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - apicalls with no 'action' will send back apidocs for endpoints for that controller that TOKEN has access to
 - added receivesList/returnsList to ApiDescriptor
 - added 'getApiDescriptor()' to IoStateService
-- (REMOVED - adding to SDK) added HookCacheService for implementing application does not have to create/manage domain for webhooks
 
 ### Changed
 - simplifying mapping in config
@@ -53,21 +52,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - renamed nonmappedEndpoint to 'publicEndpoints'
 
 
- ## 0.7.X - (projected release 08/01/2023)
+ ## 0.7.X - (projected release 05/01/2023)
  
  ### Added
  - CLI service for reading in args in order to scaffold
  - Added templates for scaffolded controllers/connectors
+ - Scaffolding for connectors/IO State
  
  ### Changed
  - nothing yet
  
  ### todo
-    - controller scaffolding
-    - connector scaffolding
     - rate limiting
+    - docs for scaffolding
     - functional test scaffolding
-    - (SDK) optional JMS service/config ??
     - (SDK) automated webhooks ?? 
     - (SDK) UI/UX tools ??
+    - (SDK) optional JMS service/config ??
 
