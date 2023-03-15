@@ -60,7 +60,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - Scaffolding for connectors/IO State; allows users to scaffold connectors based on data from an existing entity/controller
  
  ### Changed
- - too many tools need access to entityManager(webhooks,jwt storage, automated testing); moving the DataSourceProperties & entityManagerFactory to starter. DB Config is all in users project
+ - too many tools need access to entityManager(webhooks,jwt storage, automated testing); moving the DataSourceProperties & entityManagerFactory to starter (from beapi-java-demo). DB Config is all in users project
  
  ### todo
     - PropertySource for apiProperties (in spring-boot-starter-beapi) needs to be dynamic
