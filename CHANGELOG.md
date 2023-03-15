@@ -63,6 +63,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - nothing yet
  
  ### todo
+    - PropertySource for apiProperties (in spring-boot-starter-beapi) needs to be dynamic
+    - PropertySource for dataSourceProperties (in beapi-java-demo) needs to be dynamic
+    - need to make sure CLI does not overwrite existing files
     - rate limiting
     - docs for scaffolding
     - functional test scaffolding
