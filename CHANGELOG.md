@@ -52,7 +52,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - renamed nonmappedEndpoint to 'publicEndpoints'
 
 
- ## 0.7.X - (projected release 05/01/2023)
+ ## 0.7.X - (projected release 08/01/2023)
  
  ### Added
  - Added CLI service for reading in args in order to scaffold 
