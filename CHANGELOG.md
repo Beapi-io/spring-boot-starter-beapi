@@ -61,8 +61,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - Added 'entityPackages' to beapi_api.yaml to be able to scan users entitys; need to add to documentation
  
  ### Changed
- - too many tools need access to entityManager(webhooks,jwt storage, automated testing); moving the DataSourceProperties & entityManagerFactory to starter (from beapi-java-demo). DB Config is all in users project
- - adding datasource bean names to beapi_api.yaml so they can be shared with starter; will be moving functionality from demo app so as to simplify and enable functionality such as webhooks in starter
+ - changing default 'iostateDir' to '.beapi/.iostate' for uniqueness
  
  ### todo
     - PropertySource for apiProperties (in spring-boot-starter-beapi) needs to be dynamic
