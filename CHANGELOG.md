@@ -58,7 +58,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - Added CLI service for reading in args in order to scaffold 
  - Added templates for scaffolded connectors
  - Scaffolding for connectors/IO State; allows users to scaffold connectors based on data from an existing entity/controller
- - Added 'entityPackages' to beapi_api.yaml to be able to scan users entitys; need to add to documentation
  
  ### Changed
  - changing default 'iostateDir' to '.beapi/.iostate' for uniqueness
