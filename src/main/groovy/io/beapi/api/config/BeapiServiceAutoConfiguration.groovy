@@ -20,6 +20,7 @@ import io.beapi.api.properties.ApiProperties
 import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
+import io.beapi.api.service.ConnectorScaffoldService
 import io.beapi.api.service.ExchangeService
 import io.beapi.api.service.TraceExchangeService
 //import io.beapi.api.service.EndpointMappingService
@@ -45,17 +46,10 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.ApplicationContext
 
 
-//@ConditionalOnBean(name = ["principle","apiCacheService"])
-//@ConditionalOnClass( name = ['io.beapi.api.interceptor.ApiFrameworkInterceptor'] )
-//@EnableWebSecurity(debug=true)
-//@ConditionalOnWebApplication
 @Configuration(proxyBeanMethods = false)
-//@AutoConfigureAfter([org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration.class,BeapiEhCacheAutoConfiguration.class])
 @AutoConfigureAfter([BeapiEhCacheAutoConfiguration.class])
 @AutoConfigureBefore([BeapiWebAutoConfiguration.class])
 public class BeapiServiceAutoConfiguration {
-
-	//private final org.springframework.boot.autoconfigure.info.ProjectInfoProperties properties;
 
 	@Autowired
 	private ApiProperties apiProperties
@@ -72,8 +66,7 @@ public class BeapiServiceAutoConfiguration {
 	public BeapiServiceAutoConfiguration() {}
 
 
-
-	@Bean
+	@Bean(name='appVersion')
 	String appVersion() throws IOException {
 		ClassLoader classLoader = getClass().getClassLoader();
 		URL incoming = classLoader.getResource("META-INF/build-info.properties")
@@ -93,27 +86,31 @@ public class BeapiServiceAutoConfiguration {
 		return new PrincipleService();
 	}
 
-	@Bean
+	@Bean(name='cliService')
 	@ConditionalOnMissingBean
 	public CliService cliService() throws IOException {
-		return new CliService(applicationContext);
+		return new CliService();
 	}
 
-	@Bean
+	@Bean(name='connScaffoldService')
+	@ConditionalOnMissingBean
+	public ConnectorScaffoldService connScaffoldService() throws IOException {
+		return new ConnectorScaffoldService(applicationContext);
+	}
+
+	@Bean(name='exchangeService')
 	@ConditionalOnMissingBean
 	public ExchangeService exchangeService() throws IOException {
 		return new ExchangeService(apiCacheService);
 	}
 
-
-	@Bean
+	@Bean(name='batchService')
 	@ConditionalOnMissingBean
 	public BatchExchangeService batchService() throws IOException {
 		return new BatchExchangeService(apiCacheService, applicationContext);
 	}
 
-
-	@Bean
+	@Bean(name='chainService')
 	@ConditionalOnMissingBean
 	public ChainExchangeService chainService() throws IOException {
 		return new ChainExchangeService(apiCacheService, applicationContext);

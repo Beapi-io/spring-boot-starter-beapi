@@ -31,8 +31,8 @@ import org.springframework.context.annotation.PropertySource;
 //@Getter
 //@Setter
 @ConfigurationProperties(prefix="api")
-//@TestPropertySource(properties = ["apiConfigPath = ${user.home}/.boot/${env}/beapi_api.yaml"])
-@PropertySource(value = "classpath:/beapi_api.yaml", factory = YamlPropertySourceFactory.class)
+//@PropertySource(value = "classpath:/beapi_api.yaml", factory = YamlPropertySourceFactory.class)
+@PropertySource(value='file:${user.home}/.beapi/${spring.profiles.active}/beapi_api.yaml', factory = YamlPropertySourceFactory.class)
 public class ApiProperties{
 
         private String name
@@ -54,10 +54,11 @@ public class ApiProperties{
         private Boolean parseValidRequestParams
         private Boolean autoTest
 
-        ThrottleProps throttle = new ThrottleProps()
-        WebhookProps webhook = new WebhookProps()
-        SecurityProps security = new SecurityProps()
-        BootstrapProps bootstrap = new BootstrapProps()
+        private DbProps db = new DbProps()
+        private ThrottleProps throttle = new ThrottleProps()
+        private WebhookProps webhook = new WebhookProps()
+        private SecurityProps security = new SecurityProps()
+        private BootstrapProps bootstrap = new BootstrapProps()
 
         String getName() { return name }
         Integer getAttempts() { return attempts }
@@ -98,6 +99,7 @@ public class ApiProperties{
         void setAutoTest(Boolean autoTest) { this.autoTest = autoTest }
         void setParseValidRequestParams(Boolean parseValidRequestParams){ this.parseValidRequestParams = parseValidRequestParams}
 
+        public DbProps getDb(){ return this.db; }
         public ThrottleProps getThrottle(){ return this.throttle; }
         public WebhookProps getWebhook(){ return this.webhook; }
         public SecurityProps getSecurity(){ return this.security; }
@@ -108,6 +110,25 @@ public class ApiProperties{
         public void setSecurity(SecurityProps security){ this.security = security }
         public void setBootstrap(BootstrapProps bootstrap){ this.bootstrap = bootstrap }
 
+    public class DbProps {
+        private String dataSourceBeanName
+        private String localContainerEntityManagerFactoryBeanName
+        private String localSessionFactoryBeanName
+        private String platformTransactionManagerBeanName
+        private ArrayList entityPackages
+
+        public String getDataSourceBeanName() { return this.dataSourceBeanName }
+        public String getLocalContainerEntityManagerFactoryBeanName() { return this.localContainerEntityManagerFactoryBeanName; }
+        public String getLocalSessionFactoryBeanName() { return this.localSessionFactoryBeanName; }
+        public String getPlatformTransactionManagerBeanName() { return this.platformTransactionManagerBeanName; }
+        public String getEntityPackages() { return this.entityPackages.join(', '); }
+
+        public void setDataSourceBeanName(String dataSourceBeanName) { this.dataSourceBeanName = dataSourceBeanName }
+        public void setLocalContainerEntityManagerFactoryBeanName(String localContainerEntityManagerFactoryBeanName) { this.localContainerEntityManagerFactoryBeanName = localContainerEntityManagerFactoryBeanName }
+        public void setLocalSessionFactoryBeanName(String localSessionFactoryBeanName) { this.localSessionFactoryBeanName = localSessionFactoryBeanName }
+        public void setPlatformTransactionManagerBeanName(String platformTransactionManagerBeanName) { this.platformTransactionManagerBeanName = platformTransactionManagerBeanName }
+        public void setEntityPackages(ArrayList entityPackages) { this.entityPackages = entityPackages }
+    }
 
     public class ThrottleProps {
         private Boolean active
@@ -126,8 +147,6 @@ public class ApiProperties{
         public void setRateLimit(LinkedHashMap rateLimit) { this.rateLimit = rateLimit }
         public void setDataLimit(LinkedHashMap dataLimit) { this.dataLimit = dataLimit }
         public void setExpires(Integer expires) { this.expires = expires }
-
-
     }
 
     public class WebhookProps {
@@ -140,9 +159,8 @@ public class ApiProperties{
 
         public void setActive(Boolean active) { this.active = active; }
         public void setServices(ArrayList services) { this.services = services; }
-
-
     }
+
 
     public class SecurityProps {
         private String superuserRole
