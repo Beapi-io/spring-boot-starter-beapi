@@ -64,7 +64,7 @@ public class CliService {
 		println(args)
 		if(args.size()>0) {
 			args.remove(0)
-			ArrayList validArgKeys = ['connector']
+			ArrayList validArgKeys = ['connector','help']
 			LinkedHashMap temp = [:]
 			args.each() {
 				ArrayList z = it.split('=')
@@ -77,7 +77,6 @@ public class CliService {
 			if(args.size()>0 && keys.size()==0 && keys.isEmpty()) {
 				temp.each() { k, v ->
 					if (validArgKeys.contains(k.toLowerCase())) {
-
 						if (v ==~ /[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_]/) {
 
 							switch (k.toLowerCase()) {
