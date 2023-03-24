@@ -55,6 +55,9 @@ public class CliService {
 	@Autowired
 	ConnectorScaffoldService connScaffoldService
 
+	@Autowired
+	TestScaffoldService testScaffoldService
+
 	public CliService() {}
 
 	static transactional = false
@@ -64,7 +67,7 @@ public class CliService {
 		println(args)
 		if(args.size()>0) {
 			args.remove(0)
-			ArrayList validArgKeys = ['connector','help']
+			ArrayList validArgKeys = ['connector','help','test']
 			LinkedHashMap temp = [:]
 			args.each() {
 				ArrayList z = it.split('=')
@@ -77,15 +80,27 @@ public class CliService {
 			if(args.size()>0 && keys.size()==0 && keys.isEmpty()) {
 				temp.each() { k, v ->
 					if (validArgKeys.contains(k.toLowerCase())) {
-						if (v ==~ /[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_]/) {
-
 							switch (k.toLowerCase()) {
 								case 'connector':
-									if (v.isEmpty()) {
-										error(1, "'domain' value cannot be NULL/empty. Please try again.")
-									} else {
-										println('calling ConnectorScaffoldService...')
-										connScaffoldService.scaffoldConnector(v)
+									if (v ==~ /[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_]/) {
+										if (v.isEmpty()) {
+											error(1, "'domain' value cannot be NULL/empty. Please try again.")
+										} else {
+											connScaffoldService.scaffoldConnector(v)
+										}
+									}else{
+										error(1, "Invalid package. Package value for '" + k + "' is not recognized as a valid Domain package name")
+									}
+									break
+								case 'test':
+									if (v ==~ /[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_]/) {
+										if (v.isEmpty()) {
+											error(1, "'controller' value cannot be NULL/empty. Please try again.")
+										} else {
+											testScaffoldService.scaffoldTest(v)
+										}
+									}else{
+										error(1, "Invalid package. Package value for '" + k + "' is not recognized as a valid Controller package name")
 									}
 									break
 								case 'help':
@@ -93,9 +108,7 @@ public class CliService {
 								default:
 									error(1, "Unrecognized arg. Please try again.")
 							}
-						} else {
-							error(1, "Invalid package name. Package name for '" + k + "' is not recognized as a valid package name")
-						}
+
 					} else {
 						error(1, "Invalid ARG sent. Please use '-Pargs=\"help\"' for list of valid args.")
 					}
@@ -108,20 +121,31 @@ public class CliService {
 
 	private void usage(){
 		println("""
+##########################################################################################
 USAGE: gradle scaffold -Pargs="<option>=<associated package name>"
+
 ex. gradle scaffold -Pargs="connector=demo.application.domain.Company"
+ex. gradle scaffold -Pargs="test=demo.application.controller.Company"
+ex. gradle scaffold -Pargs="help"
 
-[OPTIONS]
-connector	scaffolds connectors.requires an associated entity/domain
-test		scaffolds integration tests. requires associated controller
-help		DOES NOT require any associated package!! Can be called without.
+[ARGS]
+connector = <an associated entity/domain>
+-- scaffolds connectors
 
+test = <an associated controller>
+-- scaffolds integration tests for endpoints.
+
+help
+-- CLI usage and help information
+
+##########################################################################################
 """)
+		error(0, "")
 	}
 
 	private void error(int i, String msg) {
 		if (msg != "") {
-			System.err << "${msg}"
+			System.err << "[ERROR] ${msg}"
 		}
 		System.exit i
 	}

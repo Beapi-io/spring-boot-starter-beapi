@@ -21,6 +21,7 @@ import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ConnectorScaffoldService
+import io.beapi.api.service.TestScaffoldService
 import io.beapi.api.service.ExchangeService
 import io.beapi.api.service.TraceExchangeService
 //import io.beapi.api.service.EndpointMappingService
@@ -96,6 +97,12 @@ public class BeapiServiceAutoConfiguration {
 	@ConditionalOnMissingBean
 	public ConnectorScaffoldService connScaffoldService() throws IOException {
 		return new ConnectorScaffoldService(applicationContext);
+	}
+
+	@Bean(name='testScaffoldService')
+	@ConditionalOnMissingBean
+	public TestScaffoldService testScaffoldService() throws IOException {
+		return new TestScaffoldService(applicationContext);
 	}
 
 	@Bean(name='exchangeService')
