@@ -42,7 +42,6 @@ public class ApiProperties{
         private ArrayList views
         private ArrayList reservedUris
         private ArrayList publicEndpoint
-        private String apiServer
         private ArrayList entities
         private Integer apichainLimit
         private Boolean postcrement
@@ -51,6 +50,7 @@ public class ApiProperties{
         private String encoding
         private String iostateDir
         private String serverType
+        private String protocol
         private Boolean parseValidRequestParams
         private Boolean autoTest
 
@@ -67,7 +67,6 @@ public class ApiProperties{
         ArrayList getViews() { return views }
         ArrayList getReservedUris() { return reservedUris }
         ArrayList getPublicEndpoint() { return publicEndpoint }
-        String getApiServer() { return apiServer }
         ArrayList getEntities() { return entities }
         Integer getApichainLimit() { return apichainLimit }
         Boolean getPostcrement() { return postcrement }
@@ -77,6 +76,7 @@ public class ApiProperties{
         String getIostateDir() { return iostateDir }
         String getServerType() { return serverType }
         Boolean getAutoTest() { return autoTest }
+        String getProtocol() { return protocol }
         Boolean getParseValidRequestParams(){ return parseValidRequestParams }
 
 
@@ -87,7 +87,6 @@ public class ApiProperties{
         void setViews(ArrayList views) { this.views = views }
         void setReservedUris(ArrayList reservedUris) { this.reservedUris = reservedUris }
         void setPublicEndpoint(ArrayList publicEndpoint) { this.publicEndpoint = publicEndpoint }
-        void setApiServer(String apiServer) { this.apiServer = apiServer }
         void setEntities(ArrayList entities) { this.entities = entities }
         void setApichainLimit(Integer apichainLimit) { this.apichainLimit = apichainLimit }
         void setPostcrement(Boolean postcrement) { this.postcrement = postcrement }
@@ -97,6 +96,7 @@ public class ApiProperties{
         void setIostateDir(String iostateDir) { this.iostateDir = iostateDir }
         void setServerType(String serverType) { this.serverType = serverType }
         void setAutoTest(Boolean autoTest) { this.autoTest = autoTest }
+        void setProtocol(String protocol) { this.protocol = protocol }
         void setParseValidRequestParams(Boolean parseValidRequestParams){ this.parseValidRequestParams = parseValidRequestParams}
 
         public DbProps getDb(){ return this.db; }
@@ -152,7 +152,6 @@ public class ApiProperties{
     public class WebhookProps {
         private Boolean active
         private ArrayList services
-
 
         public Boolean getActive() { return this.active }
         public Boolean getServices() { return this.services }
