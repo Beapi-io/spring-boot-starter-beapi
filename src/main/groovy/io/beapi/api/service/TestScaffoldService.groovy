@@ -52,6 +52,8 @@ public class TestScaffoldService {
 
 	private ApplicationContext ctx
 
+	ApiCacheService apiCacheService
+
 	private boolean controllerFound = false;
 	private boolean connectorFound = false;
 	private connectorName
@@ -88,6 +90,18 @@ public class TestScaffoldService {
 
 		if(controllerFound){
 			// check for existence of 'connector'
+			String connectorPath = "${System.getProperty('user.home')}/${connectorDir}/${fileName}"
+			if(fileExists(connectorPath)){
+				// get data for template
+
+				// make sure all mockdata exists for this
+				// get cached data object
+
+
+				// createTest(data)
+			}else{
+				error(1, "Connector file '"+connectorPath+"' not found. Please check and try again.")
+			}
 		}else{
 			error(1, "Controller for Package Name '"+controllerArg+"' Not Found. Please check and try again.")
 		}
