@@ -63,6 +63,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - changing default 'iostateDir' to '.beapi/.iostate' for uniqueness
  - removed 'apiServer' from properties
  - adding 'protocol' to properties
+ - updated tests in beapi-java-demo to use 'protocol' property; this way protocol can be set per env without changing tests
  
  ### todo
     - PropertySource for apiProperties (in spring-boot-starter-beapi) needs to be dynamic
