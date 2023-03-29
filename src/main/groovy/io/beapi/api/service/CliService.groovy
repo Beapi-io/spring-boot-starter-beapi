@@ -105,16 +105,9 @@ public class CliService {
 									break
 								case 'help':
 									usage()
-								default:
-									error(1, "Unrecognized arg. Please try again.")
 							}
-
-					} else {
-						error(1, "Invalid ARG sent. Please use '-Pargs=\"help\"' for list of valid args.")
 					}
 				}
-			}else{
-				error(1, "Invalid ARG sent. Please use '-Pargs=\"help\"' for list of valid args.")
 			}
 		}
 	}
