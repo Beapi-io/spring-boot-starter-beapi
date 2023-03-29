@@ -79,10 +79,14 @@ public class TestScaffoldService {
 	void scaffoldTest(String controllerArg) {
 			// make sure there is a 'controller' & 'connector'
 		LinkedHashMap<String, Object> cont = listableBeanFactory.getBeansWithAnnotation(org.springframework.stereotype.Controller.class)
+		def cache
 		cont.each() { k, v ->
 			if (v.getClass().getCanonicalName() == controllerArg) {
 				//println("${v} / ${controllerArg}  ")
 				//println("CName : "+v.getClass().getCanonicalName())
+				cache = apiCacheService?.getApiCache(k)
+				println(cache)
+				println(cache.getClass())
 				fileName = v.getClass().getSimpleName()+".json"
 				controllerFound=true
 			}
