@@ -35,8 +35,8 @@ Additionally, this creates new patterns like [automated batching](https://beapi-
   - Full OWASP API Security Compliance
   - Automated RBAC+OWASP checks on cache; this is something that [API Gateways do not do](https://medium.com/@apiexpert/why-api-gateways-are-dead-7c9e324ff70a) and we correct for.
 - **Configuration Management**
-  - Reloadable API RULES (ie connectors)
-  - Automated synchronization of API RULES w/ services
+  - Reloadable API RULES (ie connectors) WITHOUT server/application restart
+  - Automated synchronization of API RULES w/ services via webhooks (will be adding to [beapi_java_demo](https://github.com/Beapi-io/beapi-java-demo))
 - **Automation**
   - Automated Role-based Batching
   - API Chaining(R)
