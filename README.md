@@ -33,8 +33,7 @@ Additionally, this creates new patterns like [automated batching](https://beapi-
   - Automated [Role Based Access Control (RBAC)](https://digitalguardian.com/blog/what-role-based-access-control-rbac-examples-benefits-and-more); 
   - Automated [Attribute Based Access Control (ABAC)](https://developer.okta.com/books/api-security/authz/attribute-based/)
   - Full OWASP API Security Compliance
-  - Automated RBAC+OWASP checks on request/response parameters per endpoint
-  - Automated RBAC+OWASP checks on cache
+  - Automated RBAC+OWASP checks on cache; this is something that [API Gateways do not do](https://medium.com/@apiexpert/why-api-gateways-are-dead-7c9e324ff70a) and we correct for.
 - **Configuration Management**
   - Reloadable API RULES (ie connectors)
   - Automated synchronization of API RULES w/ services
