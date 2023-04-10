@@ -164,6 +164,7 @@ public class ApiProperties{
     public class SecurityProps {
         private String superuserRole
         private String userRole
+        private String testRole
         private String anonRole
         private Set networkGroups
         private LinkedHashMap networkRoles
@@ -174,6 +175,7 @@ public class ApiProperties{
 
         public String getSuperuserRole(){ return this.superuserRole }
         public String getUserRole(){ return this.userRole}
+        public String getTestRole(){ return this.testRole}
         public String getAnonRole(){ return this.anonRole}
         public Set getNetworkGroups() { return this.networkGroups }
         public LinkedHashMap getNetworkRoles() { return this.networkRoles }
@@ -183,6 +185,7 @@ public class ApiProperties{
 
         public void setSuperuserRole(String superuserRole){ this.superuserRole = superuserRole }
         public void setUserRole(String userRole){ this.userRole = userRole}
+        public void setTestRole(String testRole){ this.testRole = testRole}
         public void setAnonRole(String anonRole){ this.anonRole = anonRole}
         public void setNetworkGroups(Set networkGroups) { this.networkGroups = networkGroups}
         public void setNetworkRoles(LinkedHashMap networkRoles) { this.networkRoles = networkRoles}

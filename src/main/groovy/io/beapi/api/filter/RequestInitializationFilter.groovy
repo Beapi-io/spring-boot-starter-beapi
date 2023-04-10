@@ -161,7 +161,15 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     if (checkNetworkGrp(networkRoles, this.authority)) {
                         LinkedHashMap tmp1 = this.apiObject?.getReceivesList()
                         this.receivesList = (tmp1[this.authority]) ? tmp1[this.authority] : tmp1['permitAll']
+                        if(this.receivesList){
+                            request.setAttribute('receivesList', this.receivesList)
 
+                            LinkedHashMap rturn = this.apiObject?.getReturnsList()
+                            ArrayList returnsList = (rturn[this.authority]) ? rturn[this.authority] : rturn['permitAll']
+                            request.setAttribute('returnsList', returnsList)
+                        }else{
+                            throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Inccorrect authority for '${uri}'")
+                        }
 
 
                         request.setAttribute('receivesList', this.receivesList)
@@ -170,7 +178,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                         ArrayList returnsList = (rturn[this.authority]) ? rturn[this.authority] : rturn['permitAll']
                         request.setAttribute('returnsList', returnsList)
                     } else {
-                        throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Request params do not match expect params for '${uri}'")
+                        throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Inccorrect authority for '${uri}'")
                     }
 
                     if(uriList[7]) {

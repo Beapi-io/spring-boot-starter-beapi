@@ -53,7 +53,7 @@ class PrincipleService {
 		//logger.debug("authorities : {}")
 		try {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			authentication.getAuthorities().each() {
+			authentication?.getAuthorities().each() {
 				if(it!='permitAll') {
 					authorities = it.getAuthority()
 				}
