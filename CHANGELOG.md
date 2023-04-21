@@ -58,6 +58,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - Added CLI service for reading in args in order to scaffold 
  - Added templates for scaffolded connectors
  - Scaffolding for connectors/IO State; allows users to scaffold connectors based on data from an existing entity/controller
+ - (SDK) automated functional tests
  
  ### Changed
  - changing default 'iostateDir' to '.beapi/.iostate' for uniqueness
@@ -66,6 +67,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - updated tests in beapi-java-demo to use 'protocol' property; this way protocol can be set per env without changing tests
  - enable bootstrapping of multiple superusers/testusers through properties
  - simplify bootstrapping
+ - added testRole to properties
  
  ### todo
     - PropertySource for apiProperties (in spring-boot-starter-beapi) needs to be dynamic
@@ -74,7 +76,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - rate limiting
     - add scaffolding to documentation
     - add 'entityPackages' for beapi_api.yaml to documentation
-    - functional test scaffolding
     - (SDK) automated webhooks ?? 
     - (SDK) UI/UX tools ??
     - (SDK) optional JMS service/config ??
