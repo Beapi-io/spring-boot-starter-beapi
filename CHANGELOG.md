@@ -74,9 +74,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - PropertySource for dataSourceProperties (in beapi-java-demo) needs to be dynamic
     - need to make sure CLI does not overwrite existing files
     - rate limiting
-    - add scaffolding to documentation
+    - need to add documentation for scaffolding functionality
     - add 'entityPackages' for beapi_api.yaml to documentation
     - (SDK) automated webhooks ?? 
-    - (SDK) UI/UX tools ??
+    - (FRONTEND) UI/UX
     - (SDK) optional JMS service/config ??
 
