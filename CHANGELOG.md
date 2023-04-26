@@ -77,8 +77,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - add 'entityPackages' for beapi_api.yaml to documentation
     - (FRONTEND) UI/UX
     - (SDK) optional JMS service/config ??
-    - (SDK) Read IOState files from CDN
     - (SDK) automated webhooks ?? 
-    - (SDK) PropertySource for dataSourceProperties (in beapi-java-demo) needs to be dynamic via CDN
-    - (SDK) PropertySource for apiProperties (in beapi-java-demo) needs to be dynamic via CDN
+    - (SDK) Read IOState files from CDN
+    - (SDK) PropertySource for dataSourceProperties/apiProperties (in beapi-java-demo) needs to be dynamic via CDN
+
 
