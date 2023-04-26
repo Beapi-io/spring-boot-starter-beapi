@@ -76,7 +76,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - rate limiting
     - need to add documentation for scaffolding functionality
     - add 'entityPackages' for beapi_api.yaml to documentation
-    - (SDK) automated webhooks ?? 
     - (FRONTEND) UI/UX
     - (SDK) optional JMS service/config ??
+    - (SDK) Read IOState files from CDN
+    - (SDK) automated webhooks ?? 
 
