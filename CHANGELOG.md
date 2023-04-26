@@ -58,7 +58,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - Added CLI service for reading in args in order to scaffold 
  - Added templates for scaffolded connectors
  - Scaffolding for connectors/IO State; allows users to scaffold connectors based on data from an existing entity/controller
- - (SDK) automated functional tests
+ - (SDK) automated functional tests for ALL API's
  
  ### Changed
  - changing default 'iostateDir' to '.beapi/.iostate' for uniqueness
@@ -70,8 +70,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - added testRole to properties
  
  ### todo
-    - PropertySource for apiProperties (in spring-boot-starter-beapi) needs to be dynamic
-    - PropertySource for dataSourceProperties (in beapi-java-demo) needs to be dynamic
     - need to make sure CLI does not overwrite existing files
     - rate limiting
     - need to add documentation for scaffolding functionality
@@ -80,4 +78,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - (SDK) optional JMS service/config ??
     - (SDK) Read IOState files from CDN
     - (SDK) automated webhooks ?? 
+    - (SDK) PropertySource for dataSourceProperties (in beapi-java-demo) needs to be dynamic via CDN
+    - (SDK) PropertySource for apiProperties (in beapi-java-demo) needs to be dynamic via CDN
 
