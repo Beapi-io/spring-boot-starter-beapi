@@ -70,6 +70,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - added testRole to properties
  
  ### todo
+    - add 'autoTest' toggle for automated tests from apiProperties/beapi_api.yml
     - need to make sure CLI does not overwrite existing files
     - rate limiting
     - need to add documentation for scaffolding functionality
