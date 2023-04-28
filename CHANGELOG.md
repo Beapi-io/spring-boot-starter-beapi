@@ -70,7 +70,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - added testRole to properties
  
  ### todo
-    - common returnObject/cachedResult service
     - need to make sure CLI does not overwrite existing files
     - rate limiting
     - need to add documentation for scaffolding functionality
