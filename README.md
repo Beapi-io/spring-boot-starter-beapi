@@ -30,6 +30,7 @@ Additionally, this creates new patterns like [automated batching](https://beapi-
 
 ## Functionality
 - **Security**
+  - [Zero Trust Security](https://www.ibm.com/topics/zero-trust) by default
   - Automated [Role Based Access Control (RBAC)](https://digitalguardian.com/blog/what-role-based-access-control-rbac-examples-benefits-and-more); 
   - Automated [Attribute Based Access Control (ABAC)](https://developer.okta.com/books/api-security/authz/attribute-based/)
   - Full OWASP API Security Compliance
