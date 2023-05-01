@@ -72,9 +72,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### todo
     - add 'autoTest' toggle for automated tests from apiProperties/beapi_api.yml
     - need to make sure CLI does not overwrite existing files
-    - rate limiting
-    - need to add documentation for scaffolding functionality
-    - add 'entityPackages' for beapi_api.yaml to documentation
+    - rate limiting / data limiting
+    - (DOCS) need to add documentation for scaffolding functionality
+    - (DOCS) add 'entityPackages' for beapi_api.yaml to documentation
+    - (DOCS) apidocs documentation
     - (FRONTEND) UI/UX
     - (SDK) optional JMS service/config ??
     - (SDK) automated webhooks ?? 
