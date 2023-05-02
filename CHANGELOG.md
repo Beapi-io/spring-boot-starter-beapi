@@ -58,7 +58,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - Added CLI service for reading in args in order to scaffold 
  - Added templates for scaffolded connectors
  - Scaffolding for connectors/IO State; allows users to scaffold connectors based on data from an existing entity/controller
- - (SDK) automated functional tests for ALL API's
+ - (SDK) automated functional tests for ALL API's; moved to SDK
  
  ### Changed
  - changing default 'iostateDir' to '.beapi/.iostate' for uniqueness
@@ -72,13 +72,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### todo
     - add 'autoTest' toggle for automated tests from apiProperties/beapi_api.yml
     - need to make sure CLI does not overwrite existing files
-    - rate limiting / data limiting
     - (DOCS) need to add documentation for scaffolding functionality
     - (DOCS) add 'entityPackages' for beapi_api.yaml to documentation
     - (DOCS) apidocs documentation
     - (FRONTEND) UI/UX
     - (SDK) optional JMS service/config ??
-    - (SDK) automated webhooks ?? 
+    - (SDK) automated webhooks (need to do prior to rate limiting)
+    - (SDK) rate limiting / data limiting (reliant on webhooks and DB)
     - (SDK) Read IOState files from CDN
     - (SDK) PropertySource for dataSourceProperties/apiProperties (in beapi-java-demo) needs to be dynamic via CDN
 
