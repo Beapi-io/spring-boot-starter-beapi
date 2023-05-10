@@ -69,6 +69,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - enable bootstrapping of multiple superusers/testusers through properties
  - simplify bootstrapping
  - added testRole to properties
+ - updated 'user' domain; added columns for webhook monitoring
  
  ### todo
     - add 'autoTest' toggle for automated tests from apiProperties/beapi_api.yml
