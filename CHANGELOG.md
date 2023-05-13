@@ -70,6 +70,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - simplify bootstrapping
  - added testRole to properties
  - updated 'user' domain; added columns for webhook monitoring
+ - fixed RequestInitializationFilter to properly return errors
  
  ### todo
     - add 'autoTest' toggle for automated tests from apiProperties/beapi_api.yml
