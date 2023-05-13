@@ -60,6 +60,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - Added templates for scaffolded connectors
  - Scaffolding for connectors/IO State; allows users to scaffold connectors based on data from an existing entity/controller
  - (SDK) automated functional tests for ALL API's; moved to SDK
+ - (SDK) automated webhooks (in progress)
  
  ### Changed
  - changing default 'iostateDir' to '.beapi/.iostate' for uniqueness
