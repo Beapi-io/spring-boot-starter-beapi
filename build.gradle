@@ -174,10 +174,7 @@ project.plugins.withType(MavenPublishPlugin).all {
     }
 }
 
-
-
-
-
+/*
 gitProperties {
     keys = ["git.branch","git.remote.origin.url","git.build.user.name","git.build.user.email","git.build.version"]
 }
@@ -208,8 +205,8 @@ task doLast(){
         request.setEntity(stringEntity);
         HttpResponse response = client.execute(request);
     }
-
 }
+ */
 
 nexusPublishing {
     repositories {

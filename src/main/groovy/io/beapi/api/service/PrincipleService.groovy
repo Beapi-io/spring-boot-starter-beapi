@@ -69,7 +69,6 @@ class PrincipleService {
 		return authentication.getName();
 	}
 
-
 	protected LinkedHashMap getPrincipal(){
 		LinkedHashMap principalSecInfo = ['name':name(),'auths':authorities()]
 		return principalSecInfo

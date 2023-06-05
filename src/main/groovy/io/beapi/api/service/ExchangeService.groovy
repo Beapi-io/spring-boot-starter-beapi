@@ -95,6 +95,7 @@ public class ExchangeService extends ApiExchange{
     }
 
     void apiResponse(HttpServletResponse response,ArrayList body){
+		//println("### apiResponse ###")
         String output = parseOutput(body, responseFileType)
 
         if(method=='GET') {
@@ -104,7 +105,7 @@ public class ExchangeService extends ApiExchange{
         PrintWriter writer = response.getWriter();
         writer.write(output);
         writer.close()
-        //response.writer.flush()
+        response.writer.flush()
     }
 
 	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {

@@ -95,6 +95,13 @@ public class IoStateService{
 	void initIoStateDir(){
 		try{
 			this.apiCacheService.flushAllApiCache()
+		}catch(Exception e){
+			println("# IoStateService - flushCache Exception - ${e}")
+			System.exit(0)
+		}
+
+		try{
+			this.apiCacheService.flushAllApiCache()
 
 			String baseDir = System.getProperty("user.dir");
 			String userDir = System.getProperty("user.home")
@@ -120,8 +127,13 @@ public class IoStateService{
 			System.exit(0)
 		}
 
-		parseResource("apidoc.json")
-		parseResource("connector.json")
+		ArrayList staticEndpoints = apiProperties.getStaticEndpoint()
+		staticEndpoints.each(){
+			String path = "${it}.json" as String
+			parseResource(path)
+		}
+		//parseResource("apidoc.json")
+		//parseResource("connector.json")
 
 	}
 
@@ -152,15 +164,12 @@ public class IoStateService{
 	private void parseFiles(String path) throws Exception{
 		logger.debug("parseFiles : {}")
 		LinkedHashMap methods = [:]
-
-		println(' ### Loading IO State Files : '+path)
+		println(" ###  Loading IO State Files : ${path}")
 
 		try {
 			new File(path).eachFile() { file ->
-
 				if(!file.isDirectory()) {
 					String fileName = file.name.toString()
-
 					ArrayList tmp = fileName.split('\\.')
 					String fileChar1 = fileName.charAt(fileName.length() - 1)
 
@@ -175,6 +184,7 @@ public class IoStateService{
 							//logger.debug("parseFiles : Loading file - {}","${path}/${fileName}")
 
 							try{
+
 								parseJson(json.IOSTATE.NAME.toString(), json.IOSTATE)
 							}catch(Exception e){
 								println("#### [IoStateService] Exception :"+e)
@@ -326,7 +336,6 @@ public class IoStateService{
 					}
 
 
-
 					methods["${versKey}"][actionname] = apiDescriptor
 					//}
 
@@ -345,6 +354,7 @@ public class IoStateService{
 					println("#### IoStateService Exception1 : "+e)
 				}
 
+				if(apiName=='hook'){}
 				cache["${versKey}"].each(){ key1,val1 ->
 					if(!['deprecated','defaultAction','testOrder'].contains(key1)){
 						try {
@@ -362,6 +372,7 @@ public class IoStateService{
 
 
 		//println("### METHODS : "+methods)
+
 
 
 		//return methods

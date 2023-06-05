@@ -27,6 +27,8 @@ import org.springframework.stereotype.Controller;
 import javax.json.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
 @Controller("apidoc")
@@ -55,8 +57,8 @@ public class ApidocController extends BeapiRequestHandler{
 	}
 	 */
 
+	//@RequestMapping(value = "/apidoc/show", method = RequestMethod.GET)
 	List show(HttpServletRequest request, HttpServletResponse response){
-		println("apidoc/show")
 		this.authority = principle.authorities()
 
 		LinkedHashMap controllerResults = [:]

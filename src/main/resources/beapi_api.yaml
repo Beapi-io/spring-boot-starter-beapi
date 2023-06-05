@@ -12,7 +12,7 @@ api:
     chainingEnabled: true
     batchingEnabled: true
     encoding: UTF-8
-    iostateDir: '.boot/.iostate'
+    iostateDir: '.beapi/.iostate'
     serverType: master
     autoTest: false
     parseValidRequestParams: false

@@ -49,10 +49,13 @@ public class ApiProperties{
         private Boolean batchingEnabled
         private String encoding
         private String iostateDir
+        private ArrayList staticEndpoint
+        private ArrayList supportedFormats
         private String serverType
         private String protocol
         private Boolean parseValidRequestParams
         private Boolean autoTest
+
 
         private DbProps db = new DbProps()
         private ThrottleProps throttle = new ThrottleProps()
@@ -74,8 +77,10 @@ public class ApiProperties{
         Boolean getBatchingEnabled() { return batchingEnabled }
         String getEncoding() { return encoding }
         String getIostateDir() { return iostateDir }
+        ArrayList getStaticEndpoint() { return staticEndpoint }
         String getServerType() { return serverType }
         Boolean getAutoTest() { return autoTest }
+        ArrayList getSupportedFormats() { return supportedFormats }
         String getProtocol() { return protocol }
         Boolean getParseValidRequestParams(){ return parseValidRequestParams }
 
@@ -94,8 +99,10 @@ public class ApiProperties{
         void setBatchingEnabled(Boolean batchingEnabled) { this.batchingEnabled = batchingEnabled }
         void setEncoding(String encoding) { this.encoding = encoding }
         void setIostateDir(String iostateDir) { this.iostateDir = iostateDir }
+        void setStaticEndpoint(ArrayList staticEndpoint){ this.staticEndpoint = staticEndpoint }
         void setServerType(String serverType) { this.serverType = serverType }
         void setAutoTest(Boolean autoTest) { this.autoTest = autoTest }
+        void setSupportedFormats(ArrayList supportedFormats) { this.supportedFormats = supportedFormats }
         void setProtocol(String protocol) { this.protocol = protocol }
         void setParseValidRequestParams(Boolean parseValidRequestParams){ this.parseValidRequestParams = parseValidRequestParams}
 
@@ -138,9 +145,9 @@ public class ApiProperties{
         private Integer expires
 
 
-        public String getActive() { return this.active; }
-        public String getRateLimit() { return this.rateLimit; }
-        public Boolean getDataLimit() { return this.dataLimit; }
+        public Boolean getActive() { return this.active; }
+        public LinkedHashMap getRateLimit() { return this.rateLimit; }
+        public LinkedHashMap getDataLimit() { return this.dataLimit; }
         public Integer getExpires() { return this.expires; }
 
         public void setActive(Boolean active) { this.active = active }
@@ -151,13 +158,13 @@ public class ApiProperties{
 
     public class WebhookProps {
         private Boolean active
-        private ArrayList services
+        private ArrayList<String> services
 
         public Boolean getActive() { return this.active }
-        public Boolean getServices() { return this.services }
+        public ArrayList<String> getServices() { return this.services }
 
         public void setActive(Boolean active) { this.active = active; }
-        public void setServices(ArrayList services) { this.services = services; }
+        public void setServices(ArrayList<String> services) { this.services = services; }
     }
 
 

@@ -28,7 +28,7 @@ import javax.servlet.FilterChain
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-
+import org.slf4j.LoggerFactory
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component
@@ -45,6 +45,15 @@ import org.springframework.beans.factory.BeanFactoryUtils
 import org.springframework.web.servlet.HandlerMapping
 import org.springframework.http.HttpStatus
 
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.beans.factory.BeanFactoryUtils
+import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.cors.CorsUtils
+import javax.servlet.RequestDispatcher
+import org.springframework.web.servlet.DispatcherServlet;
+
 /**
  * This class parses the URI attributes on initial request  &
  *
@@ -57,9 +66,10 @@ import org.springframework.http.HttpStatus
 class RequestInitializationFilter extends OncePerRequestFilter{
 
     //private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RequestInitializationFilter.class);
+
     private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml','multipart/form-data']
     private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
-    private static final ArrayList CALL_TYPES = ['v','b','c','t','h']
+    private static final ArrayList CALL_TYPES = ['v','b','c','t']
 
     @Autowired
     ApplicationContext ctx
@@ -82,7 +92,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     ArrayList uriList
     String uri
     LinkedHashMap receives = [:]
-    ArrayList receivesList = []
+    ArrayList receivesList
     LinkedHashMap rturns = [:]
     String method
     String controller
@@ -113,18 +123,35 @@ class RequestInitializationFilter extends OncePerRequestFilter{
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+        //println("### RequestInitializationFilter...")
+        if(processRequest(request, response)) {
+
+            //println("CorsRequest? "+CorsUtils.isCorsRequest(request))
+
+            try {
+                Map<String, HandlerMapping> handlerMappingMap = BeanFactoryUtils.beansOfTypeIncludingAncestors(this.ctx, HandlerMapping.class, true, false);
+                handlerMappingMap.each{ k,v ->
+                    v.getHandler(request).getClass()
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            chain.doFilter(request, response);
+
+        }
+    }
+
+    private boolean processRequest(HttpServletRequest request, HttpServletResponse response){
         //logger.debug("doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : {}");
+        String cachedResult
         apidocFwd = false
         this.uri = request.getRequestURI()
 
-        // todo : will imporove in future version
+        // todo : improve in future version
         if(apiProperties.reservedUris.contains(request.getRequestURI())) {
-            // ### PUBLIC APIS ###
             ArrayList uriVars = uri.split('/')
             this.controller = uriVars[0]
         }else{
-            // println("### APIS HANDLED BY THE STARTER ###")
-
             this.authority = this.principle.authorities()
             this.uriList = setUri(this.uri, this.version)
 
@@ -152,25 +179,30 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                 // todo : if no action, default to apidoc/show/id
 
-
                 if (cache) {
                     this.apiObject = temp[uriList[5]]
-                    this.rturns = this.apiObject['returns'] as LinkedHashMap
+
+                    if(this.apiObject?.'returns'){
+                        this.rturns = this.apiObject['returns'] as LinkedHashMap
+                    }else{
+                        writeErrorResponse(response, '400', request.getRequestURI());
+                        return false
+                    }
+
 
                     ArrayList networkRoles = cache.networkGrpRoles
                     if (checkNetworkGrp(networkRoles, this.authority)) {
                         LinkedHashMap tmp1 = this.apiObject?.getReceivesList()
-                        this.receivesList = (tmp1[this.authority]) ? tmp1[this.authority] : tmp1['permitAll']
-                        if(this.receivesList){
+                        this.receivesList = getIOSet(this.apiObject?.getReceivesList(), this.authority)
+                        if(this.receivesList!=null){
                             request.setAttribute('receivesList', this.receivesList)
 
                             LinkedHashMap rturn = this.apiObject?.getReturnsList()
                             ArrayList returnsList = (rturn[this.authority]) ? rturn[this.authority] : rturn['permitAll']
                             request.setAttribute('returnsList', returnsList)
                         }else{
-                            throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Inccorrect authority for '${uri}'")
+                            throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Authority for '${uri}' does not exist in IOSTATE 'REQUEST'")
                         }
-
 
                         request.setAttribute('receivesList', this.receivesList)
 
@@ -178,12 +210,13 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                         ArrayList returnsList = (rturn[this.authority]) ? rturn[this.authority] : rturn['permitAll']
                         request.setAttribute('returnsList', returnsList)
                     } else {
-                        throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Inccorrect authority for '${uri}'")
+                        throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Authority '${this.authority}' for '${uri}' does not exist in IOState NetworkGrp")
                     }
 
                     if(uriList[7]) {
                         if (!this.receivesList?.contains('id') && apidocFwd==false) {
                             writeErrorResponse(response, '400', request.getRequestURI());
+                            return false
                         }
                     }
 
@@ -191,6 +224,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(), uriList[7])
                     if (!checkRequestParams(request.getAttribute('params'))) {
                         writeErrorResponse(response, '400', request.getRequestURI());
+                        return false
                         throw new Exception("[RequestInitializationFilter :: checkRequestParams] : Requestparams do not match expected params for this endpoint")
                     }
 
@@ -202,11 +236,11 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     String requestMimeType = reqMime[0]
                     String requestEncoding = reqMime[1]
 
-
                     this.requestFileType = (SUPPORTED_MIME_TYPES.contains(requestMimeType)) ? getFormat(requestMimeType) : 'JSON'
                     if (!this.requestFileType) {
                         String msg = "Request MimeType must be one of the supported mimetypes (JSON/XML)"
                         writeErrorResponse(response, '400', request.getRequestURI(), msg);
+                        return false
                         throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Accept/Request mimetype unsupported")
                     }
 
@@ -214,6 +248,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     if (!this.responseFileType) {
                         String msg = "Response MimeType must be one of the supported mimetypes (JSON/XML)"
                         writeErrorResponse(response, '400', request.getRequestURI(), msg);
+                        return false
                         throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Content-type unsupported")
                     }
 
@@ -240,36 +275,55 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                     // RETRIEVE CACHED RESULT (only if using 'GET' method)
                     if ((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}" || apiObject?.cachedResult?."permitAll"?."${responseFileType}"?."${cacheHash}")) {
-                        String cachedResult
                         try {
                             cachedResult = (apiObject['cachedResult'][authority]) ? apiObject['cachedResult'][authority][responseFileType][cacheHash] : apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
                         } catch (Exception e) {
                             throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
                         }
 
+                        // todo : check throttle cache size
                         if (cachedResult && cachedResult.size() > 0) {
+                            // todo: increment throttle cache
                             // PLACEHOLDER FOR APITHROTTLING
                             response.setStatus(200);
                             PrintWriter writer = response.getWriter();
                             writer.write(cachedResult);
                             writer.close()
                             //response.writer.flush()
-                            //return false
+                            return false
                         }
                     }
                 }
             }
         }
 
+        /*
+        * DO NOT REMOVE!!!
+        * This fixes anyone doing RESTFUL assumptions and leaving off the 'action' of 'controller/action
+        * for RPCNaming convention
+        * Will route to apidocs to show proper calls
+         */
         if(apidocFwd){
             def servletCtx = this.ctx.getServletContext()
-            String newPath = "/v${uriList[2]}/${uriList[4]}/${uriList[5]}/${uriList[4]}"
+            String newPath = "/v${uriList[2]}/${uriList[4]}/${uriList[5]}"
             def rd = servletCtx?.getRequestDispatcher(newPath)
             rd.forward(request, response)
-        }else{
-            chain.doFilter(request, response)
         }
+        return true
+    }
 
+    private Set getIOSet(LinkedHashMap input, String role){
+        Set params = []
+        input.each(){ k, v ->
+            if(k=='permitAll' || k==role){
+                v.each() { it ->
+                    if (it) {
+                        params.add(it)
+                    }
+                }
+            }
+        }
+        return params
     }
 
     protected String getFormat(String mimeType){
@@ -317,43 +371,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                 if(uriVars[4]){ uriList.add(URLDecoder.decode(uriVars[4], StandardCharsets.UTF_8.toString())) }
                 break
-            /*
-            case ~/([h])(${version})-([0-9]+)/:
-            case ~/([h])(${version})/:
-                def m = Matcher.lastMatcher
-                callType = (CALL_TYPES.indexOf(m[0][1])+1)
-                String action
-                ArrayList uriList2 = []
-                switch(request.getMethod()){
-                    case 'GET':
-                        action = 'show'
-                        break;
-                    case 'PUT':
-                        action = 'create'
-                        break;
-                    case 'POST':
-                        action = 'update'
-                        break;
-                    case 'DELETE':
-                        action = 'delete'
-                        break;
-                    default:
-                        break;
-                }
-
-                uriList.add(callType)
-                uriList.add(m[0][2])
-                uriList.add(this.version)
-                uriList.add(((m[0][3])?m[0][3]:'1'))
-                uriList.add('hook')
-                uriList.add(action)
-                uriList.add(null)
-                if(uriVars[4]){ uriList.add(URLDecoder.decode(uriVars[4], StandardCharsets.UTF_8.toString())) }
-                break
-
-             */
         }
-
         return uriList
     }
 
@@ -597,7 +615,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         response.setStatus(Integer.valueOf(statusCode))
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
-        response.writer.flush()
     }
 
     // Todo : Move to exchangeService??
@@ -613,6 +630,5 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         if(msg.isEmpty()){ msg = ErrorCodes.codes[statusCode]['long'] }
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
-        response.writer.flush()
     }
 }

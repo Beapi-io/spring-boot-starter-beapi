@@ -28,6 +28,7 @@
 package io.beapi.api.interceptor
 
 import io.beapi.api.service.ApiCacheService
+import io.beapi.api.service.ThrottleCacheService
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ExchangeService
@@ -57,7 +58,7 @@ import org.springframework.security.web.header.*
 import javax.servlet.RequestDispatcher
 import java.nio.charset.StandardCharsets
 import org.apache.commons.io.IOUtils
-
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import javax.crypto.KeyGenerator;
 
 /**
@@ -80,6 +81,7 @@ class ApiInterceptor implements HandlerInterceptor{
 
 
 	ApiCacheService apiCacheService
+	ThrottleCacheService throttle
 	PrincipleService principle
 	private ApiProperties apiProperties
 	ExchangeService exchangeService
@@ -96,8 +98,8 @@ class ApiInterceptor implements HandlerInterceptor{
 	int callType
 	KeyGenerator keyGenerator
 
-
-	public ApiInterceptor(ExchangeService exchangeService, BatchExchangeService batchService, ChainExchangeService chainService, TraceExchangeService traceService, ApiProperties apiProperties) {
+	public ApiInterceptor(ThrottleCacheService throttle, ExchangeService exchangeService, BatchExchangeService batchService, ChainExchangeService chainService, TraceExchangeService traceService, ApiProperties apiProperties) {
+		this.throttle = throttle
 		this.exchangeService = exchangeService
 		this.batchService = batchService
 		this.chainService = chainService
@@ -110,53 +112,64 @@ class ApiInterceptor implements HandlerInterceptor{
 		//logger.info("preHandle(HttpServletRequest, HttpServletResponse, Object) : {}");
 		//println("### prehandle")
 
-		privateRoles = apiProperties.security.networkRoles['private'].collect() { k, v -> v }
-		this.uList = request.getAttribute('uriList')
+		if (handler instanceof ResourceHttpRequestHandler) {
+			writeErrorResponse(response,'422',request.getRequestURI(),"No data returned for this call. This is an 'API Server'; Please limit your calls to API's only")
+		}else {
+			privateRoles = apiProperties.security.networkRoles['private'].collect() { k, v -> v }
+			this.uList = request.getAttribute('uriList')
 
-		this.callType = uList[0]
-		this.authority = request.getAttribute('principle')
+			this.callType = uList[0]
+			this.authority = request.getAttribute('principle')
 
-		switch(callType){
-			case 1:
-				return exchangeService.apiRequest(request, response, this.authority)
-				break
-			case 2:
-				if(apiProperties.batchingEnabled) {
-					return batchService.apiRequest(request, response, this.authority)
-				}else{
-					writeErrorResponse(response,'401',request.getRequestURI())
-					//response.writer.flush()
-					return false
-				}
-				break
-			case 3:
-				if(apiProperties.chainingEnabled) {
-					return chainService.apiRequest(request, response, this.authority)
-				}else{
-					writeErrorResponse(response,'401',request.getRequestURI())
-					//response.writer.flush()
-					return false
-				}
-				break
-			case 4:
-				if(privateRoles.contains(authority)) {
-					return traceExchangeService.apiRequest(request, response, this.authority)
-				}
-				break
+			switch (callType) {
+				case 1:
+					// todo : check throttle cache size
+					// println(apiProperties.throttle.rateLimit[this.authority])
+
+					return exchangeService.apiRequest(request, response, this.authority)
+					break
+				case 2:
+					if (apiProperties.batchingEnabled) {
+						// todo : check throttle cache size
+						return batchService.apiRequest(request, response, this.authority)
+					} else {
+						writeErrorResponse(response, '401', request.getRequestURI())
+						//response.writer.flush()
+						return false
+					}
+					break
+				case 3:
+					if (apiProperties.chainingEnabled) {
+						// todo : check throttle cache size
+						return chainService.apiRequest(request, response, this.authority)
+					} else {
+						// todo : check throttle cache size
+						println('chain 401')
+						writeErrorResponse(response, '401', request.getRequestURI())
+						//response.writer.flush()
+						return false
+					}
+					break
+				case 4:
+					if (privateRoles.contains(authority)) {
+						return traceExchangeService.apiRequest(request, response, this.authority)
+					}
+					break
 			//case 5:
 			//	return hookExchangeService.apiRequest(request, response, this.authority)
 			//	break
-			default:
-				writeErrorResponse(response,'400',request.getRequestURI())
-				//response.writer.flush()
-				return false
+				default:
+					writeErrorResponse(response, '400', request.getRequestURI())
+					//response.writer.flush()
+					return false
+			}
 		}
 	}
 
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mv) throws Exception {
 		//logger.info("postHandle(HttpServletRequest, HttpServletResponse, Object, ModelAndView) : {}")
-		// println("### posthandle")
+		//println("### posthandle")
 
 		ArrayList body = request.getAttribute('responseBody')
 
@@ -164,39 +177,47 @@ class ApiInterceptor implements HandlerInterceptor{
 			writeErrorResponse(response,'422',request.getRequestURI(),'No data returned for this call.')
 		}else {
 			switch (callType){
-			case 1:
-				exchangeService.apiResponse(response,body)
-				response.writer.flush()
-				break
-			case 2:
-				if(apiProperties.batchingEnabled) {
-					batchService.batchResponse(request, response, body)
-				}else{
-					writeErrorResponse(response,'401',request.getRequestURI())
-					response.writer.flush()
-				}
-				break
-			case 3:
-				if(apiProperties.chainingEnabled) {
-					chainService.chainResponse(request, response, body)
-				}else{
-					writeErrorResponse(response,'401',request.getRequestURI())
-					response.writer.flush()
-				}
-				break
-			case 4:
-				traceExchangeService.apiResponse(response,body)
-				break
-			//case 5:
-			//	hookExchangeService.apiResponse(response,body)
-			//	response.writer.flush()
-			//	break
-			default:
-				writeErrorResponse(response, '400', request.getRequestURI())
-				response.writer.flush()
+				case 1:
+					// todo: increment throttle cache
+					if(apiProperties.throttle.active) {
+						throttle.incrementThrottleCache(principle.name())
+					}
+					exchangeService.apiResponse(response,body)
+					//response.writer.flush()
+					break
+				case 2:
+					if(apiProperties.batchingEnabled) {
+						// todo: increment throttle cache
+						batchService.batchResponse(request, response, body)
+					}else{
+						println('batch 401')
+						writeErrorResponse(response,'401',request.getRequestURI())
+						//response.writer.flush()
+					}
+					break
+				case 3:
+					if(apiProperties.chainingEnabled) {
+						// todo: increment throttle cache
+						chainService.chainResponse(request, response, body)
+					}else{
+						println('chain 401')
+						writeErrorResponse(response,'401',request.getRequestURI())
+						//response.writer.flush()
+					}
+					break
+				case 4:
+					traceExchangeService.apiResponse(response,body)
+					break
+				//case 5:
+				//	hookExchangeService.apiResponse(response,body)
+				//	response.writer.flush()
+				//	break
+				default:
+					writeErrorResponse(response, '400', request.getRequestURI())
+					//response.writer.flush()
 			}
 		}
-		response.writer.flush()
+		//response.writer.flush()
 	}
 
 	// Todo : Move to exchangeService??

@@ -30,6 +30,7 @@ import io.beapi.api.service.TraceExchangeService
 
 import io.beapi.api.service.PrincipleService
 import io.beapi.api.service.TraceCacheService
+import io.beapi.api.service.HookCacheService
 import io.beapi.api.service.TraceService
 
 import io.beapi.api.service.CliService
@@ -60,6 +61,9 @@ public class BeapiServiceAutoConfiguration {
 
 	@Autowired
 	TraceCacheService traceCacheService
+
+	//@Autowired
+	//HookCacheService hookCacheService
 
 	@Autowired
 	ApiCacheService apiCacheService

@@ -311,7 +311,6 @@ abstract class BeapiController implements HttpRequestHandler {
         response.setStatus(Integer.valueOf(statusCode))
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
-        response.writer.flush()
     }
 
     // Todo : Move to exchangeService??
@@ -329,7 +328,6 @@ abstract class BeapiController implements HttpRequestHandler {
         }
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
-        //response.writer.flush()
     }
 
 }

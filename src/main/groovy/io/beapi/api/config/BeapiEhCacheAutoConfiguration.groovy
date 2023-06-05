@@ -17,8 +17,9 @@
 package io.beapi.api.config
 
 import io.beapi.api.properties.ApiProperties
-
+import io.beapi.api.service.HookCacheService
 import io.beapi.api.service.IoStateService
+import io.beapi.api.service.ThrottleCacheService
 import io.beapi.api.service.TraceCacheService
 import net.sf.ehcache.config.CacheConfiguration
 
@@ -79,7 +80,15 @@ public class BeapiEhCacheAutoConfiguration  implements CachingConfigurer {
 
     @Bean
     @ConditionalOnMissingBean
+    public HookCacheService hookCacheService() throws IOException { return new HookCacheService(cacheManager()); }
+
+    @Bean
+    @ConditionalOnMissingBean
     public TraceCacheService traceCacheService() throws IOException { return new TraceCacheService(cacheManager()); }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ThrottleCacheService throttleCacheService() throws IOException { return new ThrottleCacheService(cacheManager()); }
 
     @Bean(destroyMethod = "shutdown")
     public net.sf.ehcache.CacheManager ehCacheManager() {
@@ -118,12 +127,11 @@ public class BeapiEhCacheAutoConfiguration  implements CachingConfigurer {
             cacheConfig2.diskExpiryThreadIntervalSeconds(-1)
             //cacheConfig2.setMaxElementsInMemory(1000)
             cacheConfig2.setMaxElementsOnDisk(100000)
-            cacheConfig2.maxEntriesLocalHeap(0)
+            cacheConfig2.maxEntriesLocalHeap(1)
             cacheConfig2.maxEntriesLocalDisk(100000)
             cacheConfig2.memoryStoreEvictionPolicy(net.sf.ehcache.store.MemoryStoreEvictionPolicy.FIFO)
 
             // Throttle
-            /*
             CacheConfiguration cacheConfig3 = new CacheConfiguration()
             cacheConfig3.setName("Throttle")
             cacheConfig3.eternal(false)
@@ -134,7 +142,6 @@ public class BeapiEhCacheAutoConfiguration  implements CachingConfigurer {
             cacheConfig3.timeToLiveSeconds(120)
             cacheConfig3.timeToIdleSeconds(0)
             cacheConfig3.memoryStoreEvictionPolicy(net.sf.ehcache.store.MemoryStoreEvictionPolicy.LRU)
-            */
 
             // Trace
             CacheConfiguration cacheConfig4 = new CacheConfiguration()
@@ -149,11 +156,10 @@ public class BeapiEhCacheAutoConfiguration  implements CachingConfigurer {
             cacheConfig4.memoryStoreEvictionPolicy(net.sf.ehcache.store.MemoryStoreEvictionPolicy.LRU)
 
 
-
             net.sf.ehcache.config.Configuration config = new net.sf.ehcache.config.Configuration()
             config.addCache(cacheConfig1)
             config.addCache(cacheConfig2)
-            //config.addCache(cacheConfig3)
+            config.addCache(cacheConfig3)
             config.addCache(cacheConfig4)
             //config.addDiskStore(diskStoreConfiguration)
 
