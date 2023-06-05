@@ -1,0 +1,57 @@
+{
+    "NAME": "hook",
+    "NETWORKGRP": "public",
+    "VALUES": {
+        "internalEndpoint": {
+            "type": "String",
+            "description": "*",
+            "mockData": "/v0.1/user/show"
+        }
+    },
+    "CURRENTSTABLE": "1",
+    "VERSION": {
+        "1": {
+            "DEFAULTACTION": "show",
+            "URI": {
+                "show": {
+                    "METHOD": "GET",
+                    "DESCRIPTION": "Show Hook",
+                    "ROLES": {
+                        "BATCH": []
+                    },
+                    "REQUEST": {
+                        "permitAll": []
+                    },
+                    "RESPONSE": {
+                        "permitAll": ["*"]
+                    }
+                },
+                "listHook": {
+
+                },
+                "listUserHook": {
+
+                },
+                "create": {
+                    "METHOD": "PUT",
+                    "DESCRIPTION": "Create Hook",
+                    "ROLES": {
+                        "BATCH": []
+                    },
+                    "REQUEST": {
+                        "permitAll": ["forwardUrl", "format", "secret"]
+                    },
+                    "RESPONSE": {
+                        "permitAll": ["*"]
+                    }
+                },
+                "update": {
+
+                },
+                "delete": {
+
+                }
+            }
+        }
+    }
+}
