@@ -16,31 +16,30 @@
  */
 package io.beapi.api.service
 
-
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
-import javax.json.*
 import org.springframework.security.web.header.*
+import org.springframework.stereotype.Service
+
+import javax.json.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-
 // NOTE : CALLTYPE = 1
 @Service
-public class ExchangeService extends ApiExchange{
+public class HookExchangeService extends ApiExchange{
 
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ExchangeService.class);
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(HookExchangeService.class);
 	private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
 
 	ApiCacheService apiCacheService
 
 	boolean overrideAutoMimeTypes = false
 
-	public ExchangeService(ApiCacheService apiCacheService) {
+	public HookExchangeService(ApiCacheService apiCacheService) {
 		try {
 			this.apiCacheService = apiCacheService
 		} catch (Exception e) {
-			println("# [Beapi] ExchangeService - initialization Exception - ${e}")
+			println("# [Beapi] HookExchangeService - initialization Exception - ${e}")
 			System.exit(0)
 		}
 	}
@@ -49,7 +48,6 @@ public class ExchangeService extends ApiExchange{
     boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority){
 
 		initVars(request,response,authority)
-
 
 		if(this.apiObject) {
 			// todo : create public api list
@@ -95,9 +93,9 @@ public class ExchangeService extends ApiExchange{
     }
 
     void apiResponse(HttpServletResponse response,ArrayList body){
-		//println("### apiResponse ###")
+		println("### HookResponse ###")
         String output = parseOutput(body, responseFileType)
-
+		println("output : "+output)
         if(method=='GET') {
             apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
         }
@@ -149,7 +147,7 @@ public class ExchangeService extends ApiExchange{
 
 			this.method = request.getMethod()
 		} catch (Exception e) {
-			throw new Exception("[ExchangeService :: init] : Exception. full stack trace follows:", e)
+			throw new Exception("[HookExchangeService :: init] : Exception. full stack trace follows:", e)
 		}
 
 	}

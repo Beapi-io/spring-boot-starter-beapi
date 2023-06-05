@@ -5,7 +5,7 @@
         "*": {
             "type": "String",
             "description": "*",
-            "mockData": "null"
+            "mockData": "*"
         }
     },
     "CURRENTSTABLE": "1",

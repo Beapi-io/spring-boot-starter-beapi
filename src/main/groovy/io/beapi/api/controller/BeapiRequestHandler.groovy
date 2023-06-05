@@ -70,7 +70,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //logger.info("handleRequest(HttpServletRequest, HttpServletResponse) : {}");
-
+        //println("### BeapiRequestHandler...")
         ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
         this.authority = request.getAttribute('principle')
         this.uList = request.getAttribute('uriList')
@@ -115,17 +115,16 @@ class BeapiRequestHandler implements HttpRequestHandler {
                     result = convertModel(trace)
                 } else {
                     ArrayList tempResult = convertModel(output)
-
                     // todo : tempResult is good; problem lies with parseResponseParams
                     Set responseList = request.getAttribute('responseList')
 
+                    // todo : fix bug HERE!!!!!!
                     if(!responseList.contains("*")){
                         result = parseResponseParams(tempResult, responseList)
                     }else{
                         result = tempResult
                     }
                 }
-
                 request.setAttribute('responseBody', result)
             } else {
                 writeErrorResponse(response, '404', request.getRequestURI())
@@ -183,7 +182,8 @@ class BeapiRequestHandler implements HttpRequestHandler {
                                     try{
                                         output.add(formatMap(list))
                                     }catch(Exception e){
-                                        throw new Exception("[ControllerUtil > convertModel] : Exception formatting Response Map - full stack trace follows :",e)
+                                        //throw new Exception("[BeapiRequestHandler > convertModel] : Exception formatting Response Map - full stack trace follows :",e)
+                                        println("[BeapiRequestHandler > convertModel] : Exception formatting Response Map - full stack trace follows :"+e)
                                     }
                                     break;
                                 default:
@@ -193,7 +193,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
                             }
                         }
                         return output
-                    break;
+                        break;
                     default:
                         // todo : throw error ; unsupported return type
                         throw new Exception("[ControllerUtil > convertModel] : Unsupported return type; Please file a support ticket to have this return type added.")
@@ -255,7 +255,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
     ArrayList parseResponseParams(ArrayList bodyList, Set responseList){
         ArrayList output = []
         try {
-
             bodyList.each() { body ->
                 ArrayList paramsList = (body.size() == 0) ? [:] : body.keySet() as ArrayList
                     paramsList.each() { it2 ->
@@ -289,7 +288,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
         response.setStatus(Integer.valueOf(statusCode))
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
-        response.writer.flush()
     }
 
     // Todo : Move to exchangeService??
@@ -307,7 +305,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
         }
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
-        //response.writer.flush()
     }
 
 }

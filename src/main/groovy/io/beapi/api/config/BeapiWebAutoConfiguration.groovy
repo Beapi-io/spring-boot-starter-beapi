@@ -16,11 +16,11 @@
  */
 package io.beapi.api.config
 
-
 //import io.beapi.api.filter.CorsSecurityFilter
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ExchangeService
+import io.beapi.api.service.ThrottleCacheService
 import io.beapi.api.service.TraceExchangeService
 //import io.beapi.api.service.TraceService
 import org.slf4j.LoggerFactory
@@ -51,9 +51,11 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.BeansException
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
-
-
-
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.CorsRegistration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 
 @Configuration(proxyBeanMethods = false)
@@ -71,6 +73,9 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 	@Autowired
 	private ApiCacheService apiCacheService
+
+	@Autowired
+	private ThrottleCacheService throttleCacheService
 
 	@Autowired
 	private ExchangeService exchangeService
@@ -97,6 +102,19 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	public BeapiWebAutoConfiguration() {
 		this.version = getVersion()
 	}
+
+/*
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+	        registry.addMapping("/**")
+            .allowedOrigins("http://localhost","http://test.nosegrind.net")
+            .allowedMethods("*")
+			.allowedHeaders("*")
+			.exposedHeaders("*")
+            .allowCredentials(true);
+	}
+*/
+
 
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -133,70 +151,128 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 
 	@Bean
+	public RequestInitializationFilter requestInitializationFilter() {
+		return new RequestInitializationFilter(principleService, apiProperties, apiCacheService, this.version, context);
+	}
+
+
+	/*
+	@Bean
+	public CorsSecurityFilter corsSecurityFilter() {
+		return new CorsSecurityFilter(apiProperties, apiCacheService);
+	}
+	 */
+
+
+	@Bean
 	@ConditionalOnMissingBean
-	public FilterRegistrationBean<RequestInitializationFilter> requestInitializationFilter() {
+	public FilterRegistrationBean<RequestInitializationFilter> requestInitializationFilterRegistration() {
 		FilterRegistrationBean<RequestInitializationFilter> registrationBean = new FilterRegistrationBean<>();
-		registrationBean.setFilter(new RequestInitializationFilter(principleService, apiProperties, apiCacheService, this.version, context));
-		registrationBean.setOrder(SecurityProperties.DEFAULT_FILTER_ORDER+1)
+		registrationBean.setFilter(requestInitializationFilter());
+		registrationBean.setOrder(SecurityProperties.DEFAULT_FILTER_ORDER+2)
 		//registrationBean.setOrder(FilterRegistrationBean.REQUEST_WRAPPER_FILTER_MAX_ORDER-100)
-		registrationBean.addUrlPatterns("/*");
+		registrationBean.addUrlPatterns("/**");
 		return registrationBean;
 	}
 
 
+
 	@Bean(name='simpleUrlHandlerMapping')
 	public SimpleUrlHandlerMapping simpleUrlHandlerMapping() {
-
 		Map<String, Object> urlMap = new LinkedHashMap<>();
-		Map<String, CorsConfiguration> corsMap = new LinkedHashMap<>();
 
 		LinkedHashMap<String, Object> cont = this.listableBeanFactory.getBeansWithAnnotation(org.springframework.stereotype.Controller.class)
 		cont.each() { k, v ->
+			if(!['beapiErrorController','jwtAuthenticationController'].contains(k)) {
+				String controller = k
+				def cache = apiCacheService.getApiCache(controller)
+				if (cache) {
+					if (!apiProperties.publicEndpoint.contains(controller)) {
 
-			String controller = k
-			def cache = apiCacheService.getApiCache(controller)
-			if(cache) {
-				if (!apiProperties.publicEndpoint.contains(controller)) {
+						ArrayList methodNames = []
+						for (Method method : v.getClass().getDeclaredMethods()) {
+							methodNames.add(method.getName())
+						}
 
-					ArrayList methodNames = []
-					for (Method method : v.getClass().getDeclaredMethods()) { methodNames.add(method.getName()) }
+						cache.each() { k2, v2 ->
+							if (!['values', 'currentstable', 'cacheversion', 'networkGrp', 'networkGrpRoles'].contains(k2)) {
 
-					cache.each() { k2, v2 ->
-						if (!['values', 'currentstable', 'cacheversion','networkGrp','networkGrpRoles'].contains(k2)) {
-							for (Map.Entry<Integer, Object> entry : v2.entrySet()) {
-								String action = entry.getKey()
+								for (Map.Entry<Integer, Object> entry : v2.entrySet()) {
+									String action = entry.getKey()
 
-								// if IO State 'action' does not match a KNOWN controller/method, do not map
-								if (methodNames.contains(action)) {
-
-									String path = "${controller}/${action}" as String
-									urlMap += createControllerMappings(path, k2, v)
-
-								} else {
-									logger.debug("simpleUrlHandlerMapping() : {}", "Connector URI '${action}' for connector '${controller}' does not match any given method. Try ${methodNames}")
+									// if IO State 'action' does not match a KNOWN controller/method, do not map
+									if (methodNames.contains(action)) {
+										String path = "${controller}/${action}" as String
+										urlMap += createControllerMappings(path, k2, v)
+									} else {
+										logger.debug("simpleUrlHandlerMapping() : {}", "Connector URI '${action}' for connector '${controller}' does not match any given method. Try ${methodNames}")
+									}
 								}
 							}
 						}
 					}
-
 				}
 			}
 		}
 
+		Map<String, CorsConfiguration> corsMap = new LinkedHashMap<>();
+
+		CorsConfiguration config = new CorsConfiguration();
+		config.setAllowedOrigins(Arrays.asList("http://localhost","http://localhost:80","http://localhost:8080", "http://127.0.0.1","http://127.0.0.1:80", "http://test.nosegrind.net","http://test.nosegrind.net/","http://test.nosegrind.net:8080"));
+		config.setAllowedHeaders(Arrays.asList("*"));
+		config.addExposedHeader("Access-Control-Allow-Headers");
+		config.setAllowCredentials(true);
+		config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		config.setExposedHeaders(Arrays.asList("*"));
+
+		urlMap.each{ k,v ->
+			corsMap.put(k, config);
+		}
 
 		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
-		mapping.registerHandlers(urlMap)
+		//mapping.registerHandlers(urlMap)
 		mapping.setUrlMap(urlMap);
-		mapping.setOrder(1);
-		mapping.setInterceptors(new Object[]{
-				new ApiInterceptor(exchangeService, batchService, chainService, traceExchangeService, apiProperties)
-		})
+		mapping.setOrder(Integer.MAX_VALUE - 2);
+		try {
+			mapping.setInterceptors(new Object[]{new ApiInterceptor(throttleCacheService, exchangeService, batchService, chainService, traceExchangeService, apiProperties)})
+		}catch(Exception e){
+			println("Bad Interceptor : "+e)
+		}
 		mapping.setApplicationContext(context);
 		//resourceCache.putAllResources(urlSet);
-		//mapping.setCorsConfigurations(corsMap);
-
+		try {
+			mapping.setCorsConfigurations(corsMap);
+		}catch(Exception e){
+			println("Bad Corsconfig : "+e)
+		}
 		return mapping;
 	}
+
+
+	protected Map<String, CorsConfiguration> getCorsConfigurations() {
+		CorsRegistry registry = new CorsRegistry()
+		registry.addMapping("/**")
+				.allowedOrigins("http://localhost","http://test.nosegrind.net","http://test.nosegrind.net/")
+				.allowedMethods("*")
+				.allowedHeaders("*")
+				.exposedHeaders("*")
+				.allowCredentials(true);
+		return registry.getCorsConfigurations();
+	}
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList("http://localhost","http://localhost:80","http://localhost:8080", "http://127.0.0.1","http://127.0.0.1:80", "http://test.nosegrind.net","http://test.nosegrind.net/","http://test.nosegrind.net:8080"));
+        config.setAllowedHeaders(Arrays.asList("*"));
+        config.addExposedHeader("Access-Control-Allow-Headers");
+        config.setAllowCredentials(true);
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setExposedHeaders(Arrays.asList("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 
 
 	/*
@@ -209,24 +285,31 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	* This allows us the ability to move different call to different servers (should we want/need)
 	* so they do not affect 'regular calls' (ie 'v' callType)
 	*/
-	private Map createControllerMappings(String path, String apiVersion, Object obj){
+	private Map createControllerMappings(String path, String apiVersion, Object obj) {
 		Map<String, Object> urlMap = new LinkedHashMap<>();
-		List url = ["/v${this.version}/${path}/**" as String, "/v${this.version}/${path}/" as String, "/v${this.version}-${apiVersion}/${path}/**" as String, "/v${this.version}-${apiVersion}/${path}/" as String]
-		url.each() { urlMap.put(it, obj); }
 
-		if (apiProperties.batchingEnabled) {
-			List batchUrl = ["/b${this.version}/${path}/**" as String, "/b${this.version}/${path}/" as String, "/b${this.version}-${apiVersion}/${path}/**" as String, "/b${this.version}-${apiVersion}/${path}/" as String]
-			batchUrl.each() { urlMap.put(it, obj); }
+		try {
+			List url = ["/v${this.version}/${path}/**" as String, "/v${this.version}/${path}/" as String, "/v${this.version}-${apiVersion}/${path}/**" as String, "/v${this.version}-${apiVersion}/${path}/" as String]
+			url.each() { urlMap.put(it, obj); }
+
+			if (apiProperties.batchingEnabled) {
+				List batchUrl = ["/b${this.version}/${path}/**" as String, "/b${this.version}/${path}/" as String, "/b${this.version}-${apiVersion}/${path}/**" as String, "/b${this.version}-${apiVersion}/${path}/" as String]
+				batchUrl.each() { urlMap.put(it, obj); }
+			}
+
+			if (apiProperties.chainingEnabled) {
+				List chainUrl = ["/c${this.version}/${path}/**" as String, "/c${this.version}/${path}/" as String, "/c${this.version}-${apiVersion}/${path}/**" as String, "/c${this.version}-${apiVersion}/${path}/" as String]
+				chainUrl.each() { urlMap.put(it, obj); }
+			}
+
+			List traceUrl = ["/t${this.version}/${path}/**" as String, "/t${this.version}/${path}/" as String, "/t${this.version}-${apiVersion}/${path}/**" as String, "/t${this.version}-${apiVersion}/${path}/" as String]
+			traceUrl.each() { urlMap.put(it, obj); }
+
+			List hookUrl = ["/h${this.version}/${path}/**" as String, "/h${this.version}/${path}/" as String, "/h${this.version}-${apiVersion}/${path}/**" as String, "/h${this.version}-${apiVersion}/${path}/" as String]
+			hookUrl.each() { urlMap.put(it, obj); }
+		}catch(Exception e) {
+			println("### BeapiWebAutoConfiguration > CreateControllerMappings : Exception : "+e)
 		}
-
-		if (apiProperties.chainingEnabled) {
-			List chainUrl = ["/c${this.version}/${path}/**" as String, "/c${this.version}/${path}/" as String, "/c${this.version}-${apiVersion}/${path}/**" as String, "/c${this.version}-${apiVersion}/${path}/" as String]
-			chainUrl.each() { urlMap.put(it, obj); }
-		}
-
-		List traceUrl = ["/t${this.version}/${path}/**" as String, "/t${this.version}/${path}/" as String, "/t${this.version}-${apiVersion}/${path}/**" as String, "/t${this.version}-${apiVersion}/${path}/" as String]
-		traceUrl.each() { urlMap.put(it, obj); }
-
 		return urlMap
 	}
 

@@ -30,12 +30,14 @@ import org.springframework.cache.annotation.*
 import org.springframework.stereotype.Service;
 
 import groovyx.gpars.*
-import org.springframework.beans.factory.ListableBeanFactory
+
 import groovy.json.JsonOutput
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.beans.factory.annotation.Autowired
-
+import org.springframework.beans.factory.ListableBeanFactory
 import javax.annotation.PostConstruct
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 
 /**
@@ -50,6 +52,8 @@ class ApiCacheService{
 	@Autowired
 	private CacheManager cacheManager;
 
+	@Autowired
+	private ListableBeanFactory listableBeanFactory;
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApiCacheService.class);
 
@@ -78,31 +82,7 @@ class ApiCacheService{
 	 * @return
 	 */
 	@CacheEvict(value='ApiCache', allEntries = true)
-	void flushAllApiCache(){
-		try {
-/*
-            Map<String, Object> controllers = listableBeanFactory.getBeansWithAnnotation(Controller.class);
-            controllers.each(){ k,v ->
-                Pattern pattern = Pattern.compile(/(.+)Controller/)
-                Matcher match = pattern.matcher(k)
-                if (match.find()) {
-                    String controllername = match[0][1]
-                    flushApiCache(controllername)
-                }
-            }
-*/
-		}catch(Exception e){
-			throw new Exception("[ApiCacheService :: flushApiCache] : Error :",e)
-		}
-
-
-	}
-
-/*
-	boolean flushApiCache(String controllername){
-		def cache = setApiCache(controllername,[:])
-	}
-*/
+	void flushAllApiCache(){}
 
 
 	//@org.springframework.cache.annotation.CachePut(value="ApiCache",key="#controllername")
@@ -168,6 +148,9 @@ class ApiCacheService{
 	@CachePut(value='ApiCache',key="#controllername")
 	boolean setCache(String controllername,LinkedHashMap apidesc){
 		//logger.debug("setCache(String, LinkedHashMap) : {}",controllername)
+		if(controllername=='hook'){
+			println("setCache : ${apidesc}")
+		}
 		try{
 			net.sf.ehcache.Cache temp = cacheManager.getCache('ApiCache').getNativeCache()
 			if(temp.put(controllername,apidesc)){

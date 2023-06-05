@@ -1,0 +1,137 @@
+{
+    "NAME": "properties",
+    "NETWORKGRP": "public",
+    "VALUES": {
+        "name": {
+            "type": "String",
+            "description": "",
+            "mockData": "*"
+        },
+        "attempts": {
+            "type": "Integer",
+            "description": "",
+            "mockData": "*"
+        },
+        "documentationUrl" : {
+            "type": "String",
+            "description": "",
+            "mockData": "*"
+        },
+        "views": {
+            "type": "ArrayList",
+            "description": "",
+            "mockData": "*"
+        },
+        "reservedUris": {
+            "type": "ArrayList",
+            "description": "",
+            "mockData": "*"
+        },
+        "publicEndpoint": {
+            "type": "ArrayList",
+            "description": "",
+            "mockData": "*"
+        },
+        "entities": {
+            "type": "ArrayList",
+            "description": "",
+            "mockData": "*"
+        },
+        "apichainLimit": {
+            "type": "Integer",
+            "description": "",
+            "mockData": "*"
+        },
+        "postcrement": {
+            "type": "Boolean",
+            "description": "",
+            "mockData": "*"
+        },
+        "chainingEnabled": {
+            "type": "Boolean",
+            "description": "",
+            "mockData": "*"
+        },
+        "batchingEnabled": {
+            "type": "Boolean",
+            "description": "",
+            "mockData": "*"
+        },
+        "encoding": {
+            "type": "String",
+            "description": "",
+            "mockData": "*"
+        },
+        "iostateDir": {
+            "type": "String",
+            "description": "",
+            "mockData": "*"
+        },
+        "serverType": {
+            "type": "String",
+            "description": "",
+            "mockData": "*"
+        },
+        "protocol": {
+            "type": "String",
+            "description": "",
+            "mockData": "*"
+        },
+        "parseValidRequestParams": {
+            "type": "Boolean",
+            "description": "",
+            "mockData": "*"
+        },
+        "autoTest": {
+            "type": "Boolean",
+            "description": "",
+            "mockData": "*"
+        },
+        "supportedFormats": {
+            "type": "ArrayList",
+            "description": "",
+            "mockData": "*"
+        },
+        "db": {
+            "type": "LinkedHashMap",
+            "description": "",
+            "mockData": "*"
+        },
+        "throttle": {
+            "type": "LinkedHashMap",
+            "description": "",
+            "mockData": "*"
+        },
+        "webhook": {
+            "type": "LinkedHashMap",
+            "description": "",
+            "mockData": "*"
+        },
+        "security": {
+            "type": "LinkedHashMap",
+            "description": "",
+            "mockData": "*"
+        }
+    },
+    "CURRENTSTABLE": "1",
+    "VERSION": {
+        "1": {
+            "DEFAULTACTION": "webhookProps",
+            "URI": {
+                "webhookProps": {
+                    "METHOD": "GET",
+                    "DESCRIPTION": "Show webhookProps",
+                    "ROLES": {
+                        "BATCH": []
+                    },
+                    "REQUEST": {
+                        "permitAll": []
+                    },
+                    "RESPONSE": {
+                        "permitAll": ["webhook"]
+                    }
+                }
+            }
+        }
+    }
+}
