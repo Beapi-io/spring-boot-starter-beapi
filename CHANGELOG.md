@@ -27,7 +27,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - removal of attributes before resetting when chaining
 
 
-## 0.6.0-STABLE
+## 0.6.0-STABLE (released: 3/6/2023)
 
 ### Added
 - reflection for controllers/handlers added so they no longer need to be added to I/O State files
@@ -52,7 +52,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - renamed nonmappedEndpoint to 'publicEndpoints'
 
 
- ## 0.7.X - (projected release 08/01/2023)
+
+ ## 0.6.5 - (released: 6/6/2023)
  
  ### Added
  - [AUTOMATION]
@@ -72,6 +73,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - added testRole to properties
  - updated 'user' domain; added columns for webhook monitoring
  - fixed RequestInitializationFilter to properly return errors
+ 
+ ## 0.7.X - (projected release 08/01/2023)
  
  ### todo
     - add 'autoTest' toggle for automated tests from apiProperties/beapi_api.yml
