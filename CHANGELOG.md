@@ -60,6 +60,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - Added CLI service for reading in args in order to scaffold 
  - Added templates for scaffolded connectors
  - Scaffolding for connectors/IO State; allows users to scaffold connectors based on data from an existing entity/controller
+ - additional tests for JPA/Hooks
  - (SDK) automated functional tests for ALL API's; moved to SDK
  - (SDK) automated webhooks (in progress)
  
@@ -73,6 +74,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - added testRole to properties
  - updated 'user' domain; added columns for webhook monitoring
  - fixed RequestInitializationFilter to properly return errors
+ - fixed CORS/JWT issue
  
  ## 0.7.X - (projected release 08/01/2023)
  
