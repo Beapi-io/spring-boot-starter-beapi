@@ -78,6 +78,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  
  ## 0.7.X - (projected release 08/01/2023)
  
+ ### Added
+ - PropertiesController and properties IOState for reading Application properties at frontend (not changing them though; that requires restart)
+ 
+ ### Changed
+ 
+ 
+ 
  ### todo
     - add 'autoTest' toggle for automated tests from apiProperties/beapi_api.yml
     - need to make sure CLI does not overwrite existing files
