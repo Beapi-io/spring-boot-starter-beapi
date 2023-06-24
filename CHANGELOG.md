@@ -93,11 +93,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - (DOCS) need to add documentation for scaffolding functionality
     - (DOCS) add 'entityPackages' for beapi_api.yaml to documentation
     - (DOCS) apidocs documentation
-    - (FRONTEND) UI/UX
     - (SDK) optional JMS service/config ??
-    - (SDK) automated webhooks (need to do prior to rate limiting)
+    - (SDK) automated webhooks (need to do prior to rate limiting/io state)
     - (SDK) rate limiting / data limiting (reliant on webhooks and DB)
-    - (SDK) Read IOState files from CDN
+    - (SDK) change IOState files (possibly read from CDN ???)
     - (SDK) PropertySource for dataSourceProperties/apiProperties (in beapi-java-demo) needs to be dynamic via CDN
 
 
