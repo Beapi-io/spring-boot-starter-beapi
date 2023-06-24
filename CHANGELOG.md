@@ -79,9 +79,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ## 0.7.X - (projected release 08/01/2023)
  
  ### Added
- - PropertiesController and properties IOState for reading Application properties at frontend (not changing them though; that requires restart)
+ - PropertiesController and properties IOState for showing Application properties from config as API (not changing them though; that requires restart)
+ - encoding for webhooks
  
  ### Changed
+ - stability fixes
  
  
  
