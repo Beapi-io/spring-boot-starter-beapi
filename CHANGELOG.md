@@ -81,6 +81,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Added
  - PropertiesController and properties IOState for showing Application properties from config as API (not changing them though; that requires restart)
  - encoding for webhooks
+ - tests for hooks
+ - test for properties
  
  ### Changed
  - stability fixes
