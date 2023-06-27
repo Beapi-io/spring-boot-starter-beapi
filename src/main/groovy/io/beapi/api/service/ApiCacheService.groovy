@@ -81,7 +81,7 @@ class ApiCacheService{
 	 * @see BeapiApiFrameworkGrailsPlugin
 	 * @return
 	 */
-	@CacheEvict(value='ApiCache', allEntries = true)
+	@CacheEvict(value='ApiCache', allEntries=true)
 	void flushAllApiCache(){}
 
 

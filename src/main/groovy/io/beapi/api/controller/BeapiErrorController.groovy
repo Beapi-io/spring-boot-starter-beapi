@@ -28,27 +28,30 @@ import org.springframework.boot.web.servlet.error.ErrorController
 import io.beapi.api.utils.ErrorCodes
 import org.springframework.web.servlet.HandlerMapping;
 //import jakarta.servlet.RequestDispatcher;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
-@Controller
+@RestController
+@CrossOrigin
 class BeapiErrorController implements ErrorController {
-
 
 
     @RequestMapping("/error")
     @ResponseBody
     public void error(HttpServletRequest request,  HttpServletResponse response) {
         //do something like logging
+        println("### forwarded to errorController : ")
 
         Object errorUri = request.getSession().getAttribute(RequestDispatcher.ERROR_REQUEST_URI)
         println(request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI))
         println(request.getAttribute(RequestDispatcher.ERROR_SERVLET_NAME))
         println(request.getAttribute(RequestDispatcher.ERROR_EXCEPTION))
-                println(request.getAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE))
-                        println(request.getAttribute(RequestDispatcher.ERROR_MESSAGE))
+        println(request.getAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE))
+        println(request.getAttribute(RequestDispatcher.ERROR_MESSAGE))
         println(request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE))
         println(request.getAttribute(RequestDispatcher.FORWARD_CONTEXT_PATH))
 
-        println("### forwarded to errorController : ")
+
 
         final Exception exception = (Exception) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
         println("### Exception : "+exception)

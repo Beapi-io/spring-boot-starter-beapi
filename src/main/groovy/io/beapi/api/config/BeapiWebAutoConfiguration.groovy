@@ -56,7 +56,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication
@@ -171,12 +171,16 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		registrationBean.setFilter(requestInitializationFilter());
 		registrationBean.setOrder(SecurityProperties.DEFAULT_FILTER_ORDER+2)
 		//registrationBean.setOrder(FilterRegistrationBean.REQUEST_WRAPPER_FILTER_MAX_ORDER-100)
-		registrationBean.addUrlPatterns("/**");
+		//registrationBean.addUrlPatterns("/v*/**","/b*/**","/c*/**","/r*/**");
 		return registrationBean;
 	}
 
 
 
+
+
+
+	// todo : have to do similar method for HandlerMappingRequestMapping
 	@Bean(name='simpleUrlHandlerMapping')
 	public SimpleUrlHandlerMapping simpleUrlHandlerMapping() {
 		Map<String, Object> urlMap = new LinkedHashMap<>();
@@ -222,7 +226,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		config.setAllowedHeaders(Arrays.asList("*"));
 		config.addExposedHeader("Access-Control-Allow-Headers");
 		config.setAllowCredentials(true);
-		config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		config.setAllowedMethods(Arrays.asList("HEAD","GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		config.setExposedHeaders(Arrays.asList("*"));
 
 		urlMap.each{ k,v ->
@@ -232,7 +236,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
 		//mapping.registerHandlers(urlMap)
 		mapping.setUrlMap(urlMap);
-		mapping.setOrder(Integer.MAX_VALUE - 2);
+		mapping.setOrder(Integer.MAX_VALUE - 5);
 		try {
 			mapping.setInterceptors(new Object[]{new ApiInterceptor(throttleCacheService, exchangeService, batchService, chainService, traceExchangeService, apiProperties)})
 		}catch(Exception e){
@@ -248,6 +252,14 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return mapping;
 	}
 
+	@Bean
+	public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+		RequestMappingHandlerMapping handler = super.requestMappingHandlerMapping();
+		//now i have a handle on the handler i can lower it's priority
+		//in the super class implementation this is set to 0
+		handler.setOrder(Integer.MAX_VALUE);
+		return handler;
+	}
 
 	protected Map<String, CorsConfiguration> getCorsConfigurations() {
 		CorsRegistry registry = new CorsRegistry()
@@ -260,19 +272,23 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return registry.getCorsConfigurations();
 	}
 
+
+
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost","http://localhost:80","http://localhost:8080", "http://127.0.0.1","http://127.0.0.1:80", "http://test.nosegrind.net","http://test.nosegrind.net/","http://test.nosegrind.net:8080"));
-        config.setAllowedHeaders(Arrays.asList("*"));
-        config.addExposedHeader("Access-Control-Allow-Headers");
-        config.setAllowCredentials(true);
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setExposedHeaders(Arrays.asList("*"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
-    }
+		CorsConfiguration config = new CorsConfiguration();
+		config.setAllowedOrigins(Arrays.asList("http://localhost", "http://localhost:80", "http://localhost:8080", "http://127.0.0.1", "http://127.0.0.1:80", "http://test.nosegrind.net", "http://test.nosegrind.net/", "http://test.nosegrind.net:8080"));
+		config.setAllowedHeaders(Arrays.asList("*"));
+		config.addExposedHeader("Access-Control-Allow-Headers");
+		config.setAllowCredentials(true);
+		config.setAllowedMethods(Arrays.asList("HEAD","GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		config.setExposedHeaders(Arrays.asList("*"));
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", config);
+		return source;
+	}
+
 
 
 	/*

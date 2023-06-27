@@ -134,7 +134,6 @@ class ApiInterceptor implements HandlerInterceptor{
 						return batchService.apiRequest(request, response, this.authority)
 					} else {
 						writeErrorResponse(response, '401', request.getRequestURI())
-						//response.writer.flush()
 						return false
 					}
 					break
@@ -144,9 +143,7 @@ class ApiInterceptor implements HandlerInterceptor{
 						return chainService.apiRequest(request, response, this.authority)
 					} else {
 						// todo : check throttle cache size
-						println('chain 401')
 						writeErrorResponse(response, '401', request.getRequestURI())
-						//response.writer.flush()
 						return false
 					}
 					break
@@ -160,7 +157,6 @@ class ApiInterceptor implements HandlerInterceptor{
 			//	break
 				default:
 					writeErrorResponse(response, '400', request.getRequestURI())
-					//response.writer.flush()
 					return false
 			}
 		}
@@ -169,11 +165,16 @@ class ApiInterceptor implements HandlerInterceptor{
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mv) throws Exception {
 		//logger.info("postHandle(HttpServletRequest, HttpServletResponse, Object, ModelAndView) : {}")
-		//println("### posthandle")
+		println("### posthandle")
 
-		ArrayList body = request.getAttribute('responseBody')
+		ArrayList body = []
+		if(request.getAttribute('responseBody')){
+			body = request.getAttribute('responseBody')
+		}
 
-		if(!body){
+		println("body : "+body)
+
+		if(body == null){
 			writeErrorResponse(response,'422',request.getRequestURI(),'No data returned for this call.')
 		}else {
 			switch (callType){
@@ -183,16 +184,13 @@ class ApiInterceptor implements HandlerInterceptor{
 						throttle.incrementThrottleCache(principle.name())
 					}
 					exchangeService.apiResponse(response,body)
-					//response.writer.flush()
 					break
 				case 2:
 					if(apiProperties.batchingEnabled) {
 						// todo: increment throttle cache
 						batchService.batchResponse(request, response, body)
 					}else{
-						println('batch 401')
 						writeErrorResponse(response,'401',request.getRequestURI())
-						//response.writer.flush()
 					}
 					break
 				case 3:
@@ -200,9 +198,7 @@ class ApiInterceptor implements HandlerInterceptor{
 						// todo: increment throttle cache
 						chainService.chainResponse(request, response, body)
 					}else{
-						println('chain 401')
 						writeErrorResponse(response,'401',request.getRequestURI())
-						//response.writer.flush()
 					}
 					break
 				case 4:
@@ -210,14 +206,13 @@ class ApiInterceptor implements HandlerInterceptor{
 					break
 				//case 5:
 				//	hookExchangeService.apiResponse(response,body)
-				//	response.writer.flush()
 				//	break
 				default:
 					writeErrorResponse(response, '400', request.getRequestURI())
-					//response.writer.flush()
+
 			}
 		}
-		//response.writer.flush()
+		response.writer.flush()
 	}
 
 	// Todo : Move to exchangeService??
