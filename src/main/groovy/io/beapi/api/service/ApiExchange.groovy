@@ -129,7 +129,8 @@ abstract class ApiExchange{
         String test
         switch(responseFileType){
             case 'JSON':
-                test = new JSONObject(responseBody).toString()
+                test = (responseBody!=null)?new JSONObject(responseBody).toString():'{}'
+                //test = new JSONObject(responseBody).toString()
                 break;
             case 'XML':
                 // TODO : move to an XMLService(??)

@@ -108,25 +108,38 @@ class BeapiRequestHandler implements HttpRequestHandler {
                 }
             }
 
-            if (output) {
+            if (output != null) {
+
                 ArrayList result = []
                 if (trace == true) {
                     Object trace = traceService.endAndReturnTrace(controller, action, request.getSession().getId())
                     result = convertModel(trace)
                 } else {
                     ArrayList tempResult = convertModel(output)
+
                     // todo : tempResult is good; problem lies with parseResponseParams
                     Set responseList = request.getAttribute('responseList')
 
                     // todo : fix bug HERE!!!!!!
                     if(!responseList.contains("*")){
-                        result = parseResponseParams(tempResult, responseList)
+                        def tmp = (tempResult.isEmpty())?tempResult : parseResponseParams(tempResult, responseList)
+
+
+                        if(Objects.nonNull(tmp)){
+                            println("### object not null : "+tmp)
+                            result = tmp
+                        }else{
+                            println("### object VERY VERY null")
+                            writeErrorResponse(response, '422', request.getRequestURI(),"Expected Output does not match IOState RESPONSE params. Please conact the administrator.")
+                        }
+
                     }else{
                         result = tempResult
                     }
                 }
                 request.setAttribute('responseBody', result)
             } else {
+
                 writeErrorResponse(response, '404', request.getRequestURI())
             }
         } catch (SecurityException e) {
@@ -180,7 +193,8 @@ class BeapiRequestHandler implements HttpRequestHandler {
                                 case {it instanceof LinkedHashMap}:
                                 case {it instanceof HashMap}:
                                     try{
-                                        output.add(formatMap(list))
+                                        def tmp = formatMap(list)
+                                        output.add(tmp)
                                     }catch(Exception e){
                                         //throw new Exception("[BeapiRequestHandler > convertModel] : Exception formatting Response Map - full stack trace follows :",e)
                                         println("[BeapiRequestHandler > convertModel] : Exception formatting Response Map - full stack trace follows :"+e)
@@ -246,6 +260,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
                 }
             }
         }
+
         return newMap
     }
 
@@ -254,6 +269,9 @@ class BeapiRequestHandler implements HttpRequestHandler {
     */
     ArrayList parseResponseParams(ArrayList bodyList, Set responseList){
         ArrayList output = []
+
+        println("responseList : "+responseList)
+
         try {
             bodyList.each() { body ->
                 ArrayList paramsList = (body.size() == 0) ? [:] : body.keySet() as ArrayList
@@ -263,10 +281,12 @@ class BeapiRequestHandler implements HttpRequestHandler {
                         }
                     }
 
+                    println("responseList : "+responseList)
+                    println("responseKeys : "+body.keySet())
+
                     if (responseList.size()==body.keySet().size()) {
                         output.add(body)
                     }
-
             }
 
         }catch(Exception e){
@@ -288,6 +308,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
         response.setStatus(Integer.valueOf(statusCode))
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
+        response.writer.flush()
     }
 
     // Todo : Move to exchangeService??
@@ -305,6 +326,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
         }
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
+        response.writer.flush()
     }
 
 }

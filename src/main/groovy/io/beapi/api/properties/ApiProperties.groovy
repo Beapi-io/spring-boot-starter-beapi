@@ -32,7 +32,7 @@ import org.springframework.context.annotation.PropertySource;
 //@Setter
 @ConfigurationProperties(prefix="api")
 //@PropertySource(value = "classpath:/beapi_api.yaml", factory = YamlPropertySourceFactory.class)
-@PropertySource(value='file:${user.home}/.beapi/${spring.profiles.active}/beapi_api.yaml', factory = YamlPropertySourceFactory.class)
+@PropertySource(value='file:${user.home}/.boot/${spring.profiles.active}/beapi_api.yaml', factory = YamlPropertySourceFactory.class)
 public class ApiProperties{
 
         private String name

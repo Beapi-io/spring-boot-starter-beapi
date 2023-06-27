@@ -94,18 +94,19 @@ public class IoStateService{
 
 	void initIoStateDir(){
 		try{
-			this.apiCacheService.flushAllApiCache()
+			this.apiCacheService.flushAllApiCache();
 		}catch(Exception e){
 			println("# IoStateService - flushCache Exception - ${e}")
 			System.exit(0)
 		}
 
 		try{
-			this.apiCacheService.flushAllApiCache()
 
 			String baseDir = System.getProperty("user.dir");
 			String userDir = System.getProperty("user.home")
 			String apiObjectSrc = "${userDir}/${apiProperties.iostateDir}"
+
+			println("### IOStateDir : "+apiObjectSrc)
 
 			String projDir = ""
 

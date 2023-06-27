@@ -116,8 +116,47 @@
     "CURRENTSTABLE": "1",
     "VERSION": {
         "1": {
-            "DEFAULTACTION": "webhookProps",
+            "DEFAULTACTION": "getProperties",
             "URI": {
+                "getAll": {
+                    "METHOD": "GET",
+                    "DESCRIPTION": "Show properties",
+                    "ROLES": {
+                        "BATCH": []
+                    },
+                    "REQUEST": {
+                        "ROLE_ADMIN": []
+                    },
+                    "RESPONSE": {
+                        "ROLE_ADMIN": ["name","attempts","documentationUrl","views","reservedUris","publicEndpoint","apichainLimit","chainingEnabled","batchingEnabled","encoding","iostateDir","serverType","supportedFormats","throttle","webhook","security"]
+                    }
+                },
+                "getProperties": {
+                    "METHOD": "GET",
+                    "DESCRIPTION": "Show properties",
+                    "ROLES": {
+                        "BATCH": []
+                    },
+                    "REQUEST": {
+                        "ROLE_ADMIN": []
+                    },
+                    "RESPONSE": {
+                        "ROLE_ADMIN": ["name","attempts","documentationUrl","views","reservedUris","publicEndpoint","apichainLimit","chainingEnabled","batchingEnabled","encoding","iostateDir","serverType","supportedFormats"]
+                    }
+                },
+                "throttleProps": {
+                    "METHOD": "GET",
+                    "DESCRIPTION": "Show throttleProps",
+                    "ROLES": {
+                        "BATCH": []
+                    },
+                    "REQUEST": {
+                        "ROLE_ADMIN": []
+                    },
+                    "RESPONSE": {
+                        "ROLE_ADMIN": ["throttle"]
+                    }
+                },
                 "webhookProps": {
                     "METHOD": "GET",
                     "DESCRIPTION": "Show webhookProps",
@@ -129,6 +168,19 @@
                     },
                     "RESPONSE": {
                         "permitAll": ["webhook"]
+                    }
+                },
+                "securityProps": {
+                    "METHOD": "GET",
+                    "DESCRIPTION": "Show securityProps",
+                    "ROLES": {
+                        "BATCH": []
+                    },
+                    "REQUEST": {
+                        "ROLE_ADMIN": []
+                    },
+                    "RESPONSE": {
+                        "ROLE_ADMIN": ["security"]
                     }
                 }
             }

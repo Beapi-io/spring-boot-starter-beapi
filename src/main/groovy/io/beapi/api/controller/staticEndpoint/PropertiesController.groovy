@@ -38,23 +38,94 @@ public class PropertiesController extends BeapiRequestHandler{
 	@Autowired
 	ApiProperties apiProperties;
 
-	@Autowired
-	IoStateService iostateService
-	String authority
 
-	/*
+	LinkedHashMap getAll(HttpServletRequest request, HttpServletResponse response) {
+		LinkedHashMap temp = new LinkedHashMap<>();
+		temp.put("name",apiProperties.getName());
+		temp.put("attempts",apiProperties.getAttempts());
+		temp.put("procCores",apiProperties.getProcCores());
+		temp.put("documentationUrl",apiProperties.getDocumentationUrl());
+		temp.put("views",apiProperties.getViews());
+		temp.put("reservedUris",apiProperties.getReservedUris());
+		temp.put("publicEndpoint",apiProperties.getPublicEndpoint());
+		temp.put("entities",apiProperties.getEntities());
+		temp.put("apichainLimit",apiProperties.getApichainLimit());
+		temp.put("postcrement",apiProperties.getPostcrement());
+		temp.put("chainingEnabled",apiProperties.getChainingEnabled());
+		temp.put("batchingEnabled",apiProperties.getBatchingEnabled());
+		temp.put("encoding",apiProperties.getEncoding());
+		temp.put("iostateDir",apiProperties.getIostateDir());
+		temp.put("staticEndpoint",apiProperties.getStaticEndpoint());
+		temp.put("supportedFormats",apiProperties.getSupportedFormats());
+		temp.put("serverType",apiProperties.getServerType());
+		temp.put("protocol",apiProperties.getProtocol());
+		temp.put("parseValidRequestParams",apiProperties.getParseValidRequestParams());
+		temp.put("autoTest",apiProperties.getAutoTest());
+
+		LinkedHashMap throttle = new LinkedHashMap<>();
+		throttle.put("active", apiProperties.getThrottle().getActive());
+		throttle.put("rateLimit", apiProperties.getThrottle().getRateLimit());
+		throttle.put("dataLimit", apiProperties.getThrottle().getDataLimit());
+		throttle.put("expires", apiProperties.getThrottle().getExpires());
+		temp.put("throttle", throttle);
+
+		LinkedHashMap hook = new LinkedHashMap<>();
+		hook.put("active", apiProperties.getWebhook().getActive());
+		hook.put("service", apiProperties.getWebhook().getServices());
+		temp.put("webhook", hook);
+
+		LinkedHashMap sec = new LinkedHashMap<>();
+		sec.put("superuserRole",apiProperties.getSecurity().getSuperuserRole());
+		sec.put("userRole",apiProperties.getSecurity().getUserRole());
+		sec.put("testRole",apiProperties.getSecurity().getTestRole());
+		sec.put("anonRole",apiProperties.getSecurity().getAnonRole());
+		sec.put("networkGroups",apiProperties.getSecurity().getNetworkGroups());
+		sec.put("networkRoles",apiProperties.getSecurity().getNetworkRoles());
+		sec.put("corsNetworkGroups",apiProperties.getSecurity().getCorsNetworkGroups());
+		sec.put("corsIncludeEnvironments",apiProperties.getSecurity().getCorsIncludeEnvironments());
+		sec.put("corsExcludeEnvironments",apiProperties.getSecurity().getCorsExcludeEnvironments());
+		temp.put("security", sec);
+
+		return temp;
+	}
+
 	LinkedHashMap getProperties(HttpServletRequest request, HttpServletResponse response) {
-
-		return returnData
+		LinkedHashMap temp = new LinkedHashMap<>();
+        temp.put("name",apiProperties.getName());
+        temp.put("attempts",apiProperties.getAttempts());
+        temp.put("procCores",apiProperties.getProcCores());
+        temp.put("documentationUrl",apiProperties.getDocumentationUrl());
+        temp.put("views",apiProperties.getViews());
+        temp.put("reservedUris",apiProperties.getReservedUris());
+        temp.put("publicEndpoint",apiProperties.getPublicEndpoint());
+        temp.put("entities",apiProperties.getEntities());
+        temp.put("apichainLimit",apiProperties.getApichainLimit());
+        temp.put("postcrement",apiProperties.getPostcrement());
+        temp.put("chainingEnabled",apiProperties.getChainingEnabled());
+        temp.put("batchingEnabled",apiProperties.getBatchingEnabled());
+        temp.put("encoding",apiProperties.getEncoding());
+        temp.put("iostateDir",apiProperties.getIostateDir());
+        temp.put("staticEndpoint",apiProperties.getStaticEndpoint());
+        temp.put("supportedFormats",apiProperties.getSupportedFormats());
+        temp.put("serverType",apiProperties.getServerType());
+        temp.put("protocol",apiProperties.getProtocol());
+        temp.put("parseValidRequestParams",apiProperties.getParseValidRequestParams());
+        temp.put("autoTest",apiProperties.getAutoTest());
+		return temp;
 	}
 
-	LinkedHashMap getThrottle(HttpServletRequest request, HttpServletResponse response) {
 
-		return returnData
+	LinkedHashMap throttleProps(HttpServletRequest request, HttpServletResponse response) {
+		LinkedHashMap temp = new LinkedHashMap<>();
+		temp.put("active", apiProperties.getThrottle().getActive());
+		temp.put("rateLimit", apiProperties.getThrottle().getRateLimit());
+		temp.put("dataLimit", apiProperties.getThrottle().getDataLimit());
+		temp.put("expires", apiProperties.getThrottle().getExpires());
+
+		LinkedHashMap map = new LinkedHashMap<>();
+		map.put("throttle", temp);
+		return map
 	}
-
-	 */
-
 
 	// this is what we need to fix
 	LinkedHashMap webhookProps(HttpServletRequest request, HttpServletResponse response) {
@@ -64,16 +135,25 @@ public class PropertiesController extends BeapiRequestHandler{
 		temp.put("active", active);
 		temp.put("service", services);
 
-		LinkedHashMap hook = new LinkedHashMap<>();
-		hook.put("webhook", temp);
-		return hook;
+		LinkedHashMap map = new LinkedHashMap<>();
+		map.put("webhook", temp);
+		return map
 	}
 
-	/*
-	LinkedHashMap getSecurity(HttpServletRequest request, HttpServletResponse response) {
+	LinkedHashMap securityProps(HttpServletRequest request, HttpServletResponse response) {
+		LinkedHashMap temp = new LinkedHashMap<>();
+		temp.put("superuserRole",apiProperties.getSecurity().getSuperuserRole());
+		temp.put("userRole",apiProperties.getSecurity().getUserRole());
+		temp.put("testRole",apiProperties.getSecurity().getTestRole());
+		temp.put("anonRole",apiProperties.getSecurity().getAnonRole());
+		temp.put("networkGroups",apiProperties.getSecurity().getNetworkGroups());
+		temp.put("networkRoles",apiProperties.getSecurity().getNetworkRoles());
+		temp.put("corsNetworkGroups",apiProperties.getSecurity().getCorsNetworkGroups());
+		temp.put("corsIncludeEnvironments",apiProperties.getSecurity().getCorsIncludeEnvironments());
+		temp.put("corsExcludeEnvironments",apiProperties.getSecurity().getCorsExcludeEnvironments());
 
-		return returnData
+		LinkedHashMap map = new LinkedHashMap<>();
+		map.put("security", temp);
+		return map
 	}
-
-	 */
 }
