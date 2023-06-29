@@ -83,10 +83,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - encoding for webhooks
  - tests for hooks
  - test for properties
+ - default properties being read from starter config
  
  ### Changed
  - stability fixes
- - set default values for config in starter and cleanup config
+ - cleaned up/simplified user config
+ - no longer need to added config to project; will read from .boot/{env}
  
  
  
