@@ -51,6 +51,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - improvements to ApiDescriptor; better checking for request/response keys
 - renamed nonmappedEndpoint to 'publicEndpoints'
 
+### Additional
+- releasing beginning SDK frontend with this release
 
 
  ## 0.6.5 - (released: 6/6/2023)
