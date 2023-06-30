@@ -110,7 +110,6 @@ public class ExchangeService extends ApiExchange{
     }
 
 	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
-		println("###initVars")
 		//String accept = request.getHeader('Accept')
 		//String contentType = request.getContentType()
 
@@ -140,14 +139,12 @@ public class ExchangeService extends ApiExchange{
 
 
 		try {
-			println("path: ${this.controller}/${this.action}")
 			this.apiObject = apiCacheService.getApiDescriptor(this.controller, this.apiversion, this.action)
 
 			LinkedHashMap receives = this.apiObject?.getReceivesList()
 			this.receivesList = (receives[this.authority]) ? receives[this.authority] : receives['permitAll']
 
 			LinkedHashMap returns = this.apiObject?.getReturnsList()
-			println("resturn : "+returns)
 			this.returnsList = (returns[this.authority]) ? returns[this.authority] : returns['permitAll']
 			if(!request.getAttribute('responseList')){ request.setAttribute('responseList',this.returnsList) }
 

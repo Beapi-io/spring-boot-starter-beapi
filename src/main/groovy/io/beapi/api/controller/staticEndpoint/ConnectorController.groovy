@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse
 import groovy.json.JsonSlurper
 import org.json.JSONObject
 
-// todo: rename as ExchangeService : encompasses both request/response methods for interceptor
+// AKA IostateController (this is the same thing)
 @Controller("connector")
 public class ConnectorController extends BeapiRequestHandler{
 

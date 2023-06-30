@@ -165,14 +165,12 @@ class ApiInterceptor implements HandlerInterceptor{
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mv) throws Exception {
 		//logger.info("postHandle(HttpServletRequest, HttpServletResponse, Object, ModelAndView) : {}")
-		println("### posthandle")
+		// println("### posthandle")
 
 		ArrayList body = []
 		if(request.getAttribute('responseBody')){
 			body = request.getAttribute('responseBody')
 		}
-
-		println("body : "+body)
 
 		if(body == null){
 			writeErrorResponse(response,'422',request.getRequestURI(),'No data returned for this call.')
