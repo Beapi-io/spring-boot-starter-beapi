@@ -1,7 +1,7 @@
 ![alt text](https://github.com/orubel/logos/blob/master/beapi_logo_large.png)
 # Beapi Spring Boot Starter
 
-### Current Stable Version : 0.6.5
+### Current Stable Version : 0.7.0-SNAPSHOT
 
 ### Springboot Version : 2.6.2 (or greater)
 
