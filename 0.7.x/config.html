@@ -272,9 +272,9 @@
               <table class="table table-striped">
                 <thead>
                 <tr>
-                  <th scope="col">API Properties</th>
-                  <th scope="col">Definition</th>
-                  <th scope="col">Default</th>
+                  <th scope="col" style="padding:10px;width:20%;">API Properties</th>
+                  <th scope="col" style="padding:10px;width:40%;">Definition</th>
+                  <th scope="col" style="padding:10px;width:40%;">Default</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -303,16 +303,16 @@
               <table class="table table-striped">
                 <thead>
                 <tr>
-                  <th scope="col">API/Throttle Properties</th>
-                  <th scope="col">Definition</th>
-                  <th scope="col">Default</th>
+                  <th scope="col" style="padding:10px;width:20%;">API/Throttle Properties</th>
+                  <th scope="col" style="padding:10px;width:40%;">Definition</th>
+                  <th scope="col" style="padding:10px;width:40%;">Default</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr><td style="padding:10px;">active</td><td style="padding:10px;">boolean</td><td style="padding:10px;">5</td></tr>
-                <tr><td style="padding:10px;">rateLimit</td><td style="padding:10px;">map</td><td style="padding:10px;">4</td></tr>
-                <tr><td style="padding:10px;">dataLimit</td><td style="padding:10px;">map</td><td style="padding:10px;">'http://orubel.github.io/Beapi-API-Framework/'</td></tr>
-                <tr><td style="padding:10px;">expires</td><td style="padding:10px;">integer</td><td style="padding:10px;">['admin','apidoc','api','login','logout']</td></tr>
+                <tr><td style="padding:10px;">active</td><td style="padding:10px;">Boolean representing if throttling is on</td><td style="padding:10px;">false</td></tr>
+                <tr><td style="padding:10px;">rateLimit</td><td style="padding:10px;">Map representing roles/rate-limits</td><td style="padding:10px;">{'ROLE_USER':1000,'ROLE_ADMIN':10000}</td></tr>
+                <tr><td style="padding:10px;">dataLimit</td><td style="padding:10px;">Map representing roles/data-limits</td><td style="padding:10px;">{'ROLE_USER':1000000}</td></tr>
+                <tr><td style="padding:10px;">expires</td><td style="padding:10px;">Integer representing number of seconds til reset</td><td style="padding:10px;">['admin','apidoc','api','login','logout']</td></tr>
                 </tbody>
               </table>
 
@@ -321,13 +321,13 @@
               <table class="table table-striped">
                 <thead>
                 <tr>
-                  <th scope="col">API/Webhook Properties</th>
-                  <th scope="col">Definition</th>
-                  <th scope="col">Default</th>
+                  <th scope="col" style="padding:10px;width:20%;">API/Webhook Properties</th>
+                  <th scope="col" style="padding:10px;width:40%;">Definition</th>
+                  <th scope="col" style="padding:10px;width:40%;">Default</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr><td style="padding:10px;">active</td><td style="padding:10px;">boolean determining if webhooks are active</td><td style="padding:10px;">false</td></tr>
+                <tr><td style="padding:10px;">active</td><td style="padding:10px;">Boolean representing if webhooks are active</td><td style="padding:10px;">false</td></tr>
                 </tbody>
               </table>
 
@@ -336,16 +336,18 @@
               <table class="table table-striped">
                 <thead>
                 <tr>
-                  <th scope="col">API/Security Properties</th>
-                  <th scope="col">Definition</th>
-                  <th scope="col">Default</th>
+                  <th scope="col" style="padding:10px;width:20%;">API/Security Properties</th>
+                  <th scope="col" style="padding:10px;width:40%;">Definition</th>
+                  <th scope="col" style="padding:10px;width:40%;">Default</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr><td style="padding:10px;">attempts</td><td style="padding:10px;">Otto</td><td style="padding:10px;">5</td></tr>
-                <tr><td style="padding:10px;">procCores</td><td style="padding:10px;">Otto</td><td style="padding:10px;">4</td></tr>
-                <tr><td style="padding:10px;">documentationUrl</td><td style="padding:10px;">Otto</td><td style="padding:10px;">'http://orubel.github.io/Beapi-API-Framework/'</td></tr>
-                <tr><td style="padding:10px;">views</td><td style="padding:10px;">[deprecated]</td><td style="padding:10px;">['admin','apidoc','api','login','logout']</td></tr>
+                <tr><td style="padding:10px;">superuserRole</td><td style="padding:10px;">String representing super user role</td><td style="padding:10px;">ROLE_ADMIN</td></tr>
+                <tr><td style="padding:10px;">userRole</td><td style="padding:10px;">String representing user role</td><td style="padding:10px;">ROLE_USER</td></tr>
+                <tr><td style="padding:10px;">anonRole</td><td style="padding:10px;">String representing unknown user</td><td style="padding:10px;">ROLE_ANONYMOUS</td></tr>
+                <tr><td style="padding:10px;">networkGroups</td><td style="padding:10px;">List representing network types</td><td style="padding:10px;">['open','public','private']</td></tr>
+                <tr><td style="padding:10px;">networkRoles</td><td style="padding:10px;">Map representing roles associated with network types</td><td style="padding:10px;">{'open':['ROLE_ADMIN','ROLE_ANONYMOUS','ROLE_USER'],'public':['ROLE_ADMIN','ROLE_USER'],'private':['ROLE_ADMIN']}</td></tr>
+                <tr><td style="padding:10px;">corsWhitelist</td><td style="padding:10px;">List representing whitelisted FQDN's and IP's for CORS</td><td style="padding:10px;">['http://localhost','http://localhost:8080','http://127.0.0.1','http://127.0.0.1:8080']</td></tr>
                 </tbody>
               </table>
 
