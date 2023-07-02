@@ -71,10 +71,10 @@
                           <a class="nav-link" href="config.html#section-1">Settings</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link" href="config.html#section-2">beapi_api.yml</a>
+                          <a class="nav-link" href="config.html#section-2">Beapi API Config Changes</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link" href="config.html#section-3">beapi_db.yml</a>
+                          <a class="nav-link" href="config.html#section-3">Beapi DB Config Changes</a>
                         </li>
                       </ul>
                     </div>
@@ -263,8 +263,41 @@
 
             <!-- file tree -->
             <section id="section-2">
-              <h2 class="section-title-2">Beapi_Api Config File<a data-scroll href="#section-3" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
-              <p>Once you have created your project, you will need to edit your <b>'beapi_api.yaml'</b> file in your <b>~/.boot/{env}/</b> directory. The file has the following settings:</p>
+              <h2 class="section-title-2">Beapi Api Config Changes<a data-scroll href="#section-2" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <p>Once you have created your project, you will need to edit your <b>'beapi_api.yaml'</b> file in your <b>~/.boot/{env}/</b> directory and changes the following settings:</p>
+
+              <ul style="list-style-type: none;">
+                <li><h5><b>API</b></h5>
+                  <div class="row">
+                    <div class="col">
+                      <div class="alert alert-warning" role="alert">
+                        <ul>
+                          <li><h6 style="margin-bottom: 0px;"><b>procCores:</b> (CHANGE)</h6>Change this to the number of processors your machine has; if running on AWS/Google/SpringCloud, this will be your HyperThreads/vCPU number.</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li style="margin-top: 25px;"><h5><b>BOOTSTRAP</b></h5>
+                  <div class="row">
+                    <div class="col">
+                      <div class="alert alert-warning" role="alert">
+                        <ul>
+                          <li><h6 style="margin-bottom: 0px;"><b>superUser/login:</b> (CHANGE)</h6> Superuser that is bootstrapped with your application (also used for functional testing)</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>superUser/password:</b> (CHANGE)</h6> Superuser that is bootstrapped with your application (also used for functional testing)</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>superUser/email:</b> (CHANGE)</h6> Superuser that is bootstrapped with your application (also used for functional testing)</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>testUser/login:</b> (CHANGE)</h6> Testuser that is bootstrapped with your application (also used for functional testing)</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>testUser/password:</b> (CHANGE)</h6> Testuser that is bootstrapped with your application (also used for functional testing)</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>testUser/email:</b> (CHANGE)</h6> Testuser that is bootstrapped with your application (also used for functional testing)</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div></br>
+                </li>
+              </ul>
+
+
+              <p>By Default, the <b>beapi_api.yml</b> file has the following settings:</p>
 
 
               <hr size="5">
@@ -353,50 +386,49 @@
 
               <hr size="5">
 
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <th scope="col" style="padding:10px;width:20%;">API/Bootstrap Properties</th>
+                  <th scope="col" style="padding:10px;width:40%;">Definition</th>
+                  <th scope="col" style="padding:10px;width:40%;">Default</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr><td style="padding:10px;">superUser</td><td style="padding:10px;">key/val map representing login/password/email of the super-user</td><td style="padding:10px;">N/A</td></tr>
+                <tr><td style="padding:10px;">superUser</td><td style="padding:10px;">key/val map representing login/password/email of the test-user</td><td style="padding:10px;">N/A</td></tr>
+                </tbody>
+              </table>
+
+              <hr size="5">
+
+            </section>
+            <!-- / file tree -->
+
+            <!-- file tree -->
+            <section id="section-3">
+              <h2 class="section-title-3">Beapi DB Config Changes<a data-scroll href="#section-3" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <p>You will then need to edit your <b>'beapi_db.yaml'</b> file in your <b>~/.boot/{env}/</b> directory and changes the following settings:</p>
+
               <ul style="list-style-type: none;">
-                <li><h5><b>API</b></h5>
+
+                <li style="margin-top: 25px;">
                   <div class="row">
                     <div class="col">
                       <div class="alert alert-warning" role="alert">
                         <ul>
-                          <li><h6 style="margin-bottom: 0px;"><b>procCores:</b> (CHANGE)</h6>Change this to the number of processors your machine has; if running on AWS/Google/SpringCloud, this will be your HyperThreads/vCPU number.</li>
-                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>chainingenabled:</b> (optional)</h6>These will toggle chaining functionality on / off.</li>
-                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>batchingenabled:</b> (optional)</h6>These will toggle batching functionality on / off.</li>
-                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>iostateDir:</b> (optional)</h6>if you downloaded your config into a different directory (or named it something else) as well as the <b>.iostate</b> directory. </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-                <li style="margin-top: 25px;"><h5><b>SECURITY</b></h5>
-                  <div class="row">
-                    <div class="col">
-                      <div class="alert alert-warning" role="alert">
-                        <ul>
-                          <li><h6 style="margin-bottom: 0px;"><b>superUserRole / userRole:</b></h6> These are used to help define networkGroups and for bootstrapping. These <b>do not</b> have to be changed for the DEMO-APPLICATION but if you are building your own application, you will want to put in the ROLES from your OWN SYSTEM.</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-                <li style="margin-top: 25px;"><h5><b>BOOTSTRAP</b></h5>
-                  <div class="row">
-                    <div class="col">
-                      <div class="alert alert-warning" role="alert">
-                        <ul>
-                          <li><h6 style="margin-bottom: 0px;"><b>superUser/login:</b> (CHANGE)</h6> Superuser that is bootstrapped with your application (also used for functional testing)</li>
-                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>superUser/password:</b> (CHANGE)</h6> Superuser that is bootstrapped with your application (also used for functional testing)</li>
-                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>superUser/email:</b> (CHANGE)</h6> Superuser that is bootstrapped with your application (also used for functional testing)</li>
-                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>testUser/login:</b> (CHANGE)</h6> Testuser that is bootstrapped with your application (also used for functional testing)</li>
-                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>testUser/password:</b> (CHANGE)</h6> Testuser that is bootstrapped with your application (also used for functional testing)</li>
-                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>testUser/email:</b> (CHANGE)</h6> Testuser that is bootstrapped with your application (also used for functional testing)</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>driverclassname:</b> (CHANGE)</h6>driver used when making a database connection</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>username:</b> (CHANGE)</h6>database connection username</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>password:</b> (CHANGE)</h6>database connection password</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>url:</b> (CHANGE)</h6>url for database connection</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>hibernate/dialect:</b> (CHANGE)</h6>JPA dialect</li>
                         </ul>
                       </div>
                     </div>
                   </div></br>
-
                 </li>
               </ul>
+
             </section>
             <!-- / file tree -->
 
