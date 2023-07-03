@@ -86,7 +86,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - tests for hooks
  - test for properties
  - default properties being read from starter config
- - Connector/IO-State on-the-fly update added; allows changing all rules for apis onj the fly without restart
+ - updating Connector/IO-State on-the-fly added; allows changing all rules for apis without restart
  
  ### Changed
  - stability fixes
