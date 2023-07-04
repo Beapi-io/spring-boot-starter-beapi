@@ -121,9 +121,7 @@
                 "getAll": {
                     "METHOD": "GET",
                     "DESCRIPTION": "Show properties",
-                    "ROLES": {
-                        "BATCH": []
-                    },
+                    "ROLES": {},
                     "REQUEST": {
                         "ROLE_ADMIN": []
                     },
@@ -134,9 +132,7 @@
                 "getProperties": {
                     "METHOD": "GET",
                     "DESCRIPTION": "Show properties",
-                    "ROLES": {
-                        "BATCH": []
-                    },
+                    "ROLES": {},
                     "REQUEST": {
                         "ROLE_ADMIN": []
                     },
@@ -147,9 +143,7 @@
                 "throttleProps": {
                     "METHOD": "GET",
                     "DESCRIPTION": "Show throttleProps",
-                    "ROLES": {
-                        "BATCH": []
-                    },
+                    "ROLES": {},
                     "REQUEST": {
                         "ROLE_ADMIN": []
                     },
@@ -160,9 +154,7 @@
                 "webhookProps": {
                     "METHOD": "GET",
                     "DESCRIPTION": "Show webhookProps",
-                    "ROLES": {
-                        "BATCH": []
-                    },
+                    "ROLES": {},
                     "REQUEST": {
                         "permitAll": []
                     },
@@ -173,9 +165,7 @@
                 "securityProps": {
                     "METHOD": "GET",
                     "DESCRIPTION": "Show securityProps",
-                    "ROLES": {
-                        "BATCH": []
-                    },
+                    "ROLES": {},
                     "REQUEST": {
                         "ROLE_ADMIN": []
                     },

@@ -20,6 +20,7 @@ import io.beapi.api.properties.yaml.factory.YamlPropertySourceFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 //import org.springframework.test.context.TestPropertySource;
 
 //import lombok.Data;
@@ -32,29 +33,33 @@ import org.springframework.context.annotation.PropertySource;
 //@Setter
 @ConfigurationProperties(prefix="api")
 //@PropertySource(value = "classpath:/beapi_api.yaml", factory = YamlPropertySourceFactory.class)
-@PropertySource(value='file:${user.home}/.boot/${spring.profiles.active}/beapi_api.yaml', factory = YamlPropertySourceFactory.class)
+@PropertySources([
+    @PropertySource(value="classpath:beapi_api.yaml", factory=YamlPropertySourceFactory.class),
+        @PropertySource(value='file:${user.home}/.boot/${spring.profiles.active}/beapi_api.yaml', factory=YamlPropertySourceFactory.class)
+])
+//@PropertySource(value='file:${user.home}/.boot/${spring.profiles.active}/beapi_api.yaml', factory = YamlPropertySourceFactory.class)
 public class ApiProperties{
 
-        private String name
-        private Integer attempts
-        private Integer procCores
-        private String documentationUrl
-        private ArrayList views
-        private ArrayList reservedUris
-        private ArrayList publicEndpoint
-        private ArrayList entities
-        private Integer apichainLimit
-        private Boolean postcrement
-        private Boolean chainingEnabled
-        private Boolean batchingEnabled
-        private String encoding
-        private String iostateDir
-        private ArrayList staticEndpoint
-        private ArrayList supportedFormats
-        private String serverType
-        private String protocol
-        private Boolean parseValidRequestParams
-        private Boolean autoTest
+        private Integer attempts = 5
+        private Integer procCores = 8
+        private String documentationUrl = 'http://orubel.github.io/Beapi-API-Framework/'
+        private ArrayList reservedUris = ['/authenticate','/register','/error','/login','/logout']
+        private ArrayList publicEndpoint = ['jwtAuthentication','beapiError']
+        private Integer apichainLimit = 3
+        private Boolean postcrement = false
+        private Boolean chainingEnabled = true
+        private Boolean batchingEnabled = true
+        private String encoding = 'UTF-8'
+        private String iostateDir = '.boot/.iostate'
+        private ArrayList staticEndpoint = ['apidoc','connector','properties']
+        private ArrayList supportedFormats = ['JSON','XML']
+
+        // todo : current master/slave (change to parent/child)
+        private String serverType = 'slave'
+
+        // todo: change name of this to testing protocol (should be HTTPS in prod)
+        private String testingProtocol = 'http'
+        private Boolean autoTest = false
 
 
         private DbProps db = new DbProps()
@@ -63,14 +68,11 @@ public class ApiProperties{
         private SecurityProps security = new SecurityProps()
         private BootstrapProps bootstrap = new BootstrapProps()
 
-        String getName() { return name }
         Integer getAttempts() { return attempts }
         Integer getProcCores() { return procCores }
         String getDocumentationUrl() { return documentationUrl }
-        ArrayList getViews() { return views }
         ArrayList getReservedUris() { return reservedUris }
         ArrayList getPublicEndpoint() { return publicEndpoint }
-        ArrayList getEntities() { return entities }
         Integer getApichainLimit() { return apichainLimit }
         Boolean getPostcrement() { return postcrement }
         Boolean getChainingEnabled() { return chainingEnabled }
@@ -81,30 +83,22 @@ public class ApiProperties{
         String getServerType() { return serverType }
         Boolean getAutoTest() { return autoTest }
         ArrayList getSupportedFormats() { return supportedFormats }
-        String getProtocol() { return protocol }
-        Boolean getParseValidRequestParams(){ return parseValidRequestParams }
+        String getTestingProtocol() { return testingProtocol }
 
-
-        void setName(String name) { this.name = name }
         void setAttempts(Integer attempts) { this.attempts = attempts }
         void setProcCores(Integer procCores) { this.procCores = procCores }
-        void setDocumentationUrl(String documentationUrl) { this.documentationUrl = documentationUrl }
-        void setViews(ArrayList views) { this.views = views }
         void setReservedUris(ArrayList reservedUris) { this.reservedUris = reservedUris }
         void setPublicEndpoint(ArrayList publicEndpoint) { this.publicEndpoint = publicEndpoint }
-        void setEntities(ArrayList entities) { this.entities = entities }
         void setApichainLimit(Integer apichainLimit) { this.apichainLimit = apichainLimit }
         void setPostcrement(Boolean postcrement) { this.postcrement = postcrement }
         void setChainingEnabled(Boolean chainingEnabled) { this.chainingEnabled = chainingEnabled }
         void setBatchingEnabled(Boolean batchingEnabled) { this.batchingEnabled = batchingEnabled }
         void setEncoding(String encoding) { this.encoding = encoding }
         void setIostateDir(String iostateDir) { this.iostateDir = iostateDir }
-        void setStaticEndpoint(ArrayList staticEndpoint){ this.staticEndpoint = staticEndpoint }
         void setServerType(String serverType) { this.serverType = serverType }
         void setAutoTest(Boolean autoTest) { this.autoTest = autoTest }
         void setSupportedFormats(ArrayList supportedFormats) { this.supportedFormats = supportedFormats }
-        void setProtocol(String protocol) { this.protocol = protocol }
-        void setParseValidRequestParams(Boolean parseValidRequestParams){ this.parseValidRequestParams = parseValidRequestParams}
+        void setTestingProtocol(String testingProtocol) { this.testingProtocol = testingProtocol }
 
         public DbProps getDb(){ return this.db; }
         public ThrottleProps getThrottle(){ return this.throttle; }
@@ -167,18 +161,14 @@ public class ApiProperties{
         public void setServices(ArrayList<String> services) { this.services = services; }
     }
 
-
     public class SecurityProps {
-        private String superuserRole
-        private String userRole
-        private String testRole
-        private String anonRole
-        private Set networkGroups
+        private String superuserRole = 'ROLE_ADMIN'
+        private String userRole = 'ROLE_USER'
+        private String testRole = 'ROLE_USER'
+        private String anonRole = 'ROLE_ANONYMOUS'
+        private Set networkGroups = ['open','public','private']
         private LinkedHashMap networkRoles
-        private LinkedHashMap corsNetworkGroups
-        private Set corsIncludeEnvironments
-        private Set corsExcludeEnvironments
-
+        private ArrayList corsWhiteList = []
 
         public String getSuperuserRole(){ return this.superuserRole }
         public String getUserRole(){ return this.userRole}
@@ -186,19 +176,21 @@ public class ApiProperties{
         public String getAnonRole(){ return this.anonRole}
         public Set getNetworkGroups() { return this.networkGroups }
         public LinkedHashMap getNetworkRoles() { return this.networkRoles }
-        public LinkedHashMap getCorsNetworkGroups() { return this.corsNetworkGroups }
-        public Set getCorsIncludeEnvironments() { return this.corsIncludeEnvironments }
-        public Set getCorsExcludeEnvironments() { return this.corsExcludeEnvironments }
+        public ArrayList getCorsWhiteList() { return this.corsWhiteList }
+
 
         public void setSuperuserRole(String superuserRole){ this.superuserRole = superuserRole }
         public void setUserRole(String userRole){ this.userRole = userRole}
         public void setTestRole(String testRole){ this.testRole = testRole}
         public void setAnonRole(String anonRole){ this.anonRole = anonRole}
         public void setNetworkGroups(Set networkGroups) { this.networkGroups = networkGroups}
-        public void setNetworkRoles(LinkedHashMap networkRoles) { this.networkRoles = networkRoles}
-        public void setCorsNetworkGroups(LinkedHashMap corsNetworkGroups) { this.corsNetworkGroups = corsNetworkGroups}
-        public void setCorsIncludeEnvironments(Set corsIncludeEnvironments) { this.corsIncludeEnvironments = corsIncludeEnvironments}
-        public void setCorsExcludeEnvironments(Set corsExcludeEnvironments) { this.corsExcludeEnvironments = corsExcludeEnvironments}
+        public void setNetworkRoles(LinkedHashMap networkRoles) {
+            if (networkRoles) {
+                this.networkRoles = networkRoles
+            }
+        }
+        public void setCorsWhiteList(ArrayList corsWhiteList) { this.corsWhiteList = corsWhiteList}
+
     }
 
     public class BootstrapProps {

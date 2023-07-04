@@ -39,6 +39,7 @@ public class PropertiesController extends BeapiRequestHandler{
 	ApiProperties apiProperties;
 
 
+
 	LinkedHashMap getAll(HttpServletRequest request, HttpServletResponse response) {
 		LinkedHashMap temp = new LinkedHashMap<>();
 		temp.put("name",apiProperties.getName());
@@ -156,4 +157,6 @@ public class PropertiesController extends BeapiRequestHandler{
 		map.put("security", temp);
 		return map
 	}
+
+
 }

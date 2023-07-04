@@ -1,21 +1,22 @@
 api:
-    name: api
     attempts: 5
     procCores: 4
     documentationUrl: 'http://orubel.github.io/Beapi-API-Framework/'
     views: ['admin','apidoc','api','login','logout']
     reserveduris: ['/authenticate','/register','/error','/login','/logout']
     publicEndpoint: ['jwtAuthentication','beapiError']
+    staticEndpoint : ['apidoc','connector','properties']
     apiServer: 'http://localhost:8080'
     apichainLimit: 3
     postcrement: false
     chainingEnabled: true
     batchingEnabled: true
     encoding: UTF-8
-    iostateDir: '.beapi/.iostate'
+    iostateDir: '.boot/.iostate'
     serverType: master
+    configType: large
+    testingProtocol: http
     autoTest: false
-    parseValidRequestParams: false
     throttle:
         active: false
         rateLimit: {'ROLE_USER':1000,'ROLE_ADMIN':10000}
@@ -31,12 +32,7 @@ api:
         anonRole: 'ROLE_ANONYMOUS'
         networkGroups: ['open','public','private']
         networkRoles: {'open':['ROLE_ADMIN','ROLE_ANONYMOUS','ROLE_USER'],'public':['ROLE_ADMIN','ROLE_USER'],'private':['ROLE_ADMIN']}
-        corsNetworkGroups: { 
-            'open': ['http://localhost','http://localhost:8080','http://127.0.0.1','http://test.nosegrind.net','http://test.nosegrind.net:8080'],
-            'public': ['http://localhost','http://localhost:8080','http://127.0.0.1','http://test.nosegrind.net','http://test.nosegrind.net:8080'],
-            'private': ['http://localhost','http://localhost:8080','http://127.0.0.1','http://test.nosegrind.net','http://test.nosegrind.net:8080'],
-        }
-        corsIncludeEnvironments: ['development','test','production']
-        corsExcludeEnvironments: []
+        corscorsWhiteList: ['http://localhost','http://localhost:8080','http://127.0.0.1','http://test.nosegrind.net','http://test.nosegrind.net:8080']
+
 
 

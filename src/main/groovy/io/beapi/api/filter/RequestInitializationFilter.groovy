@@ -182,8 +182,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                     // get apiObject
 
-                    println(uriList)
-
                     def cache = apiCacheService?.getApiCache(uriList[4])
 
 
@@ -458,10 +456,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     }
 
     protected void parseParams(HttpServletRequest request, String formData, String uriData, String id){
-        println("FILTER[parseParams]")
-        println("formData : "+formData)
-        println("uriData : "+uriData)
-
         LinkedHashMap<String,String> get = parseGetParams(uriData, id)
         request.setAttribute('GET',get)
         //LinkedHashMap<String,String> post = parsePutParams(formData)

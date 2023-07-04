@@ -258,14 +258,18 @@ public class IoStateService{
 
 
 					ArrayList apiRoles = []
-					if (uriObject.ROLES.containsKey('DEFAULT')) {
-						apiRoles = uriObject.ROLES.DEFAULT as List
-					}
+					try{
+						if (uriObject.ROLES.containsKey('DEFAULT')) {
+							apiRoles = uriObject.ROLES.DEFAULT as List
+						}
+					}catch(Exception e){ println("### parseJson > apiroles error :"+e)}
 
 					ArrayList networkRoles = []
-					apiProperties.security.networkRoles["${networkGrp}"].each() { k3, v3 ->
-						networkRoles.add(v3)
-					}
+					try{
+						apiProperties.security.networkRoles["${networkGrp}"].each() { k3, v3 ->
+							networkRoles.add(v3)
+						}
+					}catch(Exception e){ println("### parseJson > networkroles error :"+e)}
 
 					if (apiRoles) {
 						if (!(apiRoles - networkRoles.intersect(apiRoles).isEmpty())) {
@@ -278,14 +282,18 @@ public class IoStateService{
 					}
 
 					Set batchRoles = []
-					if (uriObject.ROLES.containsKey('BATCH')) {
-						batchRoles = uriObject.ROLES.BATCH as Set
-					}
+					try {
+						if (uriObject.ROLES.containsKey('BATCH')) {
+							batchRoles = uriObject.ROLES.BATCH as Set
+						}
+					}catch(Exception e){ println("### parseJson > batchroles error :"+e)}
 
 					Set hookRoles = []
+					try{
 					if (uriObject.ROLES.containsKey('HOOK')) {
 						hookRoles = uriObject.ROLES.HOOK as Set
 					}
+					}catch(Exception e){ println("### parseJson > hookroles error :"+e)}
 
 					// TODO
 					try {

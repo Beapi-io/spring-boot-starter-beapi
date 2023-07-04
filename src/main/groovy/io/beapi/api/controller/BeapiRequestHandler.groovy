@@ -124,12 +124,9 @@ class BeapiRequestHandler implements HttpRequestHandler {
                     if(!responseList.contains("*")){
                         def tmp = (tempResult.isEmpty())?tempResult : parseResponseParams(tempResult, responseList)
 
-
                         if(Objects.nonNull(tmp)){
-                            println("### object not null : "+tmp)
                             result = tmp
                         }else{
-                            println("### object VERY VERY null")
                             writeErrorResponse(response, '422', request.getRequestURI(),"Expected Output does not match IOState RESPONSE params. Please conact the administrator.")
                         }
 
@@ -270,8 +267,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
     ArrayList parseResponseParams(ArrayList bodyList, Set responseList){
         ArrayList output = []
 
-        println("responseList : "+responseList)
-
         try {
             bodyList.each() { body ->
                 ArrayList paramsList = (body.size() == 0) ? [:] : body.keySet() as ArrayList
@@ -281,8 +276,8 @@ class BeapiRequestHandler implements HttpRequestHandler {
                         }
                     }
 
-                    println("responseList : "+responseList)
-                    println("responseKeys : "+body.keySet())
+                    // println("responseList : "+responseList)
+                    // println("responseKeys : "+body.keySet())
 
                     if (responseList.size()==body.keySet().size()) {
                         output.add(body)
