@@ -92,6 +92,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - stability fixes
  - cleaned up/simplified user config
  - no longer need to added config to project; will read from .boot/{env}
+ - moved DataSourceProperties config to starter
  
  
  
