@@ -87,6 +87,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - test for properties
  - default properties being read from starter config
  - updating of Connector/IO-State on-the-fly added; allows changing all rules for apis without restart
+ - added configurable server properties for tomcat server
  
  ### Changed
  - stability fixes
