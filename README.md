@@ -82,7 +82,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 
 # Q&A
 - **Why does the 0.6.0 version not build anymore?**
-    - There was tracking code in the 0.6.0' version that was being used to track installs; This was mainly to see which corporations are violating the licensing. Now that we have that data, we no longer need the tracker installed. Unfortunately, this breaks the 0.6.0 build. Feel free to use the 0.6.5 build as it's effectively the same with more bugs squashed :)
+    - There was tracking code in the 0.6.0' version that was being used to track installs; This was mainly to see which corporations are violating the licensing. Now that we have that data, we no longer need the tracker installed. Unfortunately, this breaks the 0.6.0 build. Feel free to use the 0.7.0 build as it's more up to date :)
 - **Why Not bind the endpoints to the 'MODEL'(ie GraphQL)?**
     - First 'resource' in API spec (per Roy Fielding) is used in the sense of 'Uniform Resource Indicator' (ie URI). This points to a service or business logic which then calls data which may be a mixture of two tables (ie JOIN), a file, a link to another api, etc. By binding to your model, you are asking it to become the 'business logic','communication logic' as well as 'data handling' and not only breaks the API spec/standard but limits what your API can return. This breaks rules of AOP, Separation of Control', OWASP API security and over complicates your build and testing. This also makes your entire environment slower and harder to scale. So yeah... bad idea in general.
 - **Why require a cache?**
