@@ -107,6 +107,5 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - (SDK) automated webhooks (need to do prior to rate limiting/io state)
     - (SDK) rate limiting / data limiting (reliant on webhooks and DB)
     - (SDK) change IOState files (possibly read from CDN ???)
-    - (SDK) PropertySource for dataSourceProperties/apiProperties (in beapi-java-demo) needs to be dynamic via CDN
 
 
