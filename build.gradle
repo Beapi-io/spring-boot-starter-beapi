@@ -101,6 +101,9 @@ dependencies {
     implementation "org.springframework:spring-web:5.3.14"
     implementation "org.springframework:spring-webmvc:5.3.14"
     implementation "org.springframework.boot:spring-boot:${springBootVersion}"
+    implementation("org.springframework.data:spring-data-jpa:2.6.0")
+    implementation 'com.zaxxer:HikariCP:3.2.0'
+    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     implementation 'org.json:json:20210307'
 
     // [LOGGING]

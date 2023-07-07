@@ -57,6 +57,9 @@ public class ApiProperties{
         // todo : current master/slave (change to parent/child)
         private String serverType = 'slave'
 
+        // note : can be nano/medium/large
+        private String configType = 'large'
+
         // todo: change name of this to testing protocol (should be HTTPS in prod)
         private String testingProtocol = 'http'
         private Boolean autoTest = false
@@ -81,6 +84,7 @@ public class ApiProperties{
         String getIostateDir() { return iostateDir }
         ArrayList getStaticEndpoint() { return staticEndpoint }
         String getServerType() { return serverType }
+        String getConfigType() { return configType }
         Boolean getAutoTest() { return autoTest }
         ArrayList getSupportedFormats() { return supportedFormats }
         String getTestingProtocol() { return testingProtocol }
@@ -96,6 +100,7 @@ public class ApiProperties{
         void setEncoding(String encoding) { this.encoding = encoding }
         void setIostateDir(String iostateDir) { this.iostateDir = iostateDir }
         void setServerType(String serverType) { this.serverType = serverType }
+        void setConfigType(String configType) { this.configType = configType }
         void setAutoTest(Boolean autoTest) { this.autoTest = autoTest }
         void setSupportedFormats(ArrayList supportedFormats) { this.supportedFormats = supportedFormats }
         void setTestingProtocol(String testingProtocol) { this.testingProtocol = testingProtocol }

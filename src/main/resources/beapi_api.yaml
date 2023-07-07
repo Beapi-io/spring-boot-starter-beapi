@@ -14,7 +14,6 @@ api:
     encoding: UTF-8
     iostateDir: '.boot/.iostate'
     serverType: master
-    configType: large
     testingProtocol: http
     autoTest: false
     throttle:

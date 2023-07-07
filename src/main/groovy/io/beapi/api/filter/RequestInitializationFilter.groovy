@@ -55,8 +55,10 @@ import javax.servlet.RequestDispatcher
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.HandlerMapping;
+
 /**
- * This class parses the URI attributes on initial request  &
+ * This class parses the URI attributes on initial request &
+ * runs some simple access checks
  *
  * @author Owen Rubel
  */
@@ -68,7 +70,10 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RequestInitializationFilter.class);
 
-    private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml','multipart/form-data']
+    /*
+    * WE DO NOT DO SUPPORT 'multipart/form-data'; THIS IS NOT A FILE SERVE!!!
+     */
+    private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml']
     private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
     private static final ArrayList CALL_TYPES = ['v','b','c','t']
 
@@ -107,7 +112,13 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     String action
     boolean apidocFwd
 
-
+    /**
+     * @param PrincipleService principle
+     * @param ApiProperties apiProperties
+     * @param ApiCacheService apiCacheService
+     * @param String version
+     * @param ApplicationContext ctx
+     */
     public RequestInitializationFilter(PrincipleService principle, ApiProperties apiProperties, ApiCacheService apiCacheService, String version, ApplicationContext ctx) {
         this.apiProperties = apiProperties
         this.version = version
@@ -116,14 +127,15 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         this.apiCacheService = apiCacheService
     }
 
+
     /**
      * (overridden method)
-     * @param HttpServletRequest
-     * @param HttpServletResponse
-     * @param FilterChain
+     * @param HttpServletRequest request
+     * @param HttpServletResponse response
+     * @param FilterChain chain
      */
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException,Exception {
         // println("### RequestInitializationFilter...")
         this.authority=this.principle.authorities()
         if (processRequest(request, response)) {
@@ -149,7 +161,12 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     }
 
 
-    private boolean processRequest(HttpServletRequest request, HttpServletResponse response){
+    /**
+     * @param HttpServletRequest request
+     * @param HttpServletResponse response
+     * @returns boolean
+     */
+    private boolean processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception{
         if(this.authority!='ROLE_ANONYMOUS') {
             //logger.debug("doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : {}");
             String cachedResult
@@ -329,6 +346,12 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         return false
     }
 
+    /**
+     * retrieve a finalized input/ouput set from receives/returns dataset for the role from the cache
+     * @param LinkedHashMap input
+     * @param String role
+     * @returns Set
+     */
     private Set getIOSet(LinkedHashMap input, String role){
         Set params = []
         input.each(){ k, v ->
@@ -343,6 +366,11 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         return params
     }
 
+    /**
+     * get simple string version of mimetype formats the application supports
+     * @param String mimeType
+     * @returns String
+     */
     protected String getFormat(String mimeType){
         String format
         switch(mimeType){
@@ -394,12 +422,9 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
 
     /**
-     * Returns concatenated IDS as a HASH used as ID for the API cache
-     * @see io.beapi.api.interceptor.ApiInterceptor#before()
-     * @see BatchInterceptor#before()
-     * @see ChainInterceptor#before()
-     * @param LinkedHashMap List of ids required when making request to endpoint
-     * @return a hash from all id's needed when making request to endpoint
+     * hashes concatenated keys of response set and uses as ID for the API cache
+     * @param LinkedHashMap params
+     * @param ArrayList receivesList
      */
     protected void setCacheHash(LinkedHashMap params,ArrayList receivesList){
         StringBuilder hashString = new StringBuilder('')
@@ -415,11 +440,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     }
 
     /**
-     * Given the request params and endpoint request definitions, test to check whether the request params match the expected endpoint params; returns boolean
-     * @see io.beapi.api.interceptor.ApiInterceptor#before()
-     * @see BatchInterceptor#before()
-     * @see ChainInterceptor#before()
-     * @param GrailsParameterMap Map of params created from the request data
+     * Given the request params, check against expected parms in IOstate for users role; returns boolean
      * @param LinkedHashMap map of variables defining endpoint request variables
      * @return Boolean returns false if request variable keys do not match expected endpoint keys
      */
@@ -620,12 +641,12 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         return obj;
     }
 
-    // Todo : Move to exchangeService??
+
     /**
      * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
      * @param HttpServletResponse response
      * @param String statusCode
-     * @return LinkedHashMap commonly formatted linkedhashmap
+     * @param String uri
      */
     void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
         response.setContentType("application/json")
@@ -635,12 +656,12 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         response.writer.flush()
     }
 
-    // Todo : Move to exchangeService??
     /**
      * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
      * @param HttpServletResponse response
      * @param String statusCode
-     * @return LinkedHashMap commonly formatted linkedhashmap
+     * @param String uri
+     * @param String msg
      */
     void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
         response.setContentType("application/json")

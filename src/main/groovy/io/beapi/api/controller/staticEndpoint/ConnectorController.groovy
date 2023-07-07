@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import groovy.json.JsonSlurper
 import org.json.JSONObject
+import javax.servlet.http.Part;
 
 // AKA IostateController (this is the same thing)
 @Controller("connector")
@@ -44,11 +45,20 @@ public class ConnectorController extends BeapiRequestHandler{
 	String authority
 
 	List update(HttpServletRequest request, HttpServletResponse response) {
-		//println("### connector/update ###")
-		HashMap model = [:]
-		iostateService.parseJson(this.params['IOSTATE']['NAME'],this.params['IOSTATE'])
 
-		model = [NAME:this.params['IOSTATE']['NAME'],VERSION:'0']
+		if (this.params.get('IOSTATE').empty) {
+			render(status:HttpServletResponse.SC_BAD_REQUEST)
+			return null
+		}
+
+		HashMap model = [:]
+		try {
+			iostateService.parseJson(this.params['IOSTATE']['NAME'], this.params['IOSTATE'])
+			model = [NAME: params['IOSTATE']['NAME'],VERSION:'0']
+		}catch(Exception e){
+			println("ConnectorController Exception : "+e)
+		}
+
 
 		List returnData = [model]
 		return returnData
