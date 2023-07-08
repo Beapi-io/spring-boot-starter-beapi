@@ -53,6 +53,9 @@
                           <a class="nav-link" href="index.html#section-3">Setup Demo Project DB</a>
                         </li>
                         <li class="nav-item">
+                          <a class="nav-link" href="index.html#section-4">Build Demo Project</a>
+                        </li>
+                        <li class="nav-item">
                           <a class="nav-link" href="index.html#section-5">Run Demo Project</a>
                         </li>
                         <li class="nav-item">
@@ -358,6 +361,42 @@ password: "password"</code></pre>
             <!-- / file tree -->
 
 <hr size="5">
+
+            <!-- file tree -->
+            <section id="section-4">
+              <h2 class="section-title-4">Build Demo Project<a data-scroll href="#section-4" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"></a></h2>
+              <p>Now that you have everything configured, you will need to build the project. In your <b>gradle.properties</b>, you have three properties (as well as a default variable for setting the 'default configType):</p>
+              <div class="row">
+                <div class="col">
+                  <div class="alert alert-warning" role="alert">
+                  <ul>
+                    <li>configType.nano</li>
+                    <li>configType.medium</li>
+                    <li>configType.large</li>
+                  </ul>
+                  </div>
+                </div>
+              </div>
+              <p></p>Each 'configType' has a default set of JVMargs (which can be changed) to fit an instance/server type</p>
+              <ul>
+                <li><p>Pass your 'configType' you wish to use in the following command in a shell to build your project :</p>
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">gradle clean build -Pargs=configType=nano</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+
+              </ul>
+              <p>Now you are setup and can start running your project...</p>
+            </section>
+
+            <hr size="5">
 
             <!-- file tree -->
             <section id="section-5">
@@ -681,6 +720,9 @@ sudo systemctl status beapi
                 </li>
                 <li class="nav-item">
                   <a data-scroll class="nav-link" href="#section-3">Setup Demo Project DB</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-4">Build Demo Project</a>
                 </li>
                 <li class="nav-item">
                   <a data-scroll class="nav-link" href="#section-5">Run Demo Project</a>
