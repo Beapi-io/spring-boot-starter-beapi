@@ -18,6 +18,7 @@ package io.beapi.api.controller.staticEndpoint
 
 
 import io.beapi.api.controller.BeapiRequestHandler
+import io.beapi.api.properties.ApiProperties
 import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.IoStateService
 import org.slf4j.LoggerFactory
@@ -29,7 +30,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import groovy.json.JsonSlurper
 import org.json.JSONObject
-import javax.servlet.http.Part;
+import io.beapi.api.properties.ApiProperties
 
 // AKA IostateController (this is the same thing)
 @Controller("connector")
@@ -38,11 +39,37 @@ public class ConnectorController extends BeapiRequestHandler{
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ConnectorController.class);
 
 	@Autowired
+	ApiProperties apiProperties
+
+	@Autowired
 	ApiCacheService apiCacheService
 
 	@Autowired
 	IoStateService iostateService
 	String authority
+
+	List list(HttpServletRequest request, HttpServletResponse response) {
+		ArrayList cacheKeys = apiCacheService.getCacheKeys()
+		HashMap model = ['list':cacheKeys]
+		List returnData = [model]
+		return returnData
+	}
+
+	List listFiles(HttpServletRequest request, HttpServletResponse response) {
+		String userDir = System.getProperty("user.home")
+		String path = "${userDir}/${apiProperties.iostateDir}"
+
+		ArrayList list = []
+		new File(path).eachFile() { file ->
+			if (!file.isDirectory()) {
+				list.add(file.name.toString())
+			}
+		}
+		HashMap model = ['list':list]
+
+		List returnData = [model]
+		return returnData
+	}
 
 	List update(HttpServletRequest request, HttpServletResponse response) {
 
@@ -59,10 +86,8 @@ public class ConnectorController extends BeapiRequestHandler{
 			println("ConnectorController Exception : "+e)
 		}
 
-
 		List returnData = [model]
 		return returnData
-
 	}
 
 }

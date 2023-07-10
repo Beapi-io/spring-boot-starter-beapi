@@ -41,15 +41,14 @@ public class PropertiesController extends BeapiRequestHandler{
 
 
 	LinkedHashMap getAll(HttpServletRequest request, HttpServletResponse response) {
+		println("###getAll")
+
 		LinkedHashMap temp = new LinkedHashMap<>();
-		temp.put("name",apiProperties.getName());
 		temp.put("attempts",apiProperties.getAttempts());
 		temp.put("procCores",apiProperties.getProcCores());
 		temp.put("documentationUrl",apiProperties.getDocumentationUrl());
-		temp.put("views",apiProperties.getViews());
 		temp.put("reservedUris",apiProperties.getReservedUris());
 		temp.put("publicEndpoint",apiProperties.getPublicEndpoint());
-		temp.put("entities",apiProperties.getEntities());
 		temp.put("apichainLimit",apiProperties.getApichainLimit());
 		temp.put("postcrement",apiProperties.getPostcrement());
 		temp.put("chainingEnabled",apiProperties.getChainingEnabled());
@@ -59,8 +58,6 @@ public class PropertiesController extends BeapiRequestHandler{
 		temp.put("staticEndpoint",apiProperties.getStaticEndpoint());
 		temp.put("supportedFormats",apiProperties.getSupportedFormats());
 		temp.put("serverType",apiProperties.getServerType());
-		temp.put("protocol",apiProperties.getProtocol());
-		temp.put("parseValidRequestParams",apiProperties.getParseValidRequestParams());
 		temp.put("autoTest",apiProperties.getAutoTest());
 
 		LinkedHashMap throttle = new LinkedHashMap<>();
@@ -82,24 +79,21 @@ public class PropertiesController extends BeapiRequestHandler{
 		sec.put("anonRole",apiProperties.getSecurity().getAnonRole());
 		sec.put("networkGroups",apiProperties.getSecurity().getNetworkGroups());
 		sec.put("networkRoles",apiProperties.getSecurity().getNetworkRoles());
-		sec.put("corsNetworkGroups",apiProperties.getSecurity().getCorsNetworkGroups());
-		sec.put("corsIncludeEnvironments",apiProperties.getSecurity().getCorsIncludeEnvironments());
-		sec.put("corsExcludeEnvironments",apiProperties.getSecurity().getCorsExcludeEnvironments());
 		temp.put("security", sec);
+
+		println(temp)
 
 		return temp;
 	}
 
 	LinkedHashMap getProperties(HttpServletRequest request, HttpServletResponse response) {
+		println("###getProperties")
 		LinkedHashMap temp = new LinkedHashMap<>();
-        temp.put("name",apiProperties.getName());
         temp.put("attempts",apiProperties.getAttempts());
         temp.put("procCores",apiProperties.getProcCores());
         temp.put("documentationUrl",apiProperties.getDocumentationUrl());
-        temp.put("views",apiProperties.getViews());
         temp.put("reservedUris",apiProperties.getReservedUris());
         temp.put("publicEndpoint",apiProperties.getPublicEndpoint());
-        temp.put("entities",apiProperties.getEntities());
         temp.put("apichainLimit",apiProperties.getApichainLimit());
         temp.put("postcrement",apiProperties.getPostcrement());
         temp.put("chainingEnabled",apiProperties.getChainingEnabled());
@@ -109,9 +103,10 @@ public class PropertiesController extends BeapiRequestHandler{
         temp.put("staticEndpoint",apiProperties.getStaticEndpoint());
         temp.put("supportedFormats",apiProperties.getSupportedFormats());
         temp.put("serverType",apiProperties.getServerType());
-        temp.put("protocol",apiProperties.getProtocol());
-        temp.put("parseValidRequestParams",apiProperties.getParseValidRequestParams());
         temp.put("autoTest",apiProperties.getAutoTest());
+
+		println(temp)
+
 		return temp;
 	}
 
@@ -149,9 +144,6 @@ public class PropertiesController extends BeapiRequestHandler{
 		temp.put("anonRole",apiProperties.getSecurity().getAnonRole());
 		temp.put("networkGroups",apiProperties.getSecurity().getNetworkGroups());
 		temp.put("networkRoles",apiProperties.getSecurity().getNetworkRoles());
-		temp.put("corsNetworkGroups",apiProperties.getSecurity().getCorsNetworkGroups());
-		temp.put("corsIncludeEnvironments",apiProperties.getSecurity().getCorsIncludeEnvironments());
-		temp.put("corsExcludeEnvironments",apiProperties.getSecurity().getCorsExcludeEnvironments());
 
 		LinkedHashMap map = new LinkedHashMap<>();
 		map.put("security", temp);
