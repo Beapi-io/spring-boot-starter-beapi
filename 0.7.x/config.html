@@ -243,21 +243,32 @@
               <div id="section-1.1">
                 <p>Since this is an API application, people will want to get into the nuts an bolts of configuring this so we also supply some of the more advanced configuration settings:</p>
                 <ul>
-                  <li><b>JVM Args</b>:  Should you need to tweak the default config, you will find the JVM Args in the demo-application's build.gradle; there is a section that looks like the following:
+                  <li><b>JVM Args</b>:  Should you need to tweak the default <b>BUILD</b> JVM ARGS, you will find the JVM Args in the 'gradle.properties'; there is a section that looks like the following:
+                    <div class="row">
+                      <div class="col">
+                        <div class="alert alert-warning" role="alert">
+                          <ul>
+                            <li><b>configType.nano</b>="-Xms512m -Xmx1024m -XX:+UseParallelGC  -XX:ParallelGCThreads=4 -XX:MaxGCPauseMillis=200 -XX:MaxGCMinorPauseMillis=75 -server -noverify  -Xshare:off  -Djava.net.preferIPv4Stack=true -XX:+EliminateLocks -XX:GCTimeRatio=7 -Djava.security.egd=file:/dev/urandom -Djdk.map.althashing.threshold=512"</li>
+                            <li><b>configType.medium</b>="-Xms1024m -Xmx2048m -XX:+UseParallelGC  -XX:ParallelGCThreads=8 -XX:MaxGCPauseMillis=200 -XX:MaxGCMinorPauseMillis=75 -server -noverify  -Xshare:off  -Djava.net.preferIPv4Stack=true -XX:+EliminateLocks -XX:GCTimeRatio=7 -Djava.security.egd=file:/dev/urandom -Djdk.map.althashing.threshold=512"</li>
+                            <li><b>configType.large</b>="-Xms4048m -Xmx4096m -XX:+UseParallelGC  -XX:ParallelGCThreads=16 -XX:MaxGCPauseMillis=200 -XX:MaxGCMinorPauseMillis=75 -server -noverify  -Xshare:off  -Djava.net.preferIPv4Stack=true -XX:+EliminateLocks -XX:GCTimeRatio=7 -Djava.security.egd=file:/dev/urandom -Djdk.map.althashing.threshold=512"</li>
+                            <li><b>configTypeDefault</b>=nano</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p>You can use these default per your instance or change them to your needs. You then simply pass the variable for your instance with your 'BUILD':</p>
                     <div class="row">
                       <div class="col">
                         <div class="card">
                           <div class="card-body" style="background-color:#000;">
-                            <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">application {
-	mainClass = 'demo.application.Application'
-	applicationDefaultJvmArgs = ["-Xms1024m -Xmx2048m -XX:+UseParallelGC  -XX:ParallelGCThreads=4 -XX:MaxGCPauseMillis=200 -XX:MaxGCMinorPauseMillis=75 -server -noverify  -Xshare:off  -Djava.net.preferIPv4Stack=true -XX:+EliminateLocks -XX:GCTimeRatio=7 -Djava.security.egd=file:/dev/urandom"]
-}</code></pre>
+                            <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">gradle clean build -Pargs=configType=nano</code></pre>
                           </div>
                         </div>
                       </div>
                     </div>
                   </li>
-                  <li style="margin-top: 25px;"><b>SSL</b>: No SSL is required; SSL should be being done at your <b>load balancer</b> so that it is checked for ALL SERVERS and then can send an HTTP tunnel to the regular servers. Should you need SSL, you will have to set that up yourself as that is not provided for the demo-application</li>
+                  <li style="margin-top: 25px;"><b>TLS/SSL</b>: No TLS/SSL is required; Certifivate handling should be being done at your <b>load balancer</b> so that it is checked for ALL SERVERS and then can send an HTTP tunnel to the regular servers. Should you need TLS/SSL, you will have to set that up yourself as that is not provided for the demo-application</li>
                 </ul>
               </div>
             </section>
