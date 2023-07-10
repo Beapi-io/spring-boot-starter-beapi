@@ -2,23 +2,18 @@
     "NAME": "properties",
     "NETWORKGRP": "public",
     "VALUES": {
-        "name": {
-            "type": "String",
+        "attempts": {
+            "type": "Integer",
             "description": "",
             "mockData": "*"
         },
-        "attempts": {
+        "procCores": {
             "type": "Integer",
             "description": "",
             "mockData": "*"
         },
         "documentationUrl" : {
             "type": "String",
-            "description": "",
-            "mockData": "*"
-        },
-        "views": {
-            "type": "ArrayList",
             "description": "",
             "mockData": "*"
         },
@@ -32,18 +27,8 @@
             "description": "",
             "mockData": "*"
         },
-        "entities": {
-            "type": "ArrayList",
-            "description": "",
-            "mockData": "*"
-        },
         "apichainLimit": {
             "type": "Integer",
-            "description": "",
-            "mockData": "*"
-        },
-        "postcrement": {
-            "type": "Boolean",
             "description": "",
             "mockData": "*"
         },
@@ -82,12 +67,12 @@
             "description": "",
             "mockData": "*"
         },
-        "autoTest": {
-            "type": "Boolean",
+        "supportedFormats": {
+            "type": "ArrayList",
             "description": "",
             "mockData": "*"
         },
-        "supportedFormats": {
+        "staticEndpoint": {
             "type": "ArrayList",
             "description": "",
             "mockData": "*"
@@ -126,7 +111,7 @@
                         "ROLE_ADMIN": []
                     },
                     "RESPONSE": {
-                        "ROLE_ADMIN": ["name","attempts","documentationUrl","views","reservedUris","publicEndpoint","apichainLimit","chainingEnabled","batchingEnabled","encoding","iostateDir","serverType","supportedFormats","throttle","webhook","security"]
+                        "ROLE_ADMIN": ["attempts","procCores","documentationUrl","reservedUris","publicEndpoint","apichainLimit","chainingEnabled","batchingEnabled","encoding","iostateDir","staticEndpoint","serverType","supportedFormats","throttle","webhook","security"]
                     }
                 },
                 "getProperties": {
@@ -137,7 +122,7 @@
                         "ROLE_ADMIN": []
                     },
                     "RESPONSE": {
-                        "ROLE_ADMIN": ["name","attempts","documentationUrl","views","reservedUris","publicEndpoint","apichainLimit","chainingEnabled","batchingEnabled","encoding","iostateDir","serverType","supportedFormats"]
+                        "ROLE_ADMIN": ["attempts","procCores","documentationUrl","reservedUris","publicEndpoint","apichainLimit","chainingEnabled","batchingEnabled","encoding","iostateDir","staticEndpoint","serverType","supportedFormats"]
                     }
                 },
                 "throttleProps": {

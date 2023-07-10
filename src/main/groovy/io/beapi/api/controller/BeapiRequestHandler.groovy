@@ -279,6 +279,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
                     // println("responseList : "+responseList)
                     // println("responseKeys : "+body.keySet())
 
+
                     if (responseList.size()==body.keySet().size()) {
                         output.add(body)
                     }
