@@ -59,7 +59,7 @@ import io.beapi.api.service.ApiCacheService
 @EnableConfigurationProperties([ApiProperties.class])
 @AutoConfigureAfter(org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration.class)
 @AutoConfigureBefore([BeapiWebAutoConfiguration.class,BeapiServiceAutoConfiguration.class])
-public class BeapiEhCacheAutoConfiguration  implements CachingConfigurer {
+public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
 
     @Autowired
     private ApiProperties apiProperties;
@@ -91,7 +91,7 @@ public class BeapiEhCacheAutoConfiguration  implements CachingConfigurer {
     public ThrottleCacheService throttleCacheService() throws IOException { return new ThrottleCacheService(cacheManager()); }
 
     @Bean(destroyMethod = "shutdown")
-    public net.sf.ehcache.CacheManager ehCacheManager() {
+    public net.sf.ehcache.CacheManager ehCacheManager() throws Exception{
         System.setProperty("net.sf.ehcache.skipUpdateCheck", "false")
 
         // user by name cache

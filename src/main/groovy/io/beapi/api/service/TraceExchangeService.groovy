@@ -89,7 +89,7 @@ public class TraceExchangeService extends ApiExchange{
     }
 
 
-	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
+	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) throws Exception{
 		String accept = request.getHeader('Accept')
 		String contentType = request.getContentType()
 

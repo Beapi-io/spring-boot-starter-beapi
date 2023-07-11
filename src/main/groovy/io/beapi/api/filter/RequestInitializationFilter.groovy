@@ -444,7 +444,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
      * @param LinkedHashMap map of variables defining endpoint request variables
      * @return Boolean returns false if request variable keys do not match expected endpoint keys
      */
-    boolean checkRequestParams(LinkedHashMap methodParams){
+    boolean checkRequestParams(LinkedHashMap methodParams) throws Exception{
         ArrayList checkList = this.receivesList
         ArrayList paramsList
         ArrayList reservedNames = ['batchLength','batchInc','chainInc','apiChain','_','batch','max','offset','chaintype']
@@ -540,7 +540,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         return output
     }
 
-    private LinkedHashMap parsePutParams(String formData){
+    private LinkedHashMap parsePutParams(String formData) throws Exception{
         //String formData = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
         LinkedHashMap<String, String> output = [:]
         if (formData) {

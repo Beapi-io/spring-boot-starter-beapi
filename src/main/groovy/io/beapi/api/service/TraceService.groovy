@@ -110,7 +110,7 @@ public class TraceService{
 		return newTrace
 	}
 
-	private Long getElapsedTime(Long startTime, Long stopTime){
+	private Long getElapsedTime(Long startTime, Long stopTime) throws Exception{
 		Long elapsedTime = stopTime - startTime
 		if(elapsedTime>=0) {
 			return elapsedTime

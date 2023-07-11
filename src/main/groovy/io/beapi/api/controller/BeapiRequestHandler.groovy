@@ -151,7 +151,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
 
     }
 
-    ArrayList convertModel(Object obj){
+    ArrayList convertModel(Object obj) throws Exception{
         try{
             ArrayList output = []
             if(obj){
@@ -223,7 +223,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
      * @param Object data
      * @return LinkedHashMap commonly formatted linkedhashmap
      */
-    LinkedHashMap formatEntity(Object obj){
+    LinkedHashMap formatEntity(Object obj) throws Exception{
         ObjectMapper omapper = new ObjectMapper()
         LinkedHashMap<String,Object> map = [:]
         try{
@@ -264,7 +264,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
     /*
     * checks multiple return sets(bodyList) against expected returns keyset(responseList)
     */
-    ArrayList parseResponseParams(ArrayList bodyList, Set responseList){
+    ArrayList parseResponseParams(ArrayList bodyList, Set responseList) throws Exception{
         ArrayList output = []
 
         try {
