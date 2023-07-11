@@ -101,7 +101,9 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 ```mermaid
 flowchart TD
     A[RequestInitializationFilter] --> B(ApiInterceptor)
-    B --> C[ExchangeService] |D[BatchExchangeService] | E[ChainExchangeService]
+    B --> C[ExchangeService] 
+    B --> D[BatchExchangeService] 
+    B --> E[ChainExchangeService] 
     C --> F[Controller]
     D --> F[Controller]
     E --> F[Controller]
