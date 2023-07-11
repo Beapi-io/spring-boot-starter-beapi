@@ -105,8 +105,8 @@ flowchart TD
     C --> D[ExchangeService] 
     C --> E[BatchExchangeService] 
     C --> F[ChainExchangeService] 
-    D --> G[Controller (extends BeapiRequestHandler)]
-    E --> G[Controller (extends BeapiRequestHandler)]
-    F --> G[Controller (extends BeapiRequestHandler)]
+    D --> G[Controller extends BeapiRequestHandler]
+    E --> G[Controller extends BeapiRequestHandler]
+    F --> G[Controller extends BeapiRequestHandler]
     G --> |postHandler| C
 ```
