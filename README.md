@@ -107,6 +107,6 @@ flowchart TD
     C --> F[ChainExchangeService] 
     D --> G[Controller]
     E --> G[Controller]
-    G --> G[Controller]
+    F --> G[Controller]
     G --> |postHandler| C
 ```
