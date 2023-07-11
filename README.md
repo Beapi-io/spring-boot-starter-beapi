@@ -100,9 +100,9 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 
 ```mermaid
 flowchart TD
-    A[Christmas] -->|Get money| B(Go shopping)
-    B --> C{Let me think}
-    C -->|One| D[Laptop]
-    C -->|Two| E[iPhone]
-    C -->|Three| F[fa:fa-car Car]
+    A[RequestInitializationFilter] --> B(ApiInterceptor)
+    B --> C[ExchangeService] |D[BatchExchangeService] | E[ChainExchangeService]
+    C --> F[Controller]
+    D --> F[Controller]
+    E --> F[Controller]
 ```
