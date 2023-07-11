@@ -261,7 +261,7 @@ public class ChainExchangeService extends ApiExchange{
 		}
 	}
 
-	private void setNewChainPath(HttpServletRequest request, ArrayList body){
+	private void setNewChainPath(HttpServletRequest request, ArrayList body) throws Exception{
 		String method = request.getMethod()
 		LinkedHashMap chainParams = [:]
 		String newPath
@@ -360,7 +360,7 @@ public class ChainExchangeService extends ApiExchange{
 		}
 	}
 
-	private void setChainParams(HttpServletRequest request) {
+	private void setChainParams(HttpServletRequest request) throws Exception{
 		if (request.getAttribute('params')){
 			this.params = request.getAttribute('params')
 		}

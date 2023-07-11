@@ -109,7 +109,7 @@ class ApiCacheService{
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	@CachePut(value='ApiCache',key="#controllername")
-	LinkedHashMap setApiCache(String controllername, String methodname, ApiDescriptor apidoc, String apiversion){
+	LinkedHashMap setApiCache(String controllername, String methodname, ApiDescriptor apidoc, String apiversion) throws Exception{
 		//logger.debug("setApiCache(String ,String ,ApiDescriptor ,String) : {}","${controllername}/${methodname}")
 		try{
 			LinkedHashMap cache = getApiCache(controllername)
@@ -146,7 +146,7 @@ class ApiCacheService{
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	@CachePut(value='ApiCache',key="#controllername")
-	boolean setCache(String controllername,LinkedHashMap apidesc){
+	boolean setCache(String controllername,LinkedHashMap apidesc) throws Exception{
 		//logger.debug("setCache(String, LinkedHashMap) : {}",controllername)
 		if(controllername=='hook'){
 			println("setCache : ${apidesc}")
@@ -178,7 +178,7 @@ class ApiCacheService{
 	// TODO: parse for XML as well
 	// todo : turn into object
 	@CachePut(value='ApiCache',key="#controllername")
-	LinkedHashMap setApiCachedResult(String cacheHash, String controllername, String apiversion, String methodname, String authority, String format, String content){
+	LinkedHashMap setApiCachedResult(String cacheHash, String controllername, String apiversion, String methodname, String authority, String format, String content) throws Exception{
 		//logger.debug("setApiCachedResults(String, String, String, String, String, String, LinkedHashMap) : {}")
 		try {
 			LinkedHashMap cachedResult = [:]
@@ -215,7 +215,7 @@ class ApiCacheService{
 	}
 
 	@CachePut(value='ApiCache',key="#controllername")
-	LinkedHashMap unsetApiCachedResult(String controllername, String actionname, String apiversion){
+	LinkedHashMap unsetApiCachedResult(String controllername, String actionname, String apiversion) throws Exception{
 		//logger.debug("unsetApiCachedResults(String, String, String) : {}")
 		try {
 			LinkedHashMap cache = getApiCache(controllername)
@@ -238,7 +238,7 @@ class ApiCacheService{
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	//@Cacheable(value='ApiCache',key="#controllername",sync=false)
-	LinkedHashMap getApiCache(String controllername){
+	LinkedHashMap getApiCache(String controllername) throws Exception{
 		//logger.debug("getApiCache(String) : {}",controllername)
 		if(controllername!=null) {
 			try {
@@ -262,7 +262,7 @@ class ApiCacheService{
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	//@Cacheable(value='ApiCache',key="#controllername",sync=false)
-	ApiDescriptor getApiDescriptor(String controllername, String version, String action){
+	ApiDescriptor getApiDescriptor(String controllername, String version, String action) throws Exception{
 		//logger.debug("getApiCache(String) : {}",controllername)
 		if(controllername!=null) {
 			try {

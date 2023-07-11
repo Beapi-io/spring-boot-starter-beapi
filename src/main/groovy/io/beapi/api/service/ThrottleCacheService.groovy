@@ -57,7 +57,7 @@ class ThrottleCacheService{
 	 */
 	//@org.springframework.cache.annotation.CachePut(value="Throttle",key="#userId")
 	@CachePut(value="Throttle",key="#userId")
-	LinkedHashMap setThrottleCache(String userId, LinkedHashMap input){
+	LinkedHashMap setThrottleCache(String userId, LinkedHashMap input) throws Exception{
 		try{
 			def cache = cacheManager.getCache('Throttle');
 			cache.put(userId,input);
@@ -74,7 +74,7 @@ class ThrottleCacheService{
 	 */
 	//@org.springframework.cache.annotation.CachePut(value="Throttle",key="#userId")
 	@CachePut(value="Throttle",key="#userId")
-	LinkedHashMap incrementThrottleCache(String userId){
+	LinkedHashMap incrementThrottleCache(String userId) throws Exception{
 		try{
 			def cache = getLimitCache(userId)
 			cache['rateLimitCurrent']++
@@ -93,7 +93,7 @@ class ThrottleCacheService{
 	 * @param String userId of user being rate limited
 	 * @return A LinkedHashMap of Cached data associated with userId
 	 */
-	LinkedHashMap getThrottleCache(String userId){
+	LinkedHashMap getThrottleCache(String userId) throws Exception{
 		if(userId!=null) {
 			try{
 				net.sf.ehcache.Ehcache temp = cacheManager?.getCache('Throttle')?.getNativeCache()

@@ -156,7 +156,7 @@ abstract class ApiExchange{
      * @param LinkedHashMap map of variables defining endpoint request variables
      * @return Boolean returns false if request variable keys do not match expected endpoint keys
      */
-    boolean checkRequestParams(LinkedHashMap methodParams){
+    boolean checkRequestParams(LinkedHashMap methodParams) throws Exception{
         ArrayList checkList = this.receivesList
         ArrayList paramsList
         Set reservedNames = ['batchLength','batchInc','chainInc','apiChain','batch','_','max','offset','chaintype']

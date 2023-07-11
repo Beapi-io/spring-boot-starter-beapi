@@ -109,7 +109,7 @@ public class ExchangeService extends ApiExchange{
         response.writer.flush()
     }
 
-	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
+	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) throws Exception{
 		//String accept = request.getHeader('Accept')
 		//String contentType = request.getContentType()
 

@@ -48,7 +48,7 @@ class PrincipleService {
 		//return authentication.getPrinciple();
 	}
 
-	String authorities() {
+	String authorities() throws Exception{
 		String authorities = 'permitAll'
 		//logger.debug("authorities : {}")
 		try {

@@ -63,7 +63,7 @@ class TraceCacheService {
 	 * @return
 	 */
 	@CacheEvict(value='Trace', allEntries = true)
-	void flushAllApiCache(){
+	void flushAllApiCache() throws Exception{
 		try {
 /*
             Map<String, Object> controllers = listableBeanFactory.getBeansWithAnnotation(Controller.class);
@@ -83,7 +83,7 @@ class TraceCacheService {
 
 	}
 
-	public void flushCache(){
+	public void flushCache() throws Exception{
 		try{
 			cacheManager.getCache('Trace').clear()
 		}catch(Exception e){
@@ -98,7 +98,7 @@ class TraceCacheService {
 */
 
 	@CachePut(value='Trace',key="#uri")
-	LinkedHashMap putTraceCache(String uri){
+	LinkedHashMap putTraceCache(String uri) throws Exception{
 		try{
 			return cache
 		}catch(Exception e){
@@ -109,7 +109,7 @@ class TraceCacheService {
 
 	// issue here
 	@CachePut(value='Trace',key="#uri")
-	LinkedHashMap setTraceMethod(String uri, LinkedHashMap input){
+	LinkedHashMap setTraceMethod(String uri, LinkedHashMap input) throws Exception{
 		try{
 			def cache = cacheManager.getCache('Trace');
 			cache.put(uri,input);
@@ -126,7 +126,7 @@ class TraceCacheService {
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	//@Cacheable(value='ApiCache',key="#controllername",sync=false)
-	LinkedHashMap getTraceCache(String uri){
+	LinkedHashMap getTraceCache(String uri) throws Exception{
 		logger.debug("getTraceCache(String) : {}",uri)
 
 		if(uri!=null) {

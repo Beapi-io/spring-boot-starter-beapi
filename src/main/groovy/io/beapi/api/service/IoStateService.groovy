@@ -513,7 +513,7 @@ public class IoStateService{
 
 
 
-	private LinkedHashMap getIOSet(LinkedHashMap io, LinkedHashMap apiObject, List valueKeys, String apiName){
+	private LinkedHashMap getIOSet(LinkedHashMap io, LinkedHashMap apiObject, List valueKeys, String apiName) throws Exception{
 		logger.debug("getIOSet : {}")
 
 		// TODO : APIOBJECT IS ALWAYS EMPTY; NEED TO FIX APIDESCRIPTOR ABOVE

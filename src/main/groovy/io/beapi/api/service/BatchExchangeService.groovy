@@ -114,7 +114,7 @@ public class BatchExchangeService extends ApiExchange{
 	}
 
 
-	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) {
+	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) throws Exception{
 		String accept = request.getHeader('Accept')
 		String contentType = request.getContentType()
 
@@ -206,7 +206,7 @@ public class BatchExchangeService extends ApiExchange{
 		}
 	}
 
-	void setBatchParams(HttpServletRequest request){
+	void setBatchParams(HttpServletRequest request) throws Exception{
 		try {
 			if(request.getAttribute('batchVars')) {
 				LinkedHashMap output = [:]

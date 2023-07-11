@@ -118,7 +118,7 @@ class HookCacheService {
 
 	// todo
 	@CachePut(value='HookCache',key="#ownerEmail")
-	LinkedHashMap setHook(String ownerEmail, ApiHook hook){
+	LinkedHashMap setHook(String ownerEmail, ApiHook hook) throws Exception{
 		try{
 			ArrayList cache = getHookCache(ownerEmail)
 
@@ -181,7 +181,7 @@ class HookCacheService {
 	 * @param String controller name for designated endpoint
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
-	LinkedHashMap getHookCache(String ownerEmail){
+	LinkedHashMap getHookCache(String ownerEmail) throws Exception{
 		if(ownerEmail!=null) {
 			try {
 				//cacheManager.setTransactionAware(false);
@@ -312,7 +312,7 @@ class HookCacheService {
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	//@Cacheable(value='ApiCache',key="#controllername",sync=false)
-	ApiDescriptor getApiDescriptor(String controllername, String version, String action){
+	ApiDescriptor getApiDescriptor(String controllername, String version, String action) throws Exception{
 		//logger.debug("getApiCache(String) : {}",controllername)
 		if(controllername!=null) {
 			try {
