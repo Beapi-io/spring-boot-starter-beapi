@@ -94,6 +94,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - cleaned up/simplified user config
  - no longer need to added config to project; will read from .boot/{env}
  - moved DataSourceProperties config to starter
+ - converted uriList/uList to UriObject for better usage/testing
  
  
  
