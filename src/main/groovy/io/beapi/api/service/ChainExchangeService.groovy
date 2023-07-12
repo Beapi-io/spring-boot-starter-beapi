@@ -127,11 +127,12 @@ public class ChainExchangeService extends ApiExchange{
 		this.chainOrder = request.getAttribute('chainOrder')
 		this.chainParams = request.getAttribute('chainParams')
 
-		this.uList = request.getAttribute('uriList')
-		this.callType = uList[0]
-		this.version = uList[1]
-		this.appversion = uList[2]
-		this.apiversion = uList[3]
+		this.uObj = request.getAttribute('uriObj')
+
+		this.callType = this.uObj.getCallType()
+		this.version = this.uObj.getAppVersion()
+		this.appversion = this.uObj.getDefaultAppVersion()
+		this.apiversion = this.uObj.getApiVersion()
 
 
 		if (this.chainOrder.size()!=this.chainSize) {
@@ -175,16 +176,17 @@ public class ChainExchangeService extends ApiExchange{
 
 			this.responseFileType = request.getAttribute('responseFileType')
 
-			this.controller = uList[4]
+			this.controller = this.uObj.getController()
 			request.setAttribute('controller',this.controller)
-			this.action = uList[5]
+			this.action = this.uObj.getAction()
 			request.setAttribute('action',this.action)
 
-			this.id = uList[7]
-			this.callType = uList[0]
-			this.version = uList[1]
-			this.appversion = uList[2]
-			this.apiversion = uList[3]
+			this.id = this.uObj.getId()
+
+			this.callType = this.uObj.getCallType()
+			this.version = this.uObj.getAppVersion()
+			this.appversion = this.uObj.getDefaultAppVersion()
+			this.apiversion = this.uObj.getApiVersion()
 
 			this.method = request.getMethod()
 			this.authority = authority

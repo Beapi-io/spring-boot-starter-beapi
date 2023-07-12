@@ -23,6 +23,7 @@ import javax.servlet.forward.*
 import groovyx.gpars.*
 import com.google.common.hash.Hashing
 import java.nio.charset.StandardCharsets
+import io.beapi.api.utils.UriObject
 
 // AES/CTR encryption
 import javax.crypto.Cipher;
@@ -87,7 +88,8 @@ abstract class ApiExchange{
 
     // [BATCH]
     LinkedList batch = []
-    ArrayList uList
+
+    UriObject uObj
     String uri
     String version
     String controller
@@ -105,7 +107,9 @@ abstract class ApiExchange{
     * validating here to better handle routing (filter is 'once per request')
      */
     boolean validateMethod(){
+        println("###validateMethod")
         boolean result = false
+        println(this.apiObject['method'].toUpperCase()+"=="+this.method)
         if(this.apiObject['method'].toUpperCase() == this.method){
             result = true
         }

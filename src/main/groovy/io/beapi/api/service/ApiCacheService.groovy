@@ -93,7 +93,7 @@ class ApiCacheService{
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	@CachePut(value='ApiCache',key="#controllername")
-	LinkedHashMap setApiCache(String controllername,LinkedHashMap apidesc){
+	LinkedHashMap setApiCache(String controllername,LinkedHashMap apidesc) throws Exception{
 		//logger.debug("setApiCache(String ,LinkedHashMap) : {}",controllername)
 		def cache = cacheManager.getCache('ApiCache');
 		cache.put(controllername,apidesc);
@@ -109,7 +109,7 @@ class ApiCacheService{
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	@CachePut(value='ApiCache',key="#controllername")
-	LinkedHashMap setApiCache(String controllername, String methodname, ApiDescriptor apidoc, String apiversion) throws Exception{
+	LinkedHashMap setApiCache(String controllername, String methodname, ApiDescriptor apidoc, String apiversion){
 		//logger.debug("setApiCache(String ,String ,ApiDescriptor ,String) : {}","${controllername}/${methodname}")
 		try{
 			LinkedHashMap cache = getApiCache(controllername)

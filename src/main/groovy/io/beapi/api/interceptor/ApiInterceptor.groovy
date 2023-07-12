@@ -37,7 +37,7 @@ import io.beapi.api.service.TraceExchangeService
 import io.beapi.api.service.PrincipleService
 import io.beapi.api.service.TraceService
 import io.beapi.api.utils.ErrorCodes
-
+import io.beapi.api.utils.UriObject
 import org.slf4j.LoggerFactory;
 
 
@@ -92,7 +92,7 @@ class ApiInterceptor implements HandlerInterceptor{
 	//int cores
 	//LinkedHashMap networkGrpRoles
 	LinkedHashMap cache
-	ArrayList uList
+	UriObject uObj
 	String authority
 	ArrayList privateRoles = []
 	int callType
@@ -116,9 +116,9 @@ class ApiInterceptor implements HandlerInterceptor{
 			writeErrorResponse(response,'422',request.getRequestURI(),"No data returned for this call. This is an 'API Server'; Please limit your calls to API's only")
 		}else {
 			privateRoles = apiProperties.security.networkRoles['private'].collect() { k, v -> v }
-			this.uList = request.getAttribute('uriList')
+			this.uObj = request.getAttribute('uriObj')
 
-			this.callType = uList[0]
+			this.callType = uObj.getCallType()
 			this.authority = request.getAttribute('principle')
 
 			switch (callType) {

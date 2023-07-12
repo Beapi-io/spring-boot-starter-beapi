@@ -6,64 +6,57 @@ import java.util.regex.Pattern;
 
 //import javax.annotation.Nonnull;
 
+// [callType, sent appVersion, default appVersion(for comparison), apiVersion, controller, action, trace, id]
 public class UriObject {
 
     private static final ArrayList CALL_TYPES = ['v','b','c','r','t']
 
-    private String uri
-    private String controller
-    private String action
     private Integer callType
-    private String version
     private String appVersion
+    private String defaultAppVersion
     private String apiVersion
-    private String id
+    private String controller
+    private String action=""
     private boolean trace = false
+    private String id
 
     public UriObject(String uri, String version){
-        setUri(uri)
-        setVersion(version)
+            Integer callType
+            boolean trace = false
 
-        ArrayList uriVars = uri.split('/')
-        String tempVersion = uriVars[1].toLowerCase()
+            ArrayList uriVars = uri.split('/')
+            String tempVersion = uriVars[1].toLowerCase()
 
-        setController(uriVars[2])
-        setAction(uriVars[3])
+            switch(tempVersion){
+                case ~/([v|b|c|t])(${version})-([0-9]+)/:
+                case ~/([v|b|c|t])(${version})/:
+                    def m = Matcher.lastMatcher
+                    callType = (CALL_TYPES.indexOf(m[0][1])+1)
 
-        if(uriVars[4]){
-            String id = URLDecoder.decode(uriVars[4], StandardCharsets.UTF_8.toString())
-            setId(id)
-        }
+                    setCallType(callType)
+                    setAppVersion(m[0][2])
+                    setDefaultAppVersion(version)
+                    setApiVersion(((m[0][3])?m[0][3]:'1'))
+                    setController(uriVars[2].toString())
+                    setAction(uriVars[3].toString())
 
-        // note : does not require stringbuilder as it only concats once (effectively) so this is faster
-        String uriPattern = "/([v|b|c|r|t])(${version})-([0-9]+)|([v|b|c|r|t])(${version})-([0-9]+)|([v|b|c|r|t])(${version})|([v|b|c|r|t])(${version})/"
-        Pattern pattern = Pattern.compile(uriPattern)
-        Matcher vers = pattern.matcher(tempVersion)
+                    //if(callType==5){ trace=true }
+                    setTrace()
 
-        if(vers.find()){
-            if(vers[0][1]) {
-                setCallType(CALL_TYPES.indexOf(vers[0][1])+1)
-                setAppVersion(vers[0][2])
-                String apiVers = (vers[0][3])?vers[0][3]:'1'
-                setApiVersion(apiVers)
-            }else if(vers[0][7]){
-                setCallType(CALL_TYPES.indexOf(vers[0][7])+1)
-                setAppVersion(vers[0][8])
-                setApiVersion('1')
+                    if(uriVars[4]){ setId(URLDecoder.decode(uriVars[4], StandardCharsets.UTF_8.toString())) }
+                    break
             }
-            setTrace()
-        }else{
-            throw new Exception("[ExchangeObject :: UriObject] : Bad Uri sent; could not parse URI '${uri}'")
-        }
     }
 
     private setUri(String uri){ this.uri = new String(uri)}
     public String getUri() { return this.uri }
 
-    private setController(String controller){ this.controller=new String(controller) }
+    public setController(String controller){ this.controller=new String(controller) }
     public String getController() { return controller }
 
-    private setAction(String action){ this.action=new String(action) }
+    public setAction(String action){
+        if(action){ this.action=action }
+    }
     public String getAction() { return action }
 
     private setCallType(Integer callType){ this.callType=new Integer(callType) }
@@ -75,11 +68,17 @@ public class UriObject {
     private setAppVersion(String appVersion){ this.appVersion=new String(appVersion) }
     public String getAppVersion() { return appVersion }
 
+    private setDefaultAppVersion(String defaultAppVersion){ this.defaultAppVersion=new String(defaultAppVersion) }
+    public String getDefaultAppVersion() { return defaultAppVersion }
+
     private setApiVersion(String apiVersion){ this.apiVersion=new String(apiVersion) }
     public String getApiVersion() { return apiVersion }
 
-    private setId(String id){ this.id=new String(id) }
+    public setId(String id){ this.id=new String(id) }
     public String getId() { return id }
+    public boolean hasId() {
+        if(this.id){ return true }else{ return false }
+    }
 
     private setTrace(){
         if(this.callType==5){this.trace=true}

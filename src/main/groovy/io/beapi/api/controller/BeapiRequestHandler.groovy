@@ -18,6 +18,8 @@ package io.beapi.api.controller
 
 
 import io.beapi.api.utils.ErrorCodes
+import io.beapi.api.utils.UriObject
+
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.ServletException;
@@ -56,7 +58,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
      */
     private static final ArrayList CALL_TYPES = ['v','b','c','t','h']
 
-    public ArrayList uList
+    private UriObject uObj
     protected boolean trace
     public String controller
     public String action
@@ -73,14 +75,15 @@ class BeapiRequestHandler implements HttpRequestHandler {
         //println("### BeapiRequestHandler...")
         ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
         this.authority = request.getAttribute('principle')
-        this.uList = request.getAttribute('uriList')
-        this.apiversion = uList[3]
+        this.uObj = request.getAttribute('uriObj')
+
+        this.apiversion = this.uObj.getApiVersion()
 
         // NOTE : CONTROLLER and ACTION can be reset in batchexchange/chainexchange so DONT USE URILIST!!!!
         this.controller = request.getAttribute('controller')
         this.action = request.getAttribute('action')
 
-        trace = uList[6]
+        trace = this.uObj.isTrace()
         this.params = request.getAttribute('params') as LinkedHashMap
         this.keyList = request.getAttribute('keyList')
 
