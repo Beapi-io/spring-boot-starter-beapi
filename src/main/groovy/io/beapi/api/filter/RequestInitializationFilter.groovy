@@ -17,6 +17,7 @@
 package io.beapi.api.filter
 
 import groovy.json.JsonSlurper
+import io.beapi.api.utils.UriObject
 import org.json.JSONObject
 import io.beapi.api.properties.ApiProperties
 import io.beapi.api.service.ApiCacheService
@@ -96,6 +97,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
 
     ArrayList uriList
+    UriObject uObj
     String uri
     LinkedHashMap receives = [:]
     ArrayList receivesList
@@ -179,13 +181,14 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                 this.controller = uriVars[0]
             } else {
                 //this.authority = this.principle.authorities()
-                this.uriList = setUri(this.uri, this.version)
+                this.uObj = new UriObject(this.uri, this.version)
 
                 // no action; show apidocs for controller
-                if (!this.uriList[5]) {
-                    this.uriList[7] = this.uriList[4]
-                    this.uriList[4] = 'apidoc'
-                    this.uriList[5] = 'show'
+                if (this.uObj.getAction()=='null') {
+                    println("### NO ACTION : "+this.uObj.getAction())
+                    this.uObj.setId(this.uObj.getController())
+                    this.uObj.setController('apidoc')
+                    this.uObj.setAction('show')
                     apidocFwd = true
                 }
 
@@ -199,16 +202,17 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                     // get apiObject
 
-                    def cache = apiCacheService?.getApiCache(uriList[4])
-
+                    def cache = apiCacheService?.getApiCache(this.uObj.getController())
+                    //def cache = apiCacheService?.getApiCache(uObj.getController())
 
                     // todo : if no action, default to apidoc/show/id
                     if (cache) {
 
-                        def temp = cache[uriList[3]]
+                        def temp = cache[this.uObj.getApiVersion()]
                         this.deprecated = temp['deprecated'] as List
 
-                        this.apiObject = temp[uriList[5]]
+
+                        this.apiObject = temp[this.uObj.getAction()]
 
                         if (this.apiObject?.'returns') {
                             this.rturns = this.apiObject['returns'] as LinkedHashMap
@@ -245,7 +249,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                             //throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Authority '${this.authority}' for '${uri}' does not exist in IOState NetworkGrp")
                         }
 
-                        if (uriList[7]) {
+                        if (this.uObj.getId()) {
                             if (!this.receivesList?.contains('id') && apidocFwd == false) {
                                 writeErrorResponse(response, '400', request.getRequestURI());
                                 return false
@@ -253,7 +257,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                         }
 
 
-                        parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(), uriList[7])
+                        parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(), this.uObj.getId())
                         if (!checkRequestParams(request.getAttribute('params'))) {
                             writeErrorResponse(response, '400', request.getRequestURI());
                             return false
@@ -297,7 +301,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
                 }
 
-                request.setAttribute('uriList', this.uriList)
+                request.setAttribute('uriObj', this.uObj)
 
                 if (this.apiObject) {
                     // todo : create public api list
@@ -337,7 +341,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
          */
             if (apidocFwd) {
                 def servletCtx = this.ctx.getServletContext()
-                String newPath = "/v${uriList[2]}/${uriList[4]}/${uriList[5]}"
+                String newPath = "/v${this.uObj.getDefaultAppVersion()}/${this.uObj.getController()}/${this.uObj.getAction()}"
                 def rd = servletCtx?.getRequestDispatcher(newPath)
                 rd.forward(request, response)
             }
@@ -444,7 +448,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
      * @param LinkedHashMap map of variables defining endpoint request variables
      * @return Boolean returns false if request variable keys do not match expected endpoint keys
      */
-    boolean checkRequestParams(LinkedHashMap methodParams) throws Exception{
+    boolean checkRequestParams(LinkedHashMap methodParams){
         ArrayList checkList = this.receivesList
         ArrayList paramsList
         ArrayList reservedNames = ['batchLength','batchInc','chainInc','apiChain','_','batch','max','offset','chaintype']
@@ -540,7 +544,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         return output
     }
 
-    private LinkedHashMap parsePutParams(String formData) throws Exception{
+    private LinkedHashMap parsePutParams(String formData){
         //String formData = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
         LinkedHashMap<String, String> output = [:]
         if (formData) {

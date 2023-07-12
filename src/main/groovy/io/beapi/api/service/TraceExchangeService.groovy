@@ -94,7 +94,8 @@ public class TraceExchangeService extends ApiExchange{
 		String contentType = request.getContentType()
 
 		this.responseFileType = request.getAttribute('responseFileType')
-		this.uList = request.getAttribute('uriList')
+		this.uList = request.getAttribute('uObj')
+		this.uObj = request.getAttribute('uriObj')
 		this.callType = uList[0]
 		this.version = uList[1]
 		this.appversion = uList[2]

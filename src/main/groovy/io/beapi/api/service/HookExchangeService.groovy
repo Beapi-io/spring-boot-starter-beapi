@@ -111,18 +111,20 @@ public class HookExchangeService extends ApiExchange{
 		//String contentType = request.getContentType()
 
 		this.responseFileType = request.getAttribute('responseFileType')
-		this.uList = request.getAttribute('uriList')
-		this.callType = uList[0]
-		this.version = uList[1]
-		this.appversion = uList[2]
-		this.apiversion = uList[3]
-		this.controller = uList[4]
 
+
+		this.uObj = request.getAttribute('uriObj')
+		this.callType = this.uObj.getCallType()
+		this.version = this.uObj.getAppVersion()
+		this.appversion = this.uObj.getDefaultAppVersion()
+		this.apiversion = this.uObj.getApiVersion()
+		this.controller = this.uObj.getController()
 		request.setAttribute('controller',this.controller)
-		this.action = uList[5]
+		this.action = this.uObj.getAction()
 		request.setAttribute('action',this.action)
-		this.trace = uList[6]
-		this.id = uList[7]
+		this.trace = this.uObj.isTrace()
+		this.id = this.uObj.getId()
+
 		this.method = request.getMethod()
 		this.authority = authority
 
