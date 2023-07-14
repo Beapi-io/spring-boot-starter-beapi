@@ -14,6 +14,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
 import javax.persistence.*;
@@ -25,6 +26,10 @@ public class DataSourceConfig {
 
     @Autowired
     private io.beapi.api.properties.DatasourceProperties datasourceProperties;
+
+
+    @Value("\${application.domain}")
+    Object applicationDomain;
 
     @Resource
     @Bean(name = "dataSource")
@@ -60,7 +65,7 @@ public class DataSourceConfig {
         hibernateJpaVendorAdapter.setDatabase(Database.MYSQL);
         LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactory.setDataSource(getDataSource());
-        entityManagerFactory.setPackagesToScan("demo.application.domain");
+        entityManagerFactory.setPackagesToScan("io.beapi.api.domain","${applicationDomain}");
         entityManagerFactory.setJpaVendorAdapter(hibernateJpaVendorAdapter);
         entityManagerFactory.setJpaProperties(getHibernateProperties());
         return entityManagerFactory;
@@ -80,7 +85,7 @@ public class DataSourceConfig {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(datasource);
         sessionFactory.setHibernateProperties(getHibernateProperties());
-        sessionFactory.setPackagesToScan("demo.application.domain");
+        sessionFactory.setPackagesToScan("io.beapi.api.domain","${applicationDomain}");
         return sessionFactory;
     }
 
