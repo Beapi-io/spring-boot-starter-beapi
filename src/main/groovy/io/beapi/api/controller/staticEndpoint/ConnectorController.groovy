@@ -73,6 +73,10 @@ public class ConnectorController extends BeapiRequestHandler{
 
 	List update(HttpServletRequest request, HttpServletResponse response) {
 
+		// todo : check file exists
+
+
+		
 		if (this.params.get('IOSTATE').empty) {
 			render(status:HttpServletResponse.SC_BAD_REQUEST)
 			return null

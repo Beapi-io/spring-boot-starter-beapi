@@ -107,9 +107,7 @@ abstract class ApiExchange{
     * validating here to better handle routing (filter is 'once per request')
      */
     boolean validateMethod(){
-        println("###validateMethod")
         boolean result = false
-        println(this.apiObject['method'].toUpperCase()+"=="+this.method)
         if(this.apiObject['method'].toUpperCase() == this.method){
             result = true
         }

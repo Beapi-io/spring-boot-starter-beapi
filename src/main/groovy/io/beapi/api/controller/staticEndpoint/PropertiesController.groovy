@@ -41,7 +41,6 @@ public class PropertiesController extends BeapiRequestHandler{
 
 
 	LinkedHashMap getAll(HttpServletRequest request, HttpServletResponse response) {
-		println("###getAll")
 
 		LinkedHashMap temp = new LinkedHashMap<>();
 		temp.put("attempts",apiProperties.getAttempts());
@@ -81,13 +80,10 @@ public class PropertiesController extends BeapiRequestHandler{
 		sec.put("networkRoles",apiProperties.getSecurity().getNetworkRoles());
 		temp.put("security", sec);
 
-		println(temp)
-
 		return temp;
 	}
 
 	LinkedHashMap getProperties(HttpServletRequest request, HttpServletResponse response) {
-		println("###getProperties")
 		LinkedHashMap temp = new LinkedHashMap<>();
         temp.put("attempts",apiProperties.getAttempts());
         temp.put("procCores",apiProperties.getProcCores());
@@ -104,8 +100,6 @@ public class PropertiesController extends BeapiRequestHandler{
         temp.put("supportedFormats",apiProperties.getSupportedFormats());
         temp.put("serverType",apiProperties.getServerType());
         temp.put("autoTest",apiProperties.getAutoTest());
-
-		println(temp)
 
 		return temp;
 	}
