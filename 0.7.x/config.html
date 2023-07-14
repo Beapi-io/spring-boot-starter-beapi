@@ -71,13 +71,16 @@
                     <div>
                       <ul class="nav flex-column">
                         <li class="nav-item">
-                          <a class="nav-link" href="config.html#section-1">Settings</a>
+                          <a class="nav-link" href="config.html#section-1">Properties</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link" href="config.html#section-2">Beapi API Config Changes</a>
+                          <a class="nav-link" href="config.html#section-2">Settings</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link" href="config.html#section-3">Beapi DB Config Changes</a>
+                          <a class="nav-link" href="config.html#section-3">Beapi API Config Changes</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="config.html#section-4">Beapi DB Config Changes</a>
                         </li>
                       </ul>
                     </div>
@@ -236,11 +239,37 @@
 <hr size="5">
 
 
-
             <!-- typogrpahy -->
             <section id="section-1">
-              <h2 class="section-title-1">Settings<a data-scroll href="#section-1" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <h2 class="section-title-1">Properties<a data-scroll href="#section-1" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
               <div id="section-1.1">
+                <p>in your 'resources' directory, you will find you <b>application.properties</b> file. The following stats are what you are most concerned with:</p>
+                <ul>
+                  <li>
+                    <div class="row">
+                      <div class="col">
+                        <div class="alert alert-warning" role="alert">
+                          <ul>
+                            <li><b>application.components</b> This should be the base path for ALL components in your application</li>
+                            <li><b>application.repository</b> This is the base path for your repositories</li>
+                            <li><b>application.domain</b> This is the base path for your domain objects</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+                <P>These are already preconfigured in the demo project; if you create a NEW PROJECT, these will have to be changed.</P>
+              </div>
+            </section>
+            <!-- / typography -->
+
+            <hr size="5">
+
+            <!-- typogrpahy -->
+            <section id="section-2">
+              <h2 class="section-title-2">Settings<a data-scroll href="#section-2" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <div id="section-2.1">
                 <p>Since this is an API application, people will want to get into the nuts an bolts of configuring this so we also supply some of the more advanced configuration settings:</p>
                 <ul>
                   <li><b>JVM Args</b>:  Should you need to tweak the default <b>BUILD</b> JVM ARGS, you will find the JVM Args in the 'gradle.properties'; there is a section that looks like the following:
@@ -276,8 +305,8 @@
 
 
             <!-- file tree -->
-            <section id="section-2">
-              <h2 class="section-title-2">Beapi Api Config Changes<a data-scroll href="#section-2" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+            <section id="section-3">
+              <h2 class="section-title-3">Beapi Api Config Changes<a data-scroll href="#section-3" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
               <p>Once you have created your project, you will need to edit your <b>'beapi_api.yaml'</b> file in your <b>~/.boot/{env}/</b> directory and changes the following settings:</p>
 
               <ul style="list-style-type: none;">
@@ -421,8 +450,8 @@
             <!-- / file tree -->
 
             <!-- file tree -->
-            <section id="section-3">
-              <h2 class="section-title-3">Beapi DB Config Changes<a data-scroll href="#section-3" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+            <section id="section-4">
+              <h2 class="section-title-4">Beapi DB Config Changes<a data-scroll href="#section-4" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
               <p>You will then need to edit your <b>'beapi_db.yaml'</b> file in your <b>~/.boot/{env}/</b> directory and changes the following settings:</p>
 
               <ul style="list-style-type: none;">
@@ -454,13 +483,16 @@
             <div class="sticky">
               <ul id="toc" class="nav flex-column toc">
                 <li class="nav-item">
-                  <a data-scroll class="nav-link" href="#section-1">Settings</a>
+                  <a data-scroll class="nav-link" href="#section-1">Properties</a>
                 </li>
                 <li class="nav-item">
-                  <a data-scroll class="nav-link" href="#section-2">beapi_api.yml</a>
+                  <a data-scroll class="nav-link" href="#section-2">Settings</a>
                 </li>
                 <li class="nav-item">
-                  <a data-scroll class="nav-link" href="#section-3">beapi_db.yml</a>
+                  <a data-scroll class="nav-link" href="#section-3">beapi_api.yml</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-4">beapi_db.yml</a>
                 </li>
               </ul>
             </div>
