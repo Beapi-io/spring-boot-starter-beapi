@@ -89,6 +89,7 @@ dependencies {
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
     implementation "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
     implementation "jakarta.persistence:jakarta.persistence-api:2.2.3"
+    implementation "jakarta.validation:jakarta.validation-api:2.0.2"
     implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.3"
     implementation "org.apache.tomcat.embed:tomcat-embed-core:9.0.56"
     implementation "org.codehaus.groovy:groovy:3.0.9"
