@@ -90,6 +90,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - added configurable server properties for tomcat server
  - integrating data components from demo project into starter to make it more of a API framework extending Springboot (as a starter should)
  - integrating security components from demo project into starter to make it more of a API framework extending Springboot (as a starter should)
+ - added convention over config; demo will be much simpler now going forward (as will docs)
  
  ### Changed
  - stability fixes
