@@ -99,6 +99,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - converted uriList/uList to UriObject for better usage/testing
  - moving core repositories/domains from demo project to starter
  - moving core security from demo project into starter
+ - consolidated 'bootstrap' functionality into a service; only requires one line to bootstrap project
  
  
  
