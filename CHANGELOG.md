@@ -27,7 +27,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - removal of attributes before resetting when chaining
 
 
-## 0.6.0-STABLE
+## 0.6.0-STABLE (released: 3/6/2023)
 
 ### Added
 - reflection for controllers/handlers added so they no longer need to be added to I/O State files
@@ -51,26 +51,68 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - improvements to ApiDescriptor; better checking for request/response keys
 - renamed nonmappedEndpoint to 'publicEndpoints'
 
+### Additional
+- releasing beginning SDK frontend with this release
 
- ## 0.7.X - (projected release 08/01/2023)
+
+ ## 0.6.5 - (released: 6/6/2023)
  
  ### Added
+ - [AUTOMATION]
  - Added CLI service for reading in args in order to scaffold 
  - Added templates for scaffolded connectors
  - Scaffolding for connectors/IO State; allows users to scaffold connectors based on data from an existing entity/controller
+ - additional tests for JPA/Hooks
+ - (SDK) automated functional tests for ALL API's; moved to SDK
+ - (SDK) automated webhooks (in progress)
  
  ### Changed
  - changing default 'iostateDir' to '.beapi/.iostate' for uniqueness
+ - removed 'apiServer' from properties
+ - adding 'protocol' to properties
+ - updated tests in beapi-java-demo to use 'protocol' property; this way protocol can be set per env without changing tests
+ - enable bootstrapping of multiple superusers/testusers through properties
+ - simplify bootstrapping
+ - added testRole to properties
+ - updated 'user' domain; added columns for webhook monitoring
+ - fixed RequestInitializationFilter to properly return errors
+ - fixed CORS/JWT issue
+ 
+ ## 0.7.X - (projected release 08/01/2023)
+ 
+ ### Added
+ - PropertiesController and properties IOState for showing Application properties from config as API (not changing them though; that requires restart)
+ - encoding for webhooks
+ - tests for hooks
+ - tests for properties
+ - default properties being read from starter config
+ - updating of Connector/IO-State on-the-fly added; allows changing all rules for apis without restart
+ - added configurable server properties for tomcat server
+ - integrating data components from demo project into starter to make it more of a API framework extending Springboot (as a starter should)
+ - integrating security components from demo project into starter to make it more of a API framework extending Springboot (as a starter should)
+ 
+ ### Changed
+ - stability fixes
+ - cleaned up/simplified user config
+ - no longer need to added config to project; will read from .boot/{env}
+ - moved DataSourceProperties config to starter
+ - converted uriList/uList to UriObject for better usage/testing
+ - moving core repositories/domains from demo project to starter
+ - moving core security from demo project into starter
+ - consolidated 'bootstrap' functionality into a service; only requires one line to bootstrap project from properties files
+ 
+ 
  
  ### todo
-    - PropertySource for apiProperties (in spring-boot-starter-beapi) needs to be dynamic
-    - PropertySource for dataSourceProperties (in beapi-java-demo) needs to be dynamic
+    - add 'autoTest' toggle for automated tests from apiProperties/beapi_api.yml
     - need to make sure CLI does not overwrite existing files
-    - rate limiting
-    - add scaffolding to documentation
-    - add 'entityPackages' for beapi_api.yaml to documentation
-    - functional test scaffolding
-    - (SDK) automated webhooks ?? 
-    - (SDK) UI/UX tools ??
+    - (DOCS) need to add documentation for scaffolding functionality
+    - (DOCS) add 'entityPackages' for beapi_api.yaml to documentation
+    - (DOCS) apidocs documentation
     - (SDK) optional JMS service/config ??
+    - (SDK) automated webhooks (need to do prior to rate limiting/io state)
+    - (SDK) rate limiting / data limiting (reliant on webhooks and DB)
+    - (SDK) change IOState files (possibly read from CDN ???)
+
+
 

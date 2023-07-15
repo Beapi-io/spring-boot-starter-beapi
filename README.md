@@ -1,7 +1,7 @@
 ![alt text](https://github.com/orubel/logos/blob/master/beapi_logo_large.png)
 # Beapi Spring Boot Starter
 
-### Current Stable Version : 0.6.0-STABLE
+### Current Version : 0.7.0-SNAPSHOT
 
 ### Springboot Version : 2.6.2 (or greater)
 
@@ -20,7 +20,7 @@
 
 **Beapi abstracts all RULES for API endpoints** so they can be **shared/syncronized with all services** in a distributed API architecture **without requiring restarts of all servers** to do so.
 
-In current architectures, DATA for endpoints is bound to FUNCTIONALITY ( see [Cross Cutting Concern](https://en.wikipedia.org/wiki/Cross-cutting_concern) ) through things like 'annotations'; this makes it so that you have to **duplicate this DATA everywhere**(see OpenApi) as said data is hardcoded into functionality via those annotations. And UNFORTUNATE. existing tools (like OpenAPI) [refuse to copy/include RBAC rules](https://www.flickr.com/photos/orubel/50695726007/in/dateposted-public/) making it so other services become insecure when using tools like OpenApi.
+In current architectures, DATA for endpoints is bound to FUNCTIONALITY ( see [Cross Cutting Concern](https://en.wikipedia.org/wiki/Cross-cutting_concern) ) through things like 'annotations'; this makes it so that you have to **duplicate this DATA everywhere**(see OpenApi) as said data is hardcoded into functionality via those annotations. And UNFORTUNATELY existing tools (like OpenAPI) [refuse to include/synchronize RBAC rules across services](https://www.flickr.com/photos/orubel/50695726007/in/dateposted-public/) making it so other services become insecure when using tools like OpenApi.
 
 By abstracting it into an externally **reloadable file**, things like [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control)/'endpoint ROLES' can be easily adjusted without requiring a restart of services. Plus using functionality like webhooks, one can synchronize all services from a MASTER server. This allows for changes to API endpoint DATA on a distributed API architecture without restarting services.
 
@@ -30,13 +30,14 @@ Additionally, this creates new patterns like [automated batching](https://beapi-
 
 ## Functionality
 - **Security**
-  - Automated [Role Based Access Control (RBAC)](https://digitalguardian.com/blog/what-role-based-access-control-rbac-examples-benefits-and-more)
+  - [Zero Trust Security](https://www.ibm.com/topics/zero-trust) by default
+  - Automated [Role Based Access Control (RBAC)](https://digitalguardian.com/blog/what-role-based-access-control-rbac-examples-benefits-and-more); 
+  - Automated [Attribute Based Access Control (ABAC)](https://developer.okta.com/books/api-security/authz/attribute-based/)
   - Full OWASP API Security Compliance
-  - Automated RBAC+OWASP checks on request/response parameters per endpoint
-  - Automated RBAC+OWASP checks on cache
+  - Automated RBAC+OWASP checks on cache; this is something that [API Gateways do not do](https://medium.com/@apiexpert/why-api-gateways-are-dead-7c9e324ff70a) and we correct for.
 - **Configuration Management**
-  - Reloadable API RULES (ie connectors)
-  - Automated synchronization of API RULES w/ services
+  - Reloadable API RULES (ie connectors) WITHOUT server/application restart
+  - Automated synchronization of API RULES w/ services via webhooks (will be adding to [beapi_java_demo](https://github.com/Beapi-io/beapi-java-demo))
 - **Automation**
   - Automated Role-based Batching
   - API Chaining(R)
@@ -61,7 +62,7 @@ repositories {
 
 dependencies {
     ...
-    implementation 'io.beapi:spring-boot-starter-beapi:0.6.0-STABLE'
+    implementation 'io.beapi:spring-boot-starter-beapi:0.6.5'
     ...
 }
  ```
@@ -80,6 +81,8 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 ---
 
 # Q&A
+- **Why does the 0.6.0 version not build anymore?**
+    - There was tracking code in the 0.6.0' version that was being used to track installs; This was mainly to see which corporations are violating the licensing. Now that we have that data, we no longer need the tracker installed. Unfortunately, this breaks the 0.6.0 build. Feel free to use the 0.7.0 build as it's more up to date :)
 - **Why Not bind the endpoints to the 'MODEL'(ie GraphQL)?**
     - First 'resource' in API spec (per Roy Fielding) is used in the sense of 'Uniform Resource Indicator' (ie URI). This points to a service or business logic which then calls data which may be a mixture of two tables (ie JOIN), a file, a link to another api, etc. By binding to your model, you are asking it to become the 'business logic','communication logic' as well as 'data handling' and not only breaks the API spec/standard but limits what your API can return. This breaks rules of AOP, Separation of Control', OWASP API security and over complicates your build and testing. This also makes your entire environment slower and harder to scale. So yeah... bad idea in general.
 - **Why require a cache?**
@@ -93,4 +96,17 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
     - Per W3C guidelines : 'A client SHOULD NOT generate content in a GET request unless it is made directly to an origin server that has previously indicated, in or out of band, that such a request has a purpose and will be adequately supported'. API Chaining(tm) is that direct connection with purpose. It provides the necessary backend checks and limits what can be sent.
 
    
+# Flowchart
 
+```mermaid
+flowchart TD
+    A[DispatcherServlet] --> B[RequestInitializationFilter]
+    B --> |preHandler| C(ApiInterceptor)
+    C --> D[ExchangeService] 
+    C --> E[BatchExchangeService] 
+    C --> F[ChainExchangeService] 
+    D --> G[Controller extends BeapiRequestHandler]
+    E --> G[Controller extends BeapiRequestHandler]
+    F --> G[Controller extends BeapiRequestHandler]
+    G --> |postHandler| C
+```
