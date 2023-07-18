@@ -1,0 +1,57 @@
+{
+	"IOSTATE": {
+		"NAME": "authority",
+		"NETWORKGRP": "private",
+		"VALUES": {
+			"id": {
+				"key": "PKEY",
+				"type": "Long",
+				"description": "",
+				"mockData": "112"
+			},
+			"authority": {
+				"type": "String",
+				"description": "",
+				"mockData": "ROLE_TEST"
+			}
+		},
+
+		"CURRENTSTABLE": "1",
+		"VERSION": {
+			"1": {
+				"DEFAULTACTION": "list",
+				"URI": {
+					"create": {
+						"METHOD": "POST",
+						"DESCRIPTION": "Create new Role",
+						"ROLES": {
+							"BATCH": ["ROLE_ADMIN"],
+							"HOOK": ["ROLE_ADMIN"]
+						},
+						"REQUEST": {
+							"permitAll": ["authority"]
+						},
+						"RESPONSE": {
+							"permitAll": ["id", "authority"]
+						}
+					},
+					"list": {
+						"METHOD": "GET",
+						"DESCRIPTION": "List all Event Types",
+						"ROLES": {
+							"BATCH": ["ROLE_ADMIN"],
+							"HOOK": ["ROLE_ADMIN"]
+						},
+						"REQUEST": {
+							"permitAll": []
+						},
+						"RESPONSE": {
+							"permitAll": ["id", "authority"]
+						}
+					}
+				}
+			}
+		}
+
+	}
+}

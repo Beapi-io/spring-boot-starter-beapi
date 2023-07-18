@@ -137,7 +137,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
      * @param FilterChain chain
      */
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException,Exception {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         // println("### RequestInitializationFilter...")
         this.authority=this.principle.authorities()
         if (processRequest(request, response)) {

@@ -1,0 +1,36 @@
+package io.beapi.api.filter
+
+import com.sun.org.slf4j.internal.Logger
+import org.springframework.stereotype.Component
+import org.springframework.web.filter.OncePerRequestFilter
+import com.sun.org.slf4j.internal.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier;
+import javax.servlet.FilterChain
+import javax.servlet.ServletException
+import java.io.IOException
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+import org.springframework.web.servlet.HandlerExceptionResolver
+
+
+@Component
+public class FilterChainExceptionHandler extends OncePerRequestFilter {
+
+    //private static final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+    //private final Logger log = LoggerFactory.getLogger(getClass());
+
+    //@Autowired
+    //@Qualifier("handlerExceptionResolver")
+    //private HandlerExceptionResolver resolver;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        println("### FilterChainExceptionHandler ...")
+        try {
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            //resolver.resolveException(request, response, null, e);
+        }
+    }
+}
