@@ -101,11 +101,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - moving core repositories/domains from demo project to starter
  - moving core security from demo project into starter
  - consolidated 'bootstrap' functionality into a service; only requires one line to bootstrap project from properties files
+
+ ## 0.8.X - (projected release 11/01/2023)
  
+ ### Added
  
- 
+ ### Changed
+
  ### todo
-    - add 'autoTest' toggle for automated tests from apiProperties/beapi_api.yml
+    - finish hook functionality (parially done)
+    - add user management
+    - trace functionality
+    - stats
+    - add 'autoTest' toggle for automated tests from apiProperties/beapi_api.yml (partically done)
     - need to make sure CLI does not overwrite existing files
     - (DOCS) need to add documentation for scaffolding functionality
     - (DOCS) add 'entityPackages' for beapi_api.yaml to documentation
