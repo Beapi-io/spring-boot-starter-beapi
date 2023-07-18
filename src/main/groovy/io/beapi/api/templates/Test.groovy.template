@@ -1,0 +1,108 @@
+package demo.application
+
+import io.beapi.api.properties.ApiProperties
+import spock.lang.*
+import geb.spock.*
+import groovy.json.JsonSlurper
+import io.beapi.api.service.ApiCacheService
+import io.beapi.api.service.PrincipleService
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationContext
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.web.server.LocalServerPort
+import org.springframework.test.context.TestPropertySource
+
+import org.apache.commons.io.IOUtils
+import org.apache.http.impl.client.DefaultHttpClient
+import org.apache.http.client.HttpClient
+import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.HttpResponse
+import org.apache.http.message.BasicHeader
+import org.apache.http.entity.StringEntity
+import org.apache.http.HttpEntity
+import org.apache.http.entity.ContentType
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import java.nio.charset.StandardCharsets
+
+
+@TestPropertySource(locations="classpath:application.properties")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class AutomatedFunctionalTest extends Specification {
+
+    @Autowired
+    ApplicationContext applicationContext
+
+    @Autowired
+    ApiProperties apiProperties
+
+    @Autowired
+    ApiCacheService apiCacheService
+
+    @Autowired
+    PrincipleService principle
+
+    @Shared String adminUserToken
+
+    @Shared String testUserToken
+
+    @Autowired
+    HikariDataSource dataSource;
+
+    @Shared String controller = 'user'
+
+    @Value("\${server.address}")
+    String serverAddress;
+
+	@Value("\${api.autoTest}")
+	String autoTest
+
+	@Value("\${api.protocol}")
+	String protocol
+
+    @LocalServerPort private int port
+
+    @Shared String exchangeIntro
+    @Shared String appVersion
+    @Shared String apiVersion = '1'
+
+    HttpClient httpClient = new DefaultHttpClient();
+
+    void "[testuser] login"(){
+        setup:"logging in"
+            HttpClient httpClient = new DefaultHttpClient();
+            LinkedHashMap testUser = apiProperties.getBootstrap().getTestUser()
+
+            String loginUri = "/authenticate"
+            String url = "${protocol}://${this.serverAddress}:${this.port}/${loginUri}" as String
+            String json = "{\"username\":\"${testUser['login']}\",\"password\":\"${testUser['password']}\"}"
+            HttpEntity stringEntity = new StringEntity(json,ContentType.APPLICATION_JSON);
+
+            HttpPost request = new HttpPost(url)
+            request.setEntity(stringEntity);
+            HttpResponse response = this.httpClient.execute(request);
+
+            //int statusCode = response.getStatusLine().getStatusCode()
+            String responseBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+            Object info = new JsonSlurper().parseText(responseBody)
+            println("info : "+info)
+
+        when:"info is not null"
+            this.testUserToken = info.token
+        then:"assert token is not null"
+            assert info.token!=[:]
+            // todo : also check that ROLE_ADMIN response vars are not in keyset
+    }
+
+}

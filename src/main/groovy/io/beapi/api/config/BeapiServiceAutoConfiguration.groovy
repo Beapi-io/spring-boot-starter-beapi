@@ -16,9 +16,11 @@
  */
 package io.beapi.api.config
 
-import io.beapi.api.properties.ApiProperties
+
+
 import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.BatchExchangeService
+import io.beapi.api.service.BootstrapService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ConnectorScaffoldService
 import io.beapi.api.service.TestScaffoldService
@@ -52,9 +54,6 @@ import org.springframework.context.ApplicationContext
 @AutoConfigureAfter([BeapiEhCacheAutoConfiguration.class])
 @AutoConfigureBefore([BeapiWebAutoConfiguration.class])
 public class BeapiServiceAutoConfiguration {
-
-	@Autowired
-	private ApiProperties apiProperties
 
 	@Autowired
 	ApplicationContext applicationContext;
