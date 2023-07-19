@@ -91,6 +91,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - integrating data components from demo project into starter to make it more of a API framework extending Springboot (as a starter should)
  - integrating security components from demo project into starter to make it more of a API framework extending Springboot (as a starter should)
  - added 'convention over config'; demo will be much simpler now going forward (as will docs)
+ - added default for 'beapi_server' in case user forgets server properties; default server properties
+ - added default for 'beapi_api' in case user forgets api properties; default api properties
  
  ### Changed
  - stability fixes
