@@ -122,10 +122,10 @@ public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
             cacheConfig2.setName("HookCache")
             cacheConfig2.eternal(true)
             cacheConfig1.overflowToDisk(true)
-            cacheConfig2.diskPersistent(true)
+            //cacheConfig2.diskPersistent(true)
             //cacheConfig2.persistence(persistConfig);
             cacheConfig2.diskExpiryThreadIntervalSeconds(-1)
-            //cacheConfig2.setMaxElementsInMemory(1000)
+            cacheConfig2.setMaxElementsInMemory(1000)
             cacheConfig2.setMaxElementsOnDisk(100000)
             cacheConfig2.maxEntriesLocalHeap(1)
             cacheConfig2.maxEntriesLocalDisk(100000)
