@@ -24,10 +24,14 @@ buildscript {
             }
         }
         mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath("io.github.gradle-nexus:publish-plugin:1.0.0")
+        classpath "ca.cutterslade.gradle:gradle-dependency-analyze:1.9.1"
     }
 }
 
@@ -37,7 +41,6 @@ plugins {
     id 'maven-publish'
     id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
     id 'groovy'
-    //id "ca.cutterslade.analyze"
     id "com.gorylenko.gradle-git-properties" version "2.4.1"
 }
 
@@ -46,6 +49,7 @@ apply plugin: 'signing'
 apply plugin: 'io.github.gradle-nexus.publish-plugin'
 apply plugin: 'groovy'
 apply plugin: 'io.spring.dependency-management'
+//apply plugin: "ca.cutterslade.analyze"
 
 description = "The Beapi Springboot Starter for API Automation; automates and simplifies almost all API functionality and security"
 
@@ -92,6 +96,7 @@ dependencies {
     implementation "jakarta.validation:jakarta.validation-api:2.0.2"
     implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.3"
     implementation "org.apache.tomcat.embed:tomcat-embed-core:9.0.56"
+    implementation "org.apache.tomcat:tomcat-annotations-api:9.0.56"
     implementation "org.codehaus.groovy:groovy:3.0.9"
     implementation "org.slf4j:slf4j-api:1.7.32"
     implementation "org.springframework.boot:spring-boot-autoconfigure:2.6.2"
@@ -105,7 +110,11 @@ dependencies {
     implementation "org.springframework:spring-web:5.3.14"
     implementation "org.springframework:spring-webmvc:5.3.14"
     implementation "org.springframework.boot:spring-boot:${springBootVersion}"
-    implementation("org.springframework.data:spring-data-jpa:2.6.0")
+
+    implementation "org.springframework:spring-orm:5.3.14"
+    implementation "org.springframework:spring-tx:5.3.14"
+
+    //implementation("org.springframework.data:spring-data-jpa:2.6.0")
     implementation 'com.zaxxer:HikariCP:3.2.0'
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     implementation 'org.json:json:20210307'
@@ -137,9 +146,11 @@ dependencies {
         exclude group:'org.multiverse', module:'multiverse-core'
         exclude group:'org.codehaus.groovy', module: 'groovy-all'
     }
-    implementation('org.codehaus.groovy:groovy-cli-commons'){
-        exclude group:'org.codehaus.groovy', module: 'groovy-all'
-    }
+
+    //implementation('org.codehaus.groovy:groovy-cli-commons'){
+    //    exclude group:'org.codehaus.groovy', module: 'groovy-all'
+    //}
+
     implementation('org.codehaus.groovy:groovy-templates:2.4.3') {
         exclude group:'org.codehaus.groovy', module: 'groovy-all'
     }
