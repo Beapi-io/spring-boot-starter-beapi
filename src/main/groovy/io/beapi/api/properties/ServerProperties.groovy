@@ -3,14 +3,17 @@ package io.beapi.api.properties
 import io.beapi.api.properties.yaml.factory.YamlPropertySourceFactory
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.PropertySource
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 
 @Configuration
 @ConfigurationProperties(prefix = "server")
-@PropertySource(value = "file:\${user.home}/.boot/\${spring.profiles.active}/beapi_server.yaml", factory = YamlPropertySourceFactory.class)
+@PropertySources([
+        @PropertySource(value="classpath:beapi_server.yaml", factory=YamlPropertySourceFactory.class),
+        @PropertySource(value = "file:\${user.home}/.boot/\${spring.profiles.active}/beapi_server.yaml", factory = YamlPropertySourceFactory.class)
+])
 public class ServerProperties {
-
-
+    
     public NanoProps nano = new NanoProps()
     public MediumProps medium = new MediumProps()
     public LargeProps large = new LargeProps()

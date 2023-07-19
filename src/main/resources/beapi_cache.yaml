@@ -1,0 +1,38 @@
+cache:
+    api:
+        eternal: true
+        overflowToDisk: true
+        diskExpiryThreadIntervalSeconds: 120
+        setMaxElementsInMemory: 10000
+        setMaxElementsOnDisk: 10000
+        maxEntriesLocalHeap: 10000
+        maxEntriesLocalDisk: 10000
+        memoryStoreEvictionPolicy: FIFO
+    hook:
+        eternal: true
+        overflowToDisk: true
+        diskExpiryThreadIntervalSeconds: -1
+        setMaxElementsInMemory: 1000
+        setMaxElementsOnDisk: 100000
+        maxEntriesLocalHeap: 1
+        maxEntriesLocalDisk: 100000
+        memoryStoreEvictionPolicy: FIFO
+    throttle:
+        eternal: false
+        overflowToDisk: true
+        diskExpiryThreadIntervalSeconds: 120
+        maxEntriesLocalHeap: 1000
+        maxEntriesLocalDisk: 5000
+        timeToLiveSeconds: 120
+        timeToIdleSeconds: 0
+        memoryStoreEvictionPolicy: LRU
+    trace:
+        eternal: false
+        overflowToDisk: false
+        diskExpiryThreadIntervalSeconds: 30
+        maxEntriesLocalHeap: 1000
+        maxEntriesLocalDisk: 500
+        timeToLiveSeconds: 0
+        timeToIdleSeconds: 30
+        memoryStoreEvictionPolicy: LRU
+
