@@ -243,7 +243,7 @@
             <section id="section-1">
               <h2 class="section-title-1">Application Properties<a data-scroll href="#section-1" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
               <div id="section-1.1">
-                <p>in your 'resources' directory, you will find your <b>application.properties</b> file. The following stats are what you are most concerned with:</p>
+                <p>in your 'src/main/resources' directory, you will find your <b>application.properties</b> file. The following stats are what you are most concerned with changing:</p>
                 <ul>
                   <li>
                     <div class="row">
@@ -259,7 +259,7 @@
                     </div>
                   </li>
                 </ul>
-                <P>These are already preconfigured in the demo project; if you create a NEW PROJECT, these will have to be changed.</P>
+                <P><b>NOTE</b>: These are already preconfigured in the demo project; if you create a NEW PROJECT, these will have to be changed.</P>
               </div>
             </section>
             <!-- / typography -->
@@ -286,7 +286,7 @@
                       </div>
                     </div>
 
-                    <p>You can use these default per your instance or change them to your needs. You then simply pass the variable for your instance with your 'BUILD':</p>
+                    <p>You can use these default per your instance or change them to your needs. You then simply pass the 'configType' variable with the OPTION for your instance [nano/medium/large] with your 'BUILD':</p>
                     <div class="row">
                       <div class="col">
                         <div class="card">
@@ -297,7 +297,6 @@
                       </div>
                     </div>
                   </li>
-                  <li style="margin-top: 25px;"><b>TLS/SSL</b>: No TLS/SSL is required; Certifivate handling should be being done at your <b>load balancer</b> so that it is checked for ALL SERVERS and then can send an HTTP tunnel to the regular servers. Should you need TLS/SSL, you will have to set that up yourself as that is not provided for the demo-application</li>
                 </ul>
               </div>
             </section>
@@ -324,7 +323,7 @@
                 <li style="margin-top: 25px;"><h5><b>BOOTSTRAP</b></h5>
                   <div class="row">
                     <div class="col">
-                      <p>For more information about this, see the <a href="index.html#section-5">installation process.</a></p>
+                      <p>You will also need to change the following. For more information about this, see the <a href="index.html#section-5">installation process.</a></p>
                       <div class="alert alert-warning" role="alert">
                         <ul>
                           <li><h6 style="margin-bottom: 0px;"><b>superUser/login:</b> (CHANGE)</h6> Superuser that is bootstrapped with your application (also used for functional testing)</li>
