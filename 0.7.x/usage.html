@@ -250,9 +250,7 @@
                               <div class="col">
                                   <div class="card">
                                       <div class="card-body" style="background-color:#000;">
-                                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">
-                                              curl -v -H "Content-Type: application/json" -X POST -d '{"username":"<login>","password":"<password>"}' http://localhost:8080/authenticatecurl -H Origin: http://localhost -H "Content-Type: application/json"--request POST -d '{"username":"login","password":"password"}' http://localhost:8080/authenticate
-                                          </code></pre>
+                                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">curl -v -H "Content-Type: application/json" -X POST -d '{"username":"login","password":"password"}' http://localhost:8080/authenticate</code></pre>
                                       </div>
                                   </div>
                               </div>
@@ -262,7 +260,7 @@
                               <div class="col">
                                   <div class="card">
                                       <div class="card-body" style="background-color:#000;">
-                                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">curl -v -H "Content-Type: application/json" -X POST -d '{"username":"<login>","password":"<password>"}' http://localhost:8080/authenticatecurl -H Origin: http://YOUR.IP.ADDRESS -H "Content-Type: application/json"--request POST -d '{"username":"login","password":"password"}' http://localhost:8080/authenticate</code></pre>
+                                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">curl -H Origin: http://YOUR.IP.ADDRESS -H "Content-Type: application/json"--request POST -d '{"username":"login","password":"password"}' http://localhost:8080/authenticate</code></pre>
                                       </div>
                                   </div>
                               </div>
@@ -364,30 +362,32 @@
                               <div class="col">
                                   <div class="card">
                                       <div class="card-body" style="background-color:#000;">
-                      <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">$.ajax({
-    type: 'GET',
-    url: window.url+"/v1.2.0/"+path+"?"+string,
-    crossDomain: true,
-    cache:false,
-    xhrFields: {
-        withCredentials: false
-    },
-    beforeSend: function(request){
-        request.setRequestHeader('Authorization','Bearer '+window.token.access_token);
-    },
-    headers:{
-        'Content-Type': contenttype
-    },
-    dataType: datatype,
-    success: function(data) {
-        if(data){
-        ...
+                      <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">var tmp = JSON.parse(window.token);
+
+const data = null;
+const xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
+
+xhr.addEventListener("readystatechange", function () {
+    if(this.readyState === this.DONE){
+        switch(this.status) {
+          case 200:
+            console.log("SUCCESS : "+this.responseText);
+            break;
+          case 401:
+              console.log("FAIL : "+this.responseText);
+            break;
+          default:
+            alert(this.responseText);
         }
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-            document.getElementById("output_"+count).innerHTML = jqXHR.status+" : "+jqXHR.statusText;
-    },
-});</code></pre>
+    }
+});
+
+xhr.open("GET", "http://localhost:8080/v1.0/hook/getHookServices");
+xhr.setRequestHeader("Content-Type", "application/json");
+xhr.setRequestHeader("Authorization", "Bearer "+tmp.token);
+xhr.send(data);
+                      </code></pre>
                                       </div>
                                   </div>
                               </div>
@@ -397,31 +397,36 @@
                               <div class="col">
                                   <div class="card">
                                       <div class="card-body" style="background-color:#000;">
-                      <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">$.ajax({
-    type: 'PUT',
-    url: window.url+"/v1.2.0/"+path,
-    data: JSON.stringify(jsonData),
-    crossDomain: true,
-    cache:false,
-    xhrFields: {
-        withCredentials: false
-    },
-    beforeSend: function(request){
-        request.setRequestHeader('Authorization','Bearer '+window.token.access_token);
-    },
-    headers:{
-        'Content-Type': contenttype
-    },
-    dataType: datatype,
-    success: function(data) {
-        if(data){
-        ...
+                      <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">var tmp = JSON.parse(window.token);
+
+const data = {
+    service: service,
+    callback: callback,
+    authorization: authorization
+}
+
+const xhr = new XMLHttpRequest();
+xhr.withCredentials = false;
+
+xhr.addEventListener("readystatechange", function () {
+    if(this.readyState === this.DONE){
+        switch(this.status) {
+          case 200:
+            console.log("SUCCESS : "+this.responseText);
+            break;
+          case 401:
+              console.log("FAIL : "+this.responseText);
+            break;
+          default:
+            alert(this.responseText);
         }
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-            document.getElementById("output_"+count).innerHTML = jqXHR.status+" : "+jqXHR.statusText;
-    },
-});</code></pre>
+    }
+});
+
+xhr.open("PUT", "http://localhost:8080/v1.0/hook/create");
+xhr.setRequestHeader("Content-Type", "application/json");
+xhr.setRequestHeader("Authorization", "Bearer "+tmp.token);
+xhr.send(JSON.stringify(data));</code></pre>
                                       </div>
                                   </div>
                               </div>

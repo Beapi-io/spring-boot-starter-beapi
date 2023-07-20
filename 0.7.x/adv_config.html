@@ -318,17 +318,18 @@
               <h2 class="section-title-2">IO State <a data-scroll href="#section-2" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
               <p>The IO State File is a descriptor for your API endpoints. It is a cacheable configuration file holding data directly associated with a specific group of API requests & responses. This enables all URI's (and their associated data) to be easily cached and this data to be shared with services in the architecture (ie Proxy, MQ, etc).</p>
               <p>URI's call a common set of data as they are based on classes/method. As such, these URIs can be GROUPED and said to share a common dataset and set of config options. The IO State File is a set of rules for all URI's sharing a common data object.</p>
-              <p>Examples of IO state files can be found in <a href="https://github.com/orubel/beapi_backend/tree/master/src/iostate">the example project here</a>.</p>
+              <p>Examples of IO state files can be found in <a href="https://github.com/Beapi-io/spring-boot-starter-beapi-config/blob/main/.iostate/">the example project here</a>.</p>
               <p>To bootstrap your IOState from your domains, simply go into the the root directory of your project and type the following command from the shell:</p>
               <div class="row">
                 <div class="col">
                   <div class="card">
                     <div class="card-body" style="background-color:#000;">
-                      <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">./gradlew GenerateIostate</code></pre>
+                      <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">gradle GenerateIostate</code></pre>
                     </div>
                   </div>
                 </div>
               </div></br>
+                <p><b>NOTE</b>: This CLI functionality is still in development and will probably be released in 0.8.</p>
               <p>This will generate IO state files based on all your domains/models. A typical IO State File looks like the following:</p>
               <div class="row">
                 <div class="col">
