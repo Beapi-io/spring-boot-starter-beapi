@@ -293,7 +293,7 @@
 
             <section id="section-3">
               <h2 class="section-title-3">Setup Demo Project DB<a data-scroll href="#section-3" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"></a></h2>
-              <p>Downloaded with the config was a file called <b>boot.sql</b>. This will allow you to setup your default DB for the demo project.</p>
+              <p>You will now need to setup your database and edit your <b>beapi_db.yml</b> file (please <a href="config.html#section-4">DB section under 'Configure Demo Project'</a>). This will allow you to setup your default DB for the demo project.</p>
               <ul>
                 <li>Login to MySQL via the shell from the directory in which the 'boot.sql' file is and use the following commands:
                   <div class="row">
@@ -313,7 +313,7 @@ exit;</code></pre>
                   </div>
                 </br>
                 </li>
-                <li>Next, go into your ~/.boot/dev directory and find the beapi_db.yaml file for editing and change the following lines:
+                <li>Next, go into your ~/.boot/dev directory and find the <b>beapi_db.yaml</b> file for editing and change the following lines:
                   <div class="row">
                     <div class="col">
                       <div class="card">
@@ -324,10 +324,10 @@ password: "password"</code></pre>
                       </div>
                     </div>
                   </div>
-                  <p><b>NOTE:</b> If you want to test in other environments, you will have to copy this file to the 'test' and 'prod' folders as well.</p>
+                  <p><b>NOTE:</b> you will have to copy this file to the 'test' and 'prod' folders as well.</p>
                   </br>
                 </li>
-                <li>Finally, go into your <b>'demo-application/src/main/resources/application.properties'</b> and make sure, that your environment is set to 'dev':
+                <li>Finally, go into your <b>'/src/main/resources/application.properties'</b> and make sure, that your environment is set to 'dev':
                   <div class="row">
                     <div class="col">
                       <div class="card">
