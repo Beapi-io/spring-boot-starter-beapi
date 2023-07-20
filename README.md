@@ -21,7 +21,7 @@
 Most everything you need for API development should be provided & configured 'out of the box' **BUT** you have the ability to configure and override everything to your hearts content
 
 ## Beapi abstracts all RULES for API endpoints ...
-All API RULES can be **shared/syncronized with all services** in a distributed API architecture **without requiring restarts of all servers** to do so. Similar docs like [https://flic.kr/p/2keNR8v]('OpenAPI' cannot and do not support RBAC/ABAC roles). This is essential when you want to integrate MULTIPLE API services across different parts of your company/product/service.
+All [API RULES](https://gist.github.com/orubel/159e94db62023c78a07ebe6d86633763) can be **shared/syncronized with all services** in a distributed API architecture **without requiring restarts of all servers** to do so. Similar docs like [https://flic.kr/p/2keNR8v]('OpenAPI' cannot and do not support RBAC/ABAC roles). This is essential when you want to integrate MULTIPLE API services across different parts of your company/product/service.
 
 In current architectures, DATA for endpoints is bound to FUNCTIONALITY ( see [Cross Cutting Concern](https://en.wikipedia.org/wiki/Cross-cutting_concern) ) through things like 'annotations'; this makes it so that you have to **duplicate this DATA everywhere**(see OpenApi) as said data is hardcoded into functionality via those annotations. And UNFORTUNATELY existing tools (like OpenAPI) [refuse to include/synchronize RBAC rules across services](https://www.flickr.com/photos/orubel/50695726007/in/dateposted-public/) making it so other services become insecure when using tools like OpenApi.
 
