@@ -13,7 +13,7 @@ import org.springframework.context.annotation.PropertySources;
         @PropertySource(value = "file:\${user.home}/.boot/\${spring.profiles.active}/beapi_server.yaml", factory = YamlPropertySourceFactory.class)
 ])
 public class ServerProperties {
-    
+
     public NanoProps nano = new NanoProps()
     public MediumProps medium = new MediumProps()
     public LargeProps large = new LargeProps()

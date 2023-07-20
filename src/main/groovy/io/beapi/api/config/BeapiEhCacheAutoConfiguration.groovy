@@ -17,6 +17,7 @@
 package io.beapi.api.config
 
 import io.beapi.api.properties.ApiProperties
+import io.beapi.api.properties.CacheProperties
 import io.beapi.api.service.HookCacheService
 import io.beapi.api.service.IoStateService
 import io.beapi.api.service.ThrottleCacheService
@@ -62,7 +63,16 @@ import io.beapi.api.service.ApiCacheService
 public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
 
     @Autowired
+    private CacheProperties cacheProperties;
+
+    @Autowired
     private ApiProperties apiProperties;
+
+    HashMap evictPolicy = [
+            'LRU':net.sf.ehcache.store.MemoryStoreEvictionPolicy.LRU,
+            'LFU':net.sf.ehcache.store.MemoryStoreEvictionPolicy.LFU,
+            'FIFO':net.sf.ehcache.store.MemoryStoreEvictionPolicy.FIFO
+    ]
 
     public BeapiEhCacheAutoConfiguration() {}
 
@@ -99,18 +109,20 @@ public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
             DiskStoreConfiguration diskStoreConfiguration = new DiskStoreConfiguration()
             diskStoreConfiguration.setPath("/tmp")
 
+
             // ApiCache
+            CacheProperties.ApiProps api = cacheProperties.getApi()
             CacheConfiguration cacheConfig1 = new CacheConfiguration()
             cacheConfig1.setName("ApiCache")
             cacheConfig1.eternal(true)
             cacheConfig1.overflowToDisk(true)
             // cacheConfig1.diskPersistent(true)
-            cacheConfig1.diskExpiryThreadIntervalSeconds(120)
-            cacheConfig1.setMaxElementsInMemory(10000)
-            cacheConfig1.setMaxElementsOnDisk(10000)
-            cacheConfig1.maxEntriesLocalHeap(10000)
-            cacheConfig1.maxEntriesLocalDisk(10000)
-            cacheConfig1.memoryStoreEvictionPolicy(net.sf.ehcache.store.MemoryStoreEvictionPolicy.FIFO)
+            cacheConfig1.diskExpiryThreadIntervalSeconds(api.getDiskExpiryThreadIntervalSeconds())
+            cacheConfig1.setMaxElementsInMemory(api.getMaxElementsInMemory())
+            cacheConfig1.setMaxElementsOnDisk(api.getMaxElementsOnDisk())
+            cacheConfig1.maxEntriesLocalHeap(api.getMaxEntriesLocalHeap())
+            cacheConfig1.maxEntriesLocalDisk(api.getMaxEntriesLocalDisk())
+            cacheConfig1.memoryStoreEvictionPolicy(evictPolicy[api.getMemoryStoreEvictionPolicy()])
 
 
             // (Enterprise ehcache only)
@@ -118,42 +130,45 @@ public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
             //persistConfig.strategy(Strategy.LOCALRESTARTABLE);
 
             // HookCache
+            CacheProperties.HookProps hook = cacheProperties.getHook()
             CacheConfiguration cacheConfig2 = new CacheConfiguration()
             cacheConfig2.setName("HookCache")
             cacheConfig2.eternal(true)
-            cacheConfig1.overflowToDisk(true)
+            cacheConfig2.overflowToDisk(true)
             //cacheConfig2.diskPersistent(true)
             //cacheConfig2.persistence(persistConfig);
-            cacheConfig2.diskExpiryThreadIntervalSeconds(-1)
-            cacheConfig2.setMaxElementsInMemory(1000)
-            cacheConfig2.setMaxElementsOnDisk(100000)
-            cacheConfig2.maxEntriesLocalHeap(1)
-            cacheConfig2.maxEntriesLocalDisk(100000)
-            cacheConfig2.memoryStoreEvictionPolicy(net.sf.ehcache.store.MemoryStoreEvictionPolicy.FIFO)
+            cacheConfig2.diskExpiryThreadIntervalSeconds(hook.getDiskExpiryThreadIntervalSeconds())
+            cacheConfig2.setMaxElementsInMemory(hook.getMaxElementsInMemory())
+            cacheConfig2.setMaxElementsOnDisk(hook.getMaxElementsOnDisk())
+            cacheConfig2.maxEntriesLocalHeap(hook.getMaxEntriesLocalHeap())
+            cacheConfig2.maxEntriesLocalDisk(hook.getMaxEntriesLocalDisk())
+            cacheConfig2.memoryStoreEvictionPolicy(evictPolicy[hook.getMemoryStoreEvictionPolicy()])
 
             // Throttle
+            CacheProperties.ThrottleProps throttle = cacheProperties.getThrottle()
             CacheConfiguration cacheConfig3 = new CacheConfiguration()
             cacheConfig3.setName("Throttle")
             cacheConfig3.eternal(false)
             cacheConfig3.overflowToDisk(true)
-            cacheConfig3.diskExpiryThreadIntervalSeconds(120)
-            cacheConfig3.maxEntriesLocalHeap(1000)
-            cacheConfig3.maxEntriesLocalDisk(5000)
-            cacheConfig3.timeToLiveSeconds(120)
-            cacheConfig3.timeToIdleSeconds(0)
-            cacheConfig3.memoryStoreEvictionPolicy(net.sf.ehcache.store.MemoryStoreEvictionPolicy.LRU)
+            cacheConfig3.diskExpiryThreadIntervalSeconds(throttle.getDiskExpiryThreadIntervalSeconds())
+            cacheConfig3.maxEntriesLocalHeap(throttle.getMaxEntriesLocalHeap())
+            cacheConfig3.maxEntriesLocalDisk(throttle.getMaxEntriesLocalDisk())
+            cacheConfig3.maxEntriesLocalDisk(throttle.getTimeToLiveSeconds())
+            cacheConfig3.maxEntriesLocalDisk(throttle.getTimeToIdleSeconds())
+            cacheConfig3.memoryStoreEvictionPolicy(evictPolicy[throttle.getMemoryStoreEvictionPolicy()])
 
             // Trace
+            CacheProperties.TraceProps trace = cacheProperties.getTrace()
             CacheConfiguration cacheConfig4 = new CacheConfiguration()
             cacheConfig4.setName("Trace")
             cacheConfig4.eternal(false)
             cacheConfig4.overflowToDisk(false)
-            cacheConfig4.diskExpiryThreadIntervalSeconds(30)
-            cacheConfig4.maxEntriesLocalHeap(1000)
-            cacheConfig4.maxEntriesLocalDisk(500)
-            cacheConfig4.timeToLiveSeconds(0)
-            cacheConfig4.timeToIdleSeconds(30)
-            cacheConfig4.memoryStoreEvictionPolicy(net.sf.ehcache.store.MemoryStoreEvictionPolicy.LRU)
+            cacheConfig4.diskExpiryThreadIntervalSeconds(trace.getDiskExpiryThreadIntervalSeconds())
+            cacheConfig4.maxEntriesLocalHeap(trace.getMaxEntriesLocalHeap())
+            cacheConfig4.maxEntriesLocalDisk(trace.getMaxEntriesLocalDisk())
+            cacheConfig4.maxEntriesLocalDisk(trace.getTimeToLiveSeconds())
+            cacheConfig4.maxEntriesLocalDisk(trace.getTimeToIdleSeconds())
+            cacheConfig4.memoryStoreEvictionPolicy(evictPolicy[trace.getMemoryStoreEvictionPolicy()])
 
 
             net.sf.ehcache.config.Configuration config = new net.sf.ehcache.config.Configuration()
