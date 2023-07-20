@@ -243,7 +243,7 @@
             <section id="section-1">
               <h2 class="section-title-1">Properties<a data-scroll href="#section-1" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
               <div id="section-1.1">
-                <p>in your 'resources' directory, you will find you <b>application.properties</b> file. The following stats are what you are most concerned with:</p>
+                <p>in your 'resources' directory, you will find your <b>application.properties</b> file. The following stats are what you are most concerned with:</p>
                 <ul>
                   <li>
                     <div class="row">
@@ -324,6 +324,7 @@
                 <li style="margin-top: 25px;"><h5><b>BOOTSTRAP</b></h5>
                   <div class="row">
                     <div class="col">
+                      <p>For more information about this, see the <a href="index.html#section-5">installation process.</a></p>
                       <div class="alert alert-warning" role="alert">
                         <ul>
                           <li><h6 style="margin-bottom: 0px;"><b>superUser/login:</b> (CHANGE)</h6> Superuser that is bootstrapped with your application (also used for functional testing)</li>
@@ -360,7 +361,7 @@
                 <tr><td style="padding:10px;">views</td><td style="padding:10px;">[deprecated]</td><td style="padding:10px;">['admin','apidoc','api','login','logout']</td></tr>
                 <tr><td style="padding:10px;">reserveduris</td><td style="padding:10px;">List representing restricted URI's </td><td style="padding:10px;">['/authenticate','/register','/error','/login','/logout']</td></tr>
                 <tr><td style="padding:10px;">publicEndpoint</td><td style="padding:10px;">List representing static endpoint in application</td><td style="padding:10px;">['jwtAuthentication','beapiError']</td></tr>
-                <tr><td style="padding:10px;">staticEndpoint</td><td style="padding:10px;">List representing hardcoded endpoints in starter</td><td style="padding:10px;">['apidoc','connector','properties']</td></tr>
+                <tr><td style="padding:10px;">staticEndpoint</td><td style="padding:10px;">List representing hardcoded endpoints in starter</td><td style="padding:10px;">['apidoc','connector','properties','user','authority','hook']</td></tr>
                 <tr><td style="padding:10px;">apiServer</td><td style="padding:10px;">String representing the (protocol / FQDN or IP / port) used by server</td><td v>'http://localhost:8080'</td></tr>
                 <tr><td style="padding:10px;">apichainLimit</td><td style="padding:10px;">Integer representing number of times api can be chained</td><td style="padding:10px;">3</td></tr>
                 <tr><td style="padding:10px;">postcrement</td><td style="padding:10px;">[deprecated]</td><td style="padding:10px;">false</td></tr>
@@ -452,7 +453,7 @@
             <!-- file tree -->
             <section id="section-4">
               <h2 class="section-title-4">Beapi DB Config Changes<a data-scroll href="#section-4" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
-              <p>You will then need to edit your <b>'beapi_db.yaml'</b> file in your <b>~/.boot/{env}/</b> directory and changes the following settings:</p>
+              <p>You will then need to edit your <b>'beapi_db.yaml'</b> file in your <b>~/.boot/{env}/</b> directory and changes the following settings (for more information, see springboots information about <a href="https://www.baeldung.com/spring-boot-configure-data-source-programmatic#configuring-a-datasource-bean">setting up a datasource</a>):</p>
 
               <ul style="list-style-type: none;">
 
