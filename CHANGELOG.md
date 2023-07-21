@@ -78,7 +78,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - fixed RequestInitializationFilter to properly return errors
  - fixed CORS/JWT issue
  
- ## 0.7.X - (projected release 08/01/2023)
+ ## 0.7.0 - (released 07/21/2023)
  
  ### Added
  - PropertiesController and properties IOState for showing Application properties from config as API (not changing them though; that requires restart)
