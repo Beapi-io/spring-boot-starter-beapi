@@ -93,6 +93,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - added 'convention over config'; demo will be much simpler now going forward (as will docs)
  - added default for 'beapi_server' in case user forgets server properties; default server properties
  - added default for 'beapi_api' in case user forgets api properties; default api properties
+ - connector scaffolding
  
  ### Changed
  - stability fixes
