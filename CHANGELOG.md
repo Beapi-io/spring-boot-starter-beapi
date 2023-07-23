@@ -113,12 +113,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
  ### todo
     - (Feature) APIExplore (see discussions)
-    - (Feature) scaffolding (iostate first)
     - (Feature) finish hook functionality (parially done)
     - (Feature) user management (also for frontend)
-    - (Feature) trace functionality
-    - (Feature) stats
     - (Feature) rate limiting
+    - (Feature) stats
+    - (Feature) trace functionality
+    - (Feature) controller/domain scaffolding
     - (DOCS) documentation for scaffolding functionality
     - (DOCS) static endpoint documentation
     - (SDK) optional JMS service/config ??
