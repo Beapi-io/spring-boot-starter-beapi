@@ -111,19 +111,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Changed
 
  ### todo
-    - finish hook functionality (parially done)
-    - add user management
-    - trace functionality
-    - stats
-    - add 'autoTest' toggle for automated tests from apiProperties/beapi_api.yml (partically done)
-    - need to make sure CLI does not overwrite existing files
-    - (DOCS) need to add documentation for scaffolding functionality
-    - (DOCS) add 'entityPackages' for beapi_api.yaml to documentation
-    - (DOCS) apidocs documentation
+    - (Feature) APIExplore (see discussions)
+    - (Feature) scaffolding (iostate first)
+    - (Feature) finish hook functionality (parially done)
+    - (Feature) user management (also for frontend)
+    - (Feature) trace functionality
+    - (Feature) stats
+    - (Feature) rate limiting
+    - (DOCS) documentation for scaffolding functionality
+    - (DOCS) static endpoint documentation
     - (SDK) optional JMS service/config ??
-    - (SDK) automated webhooks (need to do prior to rate limiting/io state)
-    - (SDK) rate limiting / data limiting (reliant on webhooks and DB)
-    - (SDK) change IOState files (possibly read from CDN ???)
 
 
 
