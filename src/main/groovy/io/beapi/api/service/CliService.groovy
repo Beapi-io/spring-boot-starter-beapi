@@ -63,10 +63,10 @@ public class CliService {
 	static transactional = false
 
 	void parse() {
-		println("#### ARGS : "+argsString)
+		//println("#### ARGS : "+argsString)
 
 		ArrayList args = argsString[0].split(" ")
-		println("#### PARSE ARGS : "+args)
+		//println("#### PARSE ARGS : "+args)
 
 		if(args.size()>0) {
 			args.remove(0)
