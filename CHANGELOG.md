@@ -105,6 +105,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - moving core security from demo project into starter
  - consolidated 'bootstrap' functionality into a service; only requires one line to bootstrap project from properties files
 
+ ## 0.7.1 - (released 07/22/2023)
+
+ ### Changed
+ - stability fixes; cleanup
+
+
  ## 0.8.X - (projected release 11/01/2023)
  
  ### Added
