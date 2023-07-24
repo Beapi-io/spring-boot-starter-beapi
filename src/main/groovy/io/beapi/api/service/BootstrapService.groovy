@@ -98,9 +98,6 @@ public class BootstrapService {
 
 	public void bootstrapSuperUser(){
 		LinkedHashMap superUser = apiProperties.getBootstrap().getSuperUser();
-		println(superUser)
-		println(superUser['password'])
-		println(superUser['password'].getClass())
 		Authority adminAuth = authService.findByAuthority(apiProperties.getSecurity().getSuperuserRole());
 		User sUser = userService.findByEmail(superUser['email']);
 
