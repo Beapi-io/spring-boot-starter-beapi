@@ -119,6 +119,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
  ### todo
     - (Feature) APIExplore (see discussions)
+        - add LinkRelationTest
     - (Feature) finish hook functionality (parially done)
     - (Feature) user management (also for frontend)
     - (Feature) rate limiting
