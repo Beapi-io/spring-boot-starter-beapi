@@ -23,14 +23,18 @@
 Most everything you need for API development should be provided & configured 'out of the box' **BUT** you have the ability to configure and override everything to your hearts content
 
 ## Beapi abstracts all RULES for API endpoints ...
-All [API RULES](https://gist.github.com/orubel/159e94db62023c78a07ebe6d86633763) can be **shared/syncronized with all services** in a distributed API architecture **without requiring restarts of all servers** to do so. Similar docs like [https://flic.kr/p/2keNR8v]('OpenAPI' cannot and do not support RBAC/ABAC roles). This is essential when you want to integrate MULTIPLE API services across different parts of your company/product/service.
+Tradional API application's bind all rules/data to controllers (ie handlers) making them impossible to be shared amongst distributed services (other api servers, gateways, etc); you can export this data but it does not export 'security rules' like RBAC/ABAC or ROLES for endpoints ([https://flic.kr/p/2keNR8v](see OpenAPI's lead dev response on ROLES in OpenAPI))
 
-In current architectures, DATA for endpoints is bound to FUNCTIONALITY ( see [Cross Cutting Concern](https://en.wikipedia.org/wiki/Cross-cutting_concern) ) through things like 'annotations'; this makes it so that you have to **duplicate this DATA everywhere**(see OpenApi) as said data is hardcoded into functionality via those annotations. And UNFORTUNATELY existing tools (like OpenAPI) [refuse to include/synchronize RBAC rules across services](https://www.flickr.com/photos/orubel/50695726007/in/dateposted-public/) making it so other services become insecure when using tools like OpenApi.
-
-By abstracting it into an externally **reloadable file**, things like [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control)/'endpoint ROLES' can be easily adjusted without requiring a restart of services. Plus using functionality like webhooks, one can synchronize all services from a MASTER server. This allows for changes to API endpoint DATA on a distributed API architecture without restarting services.
+BeAPI abstracts these [RULES/data](https://gist.github.com/orubel/159e94db62023c78a07ebe6d86633763) as a 'config' file which is **loaded at runtime and can be reloaded and SYNCHRONIZED** with distributed services **without requiring a restart**.
 
 ## BeAPI automates common usage...
-By abstracting the rules, this allows for easier automation and allows for [automated batching](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-1) and '[Api Chaining&reg;](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-3) '
+By abstracting the rules, this allows for easier automation and allows for:
+- [automated batching](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-1)
+- [Api Chaining&reg;](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-3)
+- extremely simplified security setup
+- automated api docs
+- automated HATEOS link relations
+- and more
 
 ---
 
