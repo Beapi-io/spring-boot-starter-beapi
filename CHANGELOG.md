@@ -114,6 +114,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ## 0.8.X - (projected release 11/01/2023)
  
  ### Added
+ - tests for LinkRelations
  
  ### Changed
 
