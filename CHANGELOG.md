@@ -115,7 +115,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  
  ### Added
  - tests for LinkRelations
- - automating HATEOS LinkRelations
+ - automating HATEOS LinkRelations (if there are any) via passing of 'X-LINK-RELATIONS' header
  
  ### Changed
 
