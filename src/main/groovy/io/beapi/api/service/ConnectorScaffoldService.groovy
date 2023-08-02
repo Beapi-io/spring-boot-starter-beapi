@@ -40,7 +40,9 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 /*
-Part of CLI to scaffold IOState files
+Part of CLI : Used to scaffold IOState files
+
+NOTE: Can only be used/tested as an starter artifact due to the way templates are referenced in the compiled JAR
  */
 @Service
 public class ConnectorScaffoldService {
@@ -356,6 +358,7 @@ json += """
 
 
 	void writeConnector(String inPath, String outPath, LinkedHashMap attribs){
+		println(inPath)
 		String starterDir = new File(getClass().protectionDomain.codeSource.location.path).path
 		def starter = new File(starterDir)
 		if (starter.isFile() && starter.name.endsWith("jar")) {

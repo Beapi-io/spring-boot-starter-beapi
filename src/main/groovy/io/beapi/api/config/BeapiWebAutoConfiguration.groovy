@@ -20,6 +20,7 @@ package io.beapi.api.config
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ExchangeService
+import io.beapi.api.service.LinkRelationService
 import io.beapi.api.service.ThrottleCacheService
 import io.beapi.api.service.TraceExchangeService
 //import io.beapi.api.service.TraceService
@@ -67,6 +68,9 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 	@Autowired
 	private ApplicationContext context;
+
+	@Autowired
+	LinkRelationService linkRelationService
 
 	@Autowired
 	PrincipleService principleService
@@ -152,7 +156,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 	@Bean
 	public RequestInitializationFilter requestInitializationFilter() {
-		return new RequestInitializationFilter(principleService, apiProperties, apiCacheService, this.version, context);
+		return new RequestInitializationFilter(linkRelationService, principleService, apiProperties, apiCacheService, this.version, context);
 	}
 
 
@@ -187,6 +191,11 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 		LinkedHashMap<String, Object> cont = this.listableBeanFactory.getBeansWithAnnotation(org.springframework.stereotype.Controller.class)
 		cont.each() { k, v ->
+
+			//println(k)
+			//println(v)
+			//println(v.getClass().getName())
+
 			if(!['beapiErrorController','jwtAuthenticationController'].contains(k)) {
 				String controller = k
 				def cache = apiCacheService.getApiCache(controller)

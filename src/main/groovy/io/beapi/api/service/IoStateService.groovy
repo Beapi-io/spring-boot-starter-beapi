@@ -299,7 +299,7 @@ public class IoStateService{
 					try {
 						apiDescriptor = createApiDescriptor(networkGrp, apiName, apiMethod, apiRoles, batchRoles, hookRoles, actionname, vals, apiVersion)
 					} catch (Exception e) {
-						println("unable to create ApiDescriptor. Check your IO State Formatting  : " + e)
+						println("unable to create ApiDescriptor. Check your IO State Formatting  : " + e +". Line Number "+e.getStackTrace()[0].getLineNumber())
 					}
 
 					if (!methods["${versKey}"]) {
@@ -478,17 +478,21 @@ public class IoStateService{
 			throw new Error("#### [IoStateService : getIoSet] : Exception: ",e)
 		}
 
-		// lookup controller for 'handler'
-		//try {
-		//	Class.forName(handler)
-		//}catch(Exception e){
-		//	throw new Error("#### [IoStateService : createApiDescriptor] : Handler '${handler}' does not exist : Skipping endpoint creation for '${apiname}'",e)
-		//}
+		// [KEYLIST]
+		Set keyList = []
+		fkeys.each(){ it ->
+			it.each(){ k,v ->
+				if(k) {
+					keyList.add(k)
+				}
+			}
+		}
+		if(pkeys) {
+			keyList.add(pkeys)
+		}
 
-		//receives
-		//returns
-		Set keyList = pkeys+fkeys
-		ApiDescriptor service = new ApiDescriptor(networkGrp, apiMethod, pkeys, fkeys, apiRoles, apiname, receives, receivesList, returns, returnsList)
+		ApiDescriptor service = new ApiDescriptor(networkGrp, apiMethod, pkeys, fkeys, apiRoles, apiname, receives, receivesList, returns, returnsList, keyList)
+
 
 		// override networkRoles with 'DEFAULT' in IO State
 
@@ -656,16 +660,12 @@ public class IoStateService{
 						} else {
 							if (info != "{ [/error]}") {
 								String msg = "${info} does not match expected requestmapping naming convention of '/*/controller/method**'. Also check your that you have a request method declared for your endpoint and try again."
-								println("INVALID_RPC_NAMING : " + msg)
 								throw new Exception("INVALID_RPC_NAMING : " + msg);
 								return false
 							}
 						}
 					} catch (Exception e) {
-
-						println("INVALID_RPC_NAMING (83) : " + e)
-						//throw new Exception("INVALID_RPC_NAMING : " + e);
-
+						throw new Exception("INVALID_RPC_NAMING : " + e);
 					}
 
 					if (!reservedControllerNames.contains(temp)) {
@@ -697,7 +697,6 @@ public class IoStateService{
 									}
 								}
 							}catch(Exception e){
-								println("INVALID_RPC_NAMING (624) : " + e)
 								throw new Exception("INVALID_RPC_NAMING : " + e);
 							}
 						}

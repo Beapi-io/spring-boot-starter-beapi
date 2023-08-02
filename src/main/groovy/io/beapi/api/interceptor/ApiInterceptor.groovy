@@ -73,14 +73,14 @@ import javax.crypto.KeyGenerator;
 
 
 @EnableConfigurationProperties([ApiProperties.class])
-//@ConditionalOnBean(name = ["principle","apiCacheService"])
+//@ConditionalOnBean(name = ["principle"])
 class ApiInterceptor implements HandlerInterceptor{
 	//private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApiInterceptor.class);
 
 	// TODO : inject stats service into interceptor and then into here
 
 
-	ApiCacheService apiCacheService
+
 	ThrottleCacheService throttle
 	PrincipleService principle
 	private ApiProperties apiProperties
@@ -181,7 +181,7 @@ class ApiInterceptor implements HandlerInterceptor{
 					if(apiProperties.throttle.active) {
 						throttle.incrementThrottleCache(principle.name())
 					}
-					exchangeService.apiResponse(response,body)
+					exchangeService.apiResponse(request,response,body)
 					break
 				case 2:
 					if(apiProperties.batchingEnabled) {
@@ -245,4 +245,6 @@ class ApiInterceptor implements HandlerInterceptor{
 		response.getWriter().write(message)
 		response.writer.flush()
 	}
+
+
 }

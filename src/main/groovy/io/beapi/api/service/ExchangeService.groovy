@@ -34,11 +34,13 @@ public class ExchangeService extends ApiExchange{
 	private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
 
 	ApiCacheService apiCacheService
+	LinkRelationService linkRelationService
 
 	boolean overrideAutoMimeTypes = false
 
-	public ExchangeService(ApiCacheService apiCacheService) {
+	public ExchangeService(LinkRelationService linkRelationService, ApiCacheService apiCacheService) {
 		try {
+			this.linkRelationService = linkRelationService
 			this.apiCacheService = apiCacheService
 		} catch (Exception e) {
 			println("# [Beapi] ExchangeService - initialization Exception - ${e}")
@@ -95,7 +97,7 @@ public class ExchangeService extends ApiExchange{
 
     }
 
-    void apiResponse(HttpServletResponse response,ArrayList body){
+    void apiResponse(HttpServletRequest request,HttpServletResponse response, ArrayList body){
 		// println("### apiResponse ###")
         String output = parseOutput(body, responseFileType)
 
@@ -103,8 +105,15 @@ public class ExchangeService extends ApiExchange{
             apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
         }
 
+		String linkRelations = linkRelationService.processLinkRelations(request, response, this.apiObject)
+
         PrintWriter writer = response.getWriter();
-        writer.write(output);
+		if(linkRelations){
+			String newResult ="[${output},${linkRelations}]"
+			writer.write(newResult);
+		}else{
+			writer.write(output);
+		}
         writer.close()
         response.writer.flush()
     }

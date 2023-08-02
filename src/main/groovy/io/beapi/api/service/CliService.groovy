@@ -15,7 +15,7 @@
  *
  *
  * ##### USAGE ####
- * for scaffolding a connector : gradle  scaffold -Pargs="connector=<domain.package.name>>"
+ * for scaffolding a connector : gradle  scaffold -Pargs="connector=<domain.package.name>"
  * for scaffolding a connector : gradle  scaffold -Pargs="domain=demo.application.domain.Company"
 
  *

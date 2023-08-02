@@ -17,6 +17,7 @@
 package io.beapi.api.filter
 
 import groovy.json.JsonSlurper
+import io.beapi.api.service.LinkRelationService
 import io.beapi.api.utils.UriObject
 import org.json.JSONObject
 import io.beapi.api.properties.ApiProperties
@@ -81,7 +82,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     @Autowired
     ApplicationContext ctx
 
-
+    LinkRelationService linkRelationService
     PrincipleService principle
     ApiCacheService apiCacheService
     ApiProperties apiProperties
@@ -109,10 +110,10 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     boolean reservedUri
 
     LinkedHashMap params = [:]
-    String authority
-    ArrayList deprecated
-    String action
-    boolean apidocFwd
+    protected String authority
+    protected ArrayList deprecated
+    protected String action
+    protected boolean apidocFwd
 
     /**
      * @param PrincipleService principle
@@ -121,7 +122,8 @@ class RequestInitializationFilter extends OncePerRequestFilter{
      * @param String version
      * @param ApplicationContext ctx
      */
-    public RequestInitializationFilter(PrincipleService principle, ApiProperties apiProperties, ApiCacheService apiCacheService, String version, ApplicationContext ctx) {
+    public RequestInitializationFilter(LinkRelationService linkRelationService, PrincipleService principle, ApiProperties apiProperties, ApiCacheService apiCacheService, String version, ApplicationContext ctx) {
+        this.linkRelationService = linkRelationService
         this.apiProperties = apiProperties
         this.version = version
         this.ctx = ctx
@@ -185,7 +187,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                 // no action; show apidocs for controller
                 if (this.uObj.getAction()=='null') {
-                    println("### NO ACTION : "+this.uObj.getAction())
                     this.uObj.setId(this.uObj.getController())
                     this.uObj.setController('apidoc')
                     this.uObj.setAction('show')
@@ -210,7 +211,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                         def temp = cache[this.uObj.getApiVersion()]
                         this.deprecated = temp['deprecated'] as List
-
 
                         this.apiObject = temp[this.uObj.getAction()]
 
@@ -306,7 +306,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                 if (this.apiObject) {
                     // todo : create public api list
                     if (this.method == 'GET') {
-
                         setCacheHash(request.getAttribute('params'), this.receivesList)
 
                         // RETRIEVE CACHED RESULT (only if using 'GET' method)
@@ -319,11 +318,19 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                             // todo : check throttle cache size
                             if (cachedResult && cachedResult.size() > 0) {
+                                // adding linkRelations functionality for cachedResult
+                                String linkRelations = linkRelationService.processLinkRelations(request, response, this.apiObject)
+
                                 // todo: increment throttle cache
                                 // PLACEHOLDER FOR APITHROTTLING
                                 response.setStatus(200);
                                 PrintWriter writer = response.getWriter();
-                                writer.write(cachedResult);
+                                if(linkRelations){
+                                    String newResult ="[${cachedResult},${linkRelations}]"
+                                    writer.write(newResult);
+                                }else{
+                                    writer.write(cachedResult);
+                                }
                                 writer.close()
                                 response.writer.flush()
                                 return false
