@@ -1,7 +1,9 @@
 ![alt text](https://github.com/orubel/logos/blob/master/beapi_logo_large.png)
 # Beapi Spring Boot Starter
 
-### Current Version : 0.7.0-SNAPSHOT
+### Stable Version : 0.7.1
+
+### Development Version : 0.8.0
 
 ### Springboot Version : 2.6.2 (or greater)
 
@@ -21,14 +23,18 @@
 Most everything you need for API development should be provided & configured 'out of the box' **BUT** you have the ability to configure and override everything to your hearts content
 
 ## Beapi abstracts all RULES for API endpoints ...
-All [API RULES](https://gist.github.com/orubel/159e94db62023c78a07ebe6d86633763) can be **shared/syncronized with all services** in a distributed API architecture **without requiring restarts of all servers** to do so. Similar docs like [https://flic.kr/p/2keNR8v]('OpenAPI' cannot and do not support RBAC/ABAC roles). This is essential when you want to integrate MULTIPLE API services across different parts of your company/product/service.
+Tradional API application's bind all rules/data to controllers (ie handlers) making them impossible to be shared amongst distributed services (other api servers, gateways, etc); you can export this data but it does not export 'security rules' like RBAC/ABAC or ROLES for endpoints ([https://flic.kr/p/2keNR8v](see OpenAPI's lead dev response on ROLES in OpenAPI))
 
-In current architectures, DATA for endpoints is bound to FUNCTIONALITY ( see [Cross Cutting Concern](https://en.wikipedia.org/wiki/Cross-cutting_concern) ) through things like 'annotations'; this makes it so that you have to **duplicate this DATA everywhere**(see OpenApi) as said data is hardcoded into functionality via those annotations. And UNFORTUNATELY existing tools (like OpenAPI) [refuse to include/synchronize RBAC rules across services](https://www.flickr.com/photos/orubel/50695726007/in/dateposted-public/) making it so other services become insecure when using tools like OpenApi.
-
-By abstracting it into an externally **reloadable file**, things like [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control)/'endpoint ROLES' can be easily adjusted without requiring a restart of services. Plus using functionality like webhooks, one can synchronize all services from a MASTER server. This allows for changes to API endpoint DATA on a distributed API architecture without restarting services.
+BeAPI abstracts these [RULES/data](https://gist.github.com/orubel/159e94db62023c78a07ebe6d86633763) as a 'config' file which is **loaded at runtime and can be reloaded and SYNCHRONIZED** with distributed services **without requiring a restart**.
 
 ## BeAPI automates common usage...
-By abstracting the rules, this allows for easier automation and allows for [automated batching](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-1) and '[Api Chaining&reg;](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-3) '
+By abstracting the rules, this allows for easier automation and allows for:
+- [automated batching](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-1)
+- [Api Chaining&reg;](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-3)
+- extremely simplified security setup
+- automated api docs
+- automated HATEOS link relations
+- and more
 
 ---
 
@@ -92,7 +98,7 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 - **Why require a cache?**
     - Caching is actually listed as part of the API requirements in Roy Fieldings dissertation; You cannot name an professional API implementation that does not use a cache. Unfortunately, many developers do not understand proper caching techniques (with API's). So we took that as an opportunity to handle that for you. You're welcome.
 - **Why not just use @RequestMapping, @GetMapping, etc?**
-    - The RequestMapping annotations create HARD CODED 'rules' to functionality; you cannot update/synchronize these 'rules' across your shared servers. This breaks the rules for configuration management when applying rules for the shared state across your entire architecture and can create [https://apiexpert.medium.com/why-api-gateways-are-dead-7c9e324ff70a](**security issues** in things like the api gateway). We abstract the rules away from the business logic so that they CAN be updated and shared with all running services WITHOUT requiring restarts. 
+    - The RequestMapping annotations create HARD CODED 'rules' to functionality; you cannot update/synchronize these 'rules' across your shared servers. This breaks the rules for configuration management when applying rules for the shared state across your entire architecture and can create **[security issues in the api gateway](https://apiexpert.medium.com/why-api-gateways-are-dead-7c9e324ff70a)**. We abstract the rules away from the business logic so that they CAN be updated and shared with all running services WITHOUT requiring restarts. 
     - By abstracting this data from the functionality, we are better able to make LIVE CHANGES TO ENDPOINT RULES **when functionality hasn't changed**. So for example if we want to disable privileges or change how a certain ROLE accesses endpoints, we can do that on the fly without taking down servers.
 - **Why can't 'API Chaining(R)' have more than ONE UNSAFE method in the chain?**
     - FIRST, You can only send ONE METHOD with a chain; you cannot send a PUT and POST method in the same call. But you can just default every other call to a SAFE call (ie GET) as long as client has AUTHORITY to the endpoint. SECOND, since it can only have one UNSAFE METHOD, you can only send ONE DATASET. We made it to be as simple as possible while encompassing the most commonly used calls thus simplifying the processing and the client call.

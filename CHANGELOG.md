@@ -78,7 +78,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - fixed RequestInitializationFilter to properly return errors
  - fixed CORS/JWT issue
  
- ## 0.7.X - (projected release 08/01/2023)
+ ## 0.7.0 - (released 07/21/2023)
  
  ### Added
  - PropertiesController and properties IOState for showing Application properties from config as API (not changing them though; that requires restart)
@@ -93,6 +93,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - added 'convention over config'; demo will be much simpler now going forward (as will docs)
  - added default for 'beapi_server' in case user forgets server properties; default server properties
  - added default for 'beapi_api' in case user forgets api properties; default api properties
+ - connector scaffolding
  
  ### Changed
  - stability fixes
@@ -104,26 +105,31 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - moving core security from demo project into starter
  - consolidated 'bootstrap' functionality into a service; only requires one line to bootstrap project from properties files
 
+ ## 0.7.1 - (released 07/22/2023)
+
+ ### Changed
+ - stability fixes; cleanup
+
+
  ## 0.8.X - (projected release 11/01/2023)
  
  ### Added
+ - tests for LinkRelations
  
  ### Changed
 
  ### todo
-    - finish hook functionality (parially done)
-    - add user management
-    - trace functionality
-    - stats
-    - add 'autoTest' toggle for automated tests from apiProperties/beapi_api.yml (partically done)
-    - need to make sure CLI does not overwrite existing files
-    - (DOCS) need to add documentation for scaffolding functionality
-    - (DOCS) add 'entityPackages' for beapi_api.yaml to documentation
-    - (DOCS) apidocs documentation
+    - (Feature) APIExplore (see discussions)
+        - add LinkRelationTest
+    - (Feature) finish hook functionality (parially done)
+    - (Feature) user management (also for frontend)
+    - (Feature) rate limiting
+    - (Feature) stats
+    - (Feature) trace functionality
+    - (Feature) controller/domain scaffolding
+    - (DOCS) documentation for scaffolding functionality
+    - (DOCS) static endpoint documentation
     - (SDK) optional JMS service/config ??
-    - (SDK) automated webhooks (need to do prior to rate limiting/io state)
-    - (SDK) rate limiting / data limiting (reliant on webhooks and DB)
-    - (SDK) change IOState files (possibly read from CDN ???)
 
 
 
