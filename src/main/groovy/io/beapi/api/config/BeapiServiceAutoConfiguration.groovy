@@ -23,6 +23,7 @@ import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.BootstrapService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ConnectorScaffoldService
+import io.beapi.api.service.LinkRelationService
 import io.beapi.api.service.TestScaffoldService
 import io.beapi.api.service.ExchangeService
 import io.beapi.api.service.TraceExchangeService
@@ -108,10 +109,16 @@ public class BeapiServiceAutoConfiguration {
 		return new TestScaffoldService(applicationContext);
 	}
 
+	@Bean(name='linkRelationService')
+	@ConditionalOnMissingBean
+	public LinkRelationService linkRelationService() throws IOException {
+		return new LinkRelationService(apiCacheService, principleService());
+	}
+
 	@Bean(name='exchangeService')
 	@ConditionalOnMissingBean
 	public ExchangeService exchangeService() throws IOException {
-		return new ExchangeService(apiCacheService);
+		return new ExchangeService(linkRelationService(), apiCacheService);
 	}
 
 	@Bean(name='batchService')

@@ -47,8 +47,8 @@ class ApiDescriptor implements Serializable{
 	//@NotNull
 	//@Pattern(regexp = "GET|POST|PUT|DELETE", flags = Pattern.Flag.CASE_INSENSITIVE)
 	String method
-	LinkedHashSet pkeys
-	LinkedHashSet fkeys
+	HashSet pkeys
+	HashSet fkeys
 	Set keyList
 	ArrayList roles
 	ArrayList batchRoles
@@ -67,27 +67,36 @@ class ApiDescriptor implements Serializable{
 	LinkedHashMap cachedResult
 	//LinkedHashMap stats
 
-	ApiDescriptor(String networkGrp, String method, LinkedHashSet pkeys, LinkedHashSet fkeys, ArrayList roles,String name, LinkedHashMap receives, LinkedHashMap receivesList, LinkedHashMap returns, LinkedHashMap returnsList) {
-		this.networkGrp = networkGrp
-		this.method = method
-		this.pkeys=pkeys
-		this.fkeys=fkeys
-		this.keyList = pkeys+fkeys
-		this.roles=roles
-		this.name=name
-		this.receives=receives as LinkedHashMap
-		this.receivesList=receivesList as LinkedHashMap
-		this.receivesList.each(){ it->
-			if(keyList.contains(it)){
-				receivesKeys.add(it)
+	ApiDescriptor(String networkGrp, String method, HashSet pkeys, HashSet fkeys, ArrayList roles,String name, LinkedHashMap receives, LinkedHashMap receivesList, LinkedHashMap returns, LinkedHashMap returnsList, Set keyList) {
+		try {
+			this.networkGrp = networkGrp
+			this.method = method
+			this.pkeys = pkeys
+			this.fkeys = fkeys
+
+			//this.keyList = pkeys+fkeys
+			this.keyList = keyList
+
+			this.roles = roles
+			this.name = name
+
+			this.receives = receives as LinkedHashMap
+			this.receivesList = receivesList as LinkedHashMap
+			this.receivesList.each() { it ->
+				if (keyList.contains(it)) {
+					receivesKeys.add(it)
+				}
 			}
-		}
-		this.returns=returns as LinkedHashMap
-		this.returnsList=returnsList as LinkedHashMap
-		this.returnsList.each(){ it->
-			if(keyList.contains(it)){
-				returnsKeys.add(it)
+
+			this.returns = returns as LinkedHashMap
+			this.returnsList = returnsList as LinkedHashMap
+			this.returnsList.each() { it ->
+				if (keyList.contains(it)) {
+					returnsKeys.add(it)
+				}
 			}
+		}catch(Exception e){
+			throw new Exception("[ApiDescriptor :: init] : Exception. full stack trace follows:", e)
 		}
 	}
 

@@ -34,7 +34,7 @@ import groovyx.gpars.*
 import groovy.json.JsonOutput
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.ListableBeanFactory
+//import org.springframework.beans.factory.ListableBeanFactory
 import javax.annotation.PostConstruct
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -52,8 +52,8 @@ class ApiCacheService{
 	@Autowired
 	private CacheManager cacheManager;
 
-	@Autowired
-	private ListableBeanFactory listableBeanFactory;
+	//@Autowired
+	//private ListableBeanFactory listableBeanFactory;
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApiCacheService.class);
 
