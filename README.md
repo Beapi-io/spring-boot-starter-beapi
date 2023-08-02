@@ -7,7 +7,7 @@
 
 ### Springboot Version : 2.6.2 (or greater)
 
-### JVM : 17 (has previously been tested with as low as 1.8)
+### JVM : 17 (has previously been tested with as low as 8)
 ---
 
 **License** - [Reciprocal Public License](https://en.wikipedia.org/wiki/Reciprocal_Public_License)
