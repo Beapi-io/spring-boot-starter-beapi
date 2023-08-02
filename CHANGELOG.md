@@ -115,6 +115,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  
  ### Added
  - tests for LinkRelations
+ - automating HATEOS LinkRelations
  
  ### Changed
 
