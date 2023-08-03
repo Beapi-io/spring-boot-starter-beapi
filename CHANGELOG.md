@@ -126,6 +126,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - (Feature) stats
     - (Feature) trace functionality
     - (Feature) controller/domain scaffolding
+    - (DOCS) document LinkRelation functionality
     - (DOCS) documentation for scaffolding functionality
     - (DOCS) static endpoint documentation
     - (SDK) optional JMS service/config ??
