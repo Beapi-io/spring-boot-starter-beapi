@@ -22,8 +22,9 @@
 ## BeAPI stresses convention over config...
 Most everything you need for API development should be provided & configured 'out of the box' **BUT** you have the ability to configure and override everything to your hearts content
 
-## Beapi abstracts all RULES for API endpoints ...
-Tradional API application's bind all rules/data to controllers (ie handlers) making them impossible to be shared amongst distributed services (other api servers, gateways, etc); you can export this data but it does not export 'security rules' like RBAC/ABAC or ROLES for endpoints ([https://flic.kr/p/2keNR8v](see OpenAPI's lead dev response on ROLES in OpenAPI))
+## Beapi automates API Governance...
+Tradional API application's bind all rules/data to controllers (ie handlers) making them impossible to be shared amongst distributed services. Through the creation and support of standardized services in our configuration docs, Beapi automates all processes: security (RBAC/ABAC, CORS, JWT), caching, synchronization across all servers, etc.
+
 
 BeAPI abstracts these [RULES/data](https://gist.github.com/orubel/159e94db62023c78a07ebe6d86633763) as a 'config' file which is **loaded at runtime and can be reloaded and SYNCHRONIZED** with distributed services **without requiring a restart**.
 
