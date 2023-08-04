@@ -116,6 +116,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Added
  - tests for LinkRelations
  - automating HATEOS LinkRelations (if there are any) via passing of 'X-LINK-RELATIONS' header
+ - added 'devnotes' (run with log level 'warn') which will let you know what went wrong and how to fix in the log
  
  ### Changed
 
