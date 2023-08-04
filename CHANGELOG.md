@@ -119,6 +119,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - added 'devnotes' (run with log level 'warn') which will let you know what went wrong and how to fix in the log
  
  ### Changed
+ - fixed issue with SimpleUrlMapping throwing error when 'action' not sent
 
  ### todo
     - (Feature) finish hook functionality (parially done)
