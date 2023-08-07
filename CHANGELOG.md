@@ -120,6 +120,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  
  ### Changed
  - fixed issue with SimpleUrlMapping throwing error when 'action' not sent
+ - adding back in webhook functionality
+ - upgrading to Groovy 4 for tests
+ - 'sealing' extended classes in call flow
 
  ### todo
     - (Feature) finish hook functionality (parially done)
