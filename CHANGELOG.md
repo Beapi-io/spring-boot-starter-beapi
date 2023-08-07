@@ -128,6 +128,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - (Feature) stats
     - (Feature) trace functionality
     - (Feature) controller/domain scaffolding
+    - (DOCS) separate DEMO docs from STARTER docs; keep in this project, easier to maintain
     - (DOCS) document LinkRelation functionality
     - (DOCS) documentation for scaffolding functionality
     - (DOCS) static endpoint documentation
