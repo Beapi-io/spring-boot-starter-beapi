@@ -125,7 +125,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - (Feature) finish hook functionality (parially done)
     - (Feature) user management (also for frontend)
     - (Feature) rate limiting
-    - (Feature) stats
+    - (Feature) stats (check out Matamo for integration : https://developer.matomo.org/api-reference/tracking-api)
     - (Feature) trace functionality
     - (Feature) controller/domain scaffolding
     - (Feature) CLI Bootstrap of controllers/domains/etc for new projects
