@@ -2,6 +2,7 @@ package io.beapi.api.controller.staticEndpoint;
 
 import io.beapi.api.domain.Hook;
 import io.beapi.api.domain.service.HookService;
+import io.beapi.api.service.WebHookService;
 import io.beapi.api.domain.User;
 import io.beapi.api.domain.service.UserService;
 import io.beapi.api.service.PrincipleService;
@@ -10,22 +11,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.time.Instant;
-import java.util.*;
+import java.time.Instant
+
 import io.beapi.api.properties.ApiProperties;
-import io.beapi.api.service.WebhookService;
 
 @Controller("hook")
 public class HookController extends BeapiRequestHandler{
 
-	@Autowired
-	ApiProperties apiProperties;
+	//@Autowired
+	//ApiProperties apiProperties;
 
 	@Autowired
-	WebhookService webhookService;
+	protected WebHookService webhookService;
 
 	@Autowired
-	PrincipleService principle;
+	protected PrincipleService principle;
 
 	@Autowired
 	private HookService hookService;

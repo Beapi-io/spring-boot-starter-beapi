@@ -16,7 +16,7 @@
  */
 package io.beapi.api.controller
 
-
+import io.beapi.api.service.PrincipleService
 import io.beapi.api.utils.ErrorCodes
 import io.beapi.api.utils.UriObject
 
@@ -27,24 +27,31 @@ import org.springframework.beans.factory.annotation.Autowired
 import com.fasterxml.jackson.databind.ObjectMapper
 import javax.persistence.Entity
 import org.springframework.web.HttpRequestHandler
-import org.slf4j.LoggerFactory;
+
 import io.beapi.api.service.TraceService
+import io.beapi.api.service.PrincipleService
 import java.lang.reflect.Method;
 import io.beapi.api.service.ApiCacheService
 import org.springframework.context.ApplicationContext
 import io.beapi.api.properties.ApiProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.web.context.support.WebApplicationContextUtils
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 @EnableConfigurationProperties([ApiProperties.class])
 class BeapiRequestHandler implements HttpRequestHandler {
-    //private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BeapiController.class);
+
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BeapiRequestHandler.class);
+    protected String markerText = "DEVNOTES";
+    protected Marker devnotes = MarkerFactory.getMarker(markerText);
 
     @Autowired
-    TraceService traceService
+    protected TraceService traceService
 
-    //@Autowired
-    //ApiProperties apiProperties
+    @Autowired
+    protected ApiProperties apiProperties
 
     private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml','multipart/form-data']
     private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
@@ -54,18 +61,17 @@ class BeapiRequestHandler implements HttpRequestHandler {
     * b : batch
     * c : api chain
     * t : trace
-    * h : webhook CRUD
      */
-    private static final ArrayList CALL_TYPES = ['v','b','c','t','h']
+    private static final ArrayList CALL_TYPES = ['v','b','c','t']
 
     private UriObject uObj
     protected boolean trace
     public String controller
     public String action
     public String apiversion
-    public String authority
+    protected String authority
     protected Set keyList = []
-    public LinkedHashMap<String,String> params = [:]
+    protected LinkedHashMap<String,String> params = [:]
 
 
 
@@ -75,6 +81,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
         //println("### BeapiRequestHandler...")
         ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
         this.authority = request.getAttribute('principle')
+
         this.uObj = request.getAttribute('uriObj')
 
         this.apiversion = this.uObj.getApiVersion()
@@ -103,16 +110,17 @@ class BeapiRequestHandler implements HttpRequestHandler {
                 try {
                     output = method.invoke(this, request, response)
                 } catch (IllegalArgumentException e) {
+                    logger.warn(devnotes,"[ BAD URI ] : YOU ARE ATTEMPTING TO CALL AN ENDPOINT THAT DOES NOT EXIST. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD EXISTS AND THAT IT IS PROPERLY REPRESENTED IN THE IOSTATE FILE.")
                     //writeErrorResponse(response, '422', request.getRequestURI());
                     throw Exception("[BeapiController > handleRequest] : IllegalArgumentException - full stack trace follows :", e);
                 } catch (IllegalAccessException e) {
+                    logger.warn(devnotes,"[ BAD URI ] : YOU ARE ATTEMPTING TO CALL AN ENDPOINT THAT DOES NOT EXIST. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD EXISTS AND THAT IT IS PROPERLY REPRESENTED IN THE IOSTATE FILE.")
                     //writeErrorResponse(response, '422', request.getRequestURI());
                     throw Exception("[BeapiController > handleRequest] : IllegalAccessException - full stack trace follows :", e);
                 }
             }
 
             if (output != null) {
-
                 ArrayList result = []
                 if (trace == true) {
                     Object trace = traceService.endAndReturnTrace(controller, action, request.getSession().getId())
@@ -132,14 +140,13 @@ class BeapiRequestHandler implements HttpRequestHandler {
                         }else{
                             writeErrorResponse(response, '422', request.getRequestURI(),"Expected Output does not match IOState RESPONSE params. Please conact the administrator.")
                         }
-
                     }else{
                         result = tempResult
                     }
                 }
                 request.setAttribute('responseBody', result)
             } else {
-
+                logger.warn(devnotes,"[ NO OUTPUT ] : OUTPUT EXPECTED AND NONE RETURNED. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD IS RETURNING THE PARAMS AS REPRESENTED IN THE APPROPRIATE IOSTATE FILE UNDER FOR THIS/CONTROLLER/METHOD (UNDER 'RESPONSE') AS A LINKEDHASHMAP.")
                 writeErrorResponse(response, '404', request.getRequestURI())
             }
         } catch (SecurityException e) {
@@ -149,12 +156,13 @@ class BeapiRequestHandler implements HttpRequestHandler {
         } catch (NoSuchMethodException e) {
             // cannot find endpoint
             //writeErrorResponse(response,'422',request.getRequestURI());
+            logger.warn(devnotes,"[ BAD URI ] : YOU ARE ATTEMPTING TO CALL AN ENDPOINT THAT DOES NOT EXIST. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD EXISTS AND THAT IT IS PROPERLY REPRESENTED IN THE IOSTATE FILE.")
             throw Exception("[BeapiController > handleRequest] : NoSuchMethodException - full stack trace follows :", e);
         }
 
     }
 
-    ArrayList convertModel(Object obj) throws Exception{
+    protected ArrayList convertModel(Object obj) throws Exception{
         try{
             ArrayList output = []
             if(obj){
@@ -163,6 +171,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
                         try {
                             output.add(formatEntity(obj))
                         }catch(Exception e){
+                            logger.warn(devnotes,"[ BAD DATASET ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
                             throw new Exception("[ControllerUtil > convertModel] : Exception formatting Response Entity - full stack trace follows :",e)
                         }
                         return output
@@ -186,6 +195,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
                                     try {
                                         output.add(formatEntity(list))
                                     }catch(Exception e){
+                                        logger.warn(devnotes,"[ BAD DATASET ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
                                         throw new Exception("[ControllerUtil > convertModel] : Exception formatting Response Entity - full stack trace follows :",e)
                                     }
                                     break;
@@ -196,11 +206,13 @@ class BeapiRequestHandler implements HttpRequestHandler {
                                         def tmp = formatMap(list)
                                         output.add(tmp)
                                     }catch(Exception e){
+                                        logger.warn(devnotes,"[ BAD DATASET ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
                                         //throw new Exception("[BeapiRequestHandler > convertModel] : Exception formatting Response Map - full stack trace follows :",e)
                                         println("[BeapiRequestHandler > convertModel] : Exception formatting Response Map - full stack trace follows :"+e)
                                     }
                                     break;
                                 default:
+                                    logger.warn(devnotes,"[ BAD DATASET ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
                                     // todo : throw error; response values MUST have at least ONE KEY to be checked against IO State / constructors
                                     throw new Exception("[ControllerUtil > convertModel] : List/Set for '${controller}/${action}'must contain MAP or DOMAIN OBJECT")
                                     break;
@@ -209,12 +221,14 @@ class BeapiRequestHandler implements HttpRequestHandler {
                         return output
                         break;
                     default:
+                        logger.warn(devnotes,"[ BAD DATASET ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
                         // todo : throw error ; unsupported return type
                         throw new Exception("[ControllerUtil > convertModel] : Unsupported return type; Please file a support ticket to have this return type added.")
                 }
             }
             return output
         }catch(Exception e){
+            logger.warn(devnotes,"[ BAD DATASET ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
             throw new Exception("[BeapiController > convertModel] : Exception - full stack trace follows :",e)
         }
     }
@@ -226,12 +240,13 @@ class BeapiRequestHandler implements HttpRequestHandler {
      * @param Object data
      * @return LinkedHashMap commonly formatted linkedhashmap
      */
-    LinkedHashMap formatEntity(Object obj) throws Exception{
+    protected LinkedHashMap formatEntity(Object obj) throws Exception{
         ObjectMapper omapper = new ObjectMapper()
         LinkedHashMap<String,Object> map = [:]
         try{
             map = omapper.convertValue(obj,Map.class)
         }catch(Exception e){
+            logger.warn(devnotes,"[ BAD ENTITY ] : YOU ARE ATTEMPTING TO CONVERT A BAD ENTITY. TO FIX THIS, MAKE SURE YOUR ENTITY CAN BE SEEN ON THE CLASSPATH. ")
             throw new Exception("[BeapiController > formatEntity] : Exception formatting Response Entity - full stack trace follows :",e)
         }
 
@@ -245,7 +260,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
      * @param LinkedHashMap map
      * @return LinkedHashMap commonly formatted linkedhashmap
      */
-    LinkedHashMap formatMap(Map map){
+    protected LinkedHashMap formatMap(Map map){
         LinkedHashMap newMap = [:]
         if(map) {
             map.each() { key, val ->
@@ -267,12 +282,12 @@ class BeapiRequestHandler implements HttpRequestHandler {
     /*
     * checks multiple return sets(bodyList) against expected returns keyset(responseList)
     */
-    ArrayList parseResponseParams(ArrayList bodyList, Set responseList) throws Exception{
+    private ArrayList parseResponseParams(ArrayList bodyList, Set responseList) throws Exception{
         ArrayList output = []
 
         try {
             bodyList.each() { body ->
-                ArrayList paramsList = (body.size() == 0) ? [:] : body.keySet() as ArrayList
+                ArrayList paramsList = (body.size() == 0) ? [] : body.keySet() as ArrayList
                     paramsList.each() { it2 ->
                         if (!responseList.contains(it2)) {
                             body.remove(it2.toString())
@@ -282,13 +297,13 @@ class BeapiRequestHandler implements HttpRequestHandler {
                     // println("responseList : "+responseList)
                     // println("responseKeys : "+body.keySet())
 
-
                     if (responseList.size()==body.keySet().size()) {
                         output.add(body)
                     }
             }
 
         }catch(Exception e){
+            logger.warn(devnotes,"[ BAD PARAMS ] : UNKNOWN EXCEPTION. PLEASE FILE A TICKET. ")
             throw new Exception("[ApiExchange :: parseResponseParams] : Exception - full stack trace follows:",e)
         }
 
@@ -302,7 +317,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
      * @param String statusCode
      * @return LinkedHashMap commonly formatted linkedhashmap
      */
-    void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
+     private void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
         response.setContentType("application/json")
         response.setStatus(Integer.valueOf(statusCode))
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
@@ -317,7 +332,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
      * @param String statusCode
      * @return LinkedHashMap commonly formatted linkedhashmap
      */
-    void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
+    private void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
         response.setContentType("application/json")
         response.setStatus(Integer.valueOf(statusCode))
         if(msg.isEmpty()){

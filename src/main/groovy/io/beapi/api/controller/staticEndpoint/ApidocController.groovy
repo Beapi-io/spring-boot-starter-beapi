@@ -37,36 +37,15 @@ public class ApidocController extends BeapiRequestHandler{
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApidocController.class);
 
 	@Autowired
-	ApiCacheService apiCacheService
+	protected ApiCacheService apiCacheService
 
-	@Autowired
-	PrincipleService principle;
-
-	String authority
-
-	/*
-	public ApidocService(ApiCacheService apiCacheService, PrincipleService principleService, ApiProperties apiProperties) {
-		try {
-			this.apiCacheService = apiCacheService
-			this.principle = principleService
-			this.apiProperties = apiProperties
-		} catch (Exception e) {
-			println("# [Beapi] IoStateService - initialization Exception - ${e}")
-			System.exit(0)
-		}
-	}
-	 */
-
-	//@RequestMapping(value = "/apidoc/show", method = RequestMethod.GET)
 	List show(HttpServletRequest request, HttpServletResponse response){
-		this.authority = principle.authorities()
 
 		LinkedHashMap controllerResults = [:]
 		ArrayList controllers = apiCacheService.getCacheKeys()
 		List returnData = []
 		if(params.id){
 			returnData.add(createApidocs(params.id))
-			println("returnData:"+returnData)
 		}else{
 			controllers.each() {
 				def temp = createApidocs(it)
@@ -95,6 +74,7 @@ public class ApidocController extends BeapiRequestHandler{
 		return result
 	}
 
+	/* deprecated
 	protected ArrayList setReturnsList(LinkedHashMap rturns){
 		ArrayList result = []
 		rturns.each() { k, v ->
@@ -107,6 +87,7 @@ public class ApidocController extends BeapiRequestHandler{
 		}
 		return result
 	}
+	 */
 
 	private LinkedHashMap createApidocs(String controller){
 		LinkedHashMap controllerResults = [:]
@@ -169,31 +150,32 @@ public class ApidocController extends BeapiRequestHandler{
 						result.remove('hookRoles')
 
 						result.remove('receives')
-						ArrayList receivesList = setReceivesList(receives)
+						ArrayList receivesList = (receives[this.authority])?receives[this.authority]:receives['permitAll']
 						ArrayList rec = []
+
 						receivesList.each(){ it5 ->
 							LinkedHashMap receivesMap = [:]
-							receivesMap['name'] = it5
-							receivesMap['type'] = cache.values[it5].type
-							receivesMap['desc'] = cache.values[it5].description
-							receivesMap['mockData'] = cache.values[it5].mockData
+							receivesMap['name'] = it5.name
+							receivesMap['type'] = cache.values[it5.name].type
+							receivesMap['desc'] = cache.values[it5.name].description
+							receivesMap['mockData'] = cache.values[it5.name].mockData
 							rec.add(receivesMap)
 						}
 						result['receives'] = rec
 
 						result.remove('returns')
-						ArrayList returnsList = setReturnsList(rturns)
+						ArrayList returnsList = (rturns[this.authority])?rturns[this.authority]:rturns['permitAll']
 						ArrayList ret = []
+
 						returnsList.each(){ it5 ->
 							LinkedHashMap returnsMap = [:]
-							returnsMap['name'] = it5
-							returnsMap['type'] = cache.values[it5].type
-							returnsMap['desc'] = cache.values[it5].description
-							returnsMap['mockData'] = cache.values[it5].mockData
+							returnsMap['name'] = it5.name
+							returnsMap['type'] = cache.values[it5.name].type
+							returnsMap['desc'] = cache.values[it5.name].description
+							returnsMap['mockData'] = cache.values[it5.name].mockData
 							ret.add(returnsMap)
 						}
 						result['returns'] = ret
-
 
 						result.remove('pkeys')
 						result.remove('fkeys')

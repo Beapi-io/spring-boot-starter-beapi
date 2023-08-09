@@ -60,6 +60,9 @@ import java.nio.charset.StandardCharsets
 import org.apache.commons.io.IOUtils
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import javax.crypto.KeyGenerator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 /**
  *
@@ -75,7 +78,10 @@ import javax.crypto.KeyGenerator;
 @EnableConfigurationProperties([ApiProperties.class])
 //@ConditionalOnBean(name = ["principle"])
 class ApiInterceptor implements HandlerInterceptor{
-	//private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApiInterceptor.class);
+
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApiInterceptor.class);
+	String markerText = "DEVNOTES";
+	Marker devnotes = MarkerFactory.getMarker(markerText);
 
 	// TODO : inject stats service into interceptor and then into here
 
@@ -117,47 +123,51 @@ class ApiInterceptor implements HandlerInterceptor{
 		}else {
 			privateRoles = apiProperties.security.networkRoles['private'].collect() { k, v -> v }
 			this.uObj = request.getAttribute('uriObj')
+			if(this.uObj) {
+				this.callType = this.uObj?.getCallType()
+				this.authority = request.getAttribute('principle')
 
-			this.callType = uObj.getCallType()
-			this.authority = request.getAttribute('principle')
-
-			switch (callType) {
-				case 1:
-					// todo : check throttle cache size
-					// println(apiProperties.throttle.rateLimit[this.authority])
-
-					return exchangeService.apiRequest(request, response, this.authority)
-					break
-				case 2:
-					if (apiProperties.batchingEnabled) {
+				switch (callType) {
+					case 1:
 						// todo : check throttle cache size
-						return batchService.apiRequest(request, response, this.authority)
-					} else {
-						writeErrorResponse(response, '401', request.getRequestURI())
+						// println(apiProperties.throttle.rateLimit[this.authority])
+
+						return exchangeService.apiRequest(request, response, this.authority)
+						break
+					case 2:
+						if (apiProperties.batchingEnabled) {
+							// todo : check throttle cache size
+							return batchService.apiRequest(request, response, this.authority)
+						} else {
+							writeErrorResponse(response, '401', request.getRequestURI())
+							return false
+						}
+						break
+					case 3:
+						if (apiProperties.chainingEnabled) {
+							// todo : check throttle cache size
+							return chainService.apiRequest(request, response, this.authority)
+						} else {
+							// todo : check throttle cache size
+							writeErrorResponse(response, '401', request.getRequestURI())
+							return false
+						}
+						break
+					case 4:
+						if (privateRoles.contains(authority)) {
+							return traceExchangeService.apiRequest(request, response, this.authority)
+						}
+						break
+				//case 5:
+				//	return hookExchangeService.apiRequest(request, response, this.authority)
+				//	break
+					default:
+						writeErrorResponse(response, '400', request.getRequestURI())
 						return false
-					}
-					break
-				case 3:
-					if (apiProperties.chainingEnabled) {
-						// todo : check throttle cache size
-						return chainService.apiRequest(request, response, this.authority)
-					} else {
-						// todo : check throttle cache size
-						writeErrorResponse(response, '401', request.getRequestURI())
-						return false
-					}
-					break
-				case 4:
-					if (privateRoles.contains(authority)) {
-						return traceExchangeService.apiRequest(request, response, this.authority)
-					}
-					break
-			//case 5:
-			//	return hookExchangeService.apiRequest(request, response, this.authority)
-			//	break
-				default:
-					writeErrorResponse(response, '400', request.getRequestURI())
-					return false
+				}
+			}else{
+				writeErrorResponse(response, '400', request.getRequestURI(),"bad uri")
+				return false
 			}
 		}
 	}
@@ -173,7 +183,7 @@ class ApiInterceptor implements HandlerInterceptor{
 		}
 
 		if(body == null){
-			writeErrorResponse(response,'422',request.getRequestURI(),'No data returned for this call.')
+			writeErrorResponse(response,'204',request.getRequestURI(),'No data returned for this call.')
 		}else {
 			switch (callType){
 				case 1:

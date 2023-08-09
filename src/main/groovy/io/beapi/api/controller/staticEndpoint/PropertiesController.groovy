@@ -35,13 +35,12 @@ public class PropertiesController extends BeapiRequestHandler{
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PropertiesController.class);
 
-	@Autowired
-	ApiProperties apiProperties;
+	//@Autowired
+	//protected ApiProperties apiProperties;
 
 
 
 	LinkedHashMap getAll(HttpServletRequest request, HttpServletResponse response) {
-
 		LinkedHashMap temp = new LinkedHashMap<>();
 		temp.put("attempts",apiProperties.getAttempts());
 		temp.put("procCores",apiProperties.getProcCores());

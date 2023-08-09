@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.coyote.http11.Http11NioProtocol
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Configuration;
@@ -23,15 +24,15 @@ import org.apache.coyote.http2.Http2Protocol;
 public class TomcatConfig  {
 
     @Autowired
-    ApiProperties apiProperties;
+    protected ApiProperties apiProperties;
 
     @Autowired
-    ServerProperties serverProperties;
+    protected ServerProperties serverProperties;
 
-    Boolean compression;
-    Integer maxThreads;
-    Integer minSpareThreads;
-    Integer maxConnections;
+    protected Boolean compression;
+    protected Integer maxThreads;
+    protected Integer minSpareThreads;
+    protected Integer maxConnections;
 
     @Bean
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> servletContainerCustomizer() {
@@ -79,7 +80,11 @@ public class TomcatConfig  {
                         @Override
                         public void customize(Connector connector) {
                             connector.addUpgradeProtocol(new Http2Protocol());
-                            AbstractHttp11Protocol<?> httpHandler = ((AbstractHttp11Protocol<?>) connector.getProtocolHandler());
+
+                            // No significant diff between protocols
+                            //AbstractHttp11Protocol<?> httpHandler = ((AbstractHttp11Protocol<?>) connector.getProtocolHandler());
+                            Http11NioProtocol httpHandler = (Http11NioProtocol) connector.getProtocolHandler();
+
                             httpHandler.setMaxKeepAliveRequests(-1);
                             httpHandler.setRejectIllegalHeader(true);
                             httpHandler.setMaxThreads(maxThreads);

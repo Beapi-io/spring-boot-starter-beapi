@@ -37,6 +37,7 @@ import io.beapi.api.service.HookCacheService
 import io.beapi.api.service.TraceService
 
 import io.beapi.api.service.CliService
+import io.beapi.api.service.WebHookService
 
 //import io.beapi.api.filter.RequestInitializationFilter
 //import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -57,16 +58,16 @@ import org.springframework.context.ApplicationContext
 public class BeapiServiceAutoConfiguration {
 
 	@Autowired
-	ApplicationContext applicationContext;
+	protected ApplicationContext applicationContext;
 
 	@Autowired
-	TraceCacheService traceCacheService
+	protected TraceCacheService traceCacheService
 
 	//@Autowired
 	//HookCacheService hookCacheService
 
 	@Autowired
-	ApiCacheService apiCacheService
+	protected ApiCacheService apiCacheService
 
 	public BeapiServiceAutoConfiguration() {}
 
@@ -115,6 +116,12 @@ public class BeapiServiceAutoConfiguration {
 		return new LinkRelationService(apiCacheService, principleService());
 	}
 
+	@Bean(name='webHookService')
+	@ConditionalOnMissingBean
+	public WebHookService webHookService() throws IOException {
+		return new WebHookService(apiCacheService, principleService());
+	}
+
 	@Bean(name='exchangeService')
 	@ConditionalOnMissingBean
 	public ExchangeService exchangeService() throws IOException {
@@ -144,7 +151,5 @@ public class BeapiServiceAutoConfiguration {
 	public TraceExchangeService traceExchangeService() throws IOException {
 		return new TraceExchangeService(apiCacheService, traceService())
 	}
-
-
 
 }

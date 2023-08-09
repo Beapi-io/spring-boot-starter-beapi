@@ -27,9 +27,16 @@ import java.io.*;
 import java.util.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.web.cors.CorsUtils;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
+
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(JwtRequestFilter.class);
+	String markerText = "DEVNOTES";
+	Marker devnotes = MarkerFactory.getMarker(markerText);
 
 	@Autowired
 	private UserService userService;
@@ -124,7 +131,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	}
 
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		logger.debug("loadUserByUsername(String) : {}");
+		//logger.debug("loadUserByUsername(String) : {}");
 
 		User user = userService.findByUsername(username);
 

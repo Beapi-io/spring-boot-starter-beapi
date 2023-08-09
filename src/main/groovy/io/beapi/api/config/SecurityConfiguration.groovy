@@ -66,13 +66,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    AuthorityService authService;
+    protected AuthorityService authService;
 
     @Autowired
-    UserService userService;
+    protected UserService userService;
 
     @Autowired
-    UserAuthorityService uAuthService;
+    protected UserAuthorityService uAuthService;
 
     @Autowired
     public SecurityConfiguration(PasswordEncoder passwordEncoder) {

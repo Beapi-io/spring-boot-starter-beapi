@@ -67,22 +67,5 @@ public class AuthorityController extends BeapiRequestHandler {
 	}
 */
 
-	/**
-	 * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
-	 * @param HttpServletResponse response
-	 * @param String statusCode
-	 * @return LinkedHashMap commonly formatted linkedhashmap
-
-	void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
-		response.setContentType("application/json");
-		response.setStatus(Integer.valueOf(statusCode));
-		if(msg.isEmpty()){
-			msg = ErrorCodes.codes.get(statusCode).get("long");
-		}
-		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}";
-		response.getWriter().write(message);
-		//response.writer.flush();
-	}
-	*/
 
 }

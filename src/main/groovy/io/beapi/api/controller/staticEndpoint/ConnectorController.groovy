@@ -38,15 +38,15 @@ public class ConnectorController extends BeapiRequestHandler{
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ConnectorController.class);
 
-	@Autowired
-	ApiProperties apiProperties
+	//@Autowired
+	//protected ApiProperties apiProperties
 
 	@Autowired
-	ApiCacheService apiCacheService
+	protected ApiCacheService apiCacheService
 
 	@Autowired
-	IoStateService iostateService
-	String authority
+	protected IoStateService iostateService
+
 
 	List list(HttpServletRequest request, HttpServletResponse response) {
 		ArrayList cacheKeys = apiCacheService.getCacheKeys()
@@ -75,8 +75,6 @@ public class ConnectorController extends BeapiRequestHandler{
 
 		// todo : check file exists
 
-
-		
 		if (this.params.get('IOSTATE').empty) {
 			render(status:HttpServletResponse.SC_BAD_REQUEST)
 			return null
