@@ -1,5 +1,5 @@
 ![alt text](https://github.com/orubel/logos/blob/master/beapi_logo_large.png)
-# Beapi Spring Boot Starter
+# BeAPI Spring Boot Starter
 
 ### Stable Version : 0.7.1
 
@@ -22,13 +22,23 @@
 **Configuration Files** - https://github.com/orubel/spring-boot-starter-beapi-config (Note : Move these into your 'iostateDir' location as found in your demo-application/src/main/resources/beapi_api.yaml file)
 
 ---
+### BeAPI is an automated API backend.
+It enables you to simply create the: 
+
+- API schemas
+- controllers
+- domain models
+
+  ... and everything else is automated for you! Security (JWT/CORS/RBAC/ABAC), Apidocs, Hateoas Link Relations, Tracing, Batching, Statistics, Governance, etc. It is a platform to simplify the weight of deploying an API backend so you can focus on other things.
+  
+---
 ## BeAPI stresses convention over config...
 Most everything you need for API development should be provided & configured 'out of the box' **BUT** you have the ability to configure and override everything to your hearts content
 
-## Beapi automates API Governance...
+## BeAPI automates API Governance...
 Tradional API application's bind all rules/data to controllers (ie handlers) making them impossible to be shared amongst distributed services. Through the creation and support of standardized services in our configuration docs, Beapi automates all processes: security (RBAC/ABAC, CORS, JWT), caching, synchronization across all servers, etc.
 
-## Beapi simplifies configuration...
+## BeAPI simplifies configuration...
 BeAPI abstracts these [RULES/data](https://gist.github.com/orubel/159e94db62023c78a07ebe6d86633763) as a 'config' file which is **loaded at runtime and can be reloaded and SYNCHRONIZED** with distributed services **without requiring a restart**.
 
 ## BeAPI automates common usage...
