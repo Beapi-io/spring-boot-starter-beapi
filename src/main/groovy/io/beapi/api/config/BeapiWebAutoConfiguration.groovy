@@ -70,10 +70,10 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	private ApplicationContext context;
 
 	@Autowired
-	LinkRelationService linkRelationService
+	protected LinkRelationService linkRelationService
 
 	@Autowired
-	PrincipleService principleService
+	private PrincipleService principleService
 
 	@Autowired
 	private ApiCacheService apiCacheService
@@ -94,7 +94,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	private TraceExchangeService traceExchangeService
 
 	@Autowired
-	ApiProperties apiProperties
+	protected ApiProperties apiProperties
 
 
 	String version
@@ -215,8 +215,8 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 									// if IO State 'action' does not match a KNOWN controller/method, do not map
 									if (methodNames.contains(action)) {
-										String path = "${controller}/${action}" as String
-										urlMap += createControllerMappings(path, k2, v)
+										//String path = "${controller}/${action}" as String
+										urlMap += createControllerMappings(controller, action, k2, v)
 									} else {
 										logger.debug("simpleUrlHandlerMapping() : {}", "Connector URI '${action}' for connector '${controller}' does not match any given method. Try ${methodNames}")
 									}
@@ -310,11 +310,13 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	* This allows us the ability to move different call to different servers (should we want/need)
 	* so they do not affect 'regular calls' (ie 'v' callType)
 	*/
-	private Map createControllerMappings(String path, String apiVersion, Object obj) {
+	private Map createControllerMappings(String controller, String action, String apiVersion, Object obj) {
+		String path = "${controller}/${action}" as String
 		Map<String, Object> urlMap = new LinkedHashMap<>();
 
 		try {
-			List url = ["/v${this.version}/${path}/**" as String, "/v${this.version}/${path}/" as String, "/v${this.version}-${apiVersion}/${path}/**" as String, "/v${this.version}-${apiVersion}/${path}/" as String]
+
+			List url = ["/v${this.version}/${path}/**" as String, "/v${this.version}/${path}/" as String, "/v${this.version}-${apiVersion}/${path}/**" as String, "/v${this.version}-${apiVersion}/${path}/" as String, "/v${this.version}/${controller}/**" as String, "/v${this.version}/${controller}/" as String, "/v${this.version}-${apiVersion}/${controller}/**" as String, "/v${this.version}-${apiVersion}/${controller}/" as String]
 			url.each() { urlMap.put(it, obj); }
 
 			if (apiProperties.batchingEnabled) {
@@ -330,8 +332,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 			List traceUrl = ["/t${this.version}/${path}/**" as String, "/t${this.version}/${path}/" as String, "/t${this.version}-${apiVersion}/${path}/**" as String, "/t${this.version}-${apiVersion}/${path}/" as String]
 			traceUrl.each() { urlMap.put(it, obj); }
 
-			List hookUrl = ["/h${this.version}/${path}/**" as String, "/h${this.version}/${path}/" as String, "/h${this.version}-${apiVersion}/${path}/**" as String, "/h${this.version}-${apiVersion}/${path}/" as String]
-			hookUrl.each() { urlMap.put(it, obj); }
 		}catch(Exception e) {
 			println("### BeapiWebAutoConfiguration > CreateControllerMappings : Exception : "+e)
 		}

@@ -29,7 +29,7 @@ public class DataSourceConfig {
 
 
     @Value("\${application.domain}")
-    Object applicationDomain;
+    protected Object applicationDomain;
 
     @Resource
     @Bean(name = "dataSource")

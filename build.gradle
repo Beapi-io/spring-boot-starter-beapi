@@ -97,7 +97,8 @@ dependencies {
     implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.3"
     implementation "org.apache.tomcat.embed:tomcat-embed-core:9.0.56"
     implementation "org.apache.tomcat:tomcat-annotations-api:9.0.56"
-    implementation "org.codehaus.groovy:groovy:3.0.9"
+    //implementation "org.codehaus.groovy:groovy:3.0.9"
+    implementation 'org.apache.groovy:groovy:4.0.8'
     implementation "org.slf4j:slf4j-api:1.7.32"
     implementation "org.springframework.boot:spring-boot-autoconfigure:2.6.2"
     implementation("org.springframework.security:spring-security-config:5.8.3")
@@ -121,7 +122,6 @@ dependencies {
 
 
 
-
     // [LOGGING]
     runtimeOnly 'org.slf4j:slf4j-api:1.7.15'
 
@@ -136,23 +136,21 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     
     // [GROOVY]
-    implementation("org.codehaus.groovy:groovy-ant"){
-        exclude group:'org.codehaus.groovy', module: 'groovy-all'
+    implementation('org.apache.groovy:groovy-ant:4.0.8'){
+        exclude group:'org.apache.groovy', module: 'groovy-all'
     }
-    implementation('org.codehaus.groovy:groovy-json:2.5.4'){
-        exclude group:'org.codehaus.groovy', module: 'groovy-all'
+    implementation('org.apache.groovy:groovy-json:4.0.8'){
+        exclude group:'org.apache.groovy', module: 'groovy-all'
     }
     implementation('org.codehaus.gpars:gpars:1.2.1'){
         exclude group:'org.multiverse', module:'multiverse-core'
         exclude group:'org.codehaus.groovy', module: 'groovy-all'
     }
-
-    //implementation('org.codehaus.groovy:groovy-cli-commons'){
-    //    exclude group:'org.codehaus.groovy', module: 'groovy-all'
-    //}
-
-    implementation('org.codehaus.groovy:groovy-templates:2.4.3') {
-        exclude group:'org.codehaus.groovy', module: 'groovy-all'
+    implementation('org.apache.groovy:groovy-cli-commons:4.0.8'){
+        exclude group:'org.apache.groovy', module: 'groovy-all'
+    }
+    implementation('org.apache.groovy:groovy-templates:4.0.8') {
+        exclude group:'org.apache.groovy', module: 'groovy-all'
     }
 
 

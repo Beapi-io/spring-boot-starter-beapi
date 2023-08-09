@@ -68,7 +68,7 @@ public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
     @Autowired
     private ApiProperties apiProperties;
 
-    HashMap evictPolicy = [
+    private HashMap evictPolicy = [
             'LRU':net.sf.ehcache.store.MemoryStoreEvictionPolicy.LRU,
             'LFU':net.sf.ehcache.store.MemoryStoreEvictionPolicy.LFU,
             'FIFO':net.sf.ehcache.store.MemoryStoreEvictionPolicy.FIFO

@@ -23,7 +23,8 @@ import javax.json.*
 import org.springframework.security.web.header.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 
 // NOTE : CALLTYPE = 1
@@ -31,6 +32,9 @@ import javax.servlet.http.HttpServletResponse
 public class ExchangeService extends ApiExchange{
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ExchangeService.class);
+	String markerText = "DEVNOTES";
+	Marker devnotes = MarkerFactory.getMarker(markerText);
+
 	private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
 
 	ApiCacheService apiCacheService
@@ -86,15 +90,14 @@ public class ExchangeService extends ApiExchange{
 			}
 		}
 
-
 		if(!validateMethod()){
+			logger.warn(devnotes,"[ INVALID REQUEST METHOD ] : SENT REQUEST METHOD FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DOES NOT MATCH EXPECTED 'REQUEST' METHOD OF '${apiObject['method'].toUpperCase()}'. IF THIS IS AN ISSUE, CHECK THE REQUESTMETHOD IN THE IOSTATE FILE FOR THIS CONTROLLER/ACTION.")
 			writeErrorResponse(response,'405',request.getRequestURI());
 			response.writer.flush()
 			return false
 		}else{
 			return true
 		}
-
     }
 
     void apiResponse(HttpServletRequest request,HttpServletResponse response, ArrayList body){
@@ -160,10 +163,9 @@ public class ExchangeService extends ApiExchange{
 
 			this.method = request.getMethod()
 		} catch (Exception e) {
+			logger.warn(devnotes,"[ NO IOSTATE ] : URI IS PARSEABLKE BUT NO IOSTATE FILE WAS PARSED THAT MATCHES THIS URI FOR '${this.controller}/${this.action}'. MAKE SURE YOU ARE USING 'camelCase' IN THE URI OR THAT THE IOSTATE FILE EXISTS AND IS PROPERLY DECLARED. ")
 			throw new Exception("[ExchangeService :: init] : Exception. full stack trace follows:", e)
 		}
 
 	}
-
-
 }

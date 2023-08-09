@@ -30,13 +30,14 @@ import javax.servlet.FilterChain
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import org.slf4j.LoggerFactory
+
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component
 
 
 import java.nio.charset.StandardCharsets
+import java.util.logging.Level
 import java.util.regex.Matcher
 
 import io.beapi.api.utils.ApiDescriptor
@@ -57,6 +58,9 @@ import javax.servlet.RequestDispatcher
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.HandlerMapping;
+import org.slf4j.LoggerFactory
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 /**
  * This class parses the URI attributes on initial request &
@@ -71,6 +75,8 @@ import org.springframework.web.servlet.HandlerMapping;
 class RequestInitializationFilter extends OncePerRequestFilter{
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RequestInitializationFilter.class);
+    private String markerText = "DEVNOTES";
+    private Marker devnotes = MarkerFactory.getMarker(markerText);
 
     /*
     * WE DO NOT DO SUPPORT 'multipart/form-data'; THIS IS NOT A FILE SERVE!!!
@@ -80,39 +86,30 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     private static final ArrayList CALL_TYPES = ['v','b','c','t']
 
     @Autowired
-    ApplicationContext ctx
+    private ApplicationContext ctx
 
-    LinkRelationService linkRelationService
-    PrincipleService principle
-    ApiCacheService apiCacheService
-    ApiProperties apiProperties
-    String version
-
+    protected LinkRelationService linkRelationService
+    protected PrincipleService principle
+    protected ApiCacheService apiCacheService
+    protected ApiProperties apiProperties
 
     // [CACHE]
     protected ApiDescriptor apiObject
-    String cacheHash
+    protected String cacheHash
 
     // todo : parse headers
-    LinkedHashMap<String, List<String>> headers = [:]
-
-
-    ArrayList uriList
-    UriObject uObj
-    String uri
-    LinkedHashMap receives = [:]
-    ArrayList receivesList
-    LinkedHashMap rturns = [:]
-    String method
-    String controller
-    String requestFileType
-    String responseFileType
-    boolean reservedUri
-
-    LinkedHashMap params = [:]
+    protected LinkedHashMap<String, List<String>> headers = [:]
+    protected UriObject uObj
+    protected String uri
+    protected LinkedHashMap receives = [:]
+    protected ArrayList receivesList
+    protected LinkedHashMap rturns = [:]
+    protected String method, version, controller, action
+    protected String requestFileType, responseFileType
+    protected boolean reservedUri
+    protected LinkedHashMap params = [:]
     protected String authority
     protected ArrayList deprecated
-    protected String action
     protected boolean apidocFwd
 
     /**
@@ -140,7 +137,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        // println("### RequestInitializationFilter...")
+        //println("### RequestInitializationFilter...")
         this.authority=this.principle.authorities()
         if (processRequest(request, response)) {
             try {
@@ -159,7 +156,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
             if(this.authority=='ROLE_ANONYMOUS'){
                 // IGNORE
             }else{
-                logger.info("NO AUTHORITY ACCESS ATTEMPT for {"+request.getRequestURI()+"} with auth {\"+this.authority+\"} by {"+principle.name+"}")
+                logger.info("BAD AUTHORITY ACCESS ATTEMPT for {"+request.getRequestURI()+"} with auth {\"+this.authority+\"} by {"+principle.name+"}")
             }
         }
     }
@@ -171,13 +168,13 @@ class RequestInitializationFilter extends OncePerRequestFilter{
      * @returns boolean
      */
     private boolean processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        //println("### processRequest ...")
         if(this.authority!='ROLE_ANONYMOUS') {
             //logger.debug("doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : {}");
             String cachedResult
             apidocFwd = false
             this.uri = request.getRequestURI()
 
-            // todo : improve in future version
             if (apiProperties.reservedUris.contains(request.getRequestURI())) {
                 ArrayList uriVars = uri.split('/')
                 this.controller = uriVars[0]
@@ -193,56 +190,43 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     apidocFwd = true
                 }
 
-                if (!request.getAttribute('principle')) {
-                    request.setAttribute('principle', this.authority)
-                }
+                setPrinciple(request)
 
                 try {
                     this.method = request.getMethod()
                     this.reservedUri = (apiProperties.reservedUris.contains(this.uri)) ? true : false
-
-                    // get apiObject
-
                     def cache = apiCacheService?.getApiCache(this.uObj.getController())
-                    //def cache = apiCacheService?.getApiCache(uObj.getController())
 
-                    // todo : if no action, default to apidoc/show/id
                     if (cache) {
 
                         def temp = cache[this.uObj.getApiVersion()]
                         this.deprecated = temp['deprecated'] as List
-
                         this.apiObject = temp[this.uObj.getAction()]
 
                         if (this.apiObject?.'returns') {
                             this.rturns = this.apiObject['returns'] as LinkedHashMap
                         } else {
+                            logger.warn(devnotes,"[ BAD IOSTATE DEFINITION ] : IOSTATE DEFINITION FOR '${this.uObj.getController()}/${this.uObj.getAction()}' does not have 'RESPONSE' dataset for the authority '${this.authority}'. IF THIS IS AN ISSUE, FIX THIS BY ADDING THE 'ROLE' TO THE 'RESPONSE' DATASETS.")
                             writeErrorResponse(response, '400', request.getRequestURI());
                             return false
                         }
 
-
+                        // CHECKING REQUEST/RESPONSE DATASETS (RBAC/ABAC)
                         ArrayList networkRoles = cache.networkGrpRoles
-
                         if (checkNetworkGrp(networkRoles, this.authority)) {
                             LinkedHashMap tmp1 = this.apiObject?.getReceivesList()
-                            this.receivesList = getIOSet(this.apiObject?.getReceivesList(), this.authority)
-                            if (this.receivesList != null) {
-                                request.setAttribute('receivesList', this.receivesList)
-
-                                LinkedHashMap rturn = this.apiObject?.getReturnsList()
-                                ArrayList returnsList = (rturn[this.authority]) ? rturn[this.authority] : rturn['permitAll']
-                                request.setAttribute('returnsList', returnsList)
-                            } else {
-                                throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Authority for '${uri}' does not exist in IOSTATE 'REQUEST'")
-                            }
-
+                            this.receivesList = (this.apiObject?.getReceivesList()[this.authority])?this.apiObject?.getReceivesList()[this.authority]:this.apiObject?.getReceivesList()['permitAll']
                             request.setAttribute('receivesList', this.receivesList)
 
-                            LinkedHashMap rturn = this.apiObject?.getReturnsList()
-                            ArrayList returnsList = (rturn[this.authority]) ? rturn[this.authority] : rturn['permitAll']
-                            request.setAttribute('returnsList', returnsList)
+                            ArrayList returnsList = (this.apiObject?.getReturnsList()[this.authority])?this.apiObject?.getReturnsList()[this.authority]:this.apiObject?.getReturnsList()['permitAll']
+                            if (returnsList != null) {
+                                request.setAttribute('returnsList', returnsList)
+                            }else{
+                                logger.warn(devnotes,"[ BAD IOSTATE DEFINITION ] : THE AUTHORITY '${this.authority}' DOES NOT EXIST IN THE 'RESPONSE' DATASET FOR '${this.uObj.getController()}/${this.uObj.getAction()}' IN YOUR IOSTATE FILE. IF THIS IS AN ISSUE, FIX THIS BY ADDING THIS 'ROLE' TO THE 'RESPONSE' DATASETS.")
+                                throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Authority '${this.authority}' for '${uri}' does not exist in IOSTATE 'REQUEST'")
+                            }
                         } else {
+                            logger.warn(devnotes,"[ BAD AUTHORITY ] : THE AUTHORITY '${this.authority}' DOES NOT EXIST IN THE 'NETWORKGRP' IN YOUR IOSTATE FILE FOR '${this.uObj.getController()}/${this.uObj.getAction()}'. IF THIS IS AN ISSUE, FIX BY ADDING 'ROLE' TO THE NETWORKGRP IN YOUR BEAPI_API.YML FILE")
                             String msg = "Authority '${this.authority}' for '${uri}' does not exist in IOState NetworkGrp"
                             writeErrorResponse(response, '401', request.getRequestURI(), msg);
                             return false
@@ -251,6 +235,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                         if (this.uObj.getId()) {
                             if (!this.receivesList?.contains('id') && apidocFwd == false) {
+                                logger.warn(devnotes,"[ ATTRIBUTE BASED ACCESS CONTROL(ABAC) MISMATCH (1) ] : PARAMS SENT FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DO NOT MATCH EXPECTED 'REQUEST' PARAMS. IF THIS IS AN ISSUE, FIX BY ADDING THE PARAM TO THE IOSTATE FILE.")
                                 writeErrorResponse(response, '400', request.getRequestURI());
                                 return false
                             }
@@ -259,6 +244,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                         parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(), this.uObj.getId())
                         if (!checkRequestParams(request.getAttribute('params'))) {
+                            logger.warn(devnotes,"[ ATTRIBUTE BASED ACCESS CONTROL(ABAC) MISMATCH (2) ] : PARAMS SENT FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DO NOT MATCH EXPECTED 'REQUEST' PARAMS. IF THIS IS AN ISSUE, FIX BY ADDING THE PARAM TO THE IOSTATE FILE.")
                             writeErrorResponse(response, '400', request.getRequestURI());
                             return false
                             //throw new Exception("[RequestInitializationFilter :: checkRequestParams] : Requestparams do not match expected params for this endpoint")
@@ -270,10 +256,11 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                         ArrayList respMime = reqMime
 
                         String requestMimeType = reqMime[0]
-                        String requestEncoding = reqMime[1]
+                        //String requestEncoding = reqMime[1]
 
                         this.requestFileType = (SUPPORTED_MIME_TYPES.contains(requestMimeType)) ? getFormat(requestMimeType) : 'JSON'
                         if (!this.requestFileType) {
+                            logger.warn(devnotes,"[ UNSUPPORTED MIMETYPE ] : ACCEPT/CONTENT-TYPE HEADERS MUST BE A SUPPORTED MIMETYPE OF '${SUPPORTED_MIME_TYPES}'. IF THIS IS AN ISSUE, FILE A TICKET TO ADD A NEW SUPPORTED MIMETYPE (https://github.com/Beapi-io/spring-boot-starter-beapi/issues).")
                             String msg = "Request MimeType must be one of the supported mimetypes (JSON/XML)"
                             writeErrorResponse(response, '400', request.getRequestURI(), msg);
                             return false
@@ -282,6 +269,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                         this.responseFileType = (this.requestFileType) ? this.requestFileType : getFormat(respMime[0])
                         if (!this.responseFileType) {
+                            logger.warn(devnotes,"[ UNSUPPORTED MIMETYPE ] : ACCEPT/CONTENT-TYPE HEADERS MUST BE A SUPPORTED MIMETYPE OF '${SUPPORTED_MIME_TYPES}'. IF THIS IS AN ISSUE, FILE A TICKET TO ADD A NEW SUPPORTED MIMETYPE (https://github.com/Beapi-io/spring-boot-starter-beapi/issues).")
                             String msg = "Response MimeType must be one of the supported mimetypes (JSON/XML)"
                             writeErrorResponse(response, '400', request.getRequestURI(), msg);
                             return false
@@ -289,10 +277,8 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                         }
 
                         String responseMimeType = respMime[0]
-
                         request.setAttribute('responseMimeType', responseMimeType)
                         request.setAttribute('responseFileType', responseFileType)
-
 
                     }
                     // todo : test requestEncoding against apiProperties.encoding
@@ -304,33 +290,27 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                 request.setAttribute('uriObj', this.uObj)
 
                 if (this.apiObject) {
-                    // todo : create public api list
-                    if (this.method == 'GET') {
+                    if (validCacheRequestMethod(this.method)) {
                         setCacheHash(request.getAttribute('params'), this.receivesList)
-
-                        // RETRIEVE CACHED RESULT (only if using 'GET' method)
                         if ((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}" || apiObject?.cachedResult?."permitAll"?."${responseFileType}"?."${cacheHash}")) {
                             try {
                                 cachedResult = (apiObject['cachedResult'][authority]) ? apiObject['cachedResult'][authority][responseFileType][cacheHash] : apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
                             } catch (Exception e) {
+                                logger.warn(devnotes,"[ BAD CACHED RESULT ] : THIS SHOULD NOT HAPPEN. PLEASE FILE A TICKET WITH A FULL STACKTRACE AND EXPLANATION OF WHAT YOU WERE TRYING TO DO (https://github.com/Beapi-io/spring-boot-starter-beapi/issues).")
                                 throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
                             }
 
                             // todo : check throttle cache size
                             if (cachedResult && cachedResult.size() > 0) {
-                                // adding linkRelations functionality for cachedResult
-                                String linkRelations = linkRelationService.processLinkRelations(request, response, this.apiObject)
 
                                 // todo: increment throttle cache
-                                // PLACEHOLDER FOR APITHROTTLING
+
+                                String linkRelations = linkRelationService.processLinkRelations(request, response, this.apiObject)
+                                String newResult = (linkRelations)?"[${cachedResult},${linkRelations}]":cachedResult
+
                                 response.setStatus(200);
                                 PrintWriter writer = response.getWriter();
-                                if(linkRelations){
-                                    String newResult ="[${cachedResult},${linkRelations}]"
-                                    writer.write(newResult);
-                                }else{
-                                    writer.write(cachedResult);
-                                }
+                                writer.write(newResult);
                                 writer.close()
                                 response.writer.flush()
                                 return false
@@ -341,11 +321,11 @@ class RequestInitializationFilter extends OncePerRequestFilter{
             }
 
             /*
-        * DO NOT REMOVE!!!
-        * This fixes anyone doing RESTFUL assumptions and leaving off the 'action' of 'controller/action
-        * for RPCNaming convention
-        * Will route to apidocs to show proper calls
-         */
+            * DO NOT REMOVE!!!
+            * This fixes anyone doing RESTFUL assumptions and leaving off the 'action' of 'controller/action
+            * for RPCNaming convention
+            * Will route to apidocs to show proper calls
+             */
             if (apidocFwd) {
                 def servletCtx = this.ctx.getServletContext()
                 String newPath = "/v${this.uObj.getDefaultAppVersion()}/${this.uObj.getController()}/${this.uObj.getAction()}"
@@ -377,6 +357,13 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         return params
     }
 
+    private boolean validCacheRequestMethod(String method){
+        if(method == 'GET' && this.apiObject['method'].toUpperCase()==method){
+            return true
+        }
+        return false
+    }
+
     /**
      * get simple string version of mimetype formats the application supports
      * @param String mimeType
@@ -399,39 +386,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         return format
     }
 
-
-    public ArrayList setUri(String uri, String version){
-        // [callType, sent appVersion, default appVersion(for comparison), apiVersion, controller, action, trace, id]
-        Integer callType
-        boolean trace = false
-        ArrayList uriList = []
-
-        ArrayList uriVars = uri.split('/')
-        String tempVersion = uriVars[1].toLowerCase()
-
-        switch(tempVersion){
-            case ~/([v|b|c|t])(${version})-([0-9]+)/:
-            case ~/([v|b|c|t])(${version})/:
-                def m = Matcher.lastMatcher
-                callType = (CALL_TYPES.indexOf(m[0][1])+1)
-
-                uriList.add(callType)
-                uriList.add(m[0][2])
-                uriList.add(this.version)
-                uriList.add(((m[0][3])?m[0][3]:'1'))
-                uriList.add(uriVars[2])
-                uriList.add(uriVars[3])
-
-                if(callType==5){ trace=true }
-                uriList.add(trace)
-
-                if(uriVars[4]){ uriList.add(URLDecoder.decode(uriVars[4], StandardCharsets.UTF_8.toString())) }
-                break
-        }
-        return uriList
-    }
-
-
     /**
      * hashes concatenated keys of response set and uses as ID for the API cache
      * @param LinkedHashMap params
@@ -448,6 +402,12 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
     protected boolean checkNetworkGrp(ArrayList networkRoles, String authority){
         return networkRoles.contains(authority)
+    }
+
+    protected void setPrinciple(HttpServletRequest request){
+        if (!request.getAttribute('principle')) {
+            request.setAttribute('principle', this.authority)
+        }
     }
 
     /**
@@ -490,7 +450,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     protected void parseParams(HttpServletRequest request, String formData, String uriData, String id){
         LinkedHashMap<String,String> get = parseGetParams(uriData, id)
         request.setAttribute('GET',get)
-        //LinkedHashMap<String,String> post = parsePutParams(formData)
         LinkedHashMap<String,String> post = parsePutParams(formData)
 
         // set batchVars if they are present
@@ -556,7 +515,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         LinkedHashMap<String, String> output = [:]
         if (formData) {
 
-            //LinkedHashMap object
             JSONObject object
             try {
                 switch (this.requestFileType) {

@@ -21,13 +21,13 @@ import java.util.Objects;
 public class UserController extends BeapiRequestHandler {
 
 	@Autowired
-	public PasswordEncoder passwordEncoder;
+	protected  PasswordEncoder passwordEncoder;
 
 	@Autowired
-	PrincipleService principle;
+	protected PrincipleService principle;
 
 	@Autowired
-	UserService userService;
+	protected UserService userService;
 
 	@Autowired
 	private AuthorityService authService;

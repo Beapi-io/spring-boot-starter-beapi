@@ -43,27 +43,25 @@ import java.security.SecureRandom;
  *
  */
 
-abstract class ApiExchange{
+abstract sealed class ApiExchange permits ExchangeService, BatchExchangeService, ChainExchangeService, HookExchangeService, TraceExchangeService {
 
     // todo : get supported mimetypes from properties
     //private static final org.slf4j.Logger logger = LoggerFactory.getLogger(IoStateService.class);
     private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
-    boolean overrideAutoMimeTypes = false
+    //boolean overrideAutoMimeTypes = false
 
     //private static final ArrayList formats = ['XML','JSON']
     //private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml']
 
-    int callType
-    protected String method
+    protected int callType
     protected String defaultAction
     protected String appversion
     protected String apiversion
 
-    String requestFormat
+    //String requestFormat
     protected String requestMimeType
     protected String requestFileType
     protected String responseMimeType
-    protected String responseFileType
     protected LinkedHashMap receives = [:]
     protected ArrayList receivesAuths = []
     protected Set receivesList = []
@@ -72,7 +70,7 @@ abstract class ApiExchange{
     protected ArrayList returnsAuths = []
     protected Set returnsList = []
     // [CACHE]
-    LinkedHashMap cache
+    protected LinkedHashMap cache
     protected ApiDescriptor apiObject
     // [SECURITY] : reliant on apiProperties
     protected String networkGrp
@@ -83,30 +81,29 @@ abstract class ApiExchange{
     protected LinkedHashMap<String,Integer> rateLimit
     protected LinkedHashMap<String,Integer> dataLimit
 
-    protected String cacheHash
     protected boolean cachedResponse = false
 
     // [BATCH]
-    LinkedList batch = []
+    //LinkedList batch = []
 
-    UriObject uObj
-    String uri
-    String version
-    String controller
-    String action
-    String auth
-    String cacheHash
-    String responseFileType
-    String method
-    boolean trace
-    public String id
+    protected UriObject uObj
+    protected String uri
+    protected String version
+    protected String controller
+    protected String action
+    protected String auth
+    protected String cacheHash
+    protected String responseFileType
+    protected String method
+    protected boolean trace
+    protected String id
 
 
     /*
     * Validates request method in interceptors for each type of functionality;
     * validating here to better handle routing (filter is 'once per request')
      */
-    boolean validateMethod(){
+    protected boolean validateMethod(){
         boolean result = false
         if(this.apiObject['method'].toUpperCase() == this.method){
             result = true
@@ -158,7 +155,7 @@ abstract class ApiExchange{
      * @param LinkedHashMap map of variables defining endpoint request variables
      * @return Boolean returns false if request variable keys do not match expected endpoint keys
      */
-    boolean checkRequestParams(LinkedHashMap methodParams) throws Exception{
+    protected boolean checkRequestParams(LinkedHashMap methodParams) throws Exception{
         ArrayList checkList = this.receivesList
         ArrayList paramsList
         Set reservedNames = ['batchLength','batchInc','chainInc','apiChain','batch','_','max','offset','chaintype']
@@ -211,7 +208,7 @@ abstract class ApiExchange{
      * @param String statusCode
      * @return LinkedHashMap commonly formatted linkedhashmap
      */
-    void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
+    protected void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
         response.setContentType("application/json")
         response.setStatus(Integer.valueOf(statusCode))
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
@@ -226,7 +223,7 @@ abstract class ApiExchange{
      * @param String statusCode
      * @return LinkedHashMap commonly formatted linkedhashmap
      */
-    void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
+    protected void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
         response.setContentType("application/json")
         response.setStatus(Integer.valueOf(statusCode))
         if(msg.isEmpty()){
