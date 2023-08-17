@@ -132,7 +132,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - (Feature) rate limiting
     - (Feature) stats (check out Matamo for integration : https://developer.matomo.org/api-reference/tracking-api)
     - (Feature) CLI scaffolding of controller/domain/etc for new projects
-    - (Feature) CLI init of new project
+    - (Feature) CLI init of new project; inits and creates project env based on package name 
     - (DOCS) separate DEMO docs from STARTER docs; keep in this project, easier to maintain
     - (DOCS) document LinkRelation functionality
     - (DOCS) documentation for scaffolding functionality
