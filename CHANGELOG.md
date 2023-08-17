@@ -117,19 +117,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - tests for LinkRelations
  - automating HATEOS LinkRelations (if there are any) via passing of 'X-LINK-RELATIONS' header
  - added 'devnotes' (run with log level 'warn') which will let you know what went wrong and how to fix in the log
+ - hooked up  beginning Trace service/functionality
  
  ### Changed
  - fixed issue with SimpleUrlMapping throwing error when 'action' not sent
  - adding back in webhook functionality
  - upgrading to Groovy 4.0.8 for tests
  - 'sealing' extended classes in call flow
+ - speed/scale optimizations
 
  ### todo
     - (Feature) finish hook functionality (parially done)
     - (Feature) user management (also for frontend)
     - (Feature) rate limiting
     - (Feature) stats (check out Matamo for integration : https://developer.matomo.org/api-reference/tracking-api)
-    - (Feature) trace functionality
     - (Feature) controller/domain scaffolding
     - (Feature) CLI Bootstrap of controllers/domains/etc for new projects
     - (DOCS) separate DEMO docs from STARTER docs; keep in this project, easier to maintain
