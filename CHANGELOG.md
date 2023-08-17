@@ -131,8 +131,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - (Feature) user management (also for frontend)
     - (Feature) rate limiting
     - (Feature) stats (check out Matamo for integration : https://developer.matomo.org/api-reference/tracking-api)
-    - (Feature) controller/domain scaffolding
-    - (Feature) CLI Bootstrap of controllers/domains/etc for new projects
+    - (Feature) CLI scaffolding of controller/domain/etc for new projects
+    - (Feature) CLI init of new project
     - (DOCS) separate DEMO docs from STARTER docs; keep in this project, easier to maintain
     - (DOCS) document LinkRelation functionality
     - (DOCS) documentation for scaffolding functionality
