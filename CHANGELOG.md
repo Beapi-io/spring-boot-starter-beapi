@@ -125,6 +125,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - upgrading to Groovy 4.0.8 for tests
  - 'sealing' extended classes in call flow
  - speed/scale optimizations
+ - removed functionality for bad uri to default to apidocs; can be exploited by DOS attacks.
 
  ### todo
     - (Feature) finish hook functionality (parially done)
