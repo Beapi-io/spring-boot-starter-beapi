@@ -167,6 +167,18 @@ dependencies {
 
 }
 
+
+class Globals {
+    String buildNr =  System.getenv( 'BUILD_NUMBER' ).toString()
+}
+ext {
+    globals = new Globals()
+}
+
+// reference it like:
+println "value of BUILD_NUMBER = " + globals.buildNr
+
+
 project.plugins.withType(MavenPublishPlugin).all {
     PublishingExtension publishing = project.extensions.getByType(PublishingExtension)
     publishing.publications.withType(MavenPublication).all { mavenPublication ->
