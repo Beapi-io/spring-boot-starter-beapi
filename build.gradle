@@ -72,15 +72,11 @@ class Globals {
 ext {
     globals = new Globals()
 }
-// reference it like:
-println "value of BUILD_NUMBER = " + globals.patchNum
 
 group = "${group}"
 archivesBaseName = "spring-boot-starter-beapi"
-version = "${majorNum}.${minorNum}.${globals.patchNum}-SNAPSHOT"
+version = (globals.patchNum)?"${majorNum}.${minorNum}.${globals.patchNum}-SNAPSHOT":"${majorNum}.${minorNum}-SNAPSHOT"
 sourceCompatibility = "${sourceCompatibility}"
-
-println "value of VERSION = " + version
 
 publishing {
     publications {
@@ -102,38 +98,37 @@ repositories {
 dependencies {
     annotationProcessor "org.springframework.boot:spring-boot-autoconfigure-processor:${springBootVersion}"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}"
     implementation "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot:${springBootVersion}"
+
+    implementation("org.springframework.security:spring-security-config:${springSecurityVersion}")
+    implementation("org.springframework.security:spring-security-core:${springSecurityVersion}")
+    implementation("org.springframework.security:spring-security-crypto:${springSecurityVersion}")
+    implementation("org.springframework.security:spring-security-web:${springSecurityVersion}")
+
+    implementation "org.springframework:spring-beans:${springVersion}"
+    implementation "org.springframework:spring-context:${springVersion}"
+    implementation "org.springframework:spring-core:${springVersion}"
+    implementation "org.springframework:spring-web:${springVersion}"
+    implementation "org.springframework:spring-webmvc:${springVersion}"
+    implementation "org.springframework:spring-orm:${springVersion}"
+    implementation "org.springframework:spring-tx:${springVersion}"
+
+    implementation "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}"
+    implementation "org.apache.tomcat:tomcat-annotations-api:${tomcatVersion}"
+
     implementation "jakarta.persistence:jakarta.persistence-api:2.2.3"
     implementation "jakarta.validation:jakarta.validation-api:2.0.2"
     implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.3"
-    implementation "org.apache.tomcat.embed:tomcat-embed-core:9.0.56"
-    implementation "org.apache.tomcat:tomcat-annotations-api:9.0.56"
-    //implementation "org.codehaus.groovy:groovy:3.0.9"
-    implementation 'org.apache.groovy:groovy:4.0.8'
-    implementation "org.slf4j:slf4j-api:1.7.32"
-    implementation "org.springframework.boot:spring-boot-autoconfigure:2.6.2"
-    implementation("org.springframework.security:spring-security-config:5.8.3")
-    implementation("org.springframework.security:spring-security-core:5.8.3")
-    implementation("org.springframework.security:spring-security-crypto:5.8.3")
-    implementation("org.springframework.security:spring-security-web:5.8.3")
-    implementation "org.springframework:spring-beans:5.3.14"
-    implementation "org.springframework:spring-context:5.3.14"
-    implementation "org.springframework:spring-core:5.3.14"
-    implementation "org.springframework:spring-web:5.3.14"
-    implementation "org.springframework:spring-webmvc:5.3.14"
-    implementation "org.springframework.boot:spring-boot:${springBootVersion}"
 
-    implementation "org.springframework:spring-orm:5.3.14"
-    implementation "org.springframework:spring-tx:5.3.14"
-
-    //implementation("org.springframework.data:spring-data-jpa:2.6.0")
     implementation 'com.zaxxer:HikariCP:3.2.0'
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     implementation 'org.json:json:20210307'
 
 
-
     // [LOGGING]
+    //implementation "org.slf4j:slf4j-api:1.7.32"
     runtimeOnly 'org.slf4j:slf4j-api:1.7.15'
 
     // [SECURITY]
@@ -147,20 +142,21 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     
     // [GROOVY]
-    implementation('org.apache.groovy:groovy-ant:4.0.8'){
+    implementation "org.apache.groovy:groovy:${groovyVersion}"
+    implementation("org.apache.groovy:groovy-ant:${groovyVersion}"){
         exclude group:'org.apache.groovy', module: 'groovy-all'
     }
-    implementation('org.apache.groovy:groovy-json:4.0.8'){
+    implementation("org.apache.groovy:groovy-json:${groovyVersion}"){
         exclude group:'org.apache.groovy', module: 'groovy-all'
     }
     implementation('org.codehaus.gpars:gpars:1.2.1'){
         exclude group:'org.multiverse', module:'multiverse-core'
         exclude group:'org.codehaus.groovy', module: 'groovy-all'
     }
-    implementation('org.apache.groovy:groovy-cli-commons:4.0.8'){
+    implementation("org.apache.groovy:groovy-cli-commons:${groovyVersion}"){
         exclude group:'org.apache.groovy', module: 'groovy-all'
     }
-    implementation('org.apache.groovy:groovy-templates:4.0.8') {
+    implementation("org.apache.groovy:groovy-templates:${groovyVersion}") {
         exclude group:'org.apache.groovy', module: 'groovy-all'
     }
 
@@ -173,7 +169,6 @@ dependencies {
     // CACHING
     implementation 'org.springframework:spring-context-support:5.3.3'
     implementation 'net.sf.ehcache:ehcache:2.9.1'
-    //implementation group: 'com.google.guava', name: 'guava', version: '14.0'
     implementation 'com.google.guava:guava:26.0-jre'
 
 }
