@@ -65,11 +65,22 @@ jar {
     }
 }
 
+// GET JENKINS BUILD NUMBER
+class Globals {
+    String patchNum =  System.getenv( 'BUILD_NUMBER' ).toString()
+}
+ext {
+    globals = new Globals()
+}
+// reference it like:
+println "value of BUILD_NUMBER = " + globals.patchNum
 
 group = "${group}"
 archivesBaseName = "spring-boot-starter-beapi"
-version = "${version}"
+version = "${majorNum}.${minorNum}.${globals.patchNum}-SNAPSHOT"
 sourceCompatibility = "${sourceCompatibility}"
+
+println "value of VERSION = " + version
 
 publishing {
     publications {
@@ -168,15 +179,8 @@ dependencies {
 }
 
 
-class Globals {
-    String buildNr =  System.getenv( 'BUILD_NUMBER' ).toString()
-}
-ext {
-    globals = new Globals()
-}
 
-// reference it like:
-println "value of BUILD_NUMBER = " + globals.buildNr
+
 
 
 project.plugins.withType(MavenPublishPlugin).all {
