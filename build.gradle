@@ -291,7 +291,7 @@ void sign(Project project) {
 
 task projectDetails {
     doLast {
-        println "BEAPI_STARTER_VERSION=${project.version}"
+        println "BEAPI_SNAPSHOT_VERSION=${project.version}"
     }
 }
 
