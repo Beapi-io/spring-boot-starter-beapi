@@ -289,3 +289,9 @@ void sign(Project project) {
     }
 }
 
+task projectDetails {
+    doLast {
+        println "BEAPI_STARTER_VERSION=${project.version}"
+    }
+}
+
