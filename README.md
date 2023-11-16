@@ -106,6 +106,8 @@ curl -v -H "Content-Type: application/json" -H "Authorization: Bearer {your_toke
 ---
 
 # Q&A
+- **Why develop in Groovy?**
+    - Well as most people know, Apache Groovy is a JVM language that can be DYNAMICALLY/STATICALLY typed and is 100% compatible with Java. But what most people don't realize is that it is 3X faster than Kotlin (). This makes it easier to develop in as well as being faster.
 - **Why does the 0.6.0 version not build anymore?**
     - There was tracking code in the 0.6.0' version that was being used to track installs; This was mainly to see which corporations are violating the licensing. Now that we have that data, we no longer need the tracker installed. Unfortunately, this breaks the 0.6.0 build. Feel free to use the 0.7.0 build as it's more up to date :)
 - **Why Not bind the endpoints to the 'MODEL'(ie GraphQL)?**
