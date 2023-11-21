@@ -15,7 +15,7 @@
 
 **License** - [Reciprocal Public License](https://en.wikipedia.org/wiki/Reciprocal_Public_License)
 
-**Documentation** - [https://beapi-io.github.io/spring-boot-starter-beapi/](https://beapi-io.github.io/spring-boot-starter-beapi/)
+**Documentation** - [https://beapi-io.github.io/beapi-docs/](https://beapi-io.github.io/beapi-docs/)
 
 **Demo Application** - [https://github.com/Beapi-io/beapi-java-demo](https://github.com/Beapi-io/beapi-java-demo)
 
