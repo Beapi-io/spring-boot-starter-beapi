@@ -70,6 +70,8 @@ By abstracting the rules, this allows for easier automation and allows for:
   - Automated LinkRelations ([SEE HATEOS](https://en.wikipedia.org/wiki/HATEOAS))
   - Connector Scaffolding (coming in 0.8.X)
   - Automated Role-based Webhooks (coming in 0.8.X)
+- **Data**
+  - CQRS for plugin data handling
 
 ---
 
