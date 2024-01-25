@@ -31,7 +31,7 @@ api:
         anonRole: 'ROLE_ANONYMOUS'
         networkGroups: ['open','public','private']
         networkRoles: {'open':['ROLE_ADMIN','ROLE_ANONYMOUS','ROLE_USER'],'public':['ROLE_ADMIN','ROLE_USER'],'private':['ROLE_ADMIN']}
-        corscorsWhiteList: ['http://localhost','http://localhost:8080','http://127.0.0.1','http://test.nosegrind.net','http://test.nosegrind.net:8080']
+        corsWhiteList: ['http://localhost','http://localhost:8080','http://127.0.0.1','http://test.nosegrind.net','http://test.nosegrind.net:8080']
 
 
 
