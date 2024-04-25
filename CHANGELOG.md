@@ -120,12 +120,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - hooked up  beginning Trace service/functionality
  
  ### Changed
+ - cleanup
  - fixed issue with SimpleUrlMapping throwing error when 'action' not sent
  - adding back in webhook functionality
  - upgrading to Groovy 4.0.8 for tests
  - 'sealing' extended classes in call flow
  - speed/scale optimizations
  - removed functionality for bad uri to default to apidocs; can be exploited by DOS attacks.
+ - minimized required libs
+ - added os/browser/ip information to JWT token
+ - unset cached data upon unsafe method call
 
  ### todo
     - (Feature) finish hook functionality (parially done)
