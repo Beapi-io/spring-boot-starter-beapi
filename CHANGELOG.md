@@ -136,9 +136,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - (Feature) finish hook functionality (parially done)
     - (Feature) user management (also for frontend)
     - (Feature) rate limiting
-    - (Feature) stats (check out Matamo for integration : https://developer.matomo.org/api-reference/tracking-api)
     - (Feature) CLI scaffolding of controller/domain/etc for new projects
     - (Feature) CLI init of new project; inits and creates project env based on package name 
+    - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
     - (DOCS) separate DEMO docs from STARTER docs; keep in this project, easier to maintain
     - (DOCS) document LinkRelation functionality
     - (DOCS) documentation for scaffolding functionality
