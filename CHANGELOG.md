@@ -131,6 +131,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - added os/browser/ip information to JWT token
  - unset cached data upon unsafe method call
  - caching added to batching/chaining functionality
+ - modified gradle to provide templates for scaffolding
 
  ### todo
     - (Feature) finish hook functionality (parially done)
