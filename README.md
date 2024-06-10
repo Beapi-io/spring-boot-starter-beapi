@@ -59,6 +59,7 @@ By abstracting the rules, this allows for easier automation and allows for:
   - Automated [Attribute Based Access Control (ABAC)](https://developer.okta.com/books/api-security/authz/attribute-based/)
   - Full OWASP API Security Compliance
   - Automated RBAC+OWASP checks on cache; this is something that [API Gateways do not do](https://medium.com/@apiexpert/why-api-gateways-are-dead-7c9e324ff70a) and we correct for.
+  - Separate security/routing controls for public/private endpoints
 - **Configuration Management**
   - Reloadable API RULES (ie connectors) WITHOUT server/application restart
   - Automated synchronization of API RULES w/ services via webhooks (will be adding to [beapi_java_demo](https://github.com/Beapi-io/beapi-java-demo))
