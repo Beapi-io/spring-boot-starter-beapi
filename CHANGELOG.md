@@ -132,7 +132,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - unset cached data upon unsafe method call
  - caching added to batching/chaining functionality
  - modified gradle to provide templates for scaffolding
- - adding randomly generated 'secret'; changes with every startup of the app
+ - integrating randomly generated 'secret'; changes with every startup of the app. Initialized by app and stored as bean with private variable
 
  ### todo
     - (Feature) finish hook functionality (parially done)
