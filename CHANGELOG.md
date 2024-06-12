@@ -118,22 +118,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - automating HATEOS LinkRelations (if there are any) via passing of 'X-LINK-RELATIONS' header
  - added 'devnotes' (run with log level 'warn') which will let you know what went wrong and how to fix in the log
  - hooked up  beginning Trace service/functionality
+ - integrating randomly generated 'secret'; changes with every startup of the app. Initialized by app and stored as bean with private variable. This will mean every deployed application will have a separate way of handling HASHING BUT... since proxy/gateway/load balancer maintain session (and ROUTING based on session), no server has to have the same 'secret' for hashing. This secures each environment from being vulnerable to session hijacking since you would have to supply a separate hash for each different deployed server.
+ - added os/browser/ip information as headers to JWT token
+ - added jwt header checks to avoid session hijacking
+ - caching added to batching/chaining functionality
+ - adding back in webhook functionality
  
  ### Changed
  - cleanup
  - fixed issue with SimpleUrlMapping throwing error when 'action' not sent
- - adding back in webhook functionality
  - upgrading to Groovy 4.0.8 for tests
  - 'sealing' extended classes in call flow
  - speed/scale optimizations
  - removed functionality for bad uri to default to apidocs; can be exploited by DOS attacks.
  - minimized required libs
- - added os/browser/ip information to JWT token
  - unset cached data upon unsafe method call
- - caching added to batching/chaining functionality
  - modified gradle to provide templates for scaffolding
- - integrating randomly generated 'secret'; changes with every startup of the app. Initialized by app and stored as bean with private variable. This will mean every deployed application will have a separate way of handling HASHING BUT... since proxy/gateway/load balancer maintain session (and ROUTING based on session), no server has to have the same 'secret' for hashing. This secures each environment from being vulnerable to session hijacking since you would have to supply a separate hash for each different deployed server.
- - added jwt headers and jwt header checks to avoid session hijacking
+
 
  ### todo
     - (Feature) finish hook functionality (parially done)
