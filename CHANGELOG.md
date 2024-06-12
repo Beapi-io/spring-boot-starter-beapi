@@ -133,6 +133,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - caching added to batching/chaining functionality
  - modified gradle to provide templates for scaffolding
  - integrating randomly generated 'secret'; changes with every startup of the app. Initialized by app and stored as bean with private variable. This will mean every deployed application will have a separate way of handling HASHING BUT... since proxy/gateway/load balancer maintain session (and ROUTING based on session), no server has to have the same 'secret' for hashing. This secures each environment from being vulnerable to session hijacking since you would have to supply a separate hash for each different deployed server.
+ - added jwt headers and jwt header checks to avoid session hijacking
 
  ### todo
     - (Feature) finish hook functionality (parially done)
