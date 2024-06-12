@@ -137,7 +137,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 
  ### todo
-    - (Feature) finish hook functionality (parially done)
     - (Feature) user management (also for frontend)
     - (Feature) rate limiting
     - (Feature) CLI scaffolding of controller/domain/etc for new projects
