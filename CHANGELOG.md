@@ -123,6 +123,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - added jwt header checks to avoid session hijacking
  - caching added to batching/chaining functionality
  - adding back in webhook functionality
+ - updating IO State to include caching and ratelimiting config options
  
  ### Changed
  - cleanup
