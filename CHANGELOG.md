@@ -134,6 +134,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - minimized required libs
  - unset cached data upon unsafe method call
  - modified gradle to provide templates for scaffolding
+ - updating config for cors changes; importing cors config from properties
 
 
  ### todo
