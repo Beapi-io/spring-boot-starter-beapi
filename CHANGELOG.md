@@ -124,7 +124,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - caching added to batching/chaining functionality
  - adding back in webhook functionality
  - updating IO State to include caching and ratelimiting config options
- - adding toggle to turn cache on/off per endpoint
+ - added toggle to turn cache on/off per endpoint
  
  ### Changed
  - cleanup
