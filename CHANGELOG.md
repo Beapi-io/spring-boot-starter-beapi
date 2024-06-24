@@ -125,6 +125,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - adding back in webhook functionality
  - updating IO State to include caching and ratelimiting config options
  - added toggle to turn cache on/off per endpoint
+ - added tests for registration
  
  ### Changed
  - cleanup
