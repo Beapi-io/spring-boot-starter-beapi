@@ -139,6 +139,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - modified gradle to provide templates for scaffolding
  - updating config for cors changes; importing cors config from properties
  - adding functionality/tests so registration cleanly rejects duplicates
+ - adding try/catch block to domain services to throw clean exception
 
 
  ### todo
