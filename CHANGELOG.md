@@ -138,6 +138,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - unset cached data upon unsafe method call
  - modified gradle to provide templates for scaffolding
  - updating config for cors changes; importing cors config from properties
+ - adding functionality/tests so registration cleanly rejects duplicates
 
 
  ### todo
