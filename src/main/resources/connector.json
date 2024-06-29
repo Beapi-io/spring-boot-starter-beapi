@@ -1,0 +1,130 @@
+{
+    "NAME":"connector",
+    "NETWORKGRP": "private",
+    "VALUES": {
+        "CURRENTSTABLE": {
+          "type": "String",
+          "description":"CurrentStable version",
+          "mockData":"1"
+        },
+        "VERSION": {
+          "type": "String",
+          "description":"version for set of API endpoints",
+          "mockData":"1"
+        },
+        "VALUES": {
+          "type": "List<Map>",
+          "description":"List<Map> of definitions used for receives/responds",
+          "mockData":""
+        },
+        "NAME": {
+          "type": "String",
+          "description":"Name of IOState file",
+          "mockData":""
+        },
+        "NETWORKGRP": {
+          "type": "String",
+          "description":"NetworkGrp for this IOState file",
+          "mockData":"private"
+        },
+        "name": {
+          "type": "String",
+          "description":"IO State name",
+          "mockData":"mockEndPoint"
+        },
+        "version": {
+          "type": "Long",
+          "description":"Version for Updating IO State",
+          "mockData":"0"
+        },
+        "cacheversion": {
+          "type": "Long",
+          "description":"Version in cache",
+          "mockData":"0"
+        },
+	    "method":{
+          "type": "String",
+          "description":"Request Method",
+          "mockData":"GET"
+        },
+	    "description":{
+          "type": "String",
+          "description":"API Description",
+	      "mockData":"An Api Endpoint"
+        },
+	    "roles":{
+          "type": "List",
+          "description":"Authorization",
+	      "mockData":"ROLE_USER"
+        },
+	    "batchRoles":{
+          "type": "List",
+          "description":"Batch Authorization",
+	      "mockData":"ROLE_USER"
+        },
+	    "receives":{
+          "type": "List",
+          "description":"List of variable sent on request",
+	      "mockData":""
+        },
+	    "returns":{
+          "type": "List",
+          "description":"list of variables sent on response",
+	      "mockData":""
+        },
+	    "filename":{
+          "type": "String",
+          "description":"File for sending JSON String",
+	      "mockData":""
+        },
+      "list": {
+        "type": "List",
+        "description":"List of IO State names",
+        "mockData":"mockEndPoint"
+      }
+    },
+	"CURRENTSTABLE": "1",
+	"VERSION": {
+		"1": {
+		    "DEFAULTACTION":"list",
+            "URI": {
+              "list": {
+                "METHOD":"GET",
+                "DESCRIPTION":"list IOState names",
+                "UPDATECACHE": true,
+                "RATELIMIT": {
+                  "ROLE_ANONYMOUS": "20",
+                  "ROLE_USER": "100",
+                  "ROLE_ADMIN" : "*"
+                },
+                "ROLES": {},
+                "REQUEST": {
+                  "permitAll":[]
+                },
+                "RESPONSE": {
+                  "permitAll":["list"]
+                }
+              },
+              "update": {
+                  "METHOD":"POST",
+                  "DESCRIPTION":"Update IOState",
+                  "UPDATECACHE": true,
+                  "RATELIMIT": {
+                      "ROLE_ANONYMOUS": "20",
+                      "ROLE_USER": "100",
+                      "ROLE_ADMIN" : "*"
+                  },
+                  "ROLES": {
+                      "HOOK":["ROLE_ADMIN"]
+                  },
+                  "REQUEST": {
+                      "permitAll":["CURRENTSTABLE", "VERSION", "VALUES", "NAME", "NETWORKGRP"]
+                  },
+                  "RESPONSE": {
+                      "permitAll":["NAME","VERSION"]
+                  }
+              }
+            }
+        }
+	}
+}

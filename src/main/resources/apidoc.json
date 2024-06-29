@@ -1,0 +1,38 @@
+{
+    "NAME": "apidoc",
+    "NETWORKGRP": "public",
+    "VALUES": {
+        "*": {
+            "type": "String",
+            "description": "*",
+            "mockData": "*"
+        }
+    },
+    "CURRENTSTABLE": "1",
+    "VERSION": {
+        "1": {
+            "DEFAULTACTION": "show",
+            "URI": {
+                "show": {
+                    "METHOD": "GET",
+                    "DESCRIPTION": "Show ApiDocs",
+                    "UPDATECACHE": true,
+                    "RATELIMIT": {
+                        "ROLE_ANONYMOUS": "20",
+                        "ROLE_USER": "100",
+                        "ROLE_ADMIN" : "*"
+                     },
+                    "ROLES": {
+                        "BATCH": []
+                    },
+                    "REQUEST": {
+                        "permitAll": []
+                    },
+                    "RESPONSE": {
+                        "permitAll": ["*"]
+                    }
+                }
+            }
+        }
+    }
+}

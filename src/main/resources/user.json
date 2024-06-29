@@ -1,0 +1,210 @@
+{
+	"IOSTATE": {
+		"NAME": "user",
+		"NETWORKGRP": "public",
+		"VALUES": {
+			"firstName": {
+				"type": "String",
+				"mockData": "null_fname"
+			},
+			"passwordExpired": {
+				"type": "boolean",
+				"mockData": "false"
+			},
+			"accountExpired": {
+				"type": "boolean",
+				"mockData": "false"
+			},
+			"oauthProvider": {
+				"type": "String",
+				"mockData": "http:///test.com"
+			},
+			"username": {
+				"type": "String",
+				"mockData": "test"
+			},
+			"accountLocked": {
+				"type": "boolean",
+				"mockData": "false"
+			},
+			"password": {
+				"type": "String",
+				"mockData": "password"
+			},
+			"lastName": {
+				"type": "String",
+				"mockData": "null_lname"
+			},
+			"oauthId": {
+				"type": "String",
+				"mockData": "1"
+			},
+			"enabled": {
+				"type": "boolean",
+				"mockData": "true"
+			},
+			"avatarUrl": {
+				"type": "String",
+				"mockData": "http://test.com"
+			},
+			"email": {
+				"type": "String",
+				"mockData": "test@test.com"
+			},
+			"id": {
+				"key": "PKEY",
+				"type": "Long",
+				"mockData": "112"
+			},
+			"version": {
+				"type": "Long",
+				"mockData": "0"
+			}
+		},
+		"CURRENTSTABLE": "1",
+		"VERSION": {
+			"1": {
+				"DEFAULTACTION": "show",
+				"_DEPRECATED": "10/10/2050",
+				"URI": {
+					"show": {
+						"METHOD": "GET",
+						"DESCRIPTION": "Description for show",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
+						"ROLES": {
+							"BATCH": ["ROLE_ADMIN"]
+						},
+						"REQUEST": {
+							"permitAll": [],
+							"ROLE_ADMIN": ["id"]
+						},
+						"RESPONSE": {
+							"permitAll": ["id", "version", "username", "email", "enabled", "accountExpired"],
+							"ROLE_ADMIN": ["firstName","lastName"]
+						}
+					},
+					"showById": {
+						"METHOD": "GET",
+						"DESCRIPTION": "Description for show",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
+						"ROLES": {
+							"BATCH": ["ROLE_ADMIN"]
+						},
+						"REQUEST": {
+							"ROLE_ADMIN": ["id"]
+						},
+						"RESPONSE": {
+							"ROLE_ADMIN": ["id", "version", "username", "email", "enabled", "accountExpired","firstName","lastName"]
+						}
+					},
+					"getByUsername": {
+						"METHOD": "GET",
+						"DESCRIPTION": "Description for getByUsername",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
+						"ROLES": {
+							"BATCH": ["ROLE_ADMIN"]
+						},
+						"REQUEST": {
+							"permitAll": ["username"]
+						},
+						"RESPONSE": {
+							"permitAll": ["firstName", "passwordExpired", "accountExpired", "oauthProvider", "username", "accountLocked", "password", "lastName", "oauthId", "enabled", "avatarUrl", "email", "id", "version"]
+						}
+					},
+					"update": {
+						"METHOD": "PUT",
+						"DESCRIPTION": "Description for update",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
+						"ROLES": {
+							"BATCH": ["ROLE_ADMIN"]
+						},
+						"REQUEST": {
+							"ROLE_ADMIN": ["firstName", "passwordExpired", "accountExpired", "oauthProvider", "username", "accountLocked", "password", "lastName", "oauthId", "enabled", "avatarUrl", "email", "id", "version"]
+						},
+						"RESPONSE": {
+							"ROLE_ADMIN": ["id"]
+						}
+					},
+					"create": {
+						"METHOD": "POST",
+						"DESCRIPTION": "Description for create",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
+						"ROLES": {
+							"BATCH": ["ROLE_ADMIN"]
+						},
+						"REQUEST": {
+							"permitAll": ["firstName", "passwordExpired", "accountExpired", "oauthProvider", "username", "accountLocked", "password", "lastName", "oauthId", "enabled", "avatarUrl", "email", "id", "version"]
+						},
+						"RESPONSE": {
+							"permitAll": ["id"]
+						}
+					},
+					"list": {
+						"METHOD": "GET",
+						"DESCRIPTION": "Description for list",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
+						"ROLES": {
+							"BATCH": ["ROLE_ADMIN"]
+						},
+						"REQUEST": {
+							"ROLE_ADMIN": []
+						},
+						"RESPONSE": {
+							"ROLE_ADMIN": ["id", "version", "username", "email", "enabled", "accountExpired"]
+						}
+					},
+					"delete": {
+						"METHOD": "DELETE",
+						"DESCRIPTION": "Description for delete",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
+						"ROLES": {
+							"BATCH": ["ROLE_ADMIN"]
+						},
+						"REQUEST": {
+							"permitAll": ["id"]
+						},
+						"RESPONSE": {
+							"permitAll": ["id"]
+						}
+					}
+				}
+			}
+		}
+	}
+
+}

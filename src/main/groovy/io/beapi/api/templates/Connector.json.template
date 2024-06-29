@@ -1,0 +1,16 @@
+{
+	"IOSTATE": {
+		"NAME": "${realName}",
+		"NETWORKGRP": "public",
+		"VALUES": { ${attList}
+		},
+		"CURRENTSTABLE": "1",
+		"VERSION": {
+			"1": {
+				"DEFAULTACTION":"list",
+				"URI": { ${uris}
+				}
+			}
+		}
+	}
+}
