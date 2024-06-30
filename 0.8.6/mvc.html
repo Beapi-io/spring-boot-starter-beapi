@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-87598302-1"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-87598302-1');
+</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="assets/css/vendor.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+
+  <title>BeAPI API Framework - Documentation / MVC</title>
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+
+<section class="py-0">
+  <div class="container-fluid">
+    <div class="row justify-content-between">
+
+      <!-- navigation -->
+      <aside class="col-lg-3 col-xxl-2 p-3 doc-sidebar">
+        <div class="sticky">
+          <nav class="navbar navbar-vertical navbar-expand-lg navbar-light">
+            <div>
+              <a href="index.html" class="navbar-brand"><img src="assets/images/logo.png" alt="Logo"><span class="badge badge-green ml-2"></span></a>
+              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+            </div>
+
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul id="page-nav" class="nav flex-column nav-vertical-2">
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-2" role="button" aria-expanded="false" aria-controls="menu-2">Installation</a>
+                  <div class="collapse" id="menu-2" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                          <li class="nav-item">
+                              <a class="nav-link" href="index.html#section-1">Requirements</a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="index.html#section-2">Configure Demo Project</a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="index.html#section-3">Setup Demo Project DB</a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="index.html#section-4">Build Demo Project</a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="index.html#section-5">Run Demo Project</a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="index.html#section-6">Troubleshooting</a>
+                          </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-3" role="button" aria-expanded="false" aria-controls="menu-3">Configuration</a>
+                  <div class="collapse" id="menu-3" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                          <li class="nav-item">
+                              <a class="nav-link" href="config.html#section-1">Properties</a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="config.html#section-2">Settings</a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="config.html#section-3">Beapi API Config Changes</a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="config.html#section-4">Beapi DB Config Changes</a>
+                          </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-5" role="button" aria-expanded="false" aria-controls="menu-5">Bootstrapping</a>
+                  <div class="collapse" id="menu-5" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="bootstrap.html#section-1">Generate API Controllers</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="bootstrap.html#section-2">Generate IO State</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" data-toggle="collapse" href="#menu-4" role="button" aria-expanded="false" aria-controls="menu-4">Development</a>
+                  <div class="collapse show" id="menu-4" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                          <li class="nav-item">
+                              <a class="nav-link" href="mvc.html#section-1">Build</a>
+                          </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="mvc.html#section-2">Controllers</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="mvc.html#section-3">IO State</a>
+                        </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="mvc.html#section-4">OAuth/JWT</a>
+                          </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                  <!--
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-6" role="button" aria-expanded="false" aria-controls="menu-6">Security</a>
+                  <div class="collapse" id="menu-6" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="security.html#section-1">CORS / NetworkGroups</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="security.html#section-2">Roles / NetworkRoles</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="security.html#section-3">SSO / Providers</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                  -->
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-7" role="button" aria-expanded="false" aria-controls="menu-7">API Usage (Examples)</a>
+                  <div class="collapse" id="menu-7" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-1">Authorization Calls</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-2">API Calls</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-3">User Management</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-8" role="button" aria-expanded="false" aria-controls="menu-8">Advanced Functionality</a>
+                  <div class="collapse" id="menu-8" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-1">Automated Batching</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-2">Automated Webhooks</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-3">API Chaining®</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-4">Architecture PING</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-5">Rate Limiting</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-9" role="button" aria-expanded="false" aria-controls="menu-9">Advanced Configuration</a>
+                  <div class="collapse" id="menu-9" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="adv_config.html#section-1">Versioning</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="adv_config.html#section-2">IO State</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </aside>
+      <!-- / navigation -->
+
+
+      <!-- content -->
+      <article class="col-lg-9 col-xxl-10 doc-content">
+
+        <div class="row">
+          <div class="col">
+            <div class="doc-content-header">
+              <div class="row align-items-center">
+                <div class="col">
+                  <nav aria-label="breadcrumb" class="align-items-center">
+                    <ol class="breadcrumb d-none d-lg-inline-flex">
+                      <li class="breadcrumb-item"><a href="index.html">Documentation</a></li>
+                      <li class="breadcrumb-item active" aria-current="page">MVC</li>
+                    </ol>
+                  </nav>
+                </div>
+                <div class="col text-right">
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row justify-content-between doc-content-body">
+          <article class="col-md-9 col-xxl-8">
+
+            <h1 class="h2 font-weight-light"><b>Application Development with BeAPI</b></h1>
+              <p>The <b>Beapi Springboot Starter</b> has several built-in tools to help you get started that will automate most of the development/build for you. Below is an explaination of those tools and how to use them.</p>
+
+<hr size="5">
+
+              <!-- colors -->
+              <section id="section-2">
+                  <h2 class="section-title-2">The Build<a data-scroll href="#section-2" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+                  <p>Currently we are doing everything with GRADLE (if someone wants to contribute instructions for MAVEN, let us know). </p>
+                  <div class="row">
+                      <div class="col">
+                          <div class="card">
+                              <div class="card-body" style="background-color:#000;">
+                      <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">dependencies {
+    ...
+    implementation 'io.beapi:spring-boot-starter-beapi:0.7.0-SNAPSHOT'
+    ...
+}</code></pre>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </section>
+              <!-- / colors -->
+
+
+              <hr size="5">
+
+
+            <!-- colors -->
+            <section id="section-2">
+              <h2 class="section-title-2">The Controllers<a data-scroll href="#section-2" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <p>When building a controller class, you require only two things : a <b>@Controller</b> annotation and to 'extend'' the <b>BeapiRequestHandler</b> class : </p>
+              <div class="row">
+                <div class="col">
+                  <div class="card">
+                    <div class="card-body" style="background-color:#000;">
+                      <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">import io.beapi.api.controller.BeapiRequestHandler;
+import org.springframework.stereotype.Controller;
+import java.util.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@Controller("your")
+public class YourController extends BeapiRequestHandler {
+                      ...
+}</code></pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+		<p>Notice that the <b>@Controller</b> annotation has a value that matches the <b>NAME</b> in the corresponding I/O state file (which in turn matches how it is called). This is how we map the controller to the I/O state and mapping.</p>
+              <p>It should also be mentioned that the methods (like most controller methods) are using <b>HttpServletRequest and HttpServletResponse</b> so you will have to import those as well.</p>
+
+              <p>When returning data from your methods, you can return data as an:</p>
+              <ul>
+                <li>JPA <a href="https://javaee.github.io/javaee-spec/javadocs/javax/persistence/Entity.html">ENTITY</a></li>
+                <li><b>List / ArrayList / HashSet / Set</b> : these will then need to be list of maps to be compliant with IO State</li>
+                <li><b>Map / HashMap / LinkedHashMap</b></li>
+              </ul>
+              <p>If you need examples, see the <a href="https://github.com/orubel/spring-boot-starter-beapi/tree/main/demo-application/src/main/java/demo/application/controller">demo-application/src/main/java/demo/application/controller</a> directory</p>
+            </section>
+            <!-- / colors -->
+
+
+<hr size="5">
+
+            <!-- colors -->
+            <section id="section-3">
+              <h2 class="section-title-2">IO State <a data-scroll href="#section-2" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <p>An IO State File is RULES / DESCRIPTIONS for your API endpoints ASSOCIATED a CONTROLLER; It is a cacheable configuration file that can then be synchronized with all application servers.</p>
+              <p>This enables all URI's (and their associated data) to be easily cached and this data to be shared with services in the architecture (ie Proxy, MQ, etc).</p>
+              <p>Examples of IO state files can be found in <a href="https://github.com/orubel/spring-boot-starter-beapi-config/tree/main/.iostate">spring-boot-starter-beapi-config</a>.</p>
+              <div id="section-2.1">
+                <h2 class="section-title-2">Variable Declaration</h2>
+                <p>Lets break apart the pieces of an IOState file to see what they consist of and how they work; the first part of the file declares 'VALUES' for use by the endpoints:</p>
+                <div class="row">
+                  <div class="col">
+                    <div class="card">
+                      <div class="card-body" style="background-color:#000;">
+                        <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">		"NAME": "user",
+		"HANDLER": "demo.application.controller.UserController",
+		"NETWORKGRP": "public",
+		"VALUES": {
+			"id": {
+				"key": "PKEY",
+				"type": "Long",
+				"description": "",
+				"mockData": "112"
+			},
+			"version": {
+				"type": "Long",
+				"description": "",
+				"mockData": "0"
+			}
+
+        ...</code></pre>
+                      </div>
+                    </div>
+                  </div>
+                </div></br>
+                <p>We  start by declaring the NAME of the file and our 'values':</p>
+                <ul>
+                  <li><b>NAME (REQUIRED)</b>: This corresponds directly with the name of the controller(ie UserController); lowercase because that is how you will call it.</li>
+                  <li><b>NETWORKGRP (REQUIRED)</b>: 'networkGroup' is the group of 'roles' that can access it. See <b>'networkGroups'</b> and <b>'networkRoles'</b> in <a href="https://github.com/orubel/spring-boot-starter-beapi-config/blob/main/beapi_api.yaml">your beapi_api.yaml file</a> for more</li>
+                  <li><b>VALUES (REQUIRED)</b>: These are the individual variables returned. These help us for automating testing, api docs and defining what needs to be sent/returned for each endpoint.</li>
+                </ul></br>
+
+                <p>Underneath values, we then define each individual value to be sent/returned with the following stats:</p>
+                <ul>
+                  <li><b>key</b> (optional): One of [PKEY, FKEY]; this is used when the value is a <b>ID(PKEY)</b> or a <b>reference to another table(FKEY)</b></li>
+                  <li><b>reference</b> (optional): When key equals FKEY, we then supply the ENTITY name that <b>'reference'</b>. You can see <a href="https://github.com/orubel/spring-boot-starter-beapi-config/blob/main/.iostate/Branch.json">an example here.</a></b></li>
+                  <li><b>type (REQUIRED)</b> : variable type. Merely a descriptor for the ApiDocs. Defines scope of variable for people implementing your API; be descriptive and accurate.</li>
+                  <li><b>description (REQUIRED)</b> : description of variable, how it is used; mainly for apidocs</li>
+                  <li><b>mockData</b>(REQUIRED) : string descriptor; Mock data for tests and apidoc.</li>
+                </ul>
+              </div>
+              </br>
+
+              <div id="section-2.2">
+                <h2 class="section-title-2">Rules Declaration</h2>
+                <p>Following this, we then define the 'rules' for our endpoints like so:</p>
+                <div class="row">
+                  <div class="col">
+                    <div class="card">
+                      <div class="card-body" style="background-color:#000;">
+                        <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">    "CURRENTSTABLE": "1",
+    "VERSION": {
+        "1": {
+            "DEFAULTACTION":"list",
+            "URI": {
+                "create": {
+                    "METHOD":"POST",
+                    "DESCRIPTION":"Create new User",
+                    "ROLES":{
+                        "BATCH":["ROLE_ADMIN"],
+                        "HOOK":["ROLE_ADMIN"]
+                    },
+                    "REQUEST": {
+                        "permitAll":["username","password","email"]
+                    },
+                    "RESPONSE": {
+                        "permitAll":["id","version"]
+                    }
+                },
+                ...</code></pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p>The above data has the following definitions:</p>
+                <ul>
+                  <li><b>CURRENTSTABLE (REQUIRED)</b>: This is the current stable version of API's; if you you do not have multiple versions of this file, this number is the same as 'VERSION'</li>
+                  <li><b>VERSION (REQUIRED)</b>: This is the file version. This allows to API to have several versions of IOState if you are currently supported deprecated versions
+                    <ul>
+                      <li><b>DEFAULTACTION (REQUIRED)</b>: This is the default endpoint action if if none given; commonly 'list'</li>
+                      <li><b>DEPRECATED </b> (optional):  Formated a MM/DD/YYYY, this field represents when this api version goes 'stale' and can no longer be used</li>
+                      <li><b>URI (REQUIRED)</b>: This is the endpoint and the rules for the endpoint.</li>
+                    </ul>
+                  </li>
+                </ul></br>
+
+                <p>Then under 'URI', you define the rules for the endpoint for the controller/method. In this case for the NAME:'user' and URI:'create' point to the controller/method 'person.create', which would be called like so:</p>
+                <div class="row">
+                  <div class="col">
+                    <div class="card">
+                      <div class="card-body" style="background-color:#000;">
+                        <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">http://&lt;yourdomain&gt;:8080/v{applicationVersion}/user/create</code></pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p>We will explain more about where the 'v1.0' comes under <a href="http://orubel.github.io/Beapi-API-Framework/adv_config.html#section-1">'Versioning'</a> but for right now, lets finish explaining the rest of the IOState:</p>
+                <ul>
+                  <li><b>METHOD (REQUIRED)</b>: One of [GET, PUT, POST,DELETE]. This defines how the endpoint should be called.</li>
+                  <li><b>DESCRIPTION (REQUIRED)</b>: A description of the endpoint for the API Docs</li>
+                  <li><b>ROLES (REQUIRED)</b>: A grouping for security rules (SEE '<a href="http://orubel.github.io/Beapi-API-Framework/security.html#section-2">Security: Network Roles</a>')</li>
+                  <li><b>BATCH (REQUIRED if enabled)</b>: Security roles for endpoints that have batching enabled</li>
+                  <li><b>HOOK (REQUIRED if enabled)</b>: Security roles for endpoints that have web hooks enabled</li>
+                  <li><b>REQUEST (REQUIRED)</b>: Per role data for expected when sending the request; concatenates across roles</li>
+                  <li><b>RESPONSE (REQUIRED)</b>: Per role data for expected when sending the request; concatenates across roles</li>
+                </ul>
+                <div class="row">
+                  <div class="col">
+                    <div class="alert alert-primary" role="alert">
+                      <p><b>Of note on REQUEST/RESPONSE and ROLES</b>: one can set different access levels by concatenating privileges. Their is a default privilege level called <b>'permitAll'</b> which will allow <b>ALL privileges in the NetworkGrp</b> access to this data. You can then allow more atomic access by setting additional values PER ROLE like so:</p>
+                      <div class="row">
+                        <div class="col">
+                          <div class="card">
+                            <div class="card-body" style="background-color:#000;">
+                        <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">"REQUEST": {
+    "permitAll":["name"],
+    "ROLE_USER":["id"]
+},</code></pre>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              </br>
+              <div id="section-2.3">
+                <h2 class="section-title-2">Empty PermitAll</h2>
+                <p>If you are sending no values (such as a 'list' call) or returning no values, you will often have an empty 'permitAll' such as the following:</p>
+                <div class="row">
+                  <div class="col">
+                    <div class="card">
+                      <div class="card-body" style="background-color:#000;">
+                        <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">"REQUEST": {
+    "permitAll":[]
+},</code></pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p>An empty 'permitAll' should NEVER be declared with quotes as this sends an empty string. Always leave the brackets empty like above to declare that nothing needs to be sent.</p>
+              </div>
+
+            </section>
+
+<hr size="5">
+
+            <!-- file tree -->
+            <section id="section-4">
+              <h2 class="section-title-2">Troubleshooting<a data-scroll href="#section-4" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <p></p>
+              <div class="row">
+                <div class="col">
+                  <div class="alert alert-primary" role="alert">
+                    <ul>
+                      <li>If you are having issues with your build, try running './gradlew --stop;./gradlew clean;./gradlew build --stacktrace  --refresh-dependencies'. This will give you a fresh gradle instance, show your errors and refresh all dependencies.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <!-- / file tree -->
+
+          </article>
+
+
+          <aside class="col-md-3 col-xxl-3 d-none d-md-block">
+            <div class="sticky">
+              <ul id="toc" class="nav flex-column toc">
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-2">Controllers</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-3">IO State</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-4">Troubleshooting</a>
+                </li>
+              </ul>
+            </div>
+          </aside>
+
+
+        </div>
+
+      </article>
+      <!-- / content -->
+
+    </div>
+  </div>
+</section>
+
+
+<!-- footer -->
+<footer class="bg-dark">
+  <div class="container">
+    <div class="row gutter-3">
+      <div class="col-12 col-md-2">
+        <a href=""><img src="assets/images/logo_bw.png" alt="Logo"></a>
+      </div>
+      <div class="col-12 col-md-6 text-white">
+        <p class="mb-4">Copyright © 2014-2019 - All Rights Reserved</p></div>
+      <div class="col-12 col-md-4 col-lg-2 ml-auto text-md-right">
+        <div class="dropdown"> </div>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- / footer -->
+
+
+<script src="assets/js/vendor.min.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
