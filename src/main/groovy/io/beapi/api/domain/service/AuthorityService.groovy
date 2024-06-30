@@ -6,13 +6,20 @@ import io.beapi.api.domain.Authority;
 import io.beapi.api.repositories.AuthorityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.hibernate.SessionFactory
+import org.hibernate.Session
+import org.hibernate.Transaction
+import org.springframework.dao.DataAccessException;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 //@Qualifier
 public class AuthorityService implements IAuthority {
+
+    @Autowired
+    private SessionFactory sessionFactory;
 
     AuthorityRepository authrepo;
 
@@ -27,9 +34,14 @@ public class AuthorityService implements IAuthority {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Authority save(Authority authority) {
-        authrepo.saveAndFlush(authority);
-        return authority;
+        try{
+            authrepo.saveAndFlush(authority);
+            return authority;
+        }catch (DataAccessException e){
+            throw new Exception(e.getCause().getCause().getLocalizedMessage())
+        }
     }
 
     public Authority findByAuthority(String authority){

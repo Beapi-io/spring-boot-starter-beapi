@@ -52,18 +52,9 @@ class ApiCacheService{
 	@Autowired
 	private CacheManager cacheManager;
 
-	//@Autowired
-	//private ListableBeanFactory listableBeanFactory;
 
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApiCacheService.class);
+	//private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApiCacheService.class);
 
-	//private static ApiCacheService instance;
-	//public static ApiCacheService getInstance() { return instance; }
-
-	//@PostConstruct
-	//void init() {
-	//	instance = this;
-	//}
 
 	public ApiCacheService(CacheManager cacheManager) {
 		this.cacheManager = cacheManager
@@ -148,9 +139,11 @@ class ApiCacheService{
 	@CachePut(value='ApiCache',key="#controllername")
 	boolean setCache(String controllername,LinkedHashMap apidesc) throws Exception{
 		//logger.debug("setCache(String, LinkedHashMap) : {}",controllername)
-		if(controllername=='hook'){
-			println("setCache : ${apidesc}")
-		}
+
+		//if(controllername=='hook'){
+		//	println("setCache : ${apidesc}")
+		//}
+
 		try{
 			net.sf.ehcache.Cache temp = cacheManager.getCache('ApiCache').getNativeCache()
 			if(temp.put(controllername,apidesc)){

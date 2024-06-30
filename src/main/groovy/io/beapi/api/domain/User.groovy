@@ -45,6 +45,9 @@ public class User implements Serializable {
 	@Column(nullable = false, name = "email", unique = true)
 	String email;
 
+	@Column(nullable = true, name = "registration_verification_code")
+	String registrationVerificationCode;
+
 	@Column(nullable = true, name = "email_verified")
 	Boolean emailVerified=false;
 
@@ -198,6 +201,19 @@ public class User implements Serializable {
 		//return this.hooks;
 	//}
 
+	public String getRegistrationVerificationCode(){
+		return this.registrationVerificationCode
+	}
 
+	public void setRegistrationVerificationCode(String registrationVerificationCode){
+		this.registrationVerificationCode = registrationVerificationCode
+	}
 
+	public Boolean getEmailVerified(){
+		return this.emailVerified
+	}
+
+	public void getEmailVerified(Boolean emailVerified){
+		this.emailVerified = emailVerified
+	}
 }

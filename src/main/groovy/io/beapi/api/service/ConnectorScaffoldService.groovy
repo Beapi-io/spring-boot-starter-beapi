@@ -39,6 +39,9 @@ import java.util.jar.JarFile
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+import groovy.text.Template
+import groovy.text.GStringTemplateEngine
+
 /*
 Part of CLI : Used to scaffold IOState files
 
@@ -62,19 +65,20 @@ public class ConnectorScaffoldService {
 	/*
 	 * BOOTSTRAP DATA
 	 */
-	String realName
-	String realPackageName
+	String logicalClassName
+	String realClassName
+	String packageName
 	private LinkedHashMap data = [:]
-	private Object obj;
-	String dirPath
-	String templateDir = "${System.getProperty('user.dir')}/src/main/groovy/templates/"
+	//private Object obj;
+	//String dirPath
+	//String templateDir = "${System.getProperty('user.dir')}/src/main/groovy/templates/"
 	List variables = []
 
 	public ConnectorScaffoldService(ApplicationContext applicationContext) {
 		this.ctx = applicationContext
 	}
 
-	static transactional = false
+	//static transactional = false
 
 	void scaffoldConnector(String domainArg) {
 		def entityManager = ctx.getBean('entityManagerFactory')
@@ -83,63 +87,24 @@ public class ConnectorScaffoldService {
 		LinkedHashMap values = [:]
 		for (EntityType tempEntityType : entities) {
 			if (!domainFound) {
-				println(tempEntityType.getJavaType().getCanonicalName())
+
 				if (tempEntityType.getJavaType().getCanonicalName() == domainArg) {
 
 					domainFound = true
 
 					// todo : should this be camelCase????
-					realPackageName = tempEntityType.getJavaType().getCanonicalName() - (tempEntityType.getJavaType().getPackage().getName() + ".")
-					realName = realPackageName.toLowerCase()
+					logicalClassName = tempEntityType.getJavaType().getCanonicalName() - (tempEntityType.getJavaType().getPackage().getName() + ".")
 
-					Field[] fields = tempEntityType.getJavaType().getDeclaredFields()
-					fields.each() {
+					realClassName = logicalClassName.toLowerCase()
+					packageName = (tempEntityType.getJavaType().getPackage().getName() - ".${realClassName}")
 
-						String attName = it.getName()
 
-						Annotation anno = it.getAnnotation(javax.persistence.Column.class);
-						LinkedHashMap constraints = [:]
-
-						String keyType = null
-						String reference = null
-						if (attName != 'serialVersionUID') {
-
-							Attribute att = tempEntityType.getDeclaredAttribute(attName)
-							if(['id', 'ID'].contains(attName)){
-								keyType = 'PKEY'
-							}
-
-							if (att.isAssociation()) {
-								keyType = 'FKEY'
-								reference = att.getJavaType().getSimpleName()
-							}
-						}
-
-						if(attName != 'serialVersionUID') {
-							variables.add("${attName}")
-							if (anno != null) {
-								constraints['nullable'] = anno.nullable()
-								constraints['unique'] = anno.unique()
-								values[attName] = ['type': it.getType().getCanonicalName(), 'constraints': constraints, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
-							} else {
-								if (keyType) {
-									if(reference) {
-										values[attName] = ['key': keyType, 'reference': reference, 'type': it.getType().getCanonicalName(), 'constraints': constraints, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
-									} else {
-										values[attName] = ['key': keyType, 'type': it.getType().getCanonicalName(), 'constraints': constraints, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
-									}
-								} else {
-									values[attName] = ['type': it.getType().getCanonicalName(), 'constraints': null, 'description': '<put your description here>', 'mockData': '<put your mock data here>']
-								}
-							}
-						}
-					}
 				}
 			}
 		}
 
 		// create attList
-		data['realName'] = realName
+		data['realName'] = realClassName
 		if(connectorDir) {
 			data['attList'] = createAttList(values)
 		}
@@ -147,7 +112,7 @@ public class ConnectorScaffoldService {
 		// todo : create method to check if controller exists
 		// if exists, fill out 'URI' json
 		// else template URI json using params from values
-		String uris = createUriAtts(realName)
+		String uris = createUriAtts(realClassName)
 		data['uris'] = uris
 
 		if (domainFound) {
@@ -325,8 +290,9 @@ json += """
 			error(1, "The 'iostateDir' in your 'beapi_api.yml' file is not porperly defined as the directory does not exist. Please check and try again.")
 		}
 
-		writeConnector("templates/Connector.json.template", "${System.getProperty('user.home')}/${connectorDir}/${realPackageName}.json", data)
 
+		//writeConnector("templates/Connector.json.template", "${System.getProperty('user.home')}/${connectorDir}/${logicalClassName}.json", data)
+		writeConnector("io/beapi/api/templates/Connector.json.template", "${System.getProperty('user.home')}/${connectorDir}/${logicalClassName}.json", data)
 		error(0, "")
 	}
 
@@ -353,16 +319,25 @@ json += """
 		if (msg != "") {
 			System.err << "[ERROR] ${msg}"
 		}
-		System.exit i
+		System.exit 0
 	}
 
 
 	void writeConnector(String inPath, String outPath, LinkedHashMap attribs){
-		println(inPath)
+		println("### inPath: "+inPath)
+		println("### outPath: "+outPath)
+
 		String starterDir = new File(getClass().protectionDomain.codeSource.location.path).path
 		def starter = new File(starterDir)
+		println("## starterDir : "+starterDir)
 		if (starter.isFile() && starter.name.endsWith("jar")) {
 			JarFile jar = new JarFile(starter)
+
+			//Enumeration<JarEntry> entries = jar.entries()
+			//for (JarEntry entry : entries) {
+			//	System.out.println(entry.getName());
+			//}
+
 			JarEntry entry = jar.getEntry(inPath)
 
 			InputStream inStream = jar.getInputStream(entry)

@@ -2,8 +2,8 @@ package io.beapi.api.filter;
 
 import io.beapi.api.domain.Authority;
 import io.beapi.api.domain.User;
-import io.beapi.api.domain.service.UserService;
-
+import io.beapi.api.domain.service.UserService
+import io.beapi.api.service.JwtUserDetailsService;
 import io.beapi.api.utils.JwtTokenUtil;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -29,7 +29,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.web.cors.CorsUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
+import org.slf4j.MarkerFactory
+
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -47,27 +49,32 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	@Autowired
 	private ApiProperties apiProperties;
 
+	@Autowired
+	private JwtUserDetailsService userDetails;
 
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-		//System.out.println("### JwtRequestFilter...");
+		//println("### JwtRequestFilter...");
 
-		if(CorsUtils.isCorsRequest(request)==true && request.getMethod().equals("OPTIONS")){
+		//TESTING
+		//println("### isCORS? "+CorsUtils.isCorsRequest(request))
+		//println("### request method : "+request.getMethod())
+
+		if(CorsUtils.isCorsRequest(request)==true && request.getMethod()=="OPTIONS"){
 			chain.doFilter(request, response);
 		}else{
-			final String requestTokenHeader = request.getHeader("Authorization");
-
 			String username = null;
 			String jwtToken = null;
 			String uri = request.getRequestURI();
 
-
+			final String requestTokenHeader = request.getHeader("Authorization");
 			// TODO : make sure they are not logging in/ logging out else will throw logger.warn message
 			if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
 				jwtToken = requestTokenHeader.substring(7);
+
 				try {
 					username = jwtTokenUtil.getUsernameFromToken(jwtToken.replaceAll("\\s+", ""));
 				} catch (IllegalArgumentException e) {
@@ -75,6 +82,22 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				} catch (ExpiredJwtException e) {
 					System.out.println("Exception found " + e);
 				}
+
+				//Map tokenHeader = jwtTokenUtil.getHeaders(jwtToken)
+
+
+				if(!validateTokenHeaders(jwtToken, request)){
+					logger.warn("tokenHeaders do not match (possible token hijack or using token at different location/browser)");
+					String statusCode = "403";
+					response.setContentType("application/json");
+					response.setStatus(Integer.valueOf(statusCode));
+					LinkedHashMap code = ErrorCodes.codes.get(statusCode);
+					String message = "{\"timestamp\":\""+System.currentTimeMillis()+"\",\"status\":\""+statusCode+"\",\"error\":\""+code.get("short")+"\",\"message\": \""+code.get("long")+"\",\"path\":\""+request.getRequestURI()+"\"}";
+					response.getWriter().write(message);
+					//response.getWriter().flush();
+				}
+
+
 			} else {
 				logger.warn("JWT Token does not begin with Bearer String");
 			}
@@ -82,7 +105,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			// Once we get the token validate it.
 			if (!apiProperties.getReservedUris().contains(uri)) {
 				if (username != null) {
-
 					UserDetails userDetails = loadUserByUsername(username);
 
 					// if token is valid configure Spring Security to manually set
@@ -101,10 +123,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 						// that the current user is authenticated. So it passes the
 						// Spring Security Configurations successfully.
 					}
+
+
 				} else {
 					// no username/authentication for " + request.getRequestURI());
-
-					String statusCode = "401";
+					String statusCode = "403";
 					response.setContentType("application/json");
 					response.setStatus(Integer.valueOf(statusCode));
 					LinkedHashMap code = ErrorCodes.codes.get(statusCode);
@@ -119,19 +142,20 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				chain.doFilter(request, response);
 			} catch (Exception ignored) {
 				ignored.printStackTrace();
-				String statusCode = "401";
-				response.setContentType("application/json");
-				response.setStatus(Integer.valueOf(statusCode));
-				LinkedHashMap code = ErrorCodes.codes.get(statusCode);
-				String message = "{\"timestamp\":\""+System.currentTimeMillis()+"\",\"status\":\""+statusCode+"\",\"error\":\""+code.get("short")+"\",\"message\": \""+code.get("long")+"\",\"path\":\""+request.getRequestURI()+"\"}";
-				response.getWriter().write(message);
+				//String statusCode = "401";
+				//response.setContentType("application/json");
+				//response.setStatus(Integer.valueOf(statusCode));
+				//LinkedHashMap code = ErrorCodes.codes.get(statusCode);
+				//String message = "{\"timestamp\":\""+System.currentTimeMillis()+"\",\"status\":\""+statusCode+"\",\"error\":\""+code.get("short")+"\",\"message\": \""+code.get("long")+"\",\"path\":\""+request.getRequestURI()+"\"}";
+				//response.getWriter().write(message);
 				//response.getWriter().flush();
 			}
 		}
 	}
 
+
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		//logger.debug("loadUserByUsername(String) : {}");
+		//logger.debug("JwtRequestFilter > loadUserByUsername(String) : {}");
 
 		User user = userService.findByUsername(username);
 
@@ -153,4 +177,28 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), updatedAuthorities);
 	}
 
+	public boolean validateTokenHeaders(String jwtToken, HttpServletRequest request){
+		//println("validateTokenHeaders...")
+		String  userAgent =   request.getHeader("User-Agent");
+		String  user =   userAgent.toLowerCase();
+		String os = jwtTokenUtil.getOs(userAgent);
+		String browser = jwtTokenUtil.getBrowser(user, userAgent);
+		String ip = jwtTokenUtil.getIp(request)
+
+		Map tokenHeader = jwtTokenUtil.getHeaders(jwtToken)
+		if(os!=tokenHeader.os){
+			//println("BAD MATCH [os] : ${os} != ${tokenHeader.os}")
+			return false
+		}
+		if(browser!=tokenHeader.browser){
+			//println("BAD MATCH [browser] : ${browser} != ${tokenHeader.browser}")
+			return false
+		}
+		if(ip!=tokenHeader.origin){
+			//println("BAD MATCH [ip] : ${ip} != ${tokenHeader.origin}")
+			return false
+		}
+
+		return true;
+	}
 }

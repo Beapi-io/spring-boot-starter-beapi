@@ -51,7 +51,7 @@ public class HookExchangeService extends ApiExchange{
 
 		if(this.apiObject) {
 			// todo : create public api list
-			if(this.method == 'GET') {
+			if(this.apiObject.updateCache && this.method == 'GET') {
 
 				setCacheHash(request.getAttribute('params'), this.receivesList)
 
@@ -93,10 +93,9 @@ public class HookExchangeService extends ApiExchange{
     }
 
     void apiResponse(HttpServletResponse response,ArrayList body){
-		println("### HookResponse ###")
         String output = parseOutput(body, responseFileType)
-		println("output : "+output)
-        if(method=='GET') {
+
+		if(this.apiObject.updateCache && this.method == 'GET') {
             apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
         }
 

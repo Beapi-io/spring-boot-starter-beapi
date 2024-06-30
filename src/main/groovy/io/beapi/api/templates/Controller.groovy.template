@@ -1,80 +1,94 @@
 package $packageName
 
-$importedClasses
+import io.beapi.api.controller.BeapiRequestHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
+import demo.application.domain.<%=logicalClassName%>;
+import demo.application.service.<%=logicalClassName%>Service;
 
-@Controller("dept")
-class ${realClassName}Controller extends BeapiRequestHandler{
+
+@Controller("<%=realClassName%>")
+class <%=logicalClassName%>Controller extends BeapiRequestHandler{
 
 	SpringSecurityService springSecurityService
 
+    @Autowired
+    private <%=logicalClassName%>Service <%=realClassName%>Service;
+
 	LinkedHashMap list() {
-		def ${logicalClassName} = ${realClassName}.list()
-		return [${logicalClassName}:${logicalClassName}]
+		def $realClassName = <%=logicalClassName%>.list()
+		return [<%=realClassName%>:<%=realClassName%>]
 	}
 
 	LinkedHashMap show(){
 		try{
-			${realClassName} ${logicalClassName} = ${realClassName}.get(params.id)
-			if(${logicalClassName}){
-				return [${logicalClassName}: ${logicalClassName}]
+			$logicalClassName $realClassName = <%=logicalClassName%>.get(params.id)
+			if($realClassName){
+				return [$realClassName: $realClassName]
 			}else{
 				render(status: 500,text:"Id does not match record in database.")
 			}
 
 		}catch(Exception e){
-			throw new Exception("[${realClassName}Controller : show] : Exception - full stack trace follows:",e)
+			throw new Exception("[<%=logicalClassName%>Controller : show] : Exception - full stack trace follows:",e)
 		}
     }
 
 	LinkedHashMap create(){
 		try{
-			${realClassName} ${logicalClassName} = new ${realClassName}(${createData})
+			$logicalClassName $realClassName = new <%=logicalClassName%>(<%=createData%>)
 
-			if(${logicalClassName}){
-				if(!${logicalClassName}.save(flush:true,failOnError:true)){
-					${logicalClassName}.errors.allErrors.each { println(it) }
+			if($realClassName){
+				if(!<%=realClassName%>.save(flush:true,failOnError:true)){
+					<%=realClassName%>.errors.allErrors.each { println(it) }
 				}
-				return [${logicalClassName}: ${logicalClassName}]
+				return [$realClassName: $realClassName]
 			}else{
 				render(status: 500,text:"Id does not match record in database.")
 			}
 		}catch(Exception e){
-			throw new Exception("[${realClassName}Controller : create] : Exception - full stack trace follows:",e)
+			throw new Exception("[<%=logicalClassName%>Controller : create] : Exception - full stack trace follows:",e)
 		}
 	}
 
+
 	LinkedHashMap update(){
 		try{
-			${realClassName} ${logicalClassName} = new ${realClassName}()
+			$logicalClassName $realClassName = new $logicalClassName()
 
-			if(${logicalClassName}){
-			    ${updateData}
+			if($realClassName){
 
 
-				if(!${logicalClassName}.save(flush:true,failOnError:true)){
-					${logicalClassName}.errors.allErrors.each { println(it) }
+			    // updateData
+
+
+				if(!<%=realClassName%>.save(flush:true,failOnError:true)){
+					<%=realClassName%>.errors.allErrors.each { println(it) }
 				}
-				return [${logicalClassName}: ${logicalClassName}]
+				return [$realClassName : $realClassName ]
 			}else{
 				render(status: 500,text:"Id does not match record in database.")
 			}
 		}catch(Exception e){
-			throw new Exception("[${realClassName}Controller : update] : Exception - full stack trace follows:",e)
+			throw new Exception("[<%=logicalClassName%>Controller : update] : Exception - full stack trace follows:",e)
 		}
 	}
 
     LinkedHashMap delete() {
-        ${realClassName} ${logicalClassName}
+        $logicalClassName $realClassName
         try {
-            ${logicalClassName} = ${realClassName}.get(params.id)
-            if(${logicalClassName}){
-                    ${logicalClassName}.delete(flush: true, failOnError: true)
-                    return [${logicalClassName}: [id: params.id.toLong()]]
+            $realClassName = <%=logicalClassName%>.get(params.id)
+            if($realClassName){
+                    <%=realClassName%>.delete(flush: true, failOnError: true)
+                    return [$realClassName: [id: params.id.toLong()]]
             }else{
                 render(status: 500,text:"Id " + params.id + " does not match record in database.")
             }
         }catch(Exception e){
-            throw new Exception("[${realClassName}Controller : delete] : Exception - full stack trace follows:",e)
+            throw new Exception("[<%=logicalClassName%>Controller : delete] : Exception - full stack trace follows:",e)
         }
     }
 

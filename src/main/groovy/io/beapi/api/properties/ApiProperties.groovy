@@ -194,7 +194,7 @@ public class ApiProperties{
                 this.networkRoles = networkRoles
             }
         }
-        public void setCorsWhiteList(ArrayList corsWhiteList) { this.corsWhiteList = corsWhiteList}
+        public void setcorsWhiteList(ArrayList cors) { this.corsWhiteList = cors}
 
     }
 

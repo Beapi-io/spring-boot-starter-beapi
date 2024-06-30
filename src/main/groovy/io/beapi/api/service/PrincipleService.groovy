@@ -36,7 +36,7 @@ class PrincipleService {
 	@Autowired
 	ApiProperties apiProperties
 
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PrincipleService.class);
+	//private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PrincipleService.class);
 
 	public PrincipleService() {
 		//this.apiProperties = apiProperties

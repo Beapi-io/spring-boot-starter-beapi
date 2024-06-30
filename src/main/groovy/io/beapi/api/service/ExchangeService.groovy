@@ -54,46 +54,39 @@ public class ExchangeService extends ApiExchange{
 
     // [REQUEST]
     boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority){
-
 		initVars(request,response,authority)
 
 		if(this.apiObject) {
 			// todo : create public api list
-			if(this.method == 'GET') {
 
-				setCacheHash(request.getAttribute('params'), this.receivesList)
+			if(this.apiObject.updateCache && this.method == 'GET') {
+				setCacheHash(request.getAttribute('cacheHash'))
 
 				// RETRIEVE CACHED RESULT (only if using 'GET' method)
-				if((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}")) {
+				if ((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}")) {
 
-					String cachedResult
-					//try {
-						if(apiObject['cachedResult'][authority][responseFileType][cacheHash]){
-							cachedResult = apiObject['cachedResult'][authority][responseFileType][cacheHash]
-						}else{
-							cachedResult = apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
-						}
-					//} catch (Exception e) {
-					//	throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
-					//}
+					String cachedResult = (this.apiObject['cachedResult'][authority][responseFileType][cacheHash]) ?: this.apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
 
 					if (cachedResult && cachedResult.size() > 0) {
 						// PLACEHOLDER FOR APITHROTTLING
+						String linkRelations = linkRelationService.processLinkRelations(request, response, this.apiObject)
+						String newResult = (linkRelations) ? "[${cachedResult},${linkRelations}]" : cachedResult
+
 						response.setStatus(200);
 						PrintWriter writer = response.getWriter();
-						writer.write(cachedResult);
+						writer.write(newResult);
 						writer.close()
-						response.writer.flush()
+						//response.writer.flush()
 						return false
 					}
 				}
 			}
+
 		}
 
 		if(!validateMethod()){
 			logger.warn(devnotes,"[ INVALID REQUEST METHOD ] : SENT REQUEST METHOD FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DOES NOT MATCH EXPECTED 'REQUEST' METHOD OF '${apiObject['method'].toUpperCase()}'. IF THIS IS AN ISSUE, CHECK THE REQUESTMETHOD IN THE IOSTATE FILE FOR THIS CONTROLLER/ACTION.")
 			writeErrorResponse(response,'405',request.getRequestURI());
-			response.writer.flush()
 			return false
 		}else{
 			return true
@@ -101,24 +94,32 @@ public class ExchangeService extends ApiExchange{
     }
 
     void apiResponse(HttpServletRequest request,HttpServletResponse response, ArrayList body){
-		// println("### apiResponse ###")
+		//println("### apiResponse ###")
         String output = parseOutput(body, responseFileType)
 
-        if(method=='GET') {
-            apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
-        }
+		// return/update cache if 'updateCache' is true
+		if(this.apiObject.updateCache && method == 'GET') {
+			apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
+		} else {
+			if (response.getStatus() == 200) {
+				apiCacheService.unsetApiCachedResult(this.controller, this.action, this.apiversion)
+			}
+		}
 
-		String linkRelations = linkRelationService.processLinkRelations(request, response, this.apiObject)
 
+		/*
+		return LinkRelations only upon request with this header
+		 */
         PrintWriter writer = response.getWriter();
-		if(linkRelations){
-			String newResult ="[${output},${linkRelations}]"
+		if(request.getHeader('X-LINK-RELATIONS') == "true"){
+			String linkRelations = linkRelationService.processLinkRelations(request, response, this.apiObject)
+			String newResult = (linkRelations)?"[${output},${linkRelations}]":"[${output}]"
 			writer.write(newResult);
 		}else{
 			writer.write(output);
 		}
         writer.close()
-        response.writer.flush()
+        //response.writer.flush()
     }
 
 	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) throws Exception{
@@ -141,9 +142,6 @@ public class ExchangeService extends ApiExchange{
 		this.id = this.uObj.getId()
 		this.method = request.getMethod()
 		this.authority = authority
-
-
-		this.method = request.getMethod()
 		this.uri = request.getRequestURI()
 
 
@@ -155,6 +153,7 @@ public class ExchangeService extends ApiExchange{
 			this.apiObject = apiCacheService.getApiDescriptor(this.controller, this.apiversion, this.action)
 
 			LinkedHashMap receives = this.apiObject?.getReceivesList()
+
 			this.receivesList = (receives[this.authority]) ? receives[this.authority] : receives['permitAll']
 
 			LinkedHashMap returns = this.apiObject?.getReturnsList()

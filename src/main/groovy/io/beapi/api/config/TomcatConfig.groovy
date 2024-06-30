@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
-import org.apache.coyote.http11.Http11NioProtocol
+import org.apache.coyote.http11.Http11NioProtocol;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Configuration;
@@ -46,7 +46,7 @@ public class TomcatConfig  {
                 configTypes.add("medium");
                 configTypes.add("large");
 
-                if(!configTypes.contains(configType)){
+                if(configTypes.contains(configType)){
                     //todo : throw better error/exception
                     System.out.println("not a recognizable configType");
                 }else {
@@ -80,11 +80,8 @@ public class TomcatConfig  {
                         @Override
                         public void customize(Connector connector) {
                             connector.addUpgradeProtocol(new Http2Protocol());
-
-                            // No significant diff between protocols
                             //AbstractHttp11Protocol<?> httpHandler = ((AbstractHttp11Protocol<?>) connector.getProtocolHandler());
                             Http11NioProtocol httpHandler = (Http11NioProtocol) connector.getProtocolHandler();
-
                             httpHandler.setMaxKeepAliveRequests(-1);
                             httpHandler.setRejectIllegalHeader(true);
                             httpHandler.setMaxThreads(maxThreads);

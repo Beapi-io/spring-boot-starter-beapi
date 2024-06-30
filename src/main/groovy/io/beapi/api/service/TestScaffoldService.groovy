@@ -39,6 +39,10 @@ import java.util.jar.JarFile
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+
+/*
+Scaffolding for building out integration tests
+ */
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
 @Service
 public class TestScaffoldService {
@@ -61,14 +65,14 @@ public class TestScaffoldService {
 	/*
 	 * BOOTSTRAP DATA
 	 */
-	String realName
-	String realPackageName
-	private LinkedHashMap data = [:]
-	private Object obj;
+	//String realName
+	//String realPackageName
+	//private LinkedHashMap data = [:]
+	//private Object obj;
 	String fileName
-	String dirPath
-	String templateDir = "${System.getProperty('user.dir')}/src/main/groovy/templates/"
-	List variables = []
+	//String dirPath
+	//String templateDir = "${System.getProperty('user.dir')}/src/main/groovy/templates/"
+	//List variables = []
 
 	public TestScaffoldService(ApplicationContext applicationContext) {
 		this.ctx = applicationContext
@@ -150,7 +154,7 @@ public class TestScaffoldService {
 		if (msg != "") {
 			System.err << "[ERROR] ${msg}"
 		}
-		System.exit i
+		System.exit 0
 	}
 
 

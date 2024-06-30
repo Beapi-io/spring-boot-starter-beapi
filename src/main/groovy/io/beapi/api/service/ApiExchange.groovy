@@ -155,6 +155,7 @@ abstract sealed class ApiExchange permits ExchangeService, BatchExchangeService,
      * @param LinkedHashMap map of variables defining endpoint request variables
      * @return Boolean returns false if request variable keys do not match expected endpoint keys
      */
+    /*
     protected boolean checkRequestParams(LinkedHashMap methodParams) throws Exception{
         ArrayList checkList = this.receivesList
         ArrayList paramsList
@@ -181,6 +182,48 @@ abstract sealed class ApiExchange permits ExchangeService, BatchExchangeService,
         }
         return false
     }
+     */
+
+    /**
+     * Given the request params, check against expected parms in IOstate for users role; returns boolean
+     * @param LinkedHashMap map of variables defining endpoint request variables
+     * @return Boolean returns false if request variable keys do not match expected endpoint keys
+     */
+    boolean checkRequestParams(LinkedHashMap methodParams){
+        //println("###checkRequestParams")
+        ArrayList checkList = this.receivesList
+        ArrayList paramsList
+        ArrayList reservedNames = ['batchLength','batchInc','chainInc','apiChain','_','batch','max','offset','chaintype']
+
+        try {
+            if(checkList){
+                if(methodParams) {
+                    if (checkList?.contains('*')) {
+                        return true
+                    } else {
+                        paramsList = methodParams.keySet() as ArrayList
+
+                        // remove reservedNames from List
+                        reservedNames.each() { paramsList.remove(it) }
+                        if (paramsList.size() == checkList?.intersect(paramsList).size()) {
+                            return true
+                        }
+                    }
+                }else{
+                    return false
+                }
+            }else{
+                return true
+            }
+
+            // todo : set stats cache
+            //statsService.setStatsCache(userId, response.status, request.requestURI)
+            return false
+        }catch(Exception e) {
+            throw new Exception("[RequestInitializationFilter :: checkRequestParams] : Exception - full stack trace follows:",e)
+        }
+        return false
+    }
 
 
     /**
@@ -191,13 +234,8 @@ abstract sealed class ApiExchange permits ExchangeService, BatchExchangeService,
      * @param LinkedHashMap List of ids required when making request to endpoint
      * @return a hash from all id's needed when making request to endpoint
      */
-    protected void setCacheHash(LinkedHashMap params,Set receivesList){
-        StringBuilder hashString = new StringBuilder('')
-        receivesList.each(){ it ->
-            hashString.append(params[it])
-            hashString.append("/")
-        }
-        this.cacheHash = Hashing.murmur3_32().hashString(hashString.toString(), StandardCharsets.UTF_8).toString()
+    protected void setCacheHash(String cacheHash){
+        this.cacheHash = cacheHash
     }
 
 
@@ -213,7 +251,7 @@ abstract sealed class ApiExchange permits ExchangeService, BatchExchangeService,
         response.setStatus(Integer.valueOf(statusCode))
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
-        //response.writer.flush()
+        response.writer.flush()
     }
 
     // Todo : Move to exchangeService??
@@ -231,7 +269,7 @@ abstract sealed class ApiExchange permits ExchangeService, BatchExchangeService,
         }
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
-        //response.writer.flush()
+        response.writer.flush()
     }
 
 }

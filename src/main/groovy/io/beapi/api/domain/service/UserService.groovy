@@ -4,9 +4,12 @@ import io.beapi.api.domain.User;
 import io.beapi.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.dao.DataAccessException;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.scheduling.annotation.Async
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class UserService implements IUser {
@@ -23,7 +26,7 @@ public class UserService implements IUser {
     public List<User> getAllUsers() { return userrepo.findAll(); }
 
     //@Override
-    public Optional<User> findById(Long id) {
+    public User findById(Long id) {
         return userrepo.findById(id);
     }
 
@@ -36,6 +39,9 @@ public class UserService implements IUser {
     public User findByEmail(String email) {
         return userrepo.findByEmail(email);
     }
+
+
+
     @Override
     public User findByUsername(String username) {
         return userrepo.findByUsername(username);
@@ -43,9 +49,13 @@ public class UserService implements IUser {
 
     @Override
     public User save(User usr) {
-        userrepo.save(usr);
-        userrepo.flush();
-        return usr;
+        try{
+            userrepo.save(usr);
+            userrepo.flush();
+            return usr;
+        }catch (DataAccessException e){
+            throw new Exception(e.getCause().getCause().getLocalizedMessage())
+        }
     }
 
     //@Override
@@ -62,9 +72,13 @@ public class UserService implements IUser {
 
     @Override
     public User bootstrapUser(User usr) {
-        userrepo.save(usr);
-        userrepo.flush();
-        return usr;
+        try{
+            userrepo.save(usr);
+            userrepo.flush();
+            return usr;
+        }catch (DataAccessException e){
+            throw new Exception(e.getCause().getCause().getLocalizedMessage())
+        }
     }
 
 }

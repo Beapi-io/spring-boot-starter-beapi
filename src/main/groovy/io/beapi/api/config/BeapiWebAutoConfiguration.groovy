@@ -23,6 +23,8 @@ import io.beapi.api.service.ExchangeService
 import io.beapi.api.service.LinkRelationService
 import io.beapi.api.service.ThrottleCacheService
 import io.beapi.api.service.TraceExchangeService
+import io.beapi.api.utils.SecretGenerator
+
 //import io.beapi.api.service.TraceService
 import org.slf4j.LoggerFactory
 import java.lang.reflect.Method
@@ -46,6 +48,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.beans.factory.ListableBeanFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -58,6 +61,11 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+
+import org.springframework.web.socket.server.support.WebSocketHandlerMapping;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication
@@ -96,8 +104,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	@Autowired
 	protected ApiProperties apiProperties
 
-
-	String version
+	String version = getVersion()
 
 	private ListableBeanFactory listableBeanFactory;
 
@@ -119,12 +126,21 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	}
 */
 
-
+	/**
+	 *
+	 * @param beanFactory
+	 * @throws BeansException
+	 */
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.listableBeanFactory = (ListableBeanFactory) beanFactory;
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	private String getVersion() throws IOException {
 		ClassLoader classLoader = getClass().getClassLoader();
 		URL incoming = classLoader.getResource("META-INF/build-info.properties")
@@ -138,6 +154,10 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return version
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	@Bean
 	public MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
@@ -146,6 +166,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return messageSource;
 	}
 
+
 	//@Bean
 	//public LocalValidatorFactoryBean getValidator() {
 	//	LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
@@ -153,12 +174,23 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	//	return bean;
 	//}
 
-
+	/**
+	 *
+	 * @return
+	 */
 	@Bean
 	public RequestInitializationFilter requestInitializationFilter() {
 		return new RequestInitializationFilter(linkRelationService, principleService, apiProperties, apiCacheService, this.version, context);
 	}
 
+	/**
+	 *
+	 * @return
+	 */
+	@Bean(name='secretGenerator')
+	public SecretGenerator secretGenerator() {
+		return new SecretGenerator();
+	}
 
 	/*
 	@Bean
@@ -167,7 +199,10 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	}
 	 */
 
-
+	/**
+	 *
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public FilterRegistrationBean<RequestInitializationFilter> requestInitializationFilterRegistration() {
@@ -180,21 +215,16 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	}
 
 
-
-
-
-
-	// todo : have to do similar method for HandlerMappingRequestMapping
+	/**
+	 *
+	 * @return
+	 */
 	@Bean(name='simpleUrlHandlerMapping')
 	public SimpleUrlHandlerMapping simpleUrlHandlerMapping() {
 		Map<String, Object> urlMap = new LinkedHashMap<>();
 
 		LinkedHashMap<String, Object> cont = this.listableBeanFactory.getBeansWithAnnotation(org.springframework.stereotype.Controller.class)
 		cont.each() { k, v ->
-
-			//println(k)
-			//println(v)
-			//println(v.getClass().getName())
 
 			if(!['beapiErrorController','jwtAuthenticationController'].contains(k)) {
 				String controller = k
@@ -229,9 +259,10 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		}
 
 		Map<String, CorsConfiguration> corsMap = new LinkedHashMap<>();
+		List origins = getAllowedOrigins()
 
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(Arrays.asList("http://localhost","http://localhost:80","http://localhost:8080", "http://127.0.0.1","http://127.0.0.1:80", "http://test.nosegrind.net","http://test.nosegrind.net/","http://test.nosegrind.net:8080"));
+		config.setAllowedOrigins(origins);
 		config.setAllowedHeaders(Arrays.asList("*"));
 		config.addExposedHeader("Access-Control-Allow-Headers");
 		config.setAllowCredentials(true);
@@ -261,6 +292,20 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return mapping;
 	}
 
+	// CORS whitelisted origins
+	private List getAllowedOrigins() throws IOException {
+		ClassLoader classLoader = getClass().getClassLoader();
+		URL incoming = classLoader.getResource("META-INF/build-info.properties")
+
+		List origins
+		if (incoming != null) {
+			Properties properties = new Properties();
+			properties.load(incoming.openStream());
+			origins = properties.getProperty('api.security.cors.allowedOrigins')
+		}
+		return origins
+	}
+
 	@Bean
 	public RequestMappingHandlerMapping requestMappingHandlerMapping() {
 		RequestMappingHandlerMapping handler = super.requestMappingHandlerMapping();
@@ -270,6 +315,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return handler;
 	}
 
+	/* DEPRECATED
 	protected Map<String, CorsConfiguration> getCorsConfigurations() {
 		CorsRegistry registry = new CorsRegistry()
 		registry.addMapping("/**")
@@ -280,6 +326,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 				.allowCredentials(true);
 		return registry.getCorsConfigurations();
 	}
+	 */
 
 
 
@@ -287,7 +334,9 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(Arrays.asList("http://localhost", "http://localhost:80", "http://localhost:8080", "http://127.0.0.1", "http://127.0.0.1:80", "http://test.nosegrind.net", "http://test.nosegrind.net/", "http://test.nosegrind.net:8080"));
+		config.setAllowedOrigins(
+				apiProperties.security.corsWhiteList
+		);
 		config.setAllowedHeaders(Arrays.asList("*"));
 		config.addExposedHeader("Access-Control-Allow-Headers");
 		config.setAllowCredentials(true);
@@ -300,35 +349,62 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 
 
-	/*
-	* mapping needs to include 4 'callTypes' for load balancing:
-	* v : regular api call
-	* b : batching call
-	* c : chain call
-	* r : resource call
-	*
-	* This allows us the ability to move different call to different servers (should we want/need)
-	* so they do not affect 'regular calls' (ie 'v' callType)
-	*/
+	/**
+	 *
+	 * 	mapping needs to include 4 'callTypes' for load balancing:
+	 * 	v : regular api call
+	 * 	b : batching call
+	 * 	c : chain call
+	 * 	r : resource call
+	 *
+	 * 	This allows us the ability to move different call to different servers (should we want/need)
+	 * 	so they do not affect 'regular calls' (ie 'v' callType)
+	 *
+	 * @param controller
+	 * @param action
+	 * @param apiVersion
+	 * @param obj
+	 * @return
+	 */
 	private Map createControllerMappings(String controller, String action, String apiVersion, Object obj) {
 		String path = "${controller}/${action}" as String
 		Map<String, Object> urlMap = new LinkedHashMap<>();
 
 		try {
 
-			List url = ["/v${this.version}/${path}/**" as String, "/v${this.version}/${path}/" as String, "/v${this.version}-${apiVersion}/${path}/**" as String, "/v${this.version}-${apiVersion}/${path}/" as String, "/v${this.version}/${controller}/**" as String, "/v${this.version}/${controller}/" as String, "/v${this.version}-${apiVersion}/${controller}/**" as String, "/v${this.version}-${apiVersion}/${controller}/" as String]
+			List url = [
+					"/v${this.version}/${path}/**" as String,
+					"/v${this.version}/${path}/" as String,
+					"/v${this.version}/${path}?**" as String,
+					"/v${this.version}-${apiVersion}/${path}/**" as String,
+					"/v${this.version}-${apiVersion}/${path}/" as String,
+					"/v${this.version}-${apiVersion}/${path}?**" as String,
+					"/v${this.version}/${controller}/**" as String,
+					"/v${this.version}/${controller}/" as String,
+					"/v${this.version}-${apiVersion}/${controller}/**" as String,
+					"/v${this.version}-${apiVersion}/${controller}/" as String
+			]
 			url.each() { urlMap.put(it, obj); }
 
+			/*
+			* assign batch endpoints
+			 */
 			if (apiProperties.batchingEnabled) {
 				List batchUrl = ["/b${this.version}/${path}/**" as String, "/b${this.version}/${path}/" as String, "/b${this.version}-${apiVersion}/${path}/**" as String, "/b${this.version}-${apiVersion}/${path}/" as String]
 				batchUrl.each() { urlMap.put(it, obj); }
 			}
 
+			/*
+			* assign chaining endpoints
+			 */
 			if (apiProperties.chainingEnabled) {
 				List chainUrl = ["/c${this.version}/${path}/**" as String, "/c${this.version}/${path}/" as String, "/c${this.version}-${apiVersion}/${path}/**" as String, "/c${this.version}-${apiVersion}/${path}/" as String]
 				chainUrl.each() { urlMap.put(it, obj); }
 			}
 
+			/*
+			* assign trace endpoints
+			 */
 			List traceUrl = ["/t${this.version}/${path}/**" as String, "/t${this.version}/${path}/" as String, "/t${this.version}-${apiVersion}/${path}/**" as String, "/t${this.version}-${apiVersion}/${path}/" as String]
 			traceUrl.each() { urlMap.put(it, obj); }
 
@@ -342,6 +418,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	/*
 	* mapping for CORS; takes keySet from 'createMappings' and uses it to create CORS mappings
 	 */
+
 	/*
 	private Map createCorsMappings(Map corsMap, Set paths,String networkGrp) {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
@@ -379,8 +456,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return source;
 	}
 
- */
-
+ 	*/
 
 }
 

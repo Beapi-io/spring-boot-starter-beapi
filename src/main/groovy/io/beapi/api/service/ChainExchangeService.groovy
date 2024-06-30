@@ -68,6 +68,33 @@ public class ChainExchangeService extends ApiExchange{
 	boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority) {
 		initChainVars(request, response,authority)
 
+		if(this.apiObject) {
+			// todo : create public api list
+			if(this.apiObject.updateCache && this.apiObject['method'].toUpperCase() == 'GET') {
+
+				setCacheHash(request.getAttribute('cacheHash'))
+
+				// RETRIEVE CACHED RESULT (only if using 'GET' method)
+				if((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}")) {
+
+					String cachedResult = (this.apiObject['cachedResult'][authority][responseFileType][cacheHash])?:this.apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
+
+					if (cachedResult && cachedResult.size() > 0) {
+						// PLACEHOLDER FOR APITHROTTLING
+						String linkRelations = linkRelationService.processLinkRelations(request, response, this.apiObject)
+						String newResult = (linkRelations)?"[${cachedResult},${linkRelations}]":cachedResult
+
+						response.setStatus(200);
+						PrintWriter writer = response.getWriter();
+						writer.write(newResult);
+						writer.close()
+						//response.writer.flush()
+						return false
+					}
+				}
+			}
+		}
+
 		return true
 	}
 
@@ -81,6 +108,15 @@ public class ChainExchangeService extends ApiExchange{
 				// todo : cache attribute 'batchOutput'; concat of all batch output
 
 				concatChainOutput(body, request, response, this.responseFileType)
+
+				if(this.apiObject.updateCache && this.method == 'GET') {
+					apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, responseBody[0])
+				}else{
+					if(response.getStatus()==200){
+						apiCacheService.unsetApiCachedResult(this.controller,  this.action, this.apiversion)
+					}
+				}
+
 				this.chain=[]
 
 				/*
@@ -111,6 +147,14 @@ public class ChainExchangeService extends ApiExchange{
 				// concat output
 
 				concatChainOutput(body, request, response, this.responseFileType)
+
+				if(this.apiObject.updateCache && this.method == 'GET') {
+					apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, responseBody[0])
+				}else{
+					if(response.getStatus()==200){
+						apiCacheService.unsetApiCachedResult(this.controller,  this.action, this.apiversion)
+					}
+				}
 
 				def servletCtx = this.ctx.getServletContext()
 				def rd = servletCtx?.getRequestDispatcher(this.newPath)
@@ -386,6 +430,5 @@ public class ChainExchangeService extends ApiExchange{
 
 		request.setAttribute('params',this.params)
 	}
-
 
 }

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 // [callType, sent appVersion, default appVersion(for comparison), apiVersion, controller, action, trace, id]
 public class UriObject {
 
-    private static final ArrayList CALL_TYPES = ['v','b','c','r','t']
+    private static final ArrayList CALL_TYPES = ['v','b','c','t']
 
     private Integer callType
     private String appVersion
@@ -22,7 +22,7 @@ public class UriObject {
 
     public UriObject(String uri, String version){
             Integer callType
-            boolean trace = false
+            //boolean trace = false
 
             ArrayList uriVars = uri.split('/')
             String tempVersion = uriVars[1].toLowerCase()

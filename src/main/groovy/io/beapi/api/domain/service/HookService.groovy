@@ -20,7 +20,7 @@ import io.beapi.api.domain.Hook;
 import io.beapi.api.repositories.HookRepository;
 import io.beapi.api.domain.User;
 import org.springframework.stereotype.Service;
-
+import org.springframework.dao.DataAccessException;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,9 +35,13 @@ public class HookService implements IHook {
 	}
 
 	public Hook save(Hook hook){
-		hookrepo.save(hook);
-		hookrepo.flush();
-		return hook;
+		try{
+			hookrepo.save(hook);
+			hookrepo.flush();
+			return hook;
+		}catch (DataAccessException e){
+			throw new Exception(e.getCause().getCause().getLocalizedMessage())
+		}
 	}
 
 	//@Override

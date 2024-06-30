@@ -58,7 +58,7 @@ public class IoStateService{
 
 	String version
 
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(IoStateService.class);
+	//private static final org.slf4j.Logger logger = LoggerFactory.getLogger(IoStateService.class);
 
 	public IoStateService(ApiProperties apiProperties, ApplicationContext applicationContext, ApiCacheService apiCacheService, String version)  throws Exception {
 		ApplicationContext ctx
@@ -139,7 +139,7 @@ public class IoStateService{
 	}
 
 	private void parseResource(String path) throws IOException, UndeclaredThrowableException, IllegalArgumentException{
-		logger.debug("parseResource : {}")
+		//logger.debug("parseResource : {}")
 
 		LinkedHashMap methods = [:]
 		InputStream in = this.getClass().getClassLoader().getResourceAsStream(path);
@@ -163,7 +163,7 @@ public class IoStateService{
 	}
 
 	private void parseFiles(String path) throws Exception{
-		logger.debug("parseFiles : {}")
+		//logger.debug("parseFiles : {}")
 		LinkedHashMap methods = [:]
 		println(" ###  Loading IO State Files : ${path}")
 
@@ -189,45 +189,35 @@ public class IoStateService{
 								parseJson(json.IOSTATE.NAME.toString(), json.IOSTATE)
 							}catch(Exception e){
 								println("#### [IoStateService] Exception :"+e)
+								throw new Exception("#### [IoStateService] Exception :",e)
 							}
 						} else {
-							logger.debug("parseFiles : {}","[Bad File Type ( ${tmp[1]} )] - Ignoring file : ${fileName}")
+							//logger.debug("parseFiles : {}","[Bad File Type ( ${tmp[1]} )] - Ignoring file : ${fileName}")
 						}
 				}
 			}
 
 		}catch(Exception e){
 			println('[IoStateService] : No IO State Files found for initialization :'+e)
+			throw new Exception('[IoStateService] : No IO State Files found for initialization :',e)
 		}
 	}
 
 
 	void parseJson(String apiName,LinkedHashMap json) throws Exception{
-		logger.debug("parseJson : {}")
+		//logger.debug("parseJson : {}")
 
 		LinkedHashMap methods = [:]
 
-		String type = (json['TYPE'])?json['TYPE']:'controller'
+		// DEPRECATED
+		// String type = (json['TYPE'])?json['TYPE']:'controller'
+
 		String networkGrp = (json['NETWORKGRP'])?json['NETWORKGRP']:'public'
-
-		// TODO ; BOOTSTRAP TESTUSER AND ADD VARIABLE TO ALL IOSTATE FILES
-		//String testUser
-		//if(json.containsKey('TESTUSER')) {
-		//	testUser = json.TESTUSER
-		//}
-
-
 
 		json['VERSION'].each(){ k, v ->
 			String versKey = k
-
 			LinkedHashMap apiVersion = v
-
 			String defaultAction = (v['DEFAULTACTION'])?v['DEFAULTACTION']:'index'
-			//String defaultAction = (apiVersion['DEFAULTACTION'])?apiVersion['DEFAULTACTION']:'index'
-
-			//Set testOrder = (vers.value['TESTORDER'])?vers.value.TESTORDER:[]
-
 
 			Set deprecated = []
 			if(v['DEPRECATED']) {
@@ -235,7 +225,6 @@ public class IoStateService{
 			}
 
 			String actionname
-
 
 			try {
 				apiVersion['URI'].each() { k2, v2 ->
@@ -254,8 +243,8 @@ public class IoStateService{
 					LinkedHashMap uriObject = toToLinkedHashMap(v2)
 
 
+					//String apiMethod = RequestMethod.valueOf(uriObject.METHOD).toString().toUpperCase()
 					String apiMethod = RequestMethod.valueOf(uriObject.METHOD).toString()
-
 
 					ArrayList apiRoles = []
 					try{
@@ -290,14 +279,32 @@ public class IoStateService{
 
 					Set hookRoles = []
 					try{
-					if (uriObject.ROLES.containsKey('HOOK')) {
-						hookRoles = uriObject.ROLES.HOOK as Set
-					}
+						if (uriObject.ROLES.containsKey('HOOK')) {
+							hookRoles = uriObject.ROLES.HOOK as Set
+						}
 					}catch(Exception e){ println("### parseJson > hookroles error :"+e)}
 
+					boolean updateCache = false
+					try{
+						if (uriObject.UPDATECACHE=="true") {
+							updateCache = true
+						}
+					}catch(Exception e){ println("### parseJson > updateCache error :"+e)}
+
+					LinkedHashMap rateLimit = []
+					try{
+						if (uriObject.RATELIMIT) {
+							uriObject.RATELIMIT.each() { k5, v5 ->
+								rateLimit.add(k5,v5)
+							}
+						}
+					}catch(Exception e){ println("### parseJson > rateLimit error :"+e)}
+
 					// TODO
+					// add updateCache
+					// add rateLimit
 					try {
-						apiDescriptor = createApiDescriptor(networkGrp, apiName, apiMethod, apiRoles, batchRoles, hookRoles, actionname, vals, apiVersion)
+						apiDescriptor = createApiDescriptor(networkGrp, apiName, apiMethod, apiRoles, batchRoles, hookRoles, actionname, vals, apiVersion, updateCache, rateLimit)
 					} catch (Exception e) {
 						println("unable to create ApiDescriptor. Check your IO State Formatting  : " + e +". Line Number "+e.getStackTrace()[0].getLineNumber())
 					}
@@ -361,6 +368,7 @@ public class IoStateService{
 					cache = apiCacheService.setApiCache(apiName, methods)
 				}catch(Exception e){
 					println("#### IoStateService Exception1 : "+e)
+					throw new Exception("#### IoStateService Exception1 : ",e)
 				}
 
 				if(apiName=='hook'){}
@@ -387,7 +395,7 @@ public class IoStateService{
 		//return methods
 	}
 
-	protected ApiDescriptor createApiDescriptor(String networkGrp, String apiname, String apiMethod, ArrayList apiRoles, LinkedHashSet batchRoles, LinkedHashSet hookRoles, String uri, LinkedHashMap vals, LinkedHashMap json) throws Exception{
+	protected ApiDescriptor createApiDescriptor(String networkGrp, String apiname, String apiMethod, ArrayList apiRoles, LinkedHashSet batchRoles, LinkedHashSet hookRoles, String uri, LinkedHashMap vals, LinkedHashMap json, boolean updateCache, LinkedHashMap rateLimit) throws Exception{
 		//logger.debug("createApiDescriptor : {}")
 		LinkedHashMap<String, ParamsDescriptor> apiObject = new LinkedHashMap()
 		ApiParams param = new ApiParams()
@@ -401,7 +409,7 @@ public class IoStateService{
 
 				keys.add(k)
 
-				v.reference = (v.reference) ? v.reference : 'self'
+				v.reference = (v.reference) ? v.reference : apiname
 				param.setParam(v.type, k)
 				String hasKey = (v?.key) ? v.key : null
 
@@ -409,14 +417,14 @@ public class IoStateService{
 
 					param.setKey(hasKey)
 
-					String hasReference = (v?.reference) ? v.reference : 'self'
+					String hasReference = (v?.reference) ? v.reference : apiname
 					param.setReference(hasReference)
 
 
 					if (['FKEY', 'INDEX', 'PKEY'].contains(v.key?.toUpperCase())) {
 						switch (v.key) {
 							case 'INDEX':
-								if (v.reference != 'self') {
+								if (v.reference != apiname) {
 									LinkedHashMap fkey = ["${k}": "${v.reference}"]
 									fkeys.add(fkey)
 								}
@@ -430,7 +438,6 @@ public class IoStateService{
 								break;
 						}
 					}
-
 				}
 
 
@@ -457,7 +464,6 @@ public class IoStateService{
 		is applicable for argument types: (org.json.JSONObject) values: [{"permitAll":[],"ROLE_ADMIN":["id"]}]
 		 */
 		LinkedHashMap requestObj = json.URI[uri].REQUEST
-
 		LinkedHashMap responseObj =json.URI[uri].RESPONSE
 
 		LinkedHashMap receives = [:]
@@ -491,7 +497,7 @@ public class IoStateService{
 			keyList.add(pkeys)
 		}
 
-		ApiDescriptor service = new ApiDescriptor(networkGrp, apiMethod, pkeys, fkeys, apiRoles, apiname, receives, receivesList, returns, returnsList, keyList)
+		ApiDescriptor service = new ApiDescriptor(networkGrp, apiMethod, pkeys, fkeys, apiRoles, apiname, receives, receivesList, returns, returnsList, keyList, updateCache, rateLimit)
 
 
 		// override networkRoles with 'DEFAULT' in IO State
@@ -518,7 +524,7 @@ public class IoStateService{
 
 
 	private LinkedHashMap getIOSet(LinkedHashMap io, LinkedHashMap apiObject, List valueKeys, String apiName) throws Exception{
-		logger.debug("getIOSet : {}")
+		//logger.debug("getIOSet : {}")
 
 		// TODO : APIOBJECT IS ALWAYS EMPTY; NEED TO FIX APIDESCRIPTOR ABOVE
 

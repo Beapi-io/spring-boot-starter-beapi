@@ -70,6 +70,12 @@
 					"show": {
 						"METHOD": "GET",
 						"DESCRIPTION": "Description for show",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
 						"ROLES": {
 							"BATCH": ["ROLE_ADMIN"]
 						},
@@ -82,9 +88,34 @@
 							"ROLE_ADMIN": ["firstName","lastName"]
 						}
 					},
+					"showById": {
+						"METHOD": "GET",
+						"DESCRIPTION": "Description for show",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
+						"ROLES": {
+							"BATCH": ["ROLE_ADMIN"]
+						},
+						"REQUEST": {
+							"ROLE_ADMIN": ["id"]
+						},
+						"RESPONSE": {
+							"ROLE_ADMIN": ["id", "version", "username", "email", "enabled", "accountExpired","firstName","lastName"]
+						}
+					},
 					"getByUsername": {
 						"METHOD": "GET",
 						"DESCRIPTION": "Description for getByUsername",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
 						"ROLES": {
 							"BATCH": ["ROLE_ADMIN"]
 						},
@@ -98,6 +129,12 @@
 					"update": {
 						"METHOD": "PUT",
 						"DESCRIPTION": "Description for update",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
 						"ROLES": {
 							"BATCH": ["ROLE_ADMIN"]
 						},
@@ -111,6 +148,12 @@
 					"create": {
 						"METHOD": "POST",
 						"DESCRIPTION": "Description for create",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
 						"ROLES": {
 							"BATCH": ["ROLE_ADMIN"]
 						},
@@ -124,6 +167,12 @@
 					"list": {
 						"METHOD": "GET",
 						"DESCRIPTION": "Description for list",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
 						"ROLES": {
 							"BATCH": ["ROLE_ADMIN"]
 						},
@@ -137,6 +186,12 @@
 					"delete": {
 						"METHOD": "DELETE",
 						"DESCRIPTION": "Description for delete",
+						"UPDATECACHE": true,
+						"RATELIMIT": {
+							"ROLE_ANONYMOUS": "20",
+							"ROLE_USER": "100",
+							"ROLE_ADMIN" : "*"
+						},
 						"ROLES": {
 							"BATCH": ["ROLE_ADMIN"]
 						},
@@ -147,7 +202,6 @@
 							"permitAll": ["id"]
 						}
 					}
-
 				}
 			}
 		}

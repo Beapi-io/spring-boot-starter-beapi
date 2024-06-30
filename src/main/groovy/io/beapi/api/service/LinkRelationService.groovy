@@ -18,17 +18,16 @@ package io.beapi.api.service
 
 import io.beapi.api.utils.ErrorCodes
 import io.beapi.api.utils.UriObject
+import io.beapi.api.utils.ApiDescriptor
 import org.springframework.stereotype.Service
-import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
+import org.json.JSONObject
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import io.beapi.api.utils.ApiDescriptor
 
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
 @Service
 public class LinkRelationService {
-
 
 	@Autowired
 	ApiCacheService apiCacheService;
@@ -82,18 +81,22 @@ public class LinkRelationService {
 				ArrayList receives = []
 				if((apiObject?.getReceivesList()[this.authority])) {
 					apiObject?.getReceivesList()[this.authority].each(){ receives.add(it) }
-				}
-				if(apiObject?.getReceivesList()['permitAll']) {
+				}else{
 					apiObject?.getReceivesList()['permitAll'].each(){ receives.add(it) }
 				}
+				//if(apiObject?.getReceivesList()['permitAll']) {
+				//	apiObject?.getReceivesList()['permitAll'].each(){ receives.add(it) }
+				//}
 
 				Set returns = new HashSet<>()
 				if(apiObject?.getReturnsList()[this.authority]) {
 					apiObject?.getReturnsList()[this.authority].each(){ returns.add(it) }
-				}
-				if(apiObject?.getReturnsList()['permitAll']) {
+				}else{
 					apiObject?.getReturnsList()['permitAll'].each(){ returns.add(it) }
 				}
+				//if(apiObject?.getReturnsList()['permitAll']) {
+				//	apiObject?.getReturnsList()['permitAll'].each(){ returns.add(it) }
+				//}
 
 				if(receives || returns){
 					// set PATH first

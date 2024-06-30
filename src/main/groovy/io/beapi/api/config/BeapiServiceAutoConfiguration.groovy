@@ -33,11 +33,11 @@ import io.beapi.api.service.TraceExchangeService
 
 import io.beapi.api.service.PrincipleService
 import io.beapi.api.service.TraceCacheService
-import io.beapi.api.service.HookCacheService
+//import io.beapi.api.service.HookCacheService
 import io.beapi.api.service.TraceService
 
 import io.beapi.api.service.CliService
-import io.beapi.api.service.WebHookService
+//import io.beapi.api.service.WebHookService
 
 //import io.beapi.api.filter.RequestInitializationFilter
 //import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -71,7 +71,11 @@ public class BeapiServiceAutoConfiguration {
 
 	public BeapiServiceAutoConfiguration() {}
 
-
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	@Bean(name='appVersion')
 	String appVersion() throws IOException {
 		ClassLoader classLoader = getClass().getClassLoader();
@@ -86,66 +90,118 @@ public class BeapiServiceAutoConfiguration {
 		return version
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	@Bean(name='principleService')
 	@ConditionalOnMissingBean
 	public PrincipleService principleService() throws IOException {
 		return new PrincipleService();
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	@Bean(name='cliService')
 	@ConditionalOnMissingBean
 	public CliService cliService() throws IOException {
 		return new CliService();
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	@Bean(name='connScaffoldService')
 	@ConditionalOnMissingBean
 	public ConnectorScaffoldService connScaffoldService() throws IOException {
 		return new ConnectorScaffoldService(applicationContext);
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	@Bean(name='testScaffoldService')
 	@ConditionalOnMissingBean
 	public TestScaffoldService testScaffoldService() throws IOException {
 		return new TestScaffoldService(applicationContext);
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	@Bean(name='linkRelationService')
 	@ConditionalOnMissingBean
 	public LinkRelationService linkRelationService() throws IOException {
 		return new LinkRelationService(apiCacheService, principleService());
 	}
 
+	/*
 	@Bean(name='webHookService')
 	@ConditionalOnMissingBean
 	public WebHookService webHookService() throws IOException {
 		return new WebHookService(apiCacheService, principleService());
 	}
+	 */
 
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	@Bean(name='exchangeService')
 	@ConditionalOnMissingBean
 	public ExchangeService exchangeService() throws IOException {
 		return new ExchangeService(linkRelationService(), apiCacheService);
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	@Bean(name='batchService')
 	@ConditionalOnMissingBean
 	public BatchExchangeService batchService() throws IOException {
 		return new BatchExchangeService(apiCacheService, applicationContext);
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	@Bean(name='chainService')
 	@ConditionalOnMissingBean
 	public ChainExchangeService chainService() throws IOException {
 		return new ChainExchangeService(apiCacheService, applicationContext);
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	@Bean(name='traceService')
 	@ConditionalOnMissingBean
 	public TraceService traceService() throws IOException {
 		return new TraceService(traceCacheService)
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	@Bean(name='traceExchangeService')
 	@ConditionalOnMissingBean
 	public TraceExchangeService traceExchangeService() throws IOException {

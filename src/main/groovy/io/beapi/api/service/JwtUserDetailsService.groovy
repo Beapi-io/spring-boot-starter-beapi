@@ -1,7 +1,9 @@
 package io.beapi.api.service;
 
-import io.beapi.api.domain.Authority;
-
+import io.beapi.api.domain.Authority
+import io.beapi.api.domain.UserAuthority
+import io.beapi.api.domain.service.UserAuthorityService
+import io.beapi.api.repositories.UserAuthorityRepository;
 import io.beapi.api.repositories.UserRepository;
 import io.beapi.api.domain.User;
 import io.beapi.api.domain.service.UserService;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 import java.util.*;
 
+import java.util.concurrent.CompletableFuture;
+
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 
@@ -25,15 +29,16 @@ public class JwtUserDetailsService implements UserDetailsService {
 	private UserService userService;
 
 	@Autowired
-	UserRepository userrepo;
+	UserAuthorityService userauthService;
 
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(JwtUserDetailsService.class);
+	//private static final org.slf4j.Logger logger = LoggerFactory.getLogger(JwtUserDetailsService.class);
 
 
 	@RequestScope
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		logger.debug("loadUserByUsername(String) : {}");
-        User user = userService.findByUsername(username);
+		//logger.debug("loadUserByUsername(String) : {}");
+
+		User user = userService.findByUsername(username);
 
 		if (!Objects.nonNull(user)) {
 			throw new UsernameNotFoundException("User not found with username: " + username);
@@ -56,6 +61,18 @@ public class JwtUserDetailsService implements UserDetailsService {
 	//@Override
 	public User save(User usr) {
 		// TODO Auto-generated method stub
-		return userrepo.save(usr);
+		//return userrepo.save(usr);
+
+		try {
+			userService.save(usr);
+			return usr;
+		}catch(Exception e){
+			println(e)
+		}
+	}
+
+	public UserAuthority save(UserAuthority userauth) {
+		// TODO Auto-generated method stub
+		return userauthService.save(userauth);
 	}
 }

@@ -17,6 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.scheduling.annotation.Async;
+import java.util.concurrent.CompletableFuture;
+
 @Controller("user")
 public class UserController extends BeapiRequestHandler {
 
@@ -41,22 +44,34 @@ public class UserController extends BeapiRequestHandler {
 			List<User> users = userService.getAllUsers();
 			return users;
 	}
-
+	
 	public User show(HttpServletRequest request, HttpServletResponse response){
-			String username;
+			User user
+			String username
 			if(principle.isSuperuser()){
-				username = (Objects.nonNull(this.params.get("id")))? (this.params.get("id")):principle.name();
+				username= this.params?.get("id")
+				user = userService.findByUsername(username);
 			}else {
 				username = principle.name();
+				user = userService.findByUsername(username);
 			}
-
-			User user = userService.findByUsername(username);
 
 			if (Objects.nonNull(user)) {
+				return user
+			}
+			return null
+    }
+
+	public User showById(HttpServletRequest request, HttpServletResponse response){
+		Long lparam = Long.valueOf(this.params.get("id"));
+		if(lparam.toString() == this.params.get("id")){
+			User user = userService.findById(lparam)
+			if (user) {
 				return user;
 			}
-			return null;
-    }
+		}
+		return null;
+	}
 
 	// admin can pass a role else defaults to 'ROLE_USER
 	public User create(HttpServletRequest request, HttpServletResponse response){

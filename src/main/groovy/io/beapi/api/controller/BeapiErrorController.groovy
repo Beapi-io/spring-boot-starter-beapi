@@ -42,14 +42,21 @@ class BeapiErrorController implements ErrorController {
         //do something like logging
         println("### forwarded to errorController : ")
 
-        Object errorUri = request.getSession().getAttribute(RequestDispatcher.ERROR_REQUEST_URI)
-        println(request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI))
-        println(request.getAttribute(RequestDispatcher.ERROR_SERVLET_NAME))
-        println(request.getAttribute(RequestDispatcher.ERROR_EXCEPTION))
-        println(request.getAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE))
-        println(request.getAttribute(RequestDispatcher.ERROR_MESSAGE))
+
+        println("URI:"+request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI))
+        println("FORWARD URI:"+request.getAttribute(RequestDispatcher.FORWARD_REQUEST_URI))
+        println("INCLUDE URI:"+request.getAttribute(RequestDispatcher.INCLUDE_REQUEST_URI))
+
+        println("exception : "+request.getAttribute(RequestDispatcher.ERROR_EXCEPTION))
+        println("exception : "+request.getSession().getAttribute(RequestDispatcher.ERROR_EXCEPTION))
+
+
+        println("exception type : "+request.getAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE))
+        println("error_message : "+request.getAttribute(RequestDispatcher.ERROR_MESSAGE))
         println(request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE))
-        println(request.getAttribute(RequestDispatcher.FORWARD_CONTEXT_PATH))
+
+        println("CONTEXT PATH:"+request.getAttribute(RequestDispatcher.FORWARD_CONTEXT_PATH))
+        println(request.getAttribute(RequestDispatcher.FORWARD_PATH_INFO))
 
 
 

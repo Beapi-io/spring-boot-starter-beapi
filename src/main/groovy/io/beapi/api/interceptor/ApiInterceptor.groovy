@@ -123,11 +123,12 @@ class ApiInterceptor implements HandlerInterceptor{
 		}else {
 			privateRoles = apiProperties.security.networkRoles['private'].collect() { k, v -> v }
 			this.uObj = request.getAttribute('uriObj')
+
 			if(this.uObj) {
 				this.callType = this.uObj?.getCallType()
 				this.authority = request.getAttribute('principle')
 
-				switch (callType) {
+				switch (this.callType) {
 					case 1:
 						// todo : check throttle cache size
 						// println(apiProperties.throttle.rateLimit[this.authority])

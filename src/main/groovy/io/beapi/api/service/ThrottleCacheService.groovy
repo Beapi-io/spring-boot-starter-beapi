@@ -39,7 +39,7 @@ class ThrottleCacheService{
 	@Autowired
 	private CacheManager cacheManager;
 
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ThrottleCacheService.class);
+	//private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ThrottleCacheService.class);
 
 
 	public ThrottleCacheService(CacheManager cacheManager) {

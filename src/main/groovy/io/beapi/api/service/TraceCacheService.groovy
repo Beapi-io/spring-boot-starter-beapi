@@ -45,7 +45,7 @@ class TraceCacheService {
 	private CacheManager cacheManager;
 
 
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TraceCacheService.class);
+	//private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TraceCacheService.class);
 
 
 	public TraceCacheService(CacheManager cacheManager) {
@@ -127,7 +127,7 @@ class TraceCacheService {
 	 */
 	//@Cacheable(value='ApiCache',key="#controllername",sync=false)
 	LinkedHashMap getTraceCache(String uri) throws Exception{
-		logger.debug("getTraceCache(String) : {}",uri)
+		//logger.debug("getTraceCache(String) : {}",uri)
 
 		if(uri!=null) {
 			try {
@@ -148,7 +148,7 @@ class TraceCacheService {
 	 * @return A List of keys of all object names contained with the 'ApiCache'
 	 */
 	ArrayList getCacheKeys(){
-		logger.debug("getCacheKeys() : {}")
+		//logger.debug("getCacheKeys() : {}")
 		//cacheManager.setTransactionAware(false);
 		net.sf.ehcache.Ehcache temp = cacheManager.getCache('Trace').getNativeCache()
 		return temp.getKeys()

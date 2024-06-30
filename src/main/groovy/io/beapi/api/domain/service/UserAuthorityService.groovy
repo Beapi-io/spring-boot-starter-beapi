@@ -36,4 +36,10 @@ public class UserAuthorityService implements IUserAuthority{
         return userAuthority;
     }
 
+    //@Override
+    public void deleteById(Long id) {
+        userauthrepo.deleteById(id);
+        userauthrepo.flush();
+    }
+
 }

@@ -104,9 +104,26 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return super.authenticationManager();
     }
 
+    // websocket security
+    /*
+    @Bean
+    public AuthorizationManager<Message<?>> messageAuthorizationManager(MessageMatcherDelegatingAuthorizationManager.Builder messages) {
+        messages
+                .nullDestMatcher().authenticated()
+                .simpSubscribeDestMatchers("/user/queue/errors").permitAll()
+                .simpDestMatchers("/app/**").hasRole("ROLE_USER","ROLE_ADMIN")
+                .simpSubscribeDestMatchers("/**").hasRole("ROLE_USER","ROLE_ADMIN")
+                .simpTypeMatchers(MESSAGE, SUBSCRIBE).denyAll()
+                .anyMessage().denyAll();
+        return messages.build();
+    }
+
+     */
+
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable().cors();
+        //httpSecurity.authorizeRequests().antMatchers("/ws/**").permitAll();
         httpSecurity.authorizeRequests().antMatchers("/authenticate", "/register").permitAll().anyRequest().authenticated();
         httpSecurity.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
         //httpSecurity.exceptionHandling((exceptionHandling) -> exceptionHandling.accessDeniedPage("/error"));

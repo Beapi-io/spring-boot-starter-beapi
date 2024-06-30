@@ -53,12 +53,42 @@ public class BatchExchangeService extends ApiExchange{
 
 		setBatchParams(request)
 
+		if(this.apiObject) {
+			// todo : create public api list
+			if(this.apiObject.updateCache && this.method == 'GET') {
+
+				setCacheHash(request.getAttribute('cacheHash'))
+
+				// RETRIEVE CACHED RESULT (only if using 'GET' method)
+				if((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}")) {
+
+					String cachedResult = (this.apiObject['cachedResult'][authority][responseFileType][cacheHash])?:this.apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
+
+					if (cachedResult && cachedResult.size() > 0) {
+						// PLACEHOLDER FOR APITHROTTLING
+						String linkRelations = linkRelationService.processLinkRelations(request, response, this.apiObject)
+						String newResult = (linkRelations)?"[${cachedResult},${linkRelations}]":cachedResult
+
+						response.setStatus(200);
+						PrintWriter writer = response.getWriter();
+						writer.write(newResult);
+						writer.close()
+						//response.writer.flush()
+						return false
+					}
+				}
+			}
+		}
+
 		if(!validateMethod()){
+			logger.warn(devnotes,"[ INVALID REQUEST METHOD ] : SENT REQUEST METHOD FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DOES NOT MATCH EXPECTED 'REQUEST' METHOD OF '${apiObject['method'].toUpperCase()}'. IF THIS IS AN ISSUE, CHECK THE REQUESTMETHOD IN THE IOSTATE FILE FOR THIS CONTROLLER/ACTION.")
 			writeErrorResponse(response,'405',request.getRequestURI());
+			return false;
 		}
 
 		if (!checkRequestParams(request.getAttribute('params'))) {
 			writeErrorResponse(response, '400', request.getRequestURI());
+			return false;
 		}
 
 		// routing call to controller
@@ -70,9 +100,25 @@ public class BatchExchangeService extends ApiExchange{
 			if(request.getAttribute('batchVars').isEmpty()) {
 				// concat and return
 				parseBatchOutput(body, request, response, this.responseFileType)
+
+				if(this.apiObject.updateCache && method == 'GET') {
+					apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, responseBody[0])
+				}else{
+					if(response.getStatus()==200){
+						apiCacheService.unsetApiCachedResult(this.controller,  this.action, this.apiversion)
+					}
+				}
 			}else{
 				// concat and forward
 				parseBatchOutput(body, request, response, this.responseFileType)
+
+				if(this.apiObject.updateCache && method == 'GET') {
+					apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, responseBody[0])
+				}else{
+					if(response.getStatus()==200){
+						apiCacheService.unsetApiCachedResult(this.controller,  this.action, this.apiversion)
+					}
+				}
 
 				/*
 				if (apiThrottle) {
@@ -139,7 +185,7 @@ public class BatchExchangeService extends ApiExchange{
 
 		this.authority = authority
 		this.cache = apiCacheService.getApiCache(this.controller)
-		this.method = request.getMethod()
+
 		this.uri = request.getRequestURI()
 		//this.receivesList = request.getAttribute('receivesList')
 		//this.returnsList = request.getAttribute('returnsList')

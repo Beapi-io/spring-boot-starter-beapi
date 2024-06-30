@@ -1,19 +1,4 @@
-
-import com.gorylenko.GitProperties
-import groovy.json.JsonOutput
-//import org.apache.commons.io.IOUtils
-import org.apache.http.impl.client.DefaultHttpClient
-import org.apache.http.client.HttpClient
-import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.client.methods.HttpPost
-import org.apache.http.HttpEntity
-import org.apache.http.entity.StringEntity
-import org.apache.http.HttpResponse
-import org.apache.http.entity.ContentType
-import groovy.json.JsonSlurper
-import org.apache.http.message.BasicHeader
-
+import com.vanniktech.maven.publish.SonatypeHost
 
 buildscript {
     repositories {
@@ -24,32 +9,29 @@ buildscript {
             }
         }
         mavenCentral()
-        //maven {
-        //    url "https://plugins.gradle.org/m2/"
-        //}
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath("io.github.gradle-nexus:publish-plugin:1.0.0")
-        //classpath "ca.cutterslade.gradle:gradle-dependency-analyze:1.9.1"
     }
 }
 
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    //id "java-library"
+    id "org.springframework.boot" version "2.7.0"
+    id 'io.spring.dependency-management' version "1.1.5"
     id 'maven-publish'
-    id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
+    //id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
+    id("com.vanniktech.maven.publish") version "0.29.0"
     id 'groovy'
-    id "com.gorylenko.gradle-git-properties" version "2.4.1"
+    //id "ca.cutterslade.analyze"
 }
 
 apply plugin: "maven-publish"
 apply plugin: 'signing'
-apply plugin: 'io.github.gradle-nexus.publish-plugin'
+//apply plugin: 'io.github.gradle-nexus.publish-plugin'
 apply plugin: 'groovy'
 apply plugin: 'io.spring.dependency-management'
-//apply plugin: "ca.cutterslade.analyze"
 
 description = "The Beapi Springboot Starter for API Automation; automates and simplifies almost all API functionality and security"
 
@@ -57,26 +39,12 @@ bootJar {
     enabled = false
 }
 
-
-jar {
-    baseName = 'analytics'
-    from('src/main/groovy/io/beapi/api') {
-        include 'templates/*.*.template'
-    }
-}
-
-// GET JENKINS BUILD NUMBER
-class Globals {
-    String patchNum =  System.getenv( 'BUILD_NUMBER' ).toString()
-}
-ext {
-    globals = new Globals()
-}
-
+def gitRev = 'git rev-list --count HEAD'.execute().text.trim()
 group = "${group}"
 archivesBaseName = "spring-boot-starter-beapi"
-version = (globals.patchNum)?"${majorNum}.${minorNum}.${globals.patchNum}-SNAPSHOT":"${majorNum}.${minorNum}-SNAPSHOT"
-
+version = "${version}"
+sourceCompatibility = "${sourceCompatibility}"
+/*
 publishing {
     publications {
         maven(MavenPublication) {
@@ -84,62 +52,60 @@ publishing {
         }
     }
 }
-
+ */
+/*
 java {
     withJavadocJar()
     withSourcesJar()
 }
+ */
 
 repositories {
     mavenCentral()
 }
 
+
 dependencies {
+    // [CORE]
     annotationProcessor "org.springframework.boot:spring-boot-autoconfigure-processor:${springBootVersion}"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
-    implementation "org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}"
     implementation "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
-    implementation "org.springframework.boot:spring-boot:${springBootVersion}"
-
-    implementation("org.springframework.security:spring-security-config:${springSecurityVersion}")
-    implementation("org.springframework.security:spring-security-core:${springSecurityVersion}")
-    implementation("org.springframework.security:spring-security-crypto:${springSecurityVersion}")
-    implementation("org.springframework.security:spring-security-web:${springSecurityVersion}")
-
-    implementation "org.springframework:spring-beans:${springVersion}"
-    implementation "org.springframework:spring-context:${springVersion}"
-    implementation "org.springframework:spring-core:${springVersion}"
-    implementation "org.springframework:spring-web:${springVersion}"
-    implementation "org.springframework:spring-webmvc:${springVersion}"
-    implementation "org.springframework:spring-orm:${springVersion}"
-    implementation "org.springframework:spring-tx:${springVersion}"
-
-    implementation "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}"
-    implementation "org.apache.tomcat:tomcat-annotations-api:${tomcatVersion}"
-
     implementation "jakarta.persistence:jakarta.persistence-api:2.2.3"
-    implementation "jakarta.validation:jakarta.validation-api:2.0.2"
     implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.3"
-
-    implementation 'com.zaxxer:HikariCP:3.2.0'
-    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+    implementation "org.apache.tomcat.embed:tomcat-embed-core:9.0.56"
+    implementation "org.slf4j:slf4j-api:1.7.32"
+    implementation "org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}"
+    implementation("org.springframework.security:spring-security-config:5.6.1")
+    implementation("org.springframework.security:spring-security-core:5.6.1")
+    implementation("org.springframework.security:spring-security-crypto:5.6.1")
+    implementation("org.springframework.security:spring-security-web:5.6.1")
+    implementation "org.springframework:spring-beans:5.3.14"
+    implementation "org.springframework:spring-context:5.3.14"
+    implementation "org.springframework:spring-core:5.3.14"
+    implementation "org.springframework:spring-web:5.3.14"
+    implementation "org.springframework:spring-webmvc:5.3.14"
+    implementation "org.springframework.boot:spring-boot:${springBootVersion}"
     implementation 'org.json:json:20210307'
 
+    // [DATABASE]
+    implementation('org.apache.tomcat:tomcat-annotations-api:9.0.56')
+    implementation('org.hibernate:hibernate-core:5.6.3.Final')
+    implementation('org.springframework.data:spring-data-jpa:2.6.0')
+    implementation('org.springframework:spring-orm:5.3.14')
+    implementation('org.springframework:spring-tx:5.3.14')
+    implementation 'com.zaxxer:HikariCP:3.2.0'
 
     // [LOGGING]
-    //implementation "org.slf4j:slf4j-api:1.7.32"
     runtimeOnly 'org.slf4j:slf4j-api:1.7.15'
 
     // [SECURITY]
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.12.0"
-
+    //implementation "com.fasterxml.jackson.core:jackson-databind:2.12.0"
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.0'
+    implementation 'com.google.guava:guava:26.0-jre'
 
     // [LOGGING FOR GRAFANA/ GRAPHITE / CARBON]
     //implementation "io.micrometer:micrometer-registry-graphite:1.3.0"
 
-    // [TOKENS]
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
-    
     // [GROOVY]
     implementation "org.apache.groovy:groovy:${groovyVersion}"
     implementation("org.apache.groovy:groovy-ant:${groovyVersion}"){
@@ -149,112 +115,85 @@ dependencies {
         exclude group:'org.apache.groovy', module: 'groovy-all'
     }
     implementation('org.codehaus.gpars:gpars:1.2.1'){
-        exclude group:'org.multiverse', module:'multiverse-core'
+       exclude group:'org.multiverse', module:'multiverse-core'
         exclude group:'org.codehaus.groovy', module: 'groovy-all'
     }
+
     implementation("org.apache.groovy:groovy-cli-commons:${groovyVersion}"){
         exclude group:'org.apache.groovy', module: 'groovy-all'
     }
+
     implementation("org.apache.groovy:groovy-templates:${groovyVersion}") {
         exclude group:'org.apache.groovy', module: 'groovy-all'
     }
 
-
     // [IOUTILS]
     implementation 'commons-io:commons-io:2.8.0'
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    //annotationProcessor 'org.projectlombok:lombok:1.18.2'
 
-    annotationProcessor 'org.projectlombok:lombok:1.18.2'
+    // [SMTP]
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
     // CACHING
     implementation 'org.springframework:spring-context-support:5.3.3'
     implementation 'net.sf.ehcache:ehcache:2.9.1'
-    implementation 'com.google.guava:guava:26.0-jre'
 
+    // [WEBSOCKETS]
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.security:spring-security-messaging:6.1.1'
+    //implementation 'org.springframework.boot:spring-boot-starter-security:2.0.4.RELEASE'
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+
+
+    // [NEW]
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    implementation("jakarta.validation:jakarta.validation-api:2.0.2")
+}
+
+jar {
+    from('src/main/groovy') {
+        include 'io/beapi/api/templates/*.*.template'
+    }
 }
 
 
 
-
-
-
-project.plugins.withType(MavenPublishPlugin).all {
-    PublishingExtension publishing = project.extensions.getByType(PublishingExtension)
-    publishing.publications.withType(MavenPublication).all { mavenPublication ->
-        mavenPublication.pom {
-            name = "${project.group}:${project.name}"
-            description = "The Beapi Springboot Starter for API Automation; automates and simplifies almost all API functionality and security"
+mavenPublishing {
+    coordinates("io.beapi", "spring-boot-starter-beapi", "${version}")
+    pom {
+        name = "${project.group}:${project.name}"
+        description = "The Beapi Springboot Starter for API Automation; automates and simplifies almost all API functionality and security"
+        url = "https://github.com/orubel/spring-boot-starter-beapi"
+        licenses {
+            license {
+                name = "Reciprocal Public License (RPL-1.5)"
+                url = "https://opensource.org/licenses/RPL-1.5"
+            }
+        }
+        developers {
+            developer {
+                id = "orubel"
+                name = "Owen Rubel"
+                email = "orubel+spam@gmail.com"
+            }
+        }
+        scm {
+            connection = "https://github.com/orubel/spring-boot-starter-beapi.git"
+            developerConnection = "https://github.com/orubel/spring-boot-starter-beapi.git"
             url = "https://github.com/orubel/spring-boot-starter-beapi"
-            licenses {
-                license {
-                    name = "Reciprocal Public License (RPL-1.5)"
-                    url = "https://opensource.org/licenses/RPL-1.5"
-                }
-            }
-            developers {
-                developer {
-                    id = "orubel"
-                    name = "Owen Rubel"
-                    email = "orubel+spam@gmail.com"
-                }
-            }
-            scm {
-                connection = "https://github.com/orubel/spring-boot-starter-beapi.git"
-                developerConnection = "https://github.com/orubel/spring-boot-starter-beapi.git"
-                url = "https://github.com/orubel/spring-boot-starter-beapi"
-            }
-        }
-    }
-}
-
-/*
-gitProperties {
-    keys = ["git.branch","git.remote.origin.url","git.build.user.name","git.build.user.email","git.build.version"]
-}
-
-
-task doLast(){
-    gradle.buildFinished { buildResult ->
-        //def environment = hasProperty('env') ? env : 'dev'
-        def task = project.tasks.generateGitProperties
-        task.generate()
-
-        def gitPropertiesFile = project.buildDir.getAbsolutePath() + '/resources/main/git.properties'
-        Properties properties = new Properties()
-        properties.load(new FileInputStream(gitPropertiesFile))
-
-        def map = [:]
-        GitProperties.standardProperties.each {
-            if (properties.getProperty(it) != null){ map[it] = properties.getProperty(it) }
-        }
-
-        // Notify of build success/fail & build version
-        String url = (buildResult.failure)?"http://44.228.199.174:8080/notify/fail":"http://44.228.199.174:8080/notify/success"
-        String output=(map)?JsonOutput.toJson(map):"{}"
-        HttpEntity stringEntity = new StringEntity(output,ContentType.APPLICATION_JSON);
-        HttpClient client = new DefaultHttpClient();
-        HttpPost request = new HttpPost(url)
-        request.setHeader(new BasicHeader("Content-Type","application/json"));
-        request.setEntity(stringEntity);
-        HttpResponse response = client.execute(request);
-    }
-}
- */
-
-nexusPublishing {
-    repositories {
-        sonatype {
-            username = "${ossrhUsername}"
-            password = "${ossrhPassword}"
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
         }
     }
 
-    // these are not strictly required. The default timeouts are set to 1 minute. But Sonatype can be really slow.
-    // If you get the error "java.net.SocketTimeoutException: timeout", these lines will help.
-    connectTimeout = Duration.ofMinutes(3)
-    clientTimeout = Duration.ofMinutes(3)
+    //publishToMavenCentral(SonatypeHost.DEFAULT)
+    publishToMavenCentral(SonatypeHost.S01)
+    //publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+    signAllPublications()
+
 }
+
 
 publishing {
     repositories {
@@ -265,9 +204,39 @@ publishing {
             def snapshotsRepoUrl = "$buildDir/repos/snapshots"
             url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
         }
+        /*
+        sonatype {
+            //username = System.getenv("ORG_GRADLE_PROJECT_ossrhUsername")
+            //password = System.getenv("ORG_GRADLE_PROJECT_ossrhPassword")
+            username = findProperty("ossrhUsername")
+            password = findProperty("ossrhPassword")
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+        }
+ */
     }
 }
 
+
+
+
+
+
+
+tasks.register('copy', Copy) {
+    from jar
+    from('src/main/groovy/io/beapi/api/cli/Beapi.groovy') {
+        into(buildDir)
+    }
+}
+
+task firstCopy(type: Copy) {
+    from('src/main/groovy/io/beapi/api/cli/Beapi.groovy') {
+        into(buildDir)
+    }
+}
+
+/*
 def hasSigningKey = findProperty("signing.keyId") || findProperty("signing.key")
 if(hasSigningKey) {
     sign(project)
@@ -285,13 +254,25 @@ void sign(Project project) {
         } else if (signingKey) {
             useInMemoryPgpKeys(signingKey, signingPassword)
         }
-        sign publishing.publications.maven
+        sign publishing.publications
     }
 }
 
-task projectDetails {
-    doLast {
-        println "BEAPI_SNAPSHOT_VERSION=${project.version}"
-    }
-}
+ */
+
+defaultTasks = ['myExec']
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

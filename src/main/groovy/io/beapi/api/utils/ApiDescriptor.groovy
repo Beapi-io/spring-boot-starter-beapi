@@ -44,6 +44,9 @@ class ApiDescriptor implements Serializable{
 	//@NotNull
 	String networkGrp
 
+	boolean updateCache
+	LinkedHashMap<String,Integer> rateLimit = [:]
+
 	//@NotNull
 	//@Pattern(regexp = "GET|POST|PUT|DELETE", flags = Pattern.Flag.CASE_INSENSITIVE)
 	String method
@@ -67,12 +70,28 @@ class ApiDescriptor implements Serializable{
 	LinkedHashMap cachedResult
 	//LinkedHashMap stats
 
-	ApiDescriptor(String networkGrp, String method, HashSet pkeys, HashSet fkeys, ArrayList roles,String name, LinkedHashMap receives, LinkedHashMap receivesList, LinkedHashMap returns, LinkedHashMap returnsList, Set keyList) {
+	ApiDescriptor(String networkGrp, String method, HashSet pkeys, HashSet fkeys, ArrayList roles,String name, LinkedHashMap receives, LinkedHashMap receivesList, LinkedHashMap returns, LinkedHashMap returnsList, Set keyList, boolean updateCache, LinkedHashMap<String,String> rateLimit) {
 		try {
 			this.networkGrp = networkGrp
 			this.method = method
 			this.pkeys = pkeys
 			this.fkeys = fkeys
+
+			this.updateCache = updateCache
+
+			// unlimited is represented as -1; mainly for admins
+			// we only use string for the config; using integers in final object
+			// is faster than strings
+			if(!rateLimit.isEmpty()){
+				rateLimit.each(){ k, v ->
+					if(v=="*"){
+						this.rateLimit.add(k, -1)
+					}else{
+						this.rateLimit.add(k, (Integer)v)
+					}
+				}
+			}
+
 
 			//this.keyList = pkeys+fkeys
 			this.keyList = keyList
@@ -165,4 +184,11 @@ class ApiDescriptor implements Serializable{
 		return [networkGrp: this.networkGrp, method: this.method, roles: this.roles, name: this.name, receives: this.receives, receivesList: this.receivesList, returns: this.returns, returnsList: this.returnsList]
 	}
 
+	public boolean getUpdateCache() {
+		return this.updateCache
+	}
+
+	public LinkedHashMap getRateLimit() {
+		return this.rateLimit
+	}
 }

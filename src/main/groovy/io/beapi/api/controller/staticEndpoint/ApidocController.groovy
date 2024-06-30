@@ -44,7 +44,7 @@ public class ApidocController extends BeapiRequestHandler{
 		LinkedHashMap controllerResults = [:]
 		ArrayList controllers = apiCacheService.getCacheKeys()
 		List returnData = []
-		if(params.id){
+		if(params?.id){
 			returnData.add(createApidocs(params.id))
 		}else{
 			controllers.each() {
