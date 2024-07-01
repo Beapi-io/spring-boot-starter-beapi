@@ -141,7 +141,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - adding functionality/tests so registration cleanly rejects duplicates
  - adding try/catch block to domain services to throw clean exception
 
-### todo
+
     - (DOCS) separate DEMO docs from STARTER docs; keep in this project, easier to maintain
     - (DOCS) document LinkRelation functionality
     - (DOCS) documentation for scaffolding functionality
@@ -153,6 +153,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Added
  
  ### Changed
+
+ ### todo
     - (PRIORITY) email registration validation
     - (PRIORITY) rate limiting
     - (Feature) CLI scaffolding of controller/domain/etc for new projects
