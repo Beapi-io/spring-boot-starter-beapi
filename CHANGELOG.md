@@ -111,7 +111,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - stability fixes; cleanup
 
 
- ## 0.8.X - (projected release 11/01/2023)
+ ## 0.8.61 - (projected release 11/01/2023)
  
  ### Added
  - tests for LinkRelations
@@ -141,17 +141,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - adding functionality/tests so registration cleanly rejects duplicates
  - adding try/catch block to domain services to throw clean exception
 
-
- ### todo
-    - (Feature) user management (also for frontend)
-    - (Feature) rate limiting
-    - (Feature) CLI scaffolding of controller/domain/etc for new projects
-    - (Feature) CLI init of new project; inits and creates project env based on package name 
-    - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
+### todo
     - (DOCS) separate DEMO docs from STARTER docs; keep in this project, easier to maintain
     - (DOCS) document LinkRelation functionality
     - (DOCS) documentation for scaffolding functionality
     - (DOCS) static endpoint documentation
+
+
+ ## 0.9.x - (projected release 11/01/2023)
+ 
+ ### Added
+ 
+ ### Changed
+    - (PRIORITY) email registration validation
+    - (PRIORITY) rate limiting
+    - (Feature) CLI scaffolding of controller/domain/etc for new projects
+    - (Feature) CLI init of new project; inits and creates project env based on package name 
+    - (Feature) user management (also for frontend)
+    - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
     - (SDK) optional JMS service/config ??
 
 
