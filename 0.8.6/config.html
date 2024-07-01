@@ -71,10 +71,13 @@
                     <div>
                       <ul class="nav flex-column">
                         <li class="nav-item">
-                          <a class="nav-link" href="config.html#section-1">Properties</a>
+                          <a class="nav-link" href="config.html#section-a">Config Files</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link" href="config.html#section-2">Settings</a>
+                          <a class="nav-link" href="config.html#section-1">Application.properties</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="config.html#section-2">Gradle.properties</a>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link" href="config.html#section-3">Beapi API Config Changes</a>
@@ -148,6 +151,9 @@
                     <div>
                       <ul class="nav flex-column">
                         <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-a">User Registration</a>
+                        </li>
+                        <li class="nav-item">
                           <a class="nav-link" href="usage.html#section-1">Authorization Calls</a>
                         </li>
                         <li class="nav-item">
@@ -192,9 +198,6 @@
                         <li class="nav-item">
                           <a class="nav-link" href="adv_config.html#section-1">Versioning</a>
                         </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="adv_config.html#section-2">IO State</a>
-                        </li>
                       </ul>
                     </div>
                   </div>
@@ -238,10 +241,33 @@
 
 <hr size="5">
 
+            <!-- typogrpahy -->
+            <section id="section-a">
+              <h2 class="section-title-a">Configuration Files<a data-scroll href="#section-a" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <div id="section-1.1">
+                <p>Prior to making changes to your configuration, you will need to <a href=""https://github.com/Beapi-io/spring-boot-starter-beapi-config">move all configuration files</a> into the project owners home directory in a hidden directory called '.beapi'</p>
+                <ul>
+
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">git clone https://github.com/Beapi-io/spring-boot-starter-beapi-config ~/.beapi</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+                </ul>
+                <P><b>NOTE</b>: These are already preconfigured in the demo project; if you create a NEW PROJECT, these will have to be changed.</P>
+              </div>
+            </section>
+            <!-- / typography -->
 
             <!-- typogrpahy -->
             <section id="section-1">
-              <h2 class="section-title-1">Application Properties<a data-scroll href="#section-1" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <h2 class="section-title-1">Resources/Application.properties Settings<a data-scroll href="#section-1" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
               <div id="section-1.1">
                 <p>in your 'src/main/resources' directory, you will find your <b>application.properties</b> file. The following stats are what you are most concerned with changing:</p>
                 <ul>
@@ -268,7 +294,7 @@
 
             <!-- typogrpahy -->
             <section id="section-2">
-              <h2 class="section-title-2">Gradle Properties Settings<a data-scroll href="#section-2" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <h2 class="section-title-2">Gradle.properties Settings<a data-scroll href="#section-2" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
               <div id="section-2.1">
                 <p>Since this is an API application, people will want to get into the nuts an bolts of configuring this so we also supply some of the more advanced configuration settings:</p>
                 <ul>
@@ -305,11 +331,11 @@
 
             <!-- file tree -->
             <section id="section-3">
-              <h2 class="section-title-3">Beapi Api Config Changes<a data-scroll href="#section-3" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
-              <p>Once you have created your project, you will need to edit your <b>'beapi_api.yaml'</b> file in your <b>~/.boot/{env}/</b> directory and changes the following settings:</p>
+              <h2 class="section-title-3">Beapi_api.yml Settings<a data-scroll href="#section-3" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <p>Once you have created your project, you will need to edit your <b>'beapi_api.yaml'</b> file in your <b>~/.beapi/{env}/</b> directory and changes the following settings:</p>
 
               <ul style="list-style-type: none;">
-                <li><h5><b>API</b></h5>
+                <li><h5><b>API Settings</b></h5>
                   <div class="row">
                     <div class="col">
                       <div class="alert alert-warning" role="alert">
@@ -320,7 +346,7 @@
                     </div>
                   </div>
                 </li>
-                <li style="margin-top: 25px;"><h5><b>BOOTSTRAP</b></h5>
+                <li style="margin-top: 25px;"><h5><b>BOOTSTRAP Settings</b></h5>
                   <div class="row">
                     <div class="col">
                       <p>You will also need to change the following. For more information about this, see the <a href="index.html#section-5">installation process.</a></p>
@@ -367,7 +393,7 @@
                 <tr><td style="padding:10px;">chainingEnabled</td><td style="padding:10px;">Boolean representing if chaining is enabled</td><td style="padding:10px;">true</td></tr>
                 <tr><td style="padding:10px;">batchingEnabled</td><td style="padding:10px;">Boolean representing if batching is enabled</td><td style="padding:10px;">true</td></tr>
                 <tr><td style="padding:10px;">encoding</td><td style="padding:10px;">String representing the default encoding</td><td style="padding:10px;">UTF-8</td></tr>
-                <tr><td style="padding:10px;">iostateDir</td><td style="padding:10px;">String representing the configuration dir</td><td style="padding:10px;">'.boot/.iostate'</td></tr>
+                <tr><td style="padding:10px;">iostateDir</td><td style="padding:10px;">String representing the configuration dir</td><td style="padding:10px;">'.beapi/.iostate'</td></tr>
                 <tr><td style="padding:10px;">serverType</td><td style="padding:10px;">String representing the server type; can be either master/slave</td><td style="padding:10px;">master</td></tr>
                 <tr><td style="padding:10px;">configType</td><td style="padding:10px;">String representing the Tomcat config type; can be either nano/medium/large</td><td style="padding:10px;">large</td></tr>
                 <tr><td style="padding:10px;">testingProtocol</td><td style="padding:10px;">String representing the default protocol to use when testing</td><td style="padding:10px;">http</td></tr>
@@ -451,8 +477,8 @@
 
             <!-- file tree -->
             <section id="section-4">
-              <h2 class="section-title-4">Beapi DB Config Changes<a data-scroll href="#section-4" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
-              <p>You will then need to edit your <b>'beapi_db.yaml'</b> file in your <b>~/.boot/{env}/</b> directory and changes the following settings (for more information, see springboots information about <a href="https://www.baeldung.com/spring-boot-configure-data-source-programmatic#configuring-a-datasource-bean">setting up a datasource</a>):</p>
+              <h2 class="section-title-4">beapi_db.yml Settings<a data-scroll href="#section-4" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <p>You will then need to edit your <b>'beapi_db.yaml'</b> file in your <b>~/.beapi/{env}/</b> directory and changes the following settings (for more information, see springboots information about <a href="https://www.baeldung.com/spring-boot-configure-data-source-programmatic#configuring-a-datasource-bean">setting up a datasource</a>):</p>
 
               <ul style="list-style-type: none;">
 
@@ -483,10 +509,13 @@
             <div class="sticky">
               <ul id="toc" class="nav flex-column toc">
                 <li class="nav-item">
-                  <a data-scroll class="nav-link" href="#section-1">Properties</a>
+                  <a data-scroll class="nav-link" href="#section-a">Config Files</a>
                 </li>
                 <li class="nav-item">
-                  <a data-scroll class="nav-link" href="#section-2">Settings</a>
+                  <a data-scroll class="nav-link" href="#section-1">Application.properties</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-2">Gradle.properties</a>
                 </li>
                 <li class="nav-item">
                   <a data-scroll class="nav-link" href="#section-3">beapi_api.yml</a>

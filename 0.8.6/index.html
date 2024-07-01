@@ -71,10 +71,13 @@
                     <div>
                       <ul class="nav flex-column">
                         <li class="nav-item">
-                          <a class="nav-link" href="config.html#section-1">Properties</a>
+                          <a class="nav-link" href="config.html#section-a">Config Files</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link" href="config.html#section-2">Settings</a>
+                          <a class="nav-link" href="config.html#section-1">Application.properties</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="config.html#section-2">Gradle.properties</a>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link" href="config.html#section-3">Beapi API Config Changes</a>
@@ -148,6 +151,9 @@
                     <div>
                       <ul class="nav flex-column">
                         <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-a">User Registration</a>
+                        </li>
+                        <li class="nav-item">
                           <a class="nav-link" href="usage.html#section-1">Authorization Calls</a>
                         </li>
                         <li class="nav-item">
@@ -191,9 +197,6 @@
                       <ul class="nav flex-column">
                         <li class="nav-item">
                           <a class="nav-link" href="adv_config.html#section-1">Versioning</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="adv_config.html#section-2">IO State</a>
                         </li>
                       </ul>
                     </div>
@@ -251,14 +254,25 @@
                       <div class="alert alert-warning" role="alert">
                         <ul>
                           <li><b>Java 1.8 > </b></li>
-                          <li><b>Springboot 2.6.2 ></b></li>
-                          <li><b>Gradle 7 ></b> (for building)</li>
+                          <li><b>Springboot 2.6.2 > </b></li>
+                          <li><b>Gradle 8 ></b> (for building)</li>
                         </ul>
                       </div>
                     </div>
                   </div></br>
                 </li>
                 <li><p>Start by cloning the <b>demo project</b> to a local directory:</p>
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">git clone https://github.com/Beapi-io/beapi-java-demo.git</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div></br>
+                </li>
+                <li><p>Next, create a directory in the project owners home directory in a hidden directory called '.beapi' and clone all configuration files over:</p>
                   <div class="row">
                     <div class="col">
                       <div class="card">
@@ -287,10 +301,10 @@
                 <div class="col">
                   <div class="alert alert-warning" role="alert">
                     <ul>
-                      <li><b><a href="config.html#section-1">application.properties</a></b></li>
+                      <li><b><a href="config.html#section-1">resources/application.properties</a></b></li>
                       <li><b><a href="config.html#section-2">gradle.properties</a></b></li>
-                      <li><b><a href="config.html#section-3">~/.boot/{env}/beapi_api.yaml</a></b></li>
-                      <li><b><a href="config.html#section-4">~/.boot/{env}/beapi_db.yaml</a></b></li>
+                      <li><b><a href="config.html#section-3">~/.beapi/{env}/beapi_api.yaml</a></b></li>
+                      <li><b><a href="config.html#section-4">~/.beapi/{env}/beapi_db.yaml</a></b></li>
                     </ul>
                   </div>
                 </div>
@@ -325,7 +339,7 @@ exit;</code></pre>
                   </div>
                 </br>
                 </li>
-                <li>Next, go into your ~/.boot/dev directory and find the <b>beapi_db.yaml</b> file for editing and change the following lines:
+                <li>Next, go into your ~/.beapi/dev directory and find the <b>beapi_db.yaml</b> file for editing and change the following lines:
                   <div class="row">
                     <div class="col">
                       <div class="card">
@@ -389,9 +403,19 @@ password: "password"</code></pre>
                   </div>
                   <br/>
                 </li>
-
+                <li><p>or if you are fine with the default config (which is usually 'nano'), just run :</p>
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">gradle clean build</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
               </ul>
-              <p>Now you are setup and can start running your project...</p>
             </section>
 
             <hr size="5">
@@ -401,7 +425,7 @@ password: "password"</code></pre>
               <h2 class="section-title-2">Run Demo Project<a data-scroll href="#section-3" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"></a></h2>
               <p>If your database is properly configured and running, you will now need to change your default bootstrapped users.</p>
               <ul>
-                <li>Look in your <b>~/.boot/{env}</b> dir for a file called <b>'beapi_api.yaml'</b> (you will want to change this in all environments but change FIRST in the environment your are using right now). In this file you will find the bootstrapping for an ADMIN and a TEST user that are created on startup :
+                <li>Look in your <b>~/.beapi/{env}</b> dir for a file called <b>'beapi_api.yaml'</b> (you will want to change this in all environments but change FIRST in the environment your are using right now). In this file you will find the bootstrapping for an ADMIN and a TEST user that are created on startup :
                   <div class="row">
                     <div class="col">
                       <div class="card">
@@ -693,8 +717,8 @@ sudo systemctl status beapi
                 <div class="col">
                   <div class="alert alert-warning" role="alert">
                     <ul>
-                      <li>Make sure you have proper READ/WRITE/EXECUTE(755) for the files in ~/.boot/ and ~/.boot/.iostate</li>
-                      <li>Make sure you have matching named Controllers for all IO State files; see examples in <b>~/.boot/.iostate</b> directory</li>
+                      <li>Make sure you have proper READ/WRITE/EXECUTE(755) for the files in ~/.beapi/ and ~/.beapi/.iostate</li>
+                      <li>Make sure you have matching named Controllers for all IO State files; see examples in <b>~/.beapi/.iostate</b> directory</li>
                       <li>If you want to use a version of Java HIGHER than 1.8, change 'sourceCompatibility' in ALL gradle.properties files (ie demo-application/gradle.properties,/gradle.properties)</li>
                     </ul>
                   </div>

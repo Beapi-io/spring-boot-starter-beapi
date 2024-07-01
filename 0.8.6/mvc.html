@@ -71,10 +71,13 @@
                     <div>
                       <ul class="nav flex-column">
                           <li class="nav-item">
-                              <a class="nav-link" href="config.html#section-1">Properties</a>
+                              <a class="nav-link" href="config.html#section-a">Config Files</a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link" href="config.html#section-2">Settings</a>
+                              <a class="nav-link" href="config.html#section-1">Application.properties</a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="config.html#section-2">Gradle.properties</a>
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" href="config.html#section-3">Beapi API Config Changes</a>
@@ -147,6 +150,9 @@
                   <div class="collapse" id="menu-7" data-parent="#page-nav">
                     <div>
                       <ul class="nav flex-column">
+                          <li class="nav-item">
+                              <a class="nav-link" href="usage.html#section-a">User Registration</a>
+                          </li>
                         <li class="nav-item">
                           <a class="nav-link" href="usage.html#section-1">Authorization Calls</a>
                         </li>
@@ -191,9 +197,6 @@
                       <ul class="nav flex-column">
                         <li class="nav-item">
                           <a class="nav-link" href="adv_config.html#section-1">Versioning</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="adv_config.html#section-2">IO State</a>
                         </li>
                       </ul>
                     </div>
@@ -248,7 +251,7 @@
                               <div class="card-body" style="background-color:#000;">
                       <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">dependencies {
     ...
-    implementation 'io.beapi:spring-boot-starter-beapi:0.7.0-SNAPSHOT'
+    implementation 'io.beapi:spring-boot-starter-beapi:0.8.61-SNAPSHOT'
     ...
 }</code></pre>
                               </div>
@@ -276,16 +279,18 @@ import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@Controller("your")
-public class YourController extends BeapiRequestHandler {
+@Controller("company")
+public class CompantController extends BeapiRequestHandler {
                       ...
 }</code></pre>
                     </div>
                   </div>
                 </div>
               </div>
-		<p>Notice that the <b>@Controller</b> annotation has a value that matches the <b>NAME</b> in the corresponding I/O state file (which in turn matches how it is called). This is how we map the controller to the I/O state and mapping.</p>
-              <p>It should also be mentioned that the methods (like most controller methods) are using <b>HttpServletRequest and HttpServletResponse</b> so you will have to import those as well.</p>
+                <div class="alert alert-danger" role="alert">
+                    <p>Notice that the <b>@Controller</b> annotation has a value that matches the <b>NAME</b> in the corresponding I/O state file (which in turn matches how it is called). This is how we map the controller to the I/O state and mapping.</p>
+                    <p>It should also be mentioned that the methods (like most controller methods) are using <b>HttpServletRequest and HttpServletResponse</b> so you will have to import those as well.</p>
+                </div>
 
               <p>When returning data from your methods, you can return data as an:</p>
               <ul>
@@ -367,6 +372,12 @@ public class YourController extends BeapiRequestHandler {
                 "create": {
                     "METHOD":"POST",
                     "DESCRIPTION":"Create new User",
+                    "UPDATECACHE": true,
+                    "RATELIMIT": {
+                            "ROLE_ANONYMOUS": "20",
+                            "ROLE_USER": "100",
+                            "ROLE_ADMIN" : "*"
+                    },
                     "ROLES":{
                         "BATCH":["ROLE_ADMIN"],
                         "HOOK":["ROLE_ADMIN"]
@@ -409,6 +420,8 @@ public class YourController extends BeapiRequestHandler {
                 <ul>
                   <li><b>METHOD (REQUIRED)</b>: One of [GET, PUT, POST,DELETE]. This defines how the endpoint should be called.</li>
                   <li><b>DESCRIPTION (REQUIRED)</b>: A description of the endpoint for the API Docs</li>
+                    <li><b>UPDATECACHE (REQUIRED)</b>: Whether to 'cache' output from this endpoint; set to 'false' if you ALWAYS want <b>LIVE DATA</b></li>
+                    <li><b>RATELIMIT (REQUIRED)</b>: The number of requests a ROLE can make in a 10 minutes time period. (all roles must already exist in NETWORKGRP) declaration (see 'security' section in beapi_api.yaml)</li>
                   <li><b>ROLES (REQUIRED)</b>: A grouping for security rules (SEE '<a href="http://orubel.github.io/Beapi-API-Framework/security.html#section-2">Security: Network Roles</a>')</li>
                   <li><b>BATCH (REQUIRED if enabled)</b>: Security roles for endpoints that have batching enabled</li>
                   <li><b>HOOK (REQUIRED if enabled)</b>: Security roles for endpoints that have web hooks enabled</li>

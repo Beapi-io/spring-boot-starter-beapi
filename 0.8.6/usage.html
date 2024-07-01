@@ -71,10 +71,13 @@
                     <div>
                       <ul class="nav flex-column">
                           <li class="nav-item">
-                              <a class="nav-link" href="config.html#section-1">Properties</a>
+                              <a class="nav-link" href="config.html#section-a">Config Files</a>
+                          </li>li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="config.html#section-1">Application.properties</a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link" href="config.html#section-2">Settings</a>
+                              <a class="nav-link" href="config.html#section-2">Gradle.properties</a>
                           </li>
                           <li class="nav-item">
                               <a class="nav-link" href="config.html#section-3">Beapi API Config Changes</a>
@@ -147,6 +150,9 @@
                   <div class="collapse show" id="menu-7" data-parent="#page-nav">
                     <div>
                       <ul class="nav flex-column">
+                          <li class="nav-item">
+                              <a class="nav-link" href="usage.html#section-a">User Registration</a>
+                          </li>
                         <li class="nav-item">
                           <a class="nav-link" href="usage.html#section-1">Authorization Calls</a>
                         </li>
@@ -191,9 +197,6 @@
                       <ul class="nav flex-column">
                         <li class="nav-item">
                           <a class="nav-link" href="adv_config.html#section-1">Versioning</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="adv_config.html#section-2">IO State</a>
                         </li>
                       </ul>
                     </div>
@@ -240,6 +243,26 @@
                   <hr size="5">
 
                   <!-- typogrpahy -->
+                  <section id="section-a">
+                      <h2 class="section-title-a">User Registration<a data-scroll href="#section-a" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+                      <p>If you want to create USERS aside from the bootstrapped ADMIN/TEST users, you can register them easily with the following api:</p>
+                      <div id="section-a.1">
+                          <div class="row">
+                              <div class="col">
+                                  <div class="card">
+                                      <div class="card-body" style="background-color:#000;">
+                                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">curl -v -H "Content-Type: application/json" -X POST -d '{"username":"fflinstone","password":"yabbadabbadoo","email":"fflintstone@bedrock.com"}' http://localhost:8080/register</code></pre>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div></br>
+                      </div>
+                  </section>
+                  <!-- / typography -->
+
+                  <hr size="5">
+
+                  <!-- typogrpahy -->
                   <section id="section-1">
                       <h2 class="section-title-2">Authorization Calls<a data-scroll href="#section-1" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
                       <p>The <b>beapi-java-demo</b> has built in JWT token authetication so you do not have to worry about auth/validation... you merely USE IT! So before you can call any API, you have to first validate and get a token back; that token is then used for all subsequent calls. Below are example in Curl and Javascript on how to make these calls.</p>
@@ -250,7 +273,7 @@
                               <div class="col">
                                   <div class="card">
                                       <div class="card-body" style="background-color:#000;">
-                                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">curl -v -H "Content-Type: application/json" -X POST -d '{"username":"login","password":"password"}' http://localhost:8080/authenticate</code></pre>
+                                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">curl -v -H "Content-Type: application/json" -X POST -d '{"username":"fflintstone","password":"yabbadabbadoo"}' http://localhost:8080/authenticate</code></pre>
                                       </div>
                                   </div>
                               </div>
@@ -591,6 +614,9 @@ xhr.send(JSON.stringify(data));</code></pre>
               <aside class="col-md-3 col-xxl-3 d-none d-md-block">
                   <div class="sticky">
                       <ul id="toc" class="nav flex-column toc">
+                          <li class="nav-item">
+                              <a data-scroll class="nav-link" href="#section-a">Registration</a>
+                          </li>
                           <li class="nav-item">
                               <a data-scroll class="nav-link" href="#section-1">Authorization Calls</a>
                               <ul class="nav flex-column">
