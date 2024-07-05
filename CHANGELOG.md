@@ -143,7 +143,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
  ### todo
   - (DOCS) separate DEMO docs from STARTER docs; keep in this project, easier to maintain
-  - (DOCS) document LinkRelation functionality
   - (DOCS) documentation for scaffolding functionality
   - (DOCS) static endpoint documentation
 
