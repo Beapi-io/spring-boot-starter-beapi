@@ -144,7 +144,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### todo
   - (DOCS) separate DEMO docs from STARTER docs; keep in this project, easier to maintain
   - (DOCS) documentation for scaffolding functionality
-  - (DOCS) static endpoint documentation
 
 
  ## 0.9.x - (projected release 11/01/2023)
