@@ -72,7 +72,7 @@
                       <ul class="nav flex-column">
                           <li class="nav-item">
                               <a class="nav-link" href="config.html#section-a">Config Files</a>
-                          </li>li>
+                          </li>
                           <li class="nav-item">
                               <a class="nav-link" href="config.html#section-1">Application.properties</a>
                           </li>
@@ -162,6 +162,9 @@
                         <li class="nav-item">
                           <a class="nav-link" href="usage.html#section-3">User Management</a>
                         </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="usage.html#section-4">Provided Endpoints</a>
+                          </li>
                       </ul>
                     </div>
                   </div>
@@ -579,7 +582,7 @@ xhr.send(JSON.stringify(data));</code></pre>
                           <div class="row">
                               <div class="col">
                                   <div class="alert alert-primary" role="alert">
-                                      <p><b>NOTE</b>: While you will ALWAYS have to delete dependencies (such as THE USER ROLE) prior to deleting PERSON due to the foreign key dependency, this is taken care of for you in the current implamentation. All you have to do is 'delete person' and the related 'person role' record is automatically deleted as well.</p>
+                                      <p><b>NOTE</b>: While you will normally have to delete dependencies (such as THE USER ROLE) prior to deleting PERSON due to the foreign key dependency, this is taken care of for you in the current implementation. All you have to do is 'delete person' and the related 'person role' record is automatically deleted as well.</p>
                                   </div>
                               </div>
                           </div>
@@ -590,8 +593,336 @@ xhr.send(JSON.stringify(data));</code></pre>
 
                   <hr size="5">
 
-                  <!-- file tree -->
+
+                  <!-- typogrpahy -->
                   <section id="section-4">
+                      <h2 class="section-title-4">Provided Endpoints<a data-scroll href="#section-4" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+                      <p>The Beapi Starter provides endpoints that are not visible in your project but can be called via API endpoints. These are also secured via IO State files (like all your other endpoints) but generally don't have to be changed. Below we go over each one of these and the endpoints provided...</p>
+                      <div id="section-4.1">
+                          <h2 class="section-title-2"><b>APIDocs</b></h2>
+                          <p>These are the endpoints for accessing the apidocs. Pretty self explanatory</p>
+                          <table class="table table-striped">
+                              <thead>
+                              <tr>
+                                  <th scope="col" style="padding:10px;width:20%;color:#000;"><b>Endpoint</b></th>
+                                  <th scope="col" style="padding:10px;width:40%;color:#000;"><b>Request Params</b></th>
+                                  <th scope="col" style="padding:10px;width:40%;color:#000;"><b>Response Params</b></th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                    <td style="padding:10px;">/{version}/apidoc/show</td>
+                                    <td style="padding:10px;"></td>
+                                    <td style="padding:10px;">*</td>
+                                </tr>
+                              </tbody>
+                          </table>
+                      </div></br>
+
+                      <div id="section-4.2">
+                          <h2 class="section-title-2"><b>Authorities/ROLES [ADMIN ONLY]</b></h2>
+                          <p style="margin-bottom: 0;">Since 'authorities' need to be added BUT can be a point of RISK, we maintain strict control of the endpoint in the starter. Below are the endpoints that are provided through the plugin:</p>
+                          <table class="table table-striped">
+                              <thead>
+                              <tr>
+                                  <th scope="col" style="padding:10px;width:20%;color:#000;"><b>Endpoint</b></th>
+                                  <th scope="col" style="padding:10px;width:40%;color:#000;"><b>Request Params</b></th>
+                                  <th scope="col" style="padding:10px;width:40%;color:#000;"><b>Response Params</b></th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/authority/create</td>
+                                  <td style="padding:10px;">authority</td>
+                                  <td style="padding:10px;">id, authority</td>
+                              </tr>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/authority/list</td>
+                                  <td style="padding:10px;"></td>
+                                  <td style="padding:10px;">(List) id, authority</td>
+                              </tr>
+                              </tbody>
+                          </table>
+                      </div></br>
+
+                      <div id="section-4.3">
+                          <h2 class="section-title-2"><b>Connector [ADMIN ONLY]</b></h2>
+                          <p style="margin-bottom: 0;">
+                              The 'connector' controller provides a way to RELOAD your API RULES without restarting your servers.This allows you to apply changes to an IO State file and load it up to a server to update rules on the server and 'PUSH' all changes to subscribing services.
+                          </p>
+                          <table class="table table-striped">
+                              <thead>
+                              <tr>
+                                  <th scope="col" style="padding:10px;width:20%;color:#000;"><b>Endpoint</b></th>
+                                  <th scope="col" style="padding:10px;width:40%;color:#000;"><b>Request Params</b></th>
+                                  <th scope="col" style="padding:10px;width:40%;color:#000;"><b>Response Params</b></th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/connector/listFiles</td>
+                                  <td style="padding:10px;"></td>
+                                  <td style="padding:10px;">(List) filename</td>
+                              </tr>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/connector/update</td>
+                                  <td style="padding:10px;">*special</td>
+                                  <td style="padding:10px;">*special</td>
+                              </tr>
+                              </tbody>
+                          </table>
+                          <div class="row">
+                              <div class="col">
+                                  <div class="alert alert-primary" role="alert">
+                                      <p><b>NOTE</b>: Updating our our API Rules 'on-the-fly' is VERY special (as no other API tool or framework can do this without changing code and restarting the app/server). We do this by changing the RULES in the IO State file we want to make changes to and then RELOADING the file like so:
+
+                                      <div class="row">
+                                          <div class="col">
+                                              <div class="card">
+                                                  <div class="card-body" style="background-color:#000;">
+                                                      <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">curl -v -H "Content-Type: application/json" --data-binary @/home/owen/Desktop/User.json -H "Authorization: Bearer your-token-here" --request POST http://localhost:8080/v1.0/connector/update"</code></pre>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div></br>
+
+                                      </p>
+                                  </div>
+                              </div>
+                          </div>
+
+                      </div></br>
+
+                      <div id="section-4.5">
+                          <h2 class="section-title-2"><b>Application Properties [ADMIN ONLY]</b></h2>
+                          <p style="margin-bottom: 0;">This provides a way to report the existing application properties/state</p>
+                          <table class="table table-striped">
+                              <thead>
+                              <tr>
+                                  <th scope="col" style="padding:10px;width:20%;color:#000;"><b>Endpoint</b></th>
+                                  <th scope="col" style="padding:10px;width:40%;color:#000;"><b>Request Params</b></th>
+                                  <th scope="col" style="padding:10px;width:40%;color:#000;"><b>Response Params</b></th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/properties/getAll</td>
+                                  <td style="padding:10px;"></td>
+                                  <td style="padding:10px;">
+                                          <li>attempts</li>
+                                          <li>procCores</li>
+                                          <li>documentationUrl</li>
+                                          <li>reservedUris</li>
+                                          <li>publicEndpoint</li>
+                                          <li>apichainLimit</li>
+                                          <li>chainingEnabled</li>
+                                          <li>batchingEnabled</li>
+                                          <li>encoding</li>
+                                          <li>iostateDir</li>
+                                          <li>staticEndpoint</li>
+                                          <li>serverType</li>
+                                          <li>supportedFormats</li>
+                                          <li>throttle</li>
+                                          <li>webhook</li>
+                                          <li>security</li>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/properties/getProperties</td>
+                                  <td style="padding:10px;"></td>
+                                  <td style="padding:10px;">
+                                      <li>attempts</li>
+                                      <li>procCores</li>
+                                      <li>documentationUrl</li>
+                                      <li>reservedUris</li>
+                                      <li>publicEndpoint</li>
+                                      <li>apichainLimit</li>
+                                      <li>chainingEnabled</li>
+                                      <li>batchingEnabled</li>
+                                      <li>encoding</li>
+                                      <li>iostateDir</li>
+                                      <li>staticEndpoint</li>
+                                      <li>serverType</li>
+                                      <li>supportedFormats</li>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/properties/throttleProps</td>
+                                  <td style="padding:10px;"></td>
+                                  <td style="padding:10px;"><li>(Object) throttle</li></td>
+                              </tr>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/properties/webhookProps</td>
+                                  <td style="padding:10px;"></td>
+                                  <td style="padding:10px;"><li>(Object) webhook</li></td>
+                              </tr>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/properties/securityProps</td>
+                                  <td style="padding:10px;"></td>
+                                  <td style="padding:10px;"><li>(Object) security</li></td>
+                              </tr>
+                              </tbody>
+                          </table>
+                      </div></br>
+
+                      <div id="section-4.6">
+                          <h2 class="section-title-2"><b>Users</b></h2>
+                          <p>These are the endpoints for User management. These are provided for managing all the users in your system.</p>
+                          <table class="table table-striped">
+                              <thead>
+                              <tr>
+                                  <th scope="col" style="padding:10px;width:20%;color:#000;"><b>Endpoint</b></th>
+                                  <th scope="col" style="padding:10px;width:40%;color:#000;"><b>Request Params</b></th>
+                                  <th scope="col" style="padding:10px;width:40%;color:#000;"><b>Response Params</b></th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/user/show</td>
+                                  <td style="padding:10px;">
+                                      <li>permitAll[]</li>
+                                      <li>ADMIN[id]</li>
+                                  </td>
+                                  <td style="padding:10px;">
+                                      <b>permitAll</b>
+                                      <div class="row">
+                                          <div class="col">
+                                              <div class="alert alert-primary" role="alert">
+                                                  <li>id</li>
+                                                  <li>version</li>
+                                                  <li>username</li>
+                                                  <li>email</li>
+                                                  <li>enabled</li>
+                                                  <li>accountExpired</li>
+                                              </div>
+                                          </div>
+                                      </div>
+
+
+                                      <b>ADMIN</b>
+                                      <div class="row">
+                                          <div class="col">
+                                              <div class="alert alert-primary" role="alert">
+                                                  <li>id</li>
+                                                  <li>version</li>
+                                                  <li>username</li>
+                                                  <li>email</li>
+                                                  <li>enabled</li>
+                                                  <li>accountExpired</li>
+                                                  <li>firstName</li>
+                                                  <li>lastName</li>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/user/showById [ADMIN]</td>
+                                  <td style="padding:10px;">
+                                      <li>id</li>
+                                  </td>
+                                  <td style="padding:10px;">
+                                      <li>id</li>
+                                      <li>version</li>
+                                      <li>username</li>
+                                      <li>email</li>
+                                      <li>enabled</li>
+                                      <li>accountExpired</li>
+                                      <li>firstName</li>
+                                      <li>lastName</li>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/user/getByUsername</td>
+                                  <td style="padding:10px;">
+                                      <li>permitAll[]</li>
+                                      <li>ADMIN[id]</li>
+                                  </td>
+                                  <td style="padding:10px;">
+                                      <li>id</li>
+                                      <li>version</li>
+                                      <li>username</li>
+                                      <li>email</li>
+                                      <li>enabled</li>
+                                      <li>accountExpired</li>
+                                      <li>firstName</li>
+                                      <li>lastName</li>
+                                  </td>
+                              </tr>
+
+                              <tr>
+                                  <td style="padding:10px;">/{version}/user/update [ADMIN]</td>
+                                  <td style="padding:10px;">
+                                      <li>permitAll[]</li>
+                                      <li>ADMIN[id]</li>
+                                  </td>
+                                  <td style="padding:10px;">
+                                      <li>id</li>
+                                      <li>version</li>
+                                      <li>username</li>
+                                      <li>email</li>
+                                      <li>enabled</li>
+                                      <li>accountExpired</li>
+                                      <li>firstName</li>
+                                      <li>lastName</li>
+                                      <li>passwordExpired</li>
+                                      <li>accountExpired</li>
+                                      <li>oauthProvider</li>
+                                      <li>accountLocked</li>
+                                      <li>password</li>
+                                      <li>oauthId</li>
+                                      <li>avatarUrl<li>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/user/create</td>
+                                  <td style="padding:10px;">permitAll[] / ADMIN[id]</td>
+                                  <td style="padding:10px;">
+                                      <li>id</li>
+                                      <li>version</li>
+                                      <li>username</li>
+                                      <li>email</li>
+                                      <li>enabled</li>
+                                      <li>accountExpired</li>
+                                      <li>firstName</li>
+                                      <li>lastName</li>
+                                      <li>passwordExpired</li>
+                                      <li>accountExpired</li>
+                                      <li>oauthProvider</li>
+                                      <li>accountLocked</li>
+                                      <li>password</li>
+                                      <li>oauthId</li>
+                                      <li>avatarUrl</li></td>
+                              </tr>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/user/list [ADMIN]</td>
+                                  <td style="padding:10px;"></td>
+                                  <td style="padding:10px;">
+                                      <li>id</li>
+                                      <li>version</li>
+                                      <li>username</li>
+                                      <li>email</li>
+                                      <li>enabled</li>
+                                      <li>accountExpired</li>
+                                      <li>firstName</li>
+                                      <li>lastName</li>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td style="padding:10px;">/{version}/user/delete</td>
+                                  <td style="padding:10px;">id</td>
+                                  <td style="padding:10px;">id</td>
+                              </tr>
+                              </tbody>
+                          </table>
+                      </div></br>
+                  </section>
+                  <!-- / typography -->
+
+                  <hr size="5">
+
+                  <!-- file tree -->
+                  <section id="section-5">
                       <h2 class="section-title-2">Troubleshooting<a data-scroll href="#section-4" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
                       <p></p>
                       <div class="row">
@@ -642,7 +973,10 @@ xhr.send(JSON.stringify(data));</code></pre>
                               </ul>
                           </li>
                           <li class="nav-item">
-                              <a data-scroll class="nav-link" href="#section-4">Troubleshooting</a>
+                              <a data-scroll class="nav-link" href="#section-4">Provided Endpoints</a>
+                          </li>
+                          <li class="nav-item">
+                              <a data-scroll class="nav-link" href="#section-5">Troubleshooting</a>
                           </li>
                       </ul>
                   </div>
