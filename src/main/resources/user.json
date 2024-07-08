@@ -120,7 +120,6 @@
 							"BATCH": ["ROLE_ADMIN"]
 						},
 						"REQUEST": {
-						"REQUEST": {
 							"permitAll": []
                                                         "ROLE_ADMIN": ["username"]
 						},
