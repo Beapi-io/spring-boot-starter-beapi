@@ -149,11 +149,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ## 0.9.x - (projected release 11/01/2023)
  
  ### Added
+  - email registration & validation for SDK
  
  ### Changed
 
  ### todo
-  - (PRIORITY) email registration validation
   - (PRIORITY) rate limiting
   - (Feature) CLI scaffolding of controller/domain/etc for new projects
   - (Feature) CLI init of new project; inits and creates project env based on package name 
