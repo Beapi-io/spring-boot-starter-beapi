@@ -153,9 +153,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  
  ### Changed
 
+ ### Documentation
+ - (TODO) add setting apiServer in beapi_api.yml
+ - (TODO) add setting mail settings in beapi_api.yml for registration
+
  ### todo
   - (PRIORITY) rate limiting
   - (Feature) CLI scaffolding of controller/domain/etc for new projects
+  - (Feature) CLI scaffolding of PROJECT (ie beapi new-project your.domain.project)
   - (Feature) CLI init of new project; inits and creates project env based on package name 
   - (Feature) user management (also for frontend)
   - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
