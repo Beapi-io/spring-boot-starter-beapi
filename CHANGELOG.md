@@ -154,8 +154,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Changed
 
  ### Documentation
- - (TODO) add setting apiServer in beapi_api.yml
- - (TODO) add setting mail settings in beapi_api.yml for registration
+ - (TODO) setting apiServer in beapi_api.yml
+ - (TODO) setting mail settings in beapi_api.yml for registration
 
  ### todo
   - (PRIORITY) rate limiting
