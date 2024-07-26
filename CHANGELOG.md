@@ -166,5 +166,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
   - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
   - (SDK) optional JMS service/config ??
 
+## 1.0.x - (no release date yet)
+ 
+ ### Added
+ 
+ ### Changed
+
+ ### Documentation
+ - (TODO) setting apiServer in beapi_api.yml
+ - (TODO) setting mail settings in beapi_api.yml for registration
+
+ ### planned
+  - (PRIORITY) Unit Tests - we have integration/functional testing but need to add unit as well
+  - (PRIORITY) Extensibility: Alot of classes are not extensible when they need to be (ie almost all services)
+
 
 
