@@ -179,6 +179,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### planned
   - (PRIORITY) Unit Tests - we have integration/functional testing but need to add unit as well
   - (PRIORITY) Extensibility: Alot of classes are not extensible when they need to be (ie almost all services)
+  - Implement Automated Apidocs for PUBLIC endpoints using RequestMappingHandlerMapping
+  - Finish internationalizing messages
 
 
 
