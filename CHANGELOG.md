@@ -150,6 +150,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  
  ### Added
   - email registration & validation for SDK
+  - (in dev) rate limiting
  
  ### Changed
 
@@ -158,7 +159,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (TODO) setting mail settings in beapi_api.yml for registration
 
  ### todo
-  - (PRIORITY) rate limiting
   - (Feature) CLI scaffolding of controller/domain/etc for new projects
   - (Feature) CLI scaffolding of PROJECT (ie beapi new-project your.domain.project)
   - (Feature) CLI init of new project; inits and creates project env based on package name 
