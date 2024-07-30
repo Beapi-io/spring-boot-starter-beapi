@@ -164,7 +164,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
   - (Feature) CLI init of new project; inits and creates project env based on package name 
   - (Feature) user management (also for frontend)
   - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
-  - (feature) integrate Jmeter
+  - (feature) integrate micrometer
   - (SDK) optional JMS service/config ??
 
 ## 1.0.x - (no release date yet)
