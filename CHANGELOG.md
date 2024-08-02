@@ -163,7 +163,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
   - (Feature) CLI scaffolding of controller/domain/etc for new projects
   - (Feature) CLI scaffolding of PROJECT (ie beapi new-project your.domain.project)
   - (Feature) CLI init of new project; inits and creates project env based on package name
-  - time based uuid
+  - add random uuid (@UuidGenerator(style = UuidGenerator.Style.RANDOM)
   - (Feature) user management (also for frontend)
   - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
   - (feature) integrate micrometer
