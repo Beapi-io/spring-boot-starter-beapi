@@ -151,9 +151,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Added
   - email registration & validation for SDK
   - (in dev) rate limiting
-  - (in dev) session state storage with Apache Geode
  
  ### Changed
+ - FIXED BUG #125  : writeErrorResponse can be bypassed and still return response
 
  ### Documentation
  - (TODO) setting apiServer in beapi_api.yml
