@@ -9,7 +9,7 @@
 
 ### Java Version (for implementation) : 17
 
-### Groovy Version (for implementation/spock test) : (v0.7.1) 2.5.4 / (v0.8.0) 4.0.8
+### Groovy Version (for implementation/spock test) : (v0.7.1) 2.5.4 / (v0.8.0+) 4.0.8
 
 ---
 
