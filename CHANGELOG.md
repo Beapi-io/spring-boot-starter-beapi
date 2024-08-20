@@ -155,6 +155,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Changed
  - FIXED BUG #125  : writeErrorResponse can be bypassed and still return response
  - updated functional tests to save/pass session cookie
+ - optimized error reporting for responses
 
  ### Documentation
  - (TODO) setting apiServer in beapi_api.yml
