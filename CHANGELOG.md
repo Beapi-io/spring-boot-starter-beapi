@@ -150,7 +150,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  
  ### Added
   - email registration & validation for SDK
-  - (in dev) session management
+  - added sessionService
   - (in dev) rate limiting
  
  ### Changed
