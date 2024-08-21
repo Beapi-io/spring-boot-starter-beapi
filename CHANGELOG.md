@@ -157,6 +157,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - FIXED BUG #125  : writeErrorResponse can be bypassed and still return response
  - updated functional tests to save/pass session cookie
  - optimized error reporting for responses
+ - removed ThrottleCacheService to just be ThrottleService now that we reverted RateLimit Changes
 
  ### Documentation
  - (TODO) setting apiServer in beapi_api.yml
