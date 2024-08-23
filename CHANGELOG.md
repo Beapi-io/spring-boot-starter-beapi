@@ -151,7 +151,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Added
   - email registration & validation for SDK
   - added sessionService
-  - (in test) rate limiting
+  - rate limiting
  
  ### Changed
  - FIXED BUG #125  : writeErrorResponse can be bypassed and still return response
