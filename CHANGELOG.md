@@ -162,19 +162,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Documentation
  - (TODO) setting apiServer in beapi_api.yml
  - (TODO) setting mail settings in beapi_api.yml for registration
+ -   - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
 
- ### planned
-  - (Feature) CLI scaffolding of controller/domain/etc for new projects
-  - (Feature) CLI scaffolding of PROJECT (ie beapi new-project your.domain.project)
-  - (Feature) CLI init of new project; inits and creates project env based on package name
-  - (Feature) add random uuid
-    - perhaps better, use 'SecretGenerator' for creating randomized UUID. That way we can use for need authentication or to rotate
-    - ok, we can do rotation through 'caching'; UUID is only stored in cache allowing for dynamic generation & caching upon return
-    - we can turn this into a class allowing people to extend this functionality into their own document stores/caches
-  - (Feature) user management (also for frontend)
-  - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
+ ### Planned
+  - (Feature) CLI scaffolding of controller/domain/etc for new projects; this is crucial as it allows frontend/UI/UX devs to build out backend from frontend via api calls
+  - (Feature) CLI INITIALIZATION of PROJECT (ie beapi new-project your.domain.project)
   - (feature) integrate micrometer
-  - (SDK) optional JMS service/config ??
 
 ## 1.0.x - (no release date yet)
  
@@ -189,6 +182,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### planned
   - (PRIORITY) Unit Tests - we have integration/functional testing but need to add unit as well
   - (PRIORITY) Extensibility: Alot of classes are not extensible when they need to be (ie almost all services)
+  - classes need to be cleaned up
+  - gradle plugins can probably be reduced to only what classes we are using
   - Implement Automated Apidocs for PUBLIC endpoints using RequestMappingHandlerMapping
   - Finish internationalizing messages
 
