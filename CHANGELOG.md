@@ -163,11 +163,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (TODO) setting apiServer in beapi_api.yml
  - (TODO) setting mail settings in beapi_api.yml for registration
  - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
+ - document public apis (login, error, etc)
 
- ### Planned
-  - (Feature) CLI scaffolding of controller/domain/etc for new projects; this is crucial as it allows frontend/UI/UX devs to build out backend from frontend via api calls
-  - (Feature) CLI INITIALIZATION of PROJECT (ie beapi new-project your.domain.project)
-  - (feature) integrate micrometer
+
 
 ## 1.0.x - (no release date yet)
  
@@ -180,6 +178,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (TODO) setting mail settings in beapi_api.yml for registration
 
  ### planned
+   - (Feature) CLI scaffolding of controller/domain/etc for new projects; this is crucial as it allows frontend/UI/UX devs to build out backend from frontend via api calls
+  - (Feature) CLI INITIALIZATION of PROJECT (ie beapi new-project your.domain.project)
+  - (feature) integrate micrometer
   - (PRIORITY) Unit Tests - we have integration/functional testing but need to add unit as well
   - (PRIORITY) Extensibility: Alot of classes are not extensible when they need to be (ie almost all services)
   - classes need to be cleaned up
