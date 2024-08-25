@@ -161,10 +161,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
  ### Documentation
  - (TODO) setting apiServer in beapi_api.yml
- - (TODO) setting mail settings in beapi_api.yml for registration
- - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
  - document public apis (login, error, etc)
 
+### Planned
+- prior to release, update spring-boot-starter-beapi-config
 
 
 ## 1.0.x - (no release date yet)
@@ -176,6 +176,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Documentation
  - (TODO) setting apiServer in beapi_api.yml
  - (TODO) setting mail settings in beapi_api.yml for registration
+ - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
 
  ### planned
    - (Feature) CLI scaffolding of controller/domain/etc for new projects; this is crucial as it allows frontend/UI/UX devs to build out backend from frontend via api calls
