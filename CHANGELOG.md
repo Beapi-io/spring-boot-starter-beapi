@@ -151,7 +151,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Added
   - email registration & validation for SDK
   - added sessionService
-  - rate limiting
+  - added rate limiting
+    - added tests for rate limiting
   - (TODO) automate documentation for public apis (login, error, etc) and RequestHandlerMapping (ie RestController)
  
  ### Changed
@@ -175,9 +176,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Changed
 
  ### Documentation
- - (TODO) setting apiServer in beapi_api.yml
- - (TODO) setting mail settings in beapi_api.yml for registration
  - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
+   - currently only handling PRIVATE API'S (must have token/role to view); this will add public ones as well and separate  
 
  ### planned
    - (Feature) CLI scaffolding of controller/domain/etc for new projects; this is crucial as it allows frontend/UI/UX devs to build out backend from frontend via api calls
