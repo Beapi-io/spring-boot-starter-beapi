@@ -160,6 +160,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - updated functional tests to save/pass session cookie
  - optimized error reporting for responses
  - renamed ThrottleCacheService to just be ThrottleService now that we reverted RateLimit Changes
+ - tests only running in 'dev' now; will not run in 'prod'
 
  ### Documentation
  - document mailserver setup
