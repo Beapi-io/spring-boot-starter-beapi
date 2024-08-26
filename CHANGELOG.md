@@ -152,16 +152,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
   - email registration & validation for SDK
   - added sessionService
   - rate limiting
+  - (TODO) automate documentation for public apis (login, error, etc) and RequestHandlerMapping (ie RestController)
  
  ### Changed
  - FIXED BUG #125  : writeErrorResponse can be bypassed and still return response
  - updated functional tests to save/pass session cookie
  - optimized error reporting for responses
- - removed ThrottleCacheService to just be ThrottleService now that we reverted RateLimit Changes
+ - renamed ThrottleCacheService to just be ThrottleService now that we reverted RateLimit Changes
 
  ### Documentation
- - (TODO) setting apiServer in beapi_api.yml
- - document public apis (login, error, etc)
+ - document mailserver setup
+ - document rate limiting
 
 ### Planned
 - prior to release, update spring-boot-starter-beapi-config
