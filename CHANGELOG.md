@@ -153,7 +153,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
   - added sessionService
   - added rate limiting
     - added tests for rate limiting
-  - (TODO) automate documentation for public apis (login, error, etc) and RequestHandlerMapping (ie RestController)
+  - automate documentation for public static apis (login, error, etc)
     - after much back-and-forth, these can be hardcoded since we don't have/support 'public' apis; that requires separate less-secure product that anyone can provide. Our product is aimed at a secure SDK.
   - (TODO) check registration valdation did/didn't expire; set time limit on how long they have to respond before validation expires (usually 10 minutes)
  
