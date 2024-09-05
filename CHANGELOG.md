@@ -155,7 +155,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - added tests for rate limiting
   - automate documentation for public static apis (login, error, etc)
     - after much back-and-forth, these can be hardcoded since we don't have/support 'public' apis; that requires separate less-secure product that anyone can provide. Our product is aimed at a secure SDK.
-  - (TODO) check registration valdation did/didn't expire; set time limit on how long they have to respond before validation expires (usually 10 minutes)
+  - (in dev) check registration valdation did/didn't expire; set time limit on how long they have to respond before validation expires (usually 10 minutes) (RegistrationVerificationExpiry)
  
  ### Changed
  - FIXED BUG #125  : writeErrorResponse can be bypassed and still return response
