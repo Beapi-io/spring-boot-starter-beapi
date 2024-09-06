@@ -174,7 +174,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - prior to release, update spring-boot-starter-beapi-config
 
 
-## 1.0.x - (no release date yet)
+## 1.0.x - (planned 01.30.2025)
  
  ### Added
  
