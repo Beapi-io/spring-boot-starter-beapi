@@ -165,6 +165,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - renamed ThrottleCacheService to just be ThrottleService now that we reverted RateLimit Changes
  - tests only running in 'dev' now; will not run in 'prod'
  - changed 'registrationVerificationCode' to 'verificationCode' to be more genereic and general purpose
+ - updated userDetails
 
  ### Documentation
  - document mailserver setup
