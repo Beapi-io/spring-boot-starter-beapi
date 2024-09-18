@@ -166,6 +166,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - tests only running in 'dev' now; will not run in 'prod'
  - changed 'registrationVerificationCode' to 'verificationCode' to be more genereic and general purpose
  - updated userDetails
+ - newly registered user cannot get token until they verify acct via email
 
  ### Documentation
  - document mailserver setup
