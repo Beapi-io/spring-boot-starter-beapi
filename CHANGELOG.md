@@ -150,6 +150,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  
  ### Added
   - email registration & validation for SDK
+  - newly registered user cannot get token until after they validate [tested]
+  - added tests for registration
   - added sessionService
   - added rate limiting
     - added tests for rate limiting
