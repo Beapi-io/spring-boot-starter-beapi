@@ -157,9 +157,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - added tests for rate limiting
   - automate documentation for public static apis (login, error, etc)
     - after much back-and-forth, these can be hardcoded since we don't have/support 'public' apis; that requires separate less-secure product that anyone can provide. Our product is aimed at a secure SDK.
-  - (in dev) check registration valdation did/didn't expire; set time limit on how long they have to respond before validation expires (usually 10 minutes) (RegistrationVerificationExpiry)
+  - (testing) check registration valdation did/didn't expire; set time limit on how long they have to respond before validation expires (usually 10 minutes) (RegistrationVerificationExpiry)
+  - (in dev) adding 'resetToken' for resetting password
   - (TODO) need 'forgotPassword' functionality (with email verification) and 'passwordResetForward' property for beapi_api.yaml
- 
+
  ### Changed
  - FIXED BUG #125  : writeErrorResponse can be bypassed and still return response
  - updated functional tests to save/pass session cookie
@@ -169,14 +170,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - changed 'registrationVerificationCode' to 'verificationCode' to be more genereic and general purpose
  - updated userDetails
  - newly registered user cannot get token until they verify acct via email
-
+ - separated 'callbacks' from beapi-api 'mail' section into their own section as we add more callbacks.
+   
  ### Documentation
  - document mailserver setup
  - document rate limiting
  - add setting 'server.servlet.session.cookie.http-only' in application.properties; needs to be 'true' in prod environment
 
 ### Planned
-- prior to release, update spring-boot-starter-beapi-config
+- prior to release, update spring-boot-starter-beapi-config and sql file
+
 
 
 ## 1.0.x - (planned 01.30.2025)
