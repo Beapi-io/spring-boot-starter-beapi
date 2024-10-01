@@ -146,7 +146,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
   - (DOCS) documentation for scaffolding functionality
 
 
- ## 0.9.x - (planned release 11/01/2023 - revised to 9/30/2024)
+ ## 0.9.x - (planned release 11/01/2023 - revised to 9/30/2024) (LATE)
  
  ### Added
   - email registration & validation for SDK
