@@ -3,7 +3,7 @@
 
 ### Stable Version : 0.8.61-SNAPSHOT
 
-### Development Version : 0.9.X
+### In-Development : 0.9.X
 
 ### Springboot Version : 2.6.2 (or greater)
 
