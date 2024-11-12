@@ -174,6 +174,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - updated userDetails
  - newly registered user cannot get token until they verify acct via email
  - separated 'callbacks' from beapi-api 'mail' section into their own section as we add more callbacks.
+ - adding in Quartz to help with testring of timed elements(ex rate limiting)
    
  ### Documentation
  - document mailserver setup
