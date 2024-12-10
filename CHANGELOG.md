@@ -163,6 +163,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     - test with mail, api and frontend
   - (TODO) need 'forgotPassword' functionality (with email verification) and 'passwordResetForward' property for beapi_api.yaml
     - test with mail, api and frontend
+    - session timeout
 
  ### Changed
  - FIXED BUG #125  : writeErrorResponse can be bypassed and still return response
