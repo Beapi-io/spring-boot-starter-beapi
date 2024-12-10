@@ -176,6 +176,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - separated 'callbacks' from beapi-api 'mail' section into their own section as we add more callbacks.
  - adding in Quartz to help with testring of timed elements(ex rate limiting)
  - added Forgot pasword functionality for validating by email
+ - added 'register' functionality with email validation
    
  ### Documentation
  - document mailserver setup
