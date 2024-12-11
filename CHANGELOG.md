@@ -182,6 +182,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - document mailserver setup
  - document rate limiting
  - add setting 'server.servlet.session.cookie.http-only' in application.properties; needs to be 'true' in prod environment
+ - document forgotPassword/resetPassword
+ - document register
 
 ### Planned
 - prior to release, update spring-boot-starter-beapi-config and sql file
