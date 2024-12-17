@@ -163,6 +163,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
   - (TODO) (in dev) adding 'resetToken' for resetting password. need 'forgotPassword' functionality (with email verification) and 'passwordResetForward' property for beapi_api.yaml
     - test with mail, api and frontend
     - session timeout
+    - connector/iostate scaffolding
+    - controller scaffolding
 
  ### Changed
  - FIXED BUG #125  : writeErrorResponse can be bypassed and still return response
@@ -183,6 +185,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - add setting 'server.servlet.session.cookie.http-only' in application.properties; needs to be 'true' in prod environment
  - document forgotPassword/resetPassword
  - document register
+ - connector/iostate scaffolding
+ - controller scaffolding
 
 ### Planned
 - prior to release, update spring-boot-starter-beapi-config and sql file
