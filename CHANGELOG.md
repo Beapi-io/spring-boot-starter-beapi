@@ -183,7 +183,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - document mailserver setup
  - document rate limiting
  - add setting 'server.servlet.session.cookie.http-only' in application.properties; needs to be 'true' in prod environment
- - document forgotPassword/resetPassword
+ - document authorization/authentication
+   - document forgotPassword/resetPassword
  - document register
  - connector/iostate scaffolding
  - controller scaffolding
@@ -204,10 +205,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
    - currently only handling PRIVATE API'S (must have token/role to view); this will add public ones as well and separate  
 
  ### planned
-   - (Feature) CLI scaffolding of controller/domain/etc for new projects; this is crucial as it allows frontend/UI/UX devs to build out backend from frontend via api calls
   - (Feature) CLI INITIALIZATION of PROJECT (ie beapi new-project your.domain.project)
   - (feature) integrate micrometer
-  - (PRIORITY) Unit Tests - we have integration/functional testing but need to add unit as well
+  - (PRIORITY) Unit Tests/better code coverage - we have integration/functional testing but need to add unit as well
   - (PRIORITY) Extensibility: Alot of classes are not extensible when they need to be (ie almost all services)
   - classes need to be cleaned up
   - gradle plugins can probably be reduced to only what classes we are using
