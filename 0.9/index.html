@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-87598302-1"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-87598302-1');
+</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="assets/css/vendor.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+
+  <title>BeAPI API Framework - Documentation / Installation</title>
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+
+<section class="py-0">
+  <div class="container-fluid">
+    <div class="row justify-content-between">
+
+      <!-- navigation -->
+      <aside class="col-lg-3 col-xxl-2 p-3 doc-sidebar">
+        <div class="sticky">
+          <nav class="navbar navbar-vertical navbar-expand-lg navbar-light">
+            <div>
+              <a href="index.html" class="navbar-brand"><img src="assets/images/logo.png" alt="Logo"><span class="badge badge-green ml-2"></span></a>
+              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+            </div>
+
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul id="page-nav" class="nav flex-column nav-vertical-2">
+                <li class="nav-item">
+                  <a class="nav-link active" data-toggle="collapse" href="#menu-2" role="button" aria-expanded="true" aria-controls="menu-2">Installation</a>
+                  <div class="collapse show" id="menu-2" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="index.html#section-1">Requirements</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="index.html#section-2">Configure Demo Project</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="index.html#section-3">Setup Demo Project DB</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="index.html#section-4">Build Demo Project</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="index.html#section-5">Run Demo Project</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="index.html#section-6">Troubleshooting</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-3" role="button" aria-expanded="false" aria-controls="menu-3">Configuration</a>
+                  <div class="collapse" id="menu-3" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="config.html#section-a">Config Files</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="config.html#section-1">Application.properties</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="config.html#section-2">Gradle.properties</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="config.html#section-3">Beapi API Config Changes</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="config.html#section-4">Beapi DB Config Changes</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-5" role="button" aria-expanded="false" aria-controls="menu-5">Bootstrapping</a>
+                  <div class="collapse" id="menu-5" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="bootstrap.html#section-1">Generate API Controllers</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="bootstrap.html#section-2">Generate IO State</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-4" role="button" aria-expanded="false" aria-controls="menu-4">Development</a>
+                  <div class="collapse" id="menu-4" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="mvc.html#section-1">Build</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="mvc.html#section-2">Controllers</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="mvc.html#section-3">IO State</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="mvc.html#section-4">OAuth/JWT</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <!--
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="collapse" href="#menu-6" role="button" aria-expanded="false" aria-controls="menu-6">Security</a>
+                <div class="collapse" id="menu-6" data-parent="#page-nav">
+                  <div>
+                    <ul class="nav flex-column">
+                      <li class="nav-item">
+                        <a class="nav-link" href="security.html#section-1">CORS / NetworkGroups</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="security.html#section-2">Roles / NetworkRoles</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="security.html#section-3">SSO / Providers</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+                -->
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-7" role="button" aria-expanded="false" aria-controls="menu-7">API Usage (Examples)</a>
+                  <div class="collapse" id="menu-7" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-a">User Registration</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-1">Authorization Calls</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-2">API Calls</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-3">User Management</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-4">Provided Endpoints</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-8" role="button" aria-expanded="false" aria-controls="menu-8">Advanced Functionality</a>
+                  <div class="collapse" id="menu-8" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-1">Automated Batching</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-2">Automated Webhooks</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-3">API Chaining®</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-4">Architecture PING</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-5">Rate Limiting</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-6">Link Relations</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-9" role="button" aria-expanded="false" aria-controls="menu-9">Advanced Configuration</a>
+                  <div class="collapse" id="menu-9" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="adv_config.html#section-1">Versioning</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </aside>
+      <!-- / navigation -->
+
+
+      <!-- content -->
+      <article class="col-lg-9 col-xxl-10 doc-content">
+
+        <div class="row">
+          <div class="col">
+            <div class="doc-content-header">
+              <div class="row align-items-center">
+                <div class="col">
+                  <nav aria-label="breadcrumb" class="align-items-center">
+                    <ol class="breadcrumb d-none d-lg-inline-flex">
+                      <li class="breadcrumb-item"><a href="index.html">Documentation</a></li>
+                      <li class="breadcrumb-item active" aria-current="page">Installation</li>
+                    </ol>
+                  </nav>
+                </div>
+                <div class="col text-right">
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row justify-content-between doc-content-body">
+          <article class="col-md-9 col-xxl-8">
+
+            <h1 class="h2 font-weight-light"><b>BeAPI Framework Installation</b></h1>
+            <p>Getting started with the BeAPI Springboot Starter is a simple process. Prior to building and running though, we must first talk installation.
+
+
+
+<hr size="5">
+
+            <!-- typogrpahy -->
+            <section id="section-1">
+              <h2 class="section-title-2">Requirements <a data-scroll href="#section-1" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"></a></h2>
+
+              <ul>
+                <li><p>The <b>BeAPI™ API Framework</b> has the following project requirements:</p>
+                  <div class="row">
+                    <div class="col">
+                      <div class="alert alert-warning" role="alert">
+                        <ul>
+                          <li><b>Java 1.8 > </b></li>
+                          <li><b>Springboot 2.6.2 > </b></li>
+                          <li><b>Gradle 8 ></b> (for building)</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div></br>
+                </li>
+                <li><p>Start by cloning the <b>demo project</b> to a local directory:</p>
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">git clone https://github.com/Beapi-io/beapi-java-demo.git</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div></br>
+                </li>
+                <li><p>Next, create a directory in the project owners home directory in a hidden directory called '.beapi' and clone all configuration files over:</p>
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">git clone https://github.com/Beapi-io/beapi-java-demo.git</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+              </ul>
+              <div class="alert alert-danger" role="alert">
+              <b>NOTE:</b> To build and run the <b>demo-application</b>, you MAY also need a running <a href="https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/installing.html">MySQL Database server</a>. Others databases MAY work with the <demo-application</b> but this is what we tested with; change the datasource at your own risk :)
+              </div>
+            </section>
+            <!-- / typography -->
+
+<hr size="5">
+
+            <!-- file tree -->
+            <section id="section-2">
+              <h2 class="section-title-2">Configure Demo Project<a data-scroll href="#section-2" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"></a></h2>
+              <p>You will also need to <a href="config.html"><b>configure your project</b></a> by changing your...</p>
+              <div class="row">
+                <div class="col">
+                  <div class="alert alert-warning" role="alert">
+                    <ul>
+                      <li><b><a href="config.html#section-1">resources/application.properties</a></b></li>
+                      <li><b><a href="config.html#section-2">gradle.properties</a></b></li>
+                      <li><b><a href="config.html#section-3">~/.beapi/{env}/beapi_api.yaml</a></b></li>
+                      <li><b><a href="config.html#section-4">~/.beapi/{env}/beapi_db.yaml</a></b></li>
+                    </ul>
+                  </div>
+                </div>
+              </div></br>
+              <div class="alert alert-danger" role="alert">
+                <b>NOTE:</b> Make sure to follow these steps as the project <b>will NOT BUILD if you do not have the datasource and the DB setup.</b>
+              </div>
+
+            </section>
+
+            <hr size="5">
+
+            <section id="section-3">
+              <h2 class="section-title-3">Setup Demo Project DB<a data-scroll href="#section-3" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"></a></h2>
+              <p>You will now need to setup your database and edit your <b>beapi_db.yml</b> file (please <a href="config.html#section-4">DB section under 'Configure Demo Project'</a>). This will allow you to setup your default DB for the demo project.</p>
+              <ul>
+                <li>Login to MySQL via the shell from the directory in which the 'boot.sql' file is and use the following commands:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                            <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">mysql -uroot -p{yourpassword}
+create database boot;
+use boot;
+source boot.sql;
+GRANT ALL ON boot.* to 'yourlogin'@'localhost' IDENTIFIED BY 'yourpassword';
+FLUSH PRIVILEGES;
+exit;</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </br>
+                </li>
+                <li>Next, go into your ~/.beapi/dev directory and find the <b>beapi_db.yaml</b> file for editing and change the following lines:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                        <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">username: "root"
+password: "password"</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p><b>NOTE:</b> you will have to copy this file to the 'test' and 'prod' folders as well.</p>
+                  </br>
+                </li>
+                <li>Finally, go into your <b>'/src/main/resources/application.properties'</b> and make sure, that your environment is set to 'dev':
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                        <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">spring.profiles.active=dev</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  </br>
+                </li>
+              </ul>
+              <div class="alert alert-danger" role="alert">
+                <b>NOTE:</b> Make sure to follow these steps as the project <b>will NOT BUILD</b> if you do not have the datasource and the DB setup.
+              </div>
+            </section>
+            <!-- / file tree -->
+
+<hr size="5">
+
+            <!-- file tree -->
+            <section id="section-4">
+              <h2 class="section-title-4">Build Demo Project<a data-scroll href="#section-4" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"></a></h2>
+              <p>Now that you have everything configured, you will need to build the project. In your <b>gradle.properties</b>, you have three properties (as well as a default variable for setting the 'default configType):</p>
+              <div class="row">
+                <div class="col">
+                  <div class="alert alert-warning" role="alert">
+                  <ul>
+                    <li>configType.nano</li>
+                    <li>configType.medium</li>
+                    <li>configType.large</li>
+                  </ul>
+                  </div>
+                </div>
+              </div>
+              <p></p>Each 'configType' has a default set of JVMargs (which can be changed) to fit an instance/server type</p>
+              <ul>
+                <li><p>Pass your 'configType' you wish to use in the following command in a shell to build your project :</p>
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">gradle clean build -Pargs=configType=nano</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li><p>or if you are fine with the default config (which is usually 'nano'), just run :</p>
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">gradle clean build</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+              </ul>
+            </section>
+
+            <hr size="5">
+
+            <!-- file tree -->
+            <section id="section-5">
+              <h2 class="section-title-2">Run Demo Project<a data-scroll href="#section-3" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"></a></h2>
+              <p>If your database is properly configured and running, you will now need to change your default bootstrapped users.</p>
+              <ul>
+                <li>Look in your <b>~/.beapi/{env}</b> dir for a file called <b>'beapi_api.yaml'</b> (you will want to change this in all environments but change FIRST in the environment your are using right now). In this file you will find the bootstrapping for an ADMIN and a TEST user that are created on startup :
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">    bootstrap:
+        superUser: {
+            login: 'admin',
+            password: '@6m!nP@s5',
+            email: 'email@yourdomain.com'
+        }
+        testUser: {
+            login: 'test',
+            password: 't35tP@s5',
+            email: 'test@yourdomain.com',
+        }</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>Use the <b>superUser</b> login/password to create a curl request to get your token:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">curl -v -H "Content-Type: application/json" -X POST -d '{"username":"admin","password":"@6m!nP@s5"}' http://localhost:8080/authenticate</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>This will return something that looks like the following :
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">> GET /v0.4.1/user/show/test HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.58.0
+> Accept: */*
+> Content-Type: application/json
+> Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTY2MDA4NzM1OSwiaWF0IjoxNjYwMDY5MzU5fQ.bR8lgrGlzCmHKhXC1D_LF-vVmFINAVX9kgA2n-EiIbslYaix65FXB7qrPRVJxrgqhzNcdTiBOhScbujQwy0ufA
+</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>Everything after 'Bearer' is your TOKEN (not the space of course). Add this to the 'AUTHORIZATION' header with every request you make:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">curl -v -H "Content-Type: application/json" -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTY2MDA4NzM1OSwiaWF0IjoxNjYwMDY5MzU5fQ.bR8lgrGlzCmHKhXC1D_LF-vVmFINAVX9kgA2n-EiIbslYaix65FXB7qrPRVJxrgqhzNcdTiBOhScbujQwy0ufA" --request GET "http://localhost:8080/v0.4.1/user/show/test"</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>Voila! If all goes well, this will output the 'test' user that was bootstrapped on startup:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">{"firstName":"null","lastName":"null","accountExpired":false,"id":20,"version":2229,"email":"test@yourdomain.com","enabled":true,"username":"test"}</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+              </ul>
+              <div class="alert alert-danger" role="alert">
+                <b>NOTE:</b> If you don't like the superuser/testuser login/password, just delete those users from the user table in the database, change the values in the <b>'beapi.yaml'</b> and restart the app to have them be more to your liking.
+              </div>
+            </section>
+<hr size="5">
+
+            <!--
+            <section id="section-4">
+              <h2 class="section-title-2">Running As A Service<a data-scroll href="#section-4" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <p>Once you have created your project, you will need to create a file in your home directory for your configuration files:</p>
+              <ol>
+                <li>First create a user that the app will run under:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                        <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">sudo adduser beapi</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>Next, use the following commands in a shell to create you local config directory and change ownership to the newly created user:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+
+                        <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">mkdir /home/beapi/.beapi
+mkdir /home/beapi/.beapi/.iostate
+sudo chown -R beapi /home/beapi/.beapi
+sudo chgrp -R beapi /home/beapi/.beapi
+                        </code></pre>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>Next move all files marked above in your <b>'grails-app/conf'</b> directory (see above) to your newly created  <b>'/home/beapi/.beapi/'</b> directory<br/><br/></li>
+                <li>Next move all files marked above in your <b>'src/iostate'</b> directory (see above) to your newly created  <b>'/home/beapi/.beapi/.iostate'</b> directory'<br/><br/></li>
+                <li>Next, change permissions on those files:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+
+                        <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">sudo chmod -R 755 /home/beapi/.beapi</code></pre>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>Next, create the directory for the executable and move the JAR:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">sudo mkdir /usr/share/beapi
+sudo mv beapi-all-in-one-X.X.XX.jar /usr/share/beapi
+
+                          </code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>Now we create the service that calls the executable. Run the following command to open a text editor:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">sudo nano /etc/systemd/system/beapi.service</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>Now copy and paste the following into the text editor and then EXIT and SAVE:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">
+[Unit]
+Description=BeAPI API Service
+[Service]
+User=beapi
+# The configuration file application.properties should be here:
+#change this to your workspace
+WorkingDirectory=/home/beapi
+#path to executable.
+#executable is a bash script which calls jar file
+ExecStart=/usr/share/beapi/beapi
+SuccessExitStatus=143
+TimeoutStopSec=10
+Restart=on-failure
+RestartSec=5
+[Install]
+WantedBy=multi-user.target
+                          </code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>Finally, we create the bash script to call your service. First, we make the file:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">
+sudo nano /usr/share/beapi/beapi
+                          </code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>And then we copy and paste the following:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">
+#!/bin/bash
+
+MAIN_CLASS=/usr/share/beapi/beapi-all-in-one-X.X.XX.jar
+ARGS="-Xms1024m -Xmx2048m -XX:PermSize=64m -XX:MaxPermSize=128m -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:+CMSIncrementalPacing -XX:CMSIncrementalDutyCycle=10 -XX:+UseParNewGC -XX:MaxGCPauseMillis=100 -XX:MaxGCMinorPauseMillis=50 -server"
+
+exec java $MAIN_CLASS $ARGS
+                          </code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>Now set proper permissions on the files in '/usr/share/beapi':
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">
+chown beapi /usr/share/beapi/*
+chmod 755 /usr/share/beapi/*
+                          </code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>Last (but not least) initialize and start up your service:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">
+sudo systemctl daemon-reload
+sudo systemctl enable beapi.service
+sudo systemctl start beapi
+sudo systemctl status beapi
+                          </code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+                <li>If there are ANY ISSUES with your service starting, you can view them in the logs with the following:
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">sudo journalctl --unit=beapi</code></pre>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br/>
+                </li>
+              </ol>
+              <p>Now you are setup and can start <a href="config.html"><b>configuring your environment</b></a>...</p>
+            </section>
+            <!-- / file tree
+
+<hr size="5">
+-->
+
+            <!-- file tree -->
+            <section id="section-6">
+              <h2 class="section-title-2">Troubleshooting<a data-scroll href="#section-5" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"></a></h2>
+              <p></p>
+              <div class="row">
+                <div class="col">
+                  <div class="alert alert-warning" role="alert">
+                    <ul>
+                      <li>Make sure you have proper READ/WRITE/EXECUTE(755) for the files in ~/.beapi/ and ~/.beapi/.iostate</li>
+                      <li>Make sure you have matching named Controllers for all IO State files; see examples in <b>~/.beapi/.iostate</b> directory</li>
+                      <li>If you want to use a version of Java HIGHER than 1.8, change 'sourceCompatibility' in ALL gradle.properties files (ie demo-application/gradle.properties,/gradle.properties)</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <!-- / file tree -->
+
+          </article>
+
+
+          <aside class="col-md-3 col-xxl-3 d-none d-md-block">
+            <div class="sticky">
+              <ul id="toc" class="nav flex-column toc">
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-1">Requirements</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-2">Configure Demo Project</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-3">Setup Demo Project DB</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-4">Build Demo Project</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-5">Run Demo Project</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-6">Troubleshooting</a>
+                </li>
+              </ul>
+            </div>
+          </aside>
+
+
+        </div>
+
+      </article>
+      <!-- / content -->
+
+    </div>
+  </div>
+</section>
+
+
+<!-- footer -->
+<footer class="bg-dark">
+  <div class="container">
+    <div class="row gutter-3">
+      <div class="col-12 col-md-2">
+        <a href=""><img src="assets/images/logo_bw.png" alt="Logo"></a>
+      </div>
+      <div class="col-12 col-md-6 text-white">
+        <p class="mb-4">Copyright © 2014-2019 - All Rights Reserved</p></div>
+      <div class="col-12 col-md-4 col-lg-2 ml-auto text-md-right">
+        <div class="dropdown"> </div>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- / footer -->
+
+
+<script src="assets/js/vendor.min.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-87598302-1"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-87598302-1');
+</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="assets/css/vendor.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+
+  <title>BeAPI API Framework - Documentation / Configuration</title>
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+
+<section class="py-0">
+  <div class="container-fluid">
+    <div class="row justify-content-between">
+
+      <!-- navigation -->
+      <aside class="col-lg-3 col-xxl-2 p-3 doc-sidebar">
+        <div class="sticky">
+          <nav class="navbar navbar-vertical navbar-expand-lg navbar-light">
+            <div>
+              <a href="index.html" class="navbar-brand"><img src="assets/images/logo.png" alt="Logo"><span class="badge badge-green ml-2"></span></a>
+              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+            </div>
+
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul id="page-nav" class="nav flex-column nav-vertical-2">
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-2" role="button" aria-expanded="false" aria-controls="menu-2">Installation</a>
+                  <div class="collapse" id="menu-2" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="index.html#section-1">Requirements</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="index.html#section-2">Configure Demo Project</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="index.html#section-3">Setup Demo Project DB</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="index.html#section-4">Build Demo Project</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="index.html#section-5">Run Demo Project</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="index.html#section-6">Troubleshooting</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" data-toggle="collapse" href="#menu-3" role="button" aria-expanded="true" aria-controls="menu-3">Configuration</a>
+                  <div class="collapse show" id="menu-3" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="config.html#section-a">Config Files</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="config.html#section-1">Application.properties</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="config.html#section-2">Gradle.properties</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="config.html#section-3">Beapi API Config Changes</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="config.html#section-4">Beapi DB Config Changes</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-5" role="button" aria-expanded="false" aria-controls="menu-5">Bootstrapping</a>
+                  <div class="collapse" id="menu-5" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="bootstrap.html#section-1">Generate API Controllers</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="bootstrap.html#section-2">Generate IO State</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-4" role="button" aria-expanded="false" aria-controls="menu-4">Development</a>
+                  <div class="collapse" id="menu-4" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="mvc.html#section-1">Build</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="mvc.html#section-2">Controllers</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="mvc.html#section-3">IO State</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="mvc.html#section-4">OAuth/JWT</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <!--
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="collapse" href="#menu-6" role="button" aria-expanded="false" aria-controls="menu-6">Security</a>
+                <div class="collapse" id="menu-6" data-parent="#page-nav">
+                  <div>
+                    <ul class="nav flex-column">
+                      <li class="nav-item">
+                        <a class="nav-link" href="security.html#section-1">CORS / NetworkGroups</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="security.html#section-2">Roles / NetworkRoles</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="security.html#section-3">SSO / Providers</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+                -->
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-7" role="button" aria-expanded="false" aria-controls="menu-7">API Usage (Examples)</a>
+                  <div class="collapse" id="menu-7" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-a">User Registration</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-1">Authorization Calls</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-2">API Calls</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-3">User Management</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="usage.html#section-4">Provided Endpoints</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-8" role="button" aria-expanded="false" aria-controls="menu-8">Advanced Functionality</a>
+                  <div class="collapse" id="menu-8" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-1">Automated Batching</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-2">Automated Webhooks</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-3">API Chaining®</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-4">Architecture PING</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-5">Rate Limiting</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="advanced.html#section-6">Link Relations</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="collapse" href="#menu-9" role="button" aria-expanded="false" aria-controls="menu-9">Advanced Configuration</a>
+                  <div class="collapse" id="menu-9" data-parent="#page-nav">
+                    <div>
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link" href="adv_config.html#section-1">Versioning</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </aside>
+      <!-- / navigation -->
+
+
+      <!-- content -->
+      <article class="col-lg-9 col-xxl-10 doc-content">
+
+        <div class="row">
+          <div class="col">
+            <div class="doc-content-header">
+              <div class="row align-items-center">
+                <div class="col">
+                  <nav aria-label="breadcrumb" class="align-items-center">
+                    <ol class="breadcrumb d-none d-lg-inline-flex">
+                      <li class="breadcrumb-item"><a href="index.html">Documentation</a></li>
+                      <li class="breadcrumb-item active" aria-current="page">Configuration</li>
+                    </ol>
+                  </nav>
+                </div>
+                <div class="col text-right">
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row justify-content-between doc-content-body">
+          <article class="col-md-9 col-xxl-8">
+
+            <h1 class="h2 font-weight-light"><b>BeAPI Framework Configuration</b></h1>
+            <p>Once you have completed installation, you will next need to configure your environment. Follow these configuration steps in order to get your environment setup and working:
+
+<hr size="5">
+
+            <!-- typogrpahy -->
+            <section id="section-a">
+              <h2 class="section-title-a">Configuration Files<a data-scroll href="#section-a" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <div id="section-1.1">
+                <p>Prior to making changes to your configuration, you will need to <a href=""https://github.com/Beapi-io/spring-boot-starter-beapi-config">move all configuration files</a> into the project owners home directory in a hidden directory called '.beapi'</p>
+                <ul>
+
+                  <div class="row">
+                    <div class="col">
+                      <div class="card">
+                        <div class="card-body" style="background-color:#000;">
+                          <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">git clone https://github.com/Beapi-io/spring-boot-starter-beapi-config ~/.beapi</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+                </ul>
+                <P><b>NOTE</b>: These are already preconfigured in the demo project; if you create a NEW PROJECT, these will have to be changed.</P>
+              </div>
+            </section>
+            <!-- / typography -->
+
+            <!-- typogrpahy -->
+            <section id="section-1">
+              <h2 class="section-title-1">Resources/Application.properties Settings<a data-scroll href="#section-1" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <div id="section-1.1">
+                <p>in your 'src/main/resources' directory, you will find your <b>application.properties</b> file. The following stats are what you are most concerned with changing:</p>
+                <ul>
+                  <li>
+                    <div class="row">
+                      <div class="col">
+                        <div class="alert alert-warning" role="alert">
+                          <ul>
+                            <li><b>application.components</b> This should be the base path for ALL components in your application</li>
+                            <li><b>application.repository</b> This is the base path for your repositories</li>
+                            <li><b>application.domain</b> This is the base path for your domain objects</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+                <P><b>NOTE</b>: These are already preconfigured in the demo project; if you create a NEW PROJECT, these will have to be changed.</P>
+              </div>
+            </section>
+            <!-- / typography -->
+
+            <hr size="5">
+
+            <!-- typogrpahy -->
+            <section id="section-2">
+              <h2 class="section-title-2">Gradle.properties Settings<a data-scroll href="#section-2" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <div id="section-2.1">
+                <p>Since this is an API application, people will want to get into the nuts an bolts of configuring this so we also supply some of the more advanced configuration settings:</p>
+                <ul>
+                  <li><b>JVM Args</b>:  Should you need to tweak the default <b>BUILD</b> JVM ARGS, you will find the JVM Args in the 'gradle.properties'; there is a section that looks like the following:
+                    <div class="row">
+                      <div class="col">
+                        <div class="alert alert-warning" role="alert">
+                          <ul>
+                            <li><b>configType.nano</b>="-Xms512m -Xmx1024m -XX:+UseParallelGC  -XX:ParallelGCThreads=4 -XX:MaxGCPauseMillis=200 -XX:MaxGCMinorPauseMillis=75 -server -noverify  -Xshare:off  -Djava.net.preferIPv4Stack=true -XX:+EliminateLocks -XX:GCTimeRatio=7 -Djava.security.egd=file:/dev/urandom -Djdk.map.althashing.threshold=512"</li>
+                            <li><b>configType.medium</b>="-Xms1024m -Xmx2048m -XX:+UseParallelGC  -XX:ParallelGCThreads=8 -XX:MaxGCPauseMillis=200 -XX:MaxGCMinorPauseMillis=75 -server -noverify  -Xshare:off  -Djava.net.preferIPv4Stack=true -XX:+EliminateLocks -XX:GCTimeRatio=7 -Djava.security.egd=file:/dev/urandom -Djdk.map.althashing.threshold=512"</li>
+                            <li><b>configType.large</b>="-Xms4048m -Xmx4096m -XX:+UseParallelGC  -XX:ParallelGCThreads=16 -XX:MaxGCPauseMillis=200 -XX:MaxGCMinorPauseMillis=75 -server -noverify  -Xshare:off  -Djava.net.preferIPv4Stack=true -XX:+EliminateLocks -XX:GCTimeRatio=7 -Djava.security.egd=file:/dev/urandom -Djdk.map.althashing.threshold=512"</li>
+                            <li><b>configTypeDefault</b>=nano</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p>You can use these default per your instance or change them to your needs. You then simply pass the 'configType' variable with the OPTION for your instance [nano/medium/large] with your 'BUILD':</p>
+                    <div class="row">
+                      <div class="col">
+                        <div class="card">
+                          <div class="card-body" style="background-color:#000;">
+                            <pre style="background-color:#000;padding:0px;margin:0px;"><code class="language-sh">gradle clean build -Pargs=configType=nano</code></pre>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </section>
+            <!-- / typography -->
+
+
+            <!-- file tree -->
+            <section id="section-3">
+              <h2 class="section-title-3">Beapi_api.yml Settings<a data-scroll href="#section-3" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <p>Once you have created your project, you will need to edit your <b>'beapi_api.yaml'</b> file in your <b>~/.beapi/{env}/</b> directory and changes the following settings:</p>
+
+              <ul style="list-style-type: none;">
+                <li><h5><b>API Settings</b></h5>
+                  <div class="row">
+                    <div class="col">
+                      <div class="alert alert-warning" role="alert">
+                        <ul>
+                          <li><h6 style="margin-bottom: 0px;"><b>procCores:</b> (CHANGE)</h6>Change this to the number of processors your machine has; if running on AWS/Google/SpringCloud, this will be your HyperThreads/vCPU number.</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li style="margin-top: 25px;"><h5><b>BOOTSTRAP Settings</b></h5>
+                  <div class="row">
+                    <div class="col">
+                      <p>You will also need to change the following. For more information about this, see the <a href="index.html#section-5">installation process.</a></p>
+                      <div class="alert alert-warning" role="alert">
+                        <ul>
+                          <li><h6 style="margin-bottom: 0px;"><b>superUser/login:</b> (CHANGE)</h6> Superuser that is bootstrapped with your application (also used for functional testing)</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>superUser/password:</b> (CHANGE)</h6> Superuser that is bootstrapped with your application (also used for functional testing)</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>superUser/email:</b> (CHANGE)</h6> Superuser that is bootstrapped with your application (also used for functional testing)</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>testUser/login:</b> (CHANGE)</h6> Testuser that is bootstrapped with your application (also used for functional testing)</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>testUser/password:</b> (CHANGE)</h6> Testuser that is bootstrapped with your application (also used for functional testing)</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>testUser/email:</b> (CHANGE)</h6> Testuser that is bootstrapped with your application (also used for functional testing)</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div></br>
+                </li>
+              </ul>
+
+
+              <p>By Default, the <b>beapi_api.yml</b> file has the following settings:</p>
+
+
+              <hr size="5">
+
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <th scope="col" style="padding:10px;width:20%;">API Properties</th>
+                  <th scope="col" style="padding:10px;width:40%;">Definition</th>
+                  <th scope="col" style="padding:10px;width:40%;">Default</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr><td style="padding:10px;">attempts</td><td style="padding:10px;">Integer representing number of login failures</td><td style="padding:10px;">5</td></tr>
+                <tr><td style="padding:10px;">procCores</td><td style="padding:10px;">Integer representing number of system cores [set to be deprecated in 0.7]</td><td style="padding:10px;">4</td></tr>
+                <tr><td style="padding:10px;">documentationUrl</td><td style="padding:10px;">String representing documentation url</td><td style="padding:10px;">'http://orubel.github.io/Beapi-API-Framework/'</td></tr>
+                <tr><td style="padding:10px;">views</td><td style="padding:10px;">[deprecated]</td><td style="padding:10px;">['admin','apidoc','api','login','logout']</td></tr>
+                <tr><td style="padding:10px;">reserveduris</td><td style="padding:10px;">List representing restricted URI's </td><td style="padding:10px;">['/authenticate','/register','/error','/login','/logout']</td></tr>
+                <tr><td style="padding:10px;">publicEndpoint</td><td style="padding:10px;">List representing static endpoint in application</td><td style="padding:10px;">['jwtAuthentication','beapiError']</td></tr>
+                <tr><td style="padding:10px;">staticEndpoint</td><td style="padding:10px;">List representing hardcoded endpoints in starter</td><td style="padding:10px;">['apidoc','connector','properties','user','authority','hook']</td></tr>
+                <tr><td style="padding:10px;">apiServer</td><td style="padding:10px;">String representing the (protocol / FQDN or IP / port) used by server</td><td v>'http://localhost:8080'</td></tr>
+                <tr><td style="padding:10px;">apichainLimit</td><td style="padding:10px;">Integer representing number of times api can be chained</td><td style="padding:10px;">3</td></tr>
+                <tr><td style="padding:10px;">postcrement</td><td style="padding:10px;">[deprecated]</td><td style="padding:10px;">false</td></tr>
+                <tr><td style="padding:10px;">chainingEnabled</td><td style="padding:10px;">Boolean representing if chaining is enabled</td><td style="padding:10px;">true</td></tr>
+                <tr><td style="padding:10px;">batchingEnabled</td><td style="padding:10px;">Boolean representing if batching is enabled</td><td style="padding:10px;">true</td></tr>
+                <tr><td style="padding:10px;">encoding</td><td style="padding:10px;">String representing the default encoding</td><td style="padding:10px;">UTF-8</td></tr>
+                <tr><td style="padding:10px;">iostateDir</td><td style="padding:10px;">String representing the configuration dir</td><td style="padding:10px;">'.beapi/.iostate'</td></tr>
+                <tr><td style="padding:10px;">serverType</td><td style="padding:10px;">String representing the server type; can be either master/slave</td><td style="padding:10px;">master</td></tr>
+                <tr><td style="padding:10px;">configType</td><td style="padding:10px;">String representing the Tomcat config type; can be either nano/medium/large</td><td style="padding:10px;">large</td></tr>
+                <tr><td style="padding:10px;">testingProtocol</td><td style="padding:10px;">String representing the default protocol to use when testing</td><td style="padding:10px;">http</td></tr>
+                <tr><td style="padding:10px;">autoTest</td><td style="padding:10px;">Boolean representing if the app uses automated testing</td><td style="padding:10px;">false</td></tr>
+                </tbody>
+              </table>
+
+              <hr size="5">
+
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <th scope="col" style="padding:10px;width:20%;">API/Throttle Properties</th>
+                  <th scope="col" style="padding:10px;width:40%;">Definition</th>
+                  <th scope="col" style="padding:10px;width:40%;">Default</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr><td style="padding:10px;">active</td><td style="padding:10px;">Boolean representing if throttling is on</td><td style="padding:10px;">false</td></tr>
+                <tr><td style="padding:10px;">rateLimit</td><td style="padding:10px;">Map representing roles/rate-limits</td><td style="padding:10px;">{'ROLE_USER':1000,'ROLE_ADMIN':10000}</td></tr>
+                <tr><td style="padding:10px;">dataLimit</td><td style="padding:10px;">Map representing roles/data-limits</td><td style="padding:10px;">{'ROLE_USER':1000000}</td></tr>
+                <tr><td style="padding:10px;">expires</td><td style="padding:10px;">Integer representing number of seconds til reset</td><td style="padding:10px;">['admin','apidoc','api','login','logout']</td></tr>
+                </tbody>
+              </table>
+
+              <hr size="5">
+
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <th scope="col" style="padding:10px;width:20%;">API/Webhook Properties</th>
+                  <th scope="col" style="padding:10px;width:40%;">Definition</th>
+                  <th scope="col" style="padding:10px;width:40%;">Default</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr><td style="padding:10px;">active</td><td style="padding:10px;">Boolean representing if webhooks are active</td><td style="padding:10px;">false</td></tr>
+                </tbody>
+              </table>
+
+              <hr size="5">
+
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <th scope="col" style="padding:10px;width:20%;">API/Security Properties</th>
+                  <th scope="col" style="padding:10px;width:40%;">Definition</th>
+                  <th scope="col" style="padding:10px;width:40%;">Default</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr><td style="padding:10px;">superuserRole</td><td style="padding:10px;">String representing super user role</td><td style="padding:10px;">ROLE_ADMIN</td></tr>
+                <tr><td style="padding:10px;">userRole</td><td style="padding:10px;">String representing user role</td><td style="padding:10px;">ROLE_USER</td></tr>
+                <tr><td style="padding:10px;">anonRole</td><td style="padding:10px;">String representing unknown user</td><td style="padding:10px;">ROLE_ANONYMOUS</td></tr>
+                <tr><td style="padding:10px;">networkGroups</td><td style="padding:10px;">List representing network types</td><td style="padding:10px;">['open','public','private']</td></tr>
+                <tr><td style="padding:10px;">networkRoles</td><td style="padding:10px;">Map representing roles associated with network types</td><td style="padding:10px;">{'open':['ROLE_ADMIN','ROLE_ANONYMOUS','ROLE_USER'],'public':['ROLE_ADMIN','ROLE_USER'],'private':['ROLE_ADMIN']}</td></tr>
+                <tr><td style="padding:10px;">corsWhitelist</td><td style="padding:10px;">List representing whitelisted FQDN's and IP's for CORS</td><td style="padding:10px;">['http://localhost','http://localhost:8080','http://127.0.0.1','http://127.0.0.1:8080']</td></tr>
+                </tbody>
+              </table>
+
+              <hr size="5">
+
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <th scope="col" style="padding:10px;width:20%;">API/Bootstrap Properties</th>
+                  <th scope="col" style="padding:10px;width:40%;">Definition</th>
+                  <th scope="col" style="padding:10px;width:40%;">Default</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr><td style="padding:10px;">superUser</td><td style="padding:10px;">key/val map representing login/password/email of the super-user</td><td style="padding:10px;">N/A</td></tr>
+                <tr><td style="padding:10px;">superUser</td><td style="padding:10px;">key/val map representing login/password/email of the test-user</td><td style="padding:10px;">N/A</td></tr>
+                </tbody>
+              </table>
+
+              <hr size="5">
+
+            </section>
+            <!-- / file tree -->
+
+            <!-- file tree -->
+            <section id="section-4">
+              <h2 class="section-title-4">beapi_db.yml Settings<a data-scroll href="#section-4" class="anchor" data-toggle="tooltip" data-placement="top" title="Copy URL"><i class="icon-hash"></i></a></h2>
+              <p>You will then need to edit your <b>'beapi_db.yaml'</b> file in your <b>~/.beapi/{env}/</b> directory and changes the following settings (for more information, see springboots information about <a href="https://www.baeldung.com/spring-boot-configure-data-source-programmatic#configuring-a-datasource-bean">setting up a datasource</a>):</p>
+
+              <ul style="list-style-type: none;">
+
+                <li style="margin-top: 25px;">
+                  <div class="row">
+                    <div class="col">
+                      <div class="alert alert-warning" role="alert">
+                        <ul>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>driverclassname:</b> (CHANGE)</h6>driver used when making a database connection</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>username:</b> (CHANGE)</h6>database connection username</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>password:</b> (CHANGE)</h6>database connection password</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>url:</b> (CHANGE)</h6>url for database connection</li>
+                          <li style="margin-top: 15px;"><h6 style="margin-bottom: 0px;"><b>hibernate/dialect:</b> (CHANGE)</h6>JPA dialect</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div></br>
+                </li>
+              </ul>
+
+            </section>
+            <!-- / file tree -->
+
+          </article>
+
+
+          <aside class="col-md-3 col-xxl-3 d-none d-md-block">
+            <div class="sticky">
+              <ul id="toc" class="nav flex-column toc">
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-a">Config Files</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-1">Application.properties</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-2">Gradle.properties</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-3">beapi_api.yml</a>
+                </li>
+                <li class="nav-item">
+                  <a data-scroll class="nav-link" href="#section-4">beapi_db.yml</a>
+                </li>
+              </ul>
+            </div>
+          </aside>
+
+
+        </div>
+
+      </article>
+      <!-- / content -->
+
+    </div>
+  </div>
+</section>
+
+
+<!-- footer -->
+<footer class="bg-dark">
+  <div class="container">
+    <div class="row gutter-3">
+      <div class="col-12 col-md-2">
+        <a href=""><img src="assets/images/logo_bw.png" alt="Logo"></a>
+      </div>
+      <div class="col-12 col-md-6 text-white">
+        <p class="mb-4">Copyright © 2014-2019 - All Rights Reserved</p>
+      </div>
+      <div class="col-12 col-md-4 col-lg-2 ml-auto text-md-right">
+        <div class="dropdown"> </div>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- / footer -->
+
+
+<script src="assets/js/vendor.min.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
