@@ -27,9 +27,6 @@ public class UserController extends BeapiRequestHandler {
 	protected  PasswordEncoder passwordEncoder;
 
 	@Autowired
-	protected PrincipleService principle;
-
-	@Autowired
 	protected UserService userService;
 
 	@Autowired
@@ -38,28 +35,28 @@ public class UserController extends BeapiRequestHandler {
 	@Autowired
 	private UserAuthorityService uAuthService;
 
-
-
 	public List<User> list(HttpServletRequest request, HttpServletResponse response){
-			List<User> users = userService.getAllUsers();
-			return users;
+		println("### user/list")
+		List<User> users = userService.getAllUsers();
+		return users;
 	}
-	
-	public User show(HttpServletRequest request, HttpServletResponse response){
-			User user
-			String username
-			if(principle.isSuperuser()){
-				username= this.params?.get("id")
-				user = userService.findByUsername(username);
-			}else {
-				username = principle.name();
-				user = userService.findByUsername(username);
-			}
 
-			if (Objects.nonNull(user)) {
-				return user
-			}
-			return null
+
+	public User show(HttpServletRequest request, HttpServletResponse response){
+		//println("### user/show")
+		String username
+		if(principle.isSuperuser()){
+			username = (this.params?.get("id"))?this.params.get("id").toString():principle.name();
+		}else {
+			username = principle.name();
+		}
+
+		User user = userService.findByUsername(username);
+
+		if (Objects.nonNull(user)) {
+			return user
+		}
+		return null
     }
 
 	public User showById(HttpServletRequest request, HttpServletResponse response){

@@ -46,7 +46,6 @@ public class PropertiesController extends BeapiRequestHandler{
 		temp.put("procCores",apiProperties.getProcCores());
 		temp.put("documentationUrl",apiProperties.getDocumentationUrl());
 		temp.put("reservedUris",apiProperties.getReservedUris());
-		temp.put("publicEndpoint",apiProperties.getPublicEndpoint());
 		temp.put("apichainLimit",apiProperties.getApichainLimit());
 		temp.put("postcrement",apiProperties.getPostcrement());
 		temp.put("chainingEnabled",apiProperties.getChainingEnabled());
@@ -62,7 +61,7 @@ public class PropertiesController extends BeapiRequestHandler{
 		throttle.put("active", apiProperties.getThrottle().getActive());
 		throttle.put("rateLimit", apiProperties.getThrottle().getRateLimit());
 		throttle.put("dataLimit", apiProperties.getThrottle().getDataLimit());
-		throttle.put("expires", apiProperties.getThrottle().getExpires());
+		throttle.put("staleSession (mins)", apiProperties.getThrottle().getStaleSession());
 		temp.put("throttle", throttle);
 
 		LinkedHashMap hook = new LinkedHashMap<>();
@@ -88,7 +87,6 @@ public class PropertiesController extends BeapiRequestHandler{
         temp.put("procCores",apiProperties.getProcCores());
         temp.put("documentationUrl",apiProperties.getDocumentationUrl());
         temp.put("reservedUris",apiProperties.getReservedUris());
-        temp.put("publicEndpoint",apiProperties.getPublicEndpoint());
         temp.put("apichainLimit",apiProperties.getApichainLimit());
         temp.put("postcrement",apiProperties.getPostcrement());
         temp.put("chainingEnabled",apiProperties.getChainingEnabled());

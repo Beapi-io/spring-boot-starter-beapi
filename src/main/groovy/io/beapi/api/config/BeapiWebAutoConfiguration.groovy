@@ -16,15 +16,18 @@
  */
 package io.beapi.api.config
 
-//import io.beapi.api.filter.CorsSecurityFilter
+
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ExchangeService
 import io.beapi.api.service.LinkRelationService
-import io.beapi.api.service.ThrottleCacheService
+import io.beapi.api.service.MailService
+import io.beapi.api.service.SessionService
+import io.beapi.api.service.ThrottleService
 import io.beapi.api.service.TraceExchangeService
 import io.beapi.api.utils.SecretGenerator
-
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 //import io.beapi.api.service.TraceService
 import org.slf4j.LoggerFactory
 import java.lang.reflect.Method
@@ -34,7 +37,7 @@ import io.beapi.api.interceptor.ApiInterceptor
 import io.beapi.api.properties.ApiProperties
 import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.PrincipleService
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
+
 import org.springframework.context.MessageSource
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -61,11 +64,12 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-
-import org.springframework.web.socket.server.support.WebSocketHandlerMapping;
-
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication
@@ -73,58 +77,36 @@ import java.util.regex.Pattern;
 @AutoConfigureAfter([org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration.class,BeapiServiceAutoConfiguration.class])
 public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryAware{
 
+	@Autowired private ApplicationContext context;
+	@Autowired protected LinkRelationService linkRelationService
+	@Autowired private PrincipleService principleService
+	@Autowired private ApiCacheService apiCacheService
+	@Autowired private ExchangeService exchangeService
+	@Autowired private BatchExchangeService batchService
+	@Autowired private SessionService sessionService
+	@Autowired private ChainExchangeService chainService
+	@Autowired private TraceExchangeService traceExchangeService
+	@Autowired private ThrottleService throttleService
+	@Autowired protected ApiProperties apiProperties
 
-	@Autowired
-	private ApplicationContext context;
-
-	@Autowired
-	protected LinkRelationService linkRelationService
-
-	@Autowired
-	private PrincipleService principleService
-
-	@Autowired
-	private ApiCacheService apiCacheService
-
-	@Autowired
-	private ThrottleCacheService throttleCacheService
-
-	@Autowired
-	private ExchangeService exchangeService
-
-	@Autowired
-	private BatchExchangeService batchService
-
-	@Autowired
-	private ChainExchangeService chainService
-
-	@Autowired
-	private TraceExchangeService traceExchangeService
-
-	@Autowired
-	protected ApiProperties apiProperties
+	List publicEndpoint =  ['jwtAuthentication','beapiError']
 
 	String version = getVersion()
-
 	private ListableBeanFactory listableBeanFactory;
-
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BeapiWebAutoConfiguration.class);
 
 	public BeapiWebAutoConfiguration() {
 		this.version = getVersion()
 	}
 
-/*
+	// strictly for public endpoints
 	@Override
-	public void addCorsMappings(CorsRegistry registry) {
-	        registry.addMapping("/**")
-            .allowedOrigins("http://localhost","http://test.nosegrind.net")
-            .allowedMethods("*")
-			.allowedHeaders("*")
-			.exposedHeaders("*")
-            .allowCredentials(true);
+	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+		MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
+		converters.add(mappingJackson2HttpMessageConverter);
+		converters.add(new StringHttpMessageConverter()); // THIS WAS MISSING
 	}
-*/
+
 
 	/**
 	 *
@@ -167,12 +149,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	}
 
 
-	//@Bean
-	//public LocalValidatorFactoryBean getValidator() {
-	//	LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
-	//	bean.setValidationMessageSource(messageSource());
-	//	return bean;
-	//}
 
 	/**
 	 *
@@ -180,7 +156,50 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	 */
 	@Bean
 	public RequestInitializationFilter requestInitializationFilter() {
-		return new RequestInitializationFilter(linkRelationService, principleService, apiProperties, apiCacheService, this.version, context);
+		return new RequestInitializationFilter(throttleService, linkRelationService, principleService, apiProperties, apiCacheService, sessionService, version, this.context);
+	}
+
+
+	@Bean(name='mailSender')
+	public JavaMailSender mailSender() {
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+
+		mailSender.setHost(apiProperties.getMail().getHost());
+		mailSender.setPort(apiProperties.getMail().getPort());
+		mailSender.setUsername("${apiProperties.getMail().getUsername()}");
+		mailSender.setPassword("${apiProperties.getMail().getPassword()}");
+
+		Properties props = mailSender.getJavaMailProperties();
+		props.put("mail.transport.protocol", "smtp");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		props.put("mail.smtp.socketFactory.port", apiProperties.getMail().getPort());
+		props.put("mail.debug", "true");
+
+
+		//props.put("mail.transport.protocol", "smtp");
+		//props.put("mail.smtp.auth", apiProperties.getMail().getSmtpAuth());
+		//props.put("mail.smtp.ssl.enable", "true");
+		/*
+		props.put("mail.smtp.tls.enable", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+
+		props.put("mail.smtp.socketFactory.port", apiProperties.getMail().getPort());
+		props.put("mail.smtp.socketFactory.fallback", "false");
+		props.put("mail.debug", "true");
+		 */
+
+
+		return mailSender;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	@Bean(name='mailService')
+	public MailService mailService() {
+		return new MailService();
 	}
 
 	/**
@@ -210,7 +229,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		registrationBean.setFilter(requestInitializationFilter());
 		registrationBean.setOrder(SecurityProperties.DEFAULT_FILTER_ORDER+2)
 		//registrationBean.setOrder(FilterRegistrationBean.REQUEST_WRAPPER_FILTER_MAX_ORDER-100)
-		//registrationBean.addUrlPatterns("/v*/**","/b*/**","/c*/**","/r*/**");
+		registrationBean.addUrlPatterns("/v*/**","/b*/**","/c*/**","/r*/**");
 		return registrationBean;
 	}
 
@@ -228,9 +247,10 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 			if(!['beapiErrorController','jwtAuthenticationController'].contains(k)) {
 				String controller = k
+
 				def cache = apiCacheService.getApiCache(controller)
 				if (cache) {
-					if (!apiProperties.publicEndpoint.contains(controller)) {
+					if (!publicEndpoint.contains(controller)) {
 
 						ArrayList methodNames = []
 						for (Method method : v.getClass().getDeclaredMethods()) {
@@ -278,7 +298,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		mapping.setUrlMap(urlMap);
 		mapping.setOrder(Integer.MAX_VALUE - 5);
 		try {
-			mapping.setInterceptors(new Object[]{new ApiInterceptor(throttleCacheService, exchangeService, batchService, chainService, traceExchangeService, apiProperties)})
+			mapping.setInterceptors(new Object[]{new ApiInterceptor(exchangeService, batchService, chainService, traceExchangeService, apiProperties)})
 		}catch(Exception e){
 			println("Bad Interceptor : "+e)
 		}
@@ -301,7 +321,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		if (incoming != null) {
 			Properties properties = new Properties();
 			properties.load(incoming.openStream());
-			origins = properties.getProperty('api.security.cors.allowedOrigins')
+			origins = properties.getProperty('api.security.corsWhiteList')
 		}
 		return origins
 	}
@@ -330,7 +350,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 
 
 
-
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
@@ -346,6 +365,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		source.registerCorsConfiguration("/**", config);
 		return source;
 	}
+
 
 
 
@@ -413,50 +433,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		}
 		return urlMap
 	}
-
-
-	/*
-	* mapping for CORS; takes keySet from 'createMappings' and uses it to create CORS mappings
-	 */
-
-	/*
-	private Map createCorsMappings(Map corsMap, Set paths,String networkGrp) {
-		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		LinkedHashMap corsNetworkGroups = apiProperties.security.corsNetworkGroups
-
-		ArrayList networkGrps = []
-		corsNetworkGroups[networkGrp].each { k,v ->
-			networkGrps.add(v)
-		}
-
-		corsConfiguration.setAllowedOrigins(networkGrps);
-		paths.each(){
-			corsMap.put(it, corsConfiguration);
-		}
-
-		return corsMap
-	}
-
-	@Bean
-	CorsConfiguration corsConfig() {
-		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		LinkedHashMap corsNetworkGroups = apiProperties.security.corsNetworkGroups
-
-		ArrayList networkGrps = []
-		corsNetworkGroups[networkGrp].each { k,v ->
-			networkGrps.add(v)
-		}
-
-		corsConfiguration.setAllowedOrigins(networkGrps);
-
-		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", configuration);
-		return source;
-	}
-
- 	*/
 
 }
 

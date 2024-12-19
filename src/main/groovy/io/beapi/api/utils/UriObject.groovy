@@ -81,7 +81,7 @@ public class UriObject {
     }
 
     private setTrace(){
-        if(this.callType==5){this.trace=true}
+        if(this.callType.equals(5)){this.trace=true}
     }
 
     public boolean isTrace() { return trace }

@@ -1,4 +1,3 @@
-import com.vanniktech.maven.publish.SonatypeHost
 
 buildscript {
     repositories {
@@ -17,12 +16,10 @@ buildscript {
 }
 
 plugins {
-    //id "java-library"
-    id "org.springframework.boot" version "2.7.0"
-    id 'io.spring.dependency-management' version "1.1.5"
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
     id 'maven-publish'
     //id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
-    id("com.vanniktech.maven.publish") version "0.29.0"
     id 'groovy'
     //id "ca.cutterslade.analyze"
 }
@@ -44,7 +41,7 @@ group = "${group}"
 archivesBaseName = "spring-boot-starter-beapi"
 version = "${version}"
 sourceCompatibility = "${sourceCompatibility}"
-/*
+
 publishing {
     publications {
         maven(MavenPublication) {
@@ -52,13 +49,11 @@ publishing {
         }
     }
 }
- */
-/*
+
 java {
     withJavadocJar()
     withSourcesJar()
 }
- */
 
 repositories {
     mavenCentral()
@@ -74,7 +69,7 @@ dependencies {
     implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.3"
     implementation "org.apache.tomcat.embed:tomcat-embed-core:9.0.56"
     implementation "org.slf4j:slf4j-api:1.7.32"
-    implementation "org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-autoconfigure:2.6.2"
     implementation("org.springframework.security:spring-security-config:5.6.1")
     implementation("org.springframework.security:spring-security-core:5.6.1")
     implementation("org.springframework.security:spring-security-crypto:5.6.1")
@@ -86,6 +81,7 @@ dependencies {
     implementation "org.springframework:spring-webmvc:5.3.14"
     implementation "org.springframework.boot:spring-boot:${springBootVersion}"
     implementation 'org.json:json:20210307'
+
 
     // [DATABASE]
     implementation('org.apache.tomcat:tomcat-annotations-api:9.0.56')
@@ -107,49 +103,69 @@ dependencies {
     //implementation "io.micrometer:micrometer-registry-graphite:1.3.0"
 
     // [GROOVY]
-    implementation "org.apache.groovy:groovy:${groovyVersion}"
-    implementation("org.apache.groovy:groovy-ant:${groovyVersion}"){
+    implementation 'org.apache.groovy:groovy:4.0.8'
+    implementation('org.apache.groovy:groovy-ant:4.0.8'){
         exclude group:'org.apache.groovy', module: 'groovy-all'
     }
-    implementation("org.apache.groovy:groovy-json:${groovyVersion}"){
+    implementation('org.apache.groovy:groovy-json:4.0.8'){
         exclude group:'org.apache.groovy', module: 'groovy-all'
     }
-    implementation('org.codehaus.gpars:gpars:1.2.1'){
-       exclude group:'org.multiverse', module:'multiverse-core'
-        exclude group:'org.codehaus.groovy', module: 'groovy-all'
-    }
+    //implementation('org.codehaus.gpars:gpars:1.2.1'){
+     //   exclude group:'org.multiverse', module:'multiverse-core'
+    //    exclude group:'org.codehaus.groovy', module: 'groovy-all'
+    //}
 
-    implementation("org.apache.groovy:groovy-cli-commons:${groovyVersion}"){
-        exclude group:'org.apache.groovy', module: 'groovy-all'
-    }
 
-    implementation("org.apache.groovy:groovy-templates:${groovyVersion}") {
+    // CRON / SCHEDULER
+    //implementation 'org.quartz-scheduler:quartz:2.3.0'
+
+
+    // [APACHE LIBS]
+    implementation('org.apache.groovy:groovy-cli-commons:4.0.8'){
         exclude group:'org.apache.groovy', module: 'groovy-all'
     }
+    implementation 'commons-io:commons-io:2.8.0'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation('org.apache.groovy:groovy-templates:4.0.8') {
+        exclude group:'org.apache.groovy', module: 'groovy-all'
+    }
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+
 
     // [IOUTILS]
-    implementation 'commons-io:commons-io:2.8.0'
     compileOnly 'org.projectlombok:lombok:1.18.20'
     //annotationProcessor 'org.projectlombok:lombok:1.18.2'
 
+
     // [SMTP]
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 
     // CACHING
     implementation 'org.springframework:spring-context-support:5.3.3'
     implementation 'net.sf.ehcache:ehcache:2.9.1'
 
     // [WEBSOCKETS]
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'org.springframework.security:spring-security-messaging:6.1.1'
+    //implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    //implementation 'org.springframework.security:spring-security-messaging:6.1.1'
     //implementation 'org.springframework.boot:spring-boot-starter-security:2.0.4.RELEASE'
-    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
-    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+    //implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+    //implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
 
 
     // [NEW]
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation("jakarta.validation:jakarta.validation-api:2.0.2")
+
+    // [TEST]
+    implementation 'org.apache.groovy:groovy-json:4.0.8'
+    implementation('org.spockframework:spock-core:2.3-groovy-4.0')
+    testImplementation('org.spockframework:spock-spring:2.3-groovy-4.0')
+    testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    //testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 }
 
 jar {
@@ -159,67 +175,50 @@ jar {
 }
 
 
-
-mavenPublishing {
-    coordinates("io.beapi", "spring-boot-starter-beapi", "${version}")
-    pom {
-        name = "${project.group}:${project.name}"
-        description = "The Beapi Springboot Starter for API Automation; automates and simplifies almost all API functionality and security"
-        url = "https://github.com/orubel/spring-boot-starter-beapi"
-        licenses {
-            license {
-                name = "Reciprocal Public License (RPL-1.5)"
-                url = "https://opensource.org/licenses/RPL-1.5"
-            }
-        }
-        developers {
-            developer {
-                id = "orubel"
-                name = "Owen Rubel"
-                email = "orubel+spam@gmail.com"
-            }
-        }
-        scm {
-            connection = "https://github.com/orubel/spring-boot-starter-beapi.git"
-            developerConnection = "https://github.com/orubel/spring-boot-starter-beapi.git"
+project.plugins.withType(MavenPublishPlugin).all {
+    PublishingExtension publishing = project.extensions.getByType(PublishingExtension)
+    publishing.publications.withType(MavenPublication).all { mavenPublication ->
+        mavenPublication.pom {
+            name = "${project.group}:${project.name}"
+            description = "The Beapi Springboot Starter for API Automation; automates and simplifies almost all API functionality and security"
             url = "https://github.com/orubel/spring-boot-starter-beapi"
+            licenses {
+                license {
+                    name = "Reciprocal Public License (RPL-1.5)"
+                    url = "https://opensource.org/licenses/RPL-1.5"
+                }
+            }
+            developers {
+                developer {
+                    id = "orubel"
+                    name = "Owen Rubel"
+                    email = "orubel+spam@gmail.com"
+                }
+            }
+            scm {
+                connection = "https://github.com/orubel/spring-boot-starter-beapi.git"
+                developerConnection = "https://github.com/orubel/spring-boot-starter-beapi.git"
+                url = "https://github.com/orubel/spring-boot-starter-beapi"
+            }
         }
     }
-
-    //publishToMavenCentral(SonatypeHost.DEFAULT)
-    publishToMavenCentral(SonatypeHost.S01)
-    //publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-
-    signAllPublications()
-
 }
 
-
-publishing {
+nexusPublishing {
     repositories {
-        maven {
-            name = "local"
-            // change URLs to point to your repos, e.g. http://my.org/repo
-            def releasesRepoUrl = "$buildDir/repos/releases"
-            def snapshotsRepoUrl = "$buildDir/repos/snapshots"
-            url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
-        }
-        /*
         sonatype {
-            //username = System.getenv("ORG_GRADLE_PROJECT_ossrhUsername")
-            //password = System.getenv("ORG_GRADLE_PROJECT_ossrhPassword")
-            username = findProperty("ossrhUsername")
-            password = findProperty("ossrhPassword")
+            username = System.getenv("ORG_GRADLE_PROJECT_ossrhUsername")
+            password = System.getenv("ORG_GRADLE_PROJECT_ossrhPassword")
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
         }
- */
     }
+
+    // these are not strictly required. The default timeouts are set to 1 minute. But Sonatype can be really slow.
+    // If you get the error "java.net.SocketTimeoutException: timeout", these lines will help.
+    connectTimeout = Duration.ofMinutes(3)
+    clientTimeout = Duration.ofMinutes(3)
 }
-
-
-
-
 
 
 
@@ -236,7 +235,18 @@ task firstCopy(type: Copy) {
     }
 }
 
-/*
+publishing {
+    repositories {
+        maven {
+            name = "local"
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = "$buildDir/repos/releases"
+            def snapshotsRepoUrl = "$buildDir/repos/snapshots"
+            url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
+}
+
 def hasSigningKey = findProperty("signing.keyId") || findProperty("signing.key")
 if(hasSigningKey) {
     sign(project)
@@ -254,11 +264,9 @@ void sign(Project project) {
         } else if (signingKey) {
             useInMemoryPgpKeys(signingKey, signingPassword)
         }
-        sign publishing.publications
+        sign publishing.publications.maven
     }
 }
-
- */
 
 defaultTasks = ['myExec']
 

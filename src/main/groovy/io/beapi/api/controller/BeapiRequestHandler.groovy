@@ -76,7 +76,9 @@ class BeapiRequestHandler implements HttpRequestHandler {
     protected String authority
     protected Set keyList = []
     protected LinkedHashMap<String,String> params = [:]
+    ApplicationContext ctx
 
+    @Autowired protected PrincipleService principle;
 
 
     @Override
@@ -84,7 +86,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
         //logger.info("handleRequest(HttpServletRequest, HttpServletResponse) : {}")
         //println("### BeapiRequestHandler...")
 
-        //ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext())
+        ctx = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext())
 
         this.authority = request.getAttribute('principle')
         this.uObj = request.getAttribute('uriObj')
@@ -114,11 +116,11 @@ class BeapiRequestHandler implements HttpRequestHandler {
                     output = method.invoke(this, request, response)
                 } catch (IllegalArgumentException e) {
                     logger.warn(devnotes,"[ BAD URI ] : YOU ARE ATTEMPTING TO CALL AN ENDPOINT THAT DOES NOT EXIST. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD EXISTS AND THAT IT IS PROPERLY REPRESENTED IN THE IOSTATE FILE.")
-                    writeErrorResponse(response, '422', request.getRequestURI())
+                    writeErrorResponse(response, 422, request.getRequestURI())
                     throw new Exception("[BeapiController > handleRequest] : IllegalArgumentException - full stack trace follows :", e)
                 } catch (IllegalAccessException e) {
                     logger.warn(devnotes, "[ BAD URI ] : YOU ARE ATTEMPTING TO CALL AN ENDPOINT THAT DOES NOT EXIST. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD EXISTS AND THAT IT IS PROPERLY REPRESENTED IN THE IOSTATE FILE.")
-                    writeErrorResponse(response, '422', request.getRequestURI())
+                    writeErrorResponse(response, 422, request.getRequestURI())
                     throw new Exception("[BeapiController > handleRequest] : IllegalAccessException - full stack trace follows :", e)
                 }catch (java.lang.reflect.InvocationTargetException e){
                     // ignore
@@ -132,7 +134,6 @@ class BeapiRequestHandler implements HttpRequestHandler {
                     result = convertModel(trace)
                 } else {
                     ArrayList tempResult = convertModel(output)
-
                     // todo : tempResult is good; problem lies with parseResponseParams
                     Set responseList = request.getAttribute('responseList')
 
@@ -142,7 +143,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
                         if(Objects.nonNull(tmp)){
                             result = tmp
                         }else{
-                            writeErrorResponse(response, '422', request.getRequestURI(),"Expected Output does not match IOState RESPONSE params. Please conact the administrator.")
+                            writeErrorResponse(response, 422, request.getRequestURI(),"Expected Output does not match IOState RESPONSE params. Please conact the administrator.")
                         };
                     }else{
                         result = tempResult
@@ -151,15 +152,15 @@ class BeapiRequestHandler implements HttpRequestHandler {
                 request.setAttribute('responseBody', result)
             } else {
                 logger.warn(devnotes,"[ NO OUTPUT ] : OUTPUT EXPECTED AND NONE RETURNED. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD IS RETURNING THE PARAMS AS REPRESENTED IN THE APPROPRIATE IOSTATE FILE UNDER FOR THIS/CONTROLLER/METHOD (UNDER 'RESPONSE') AS A LINKEDHASHMAP.")
-                writeErrorResponse(response, '404', request.getRequestURI())
+                writeErrorResponse(response, 204, request.getRequestURI(), "[ NO OUTPUT ] : OUTPUT EXPECTED AND NONE RETURNED. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD IS RETURNING THE PARAMS AS REPRESENTED IN THE APPROPRIATE IOSTATE FILE UNDER FOR THIS/CONTROLLER/METHOD (UNDER 'RESPONSE') AS A LINKEDHASHMAP.")
             };
         } catch (SecurityException e) {
             // bad privileges for endpoint; shouldn't hit this
-            //writeErrorResponse(response,'422',request.getRequestURI())
+            writeErrorResponse(response,422,request.getRequestURI())
             throw new Exception("[BeapiController > handleRequest] : SecurityException - full stack trace follows :", e)
         } catch (NoSuchMethodException e) {
             // cannot find endpoint
-            //writeErrorResponse(response,'422',request.getRequestURI())
+            writeErrorResponse(response,422,request.getRequestURI(),"[ BAD URI ] : YOU ARE ATTEMPTING TO CALL AN ENDPOINT THAT DOES NOT EXIST. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD EXISTS AND THAT IT IS PROPERLY REPRESENTED IN THE IOSTATE FILE.")
             logger.warn(devnotes,"[ BAD URI ] : YOU ARE ATTEMPTING TO CALL AN ENDPOINT THAT DOES NOT EXIST. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD EXISTS AND THAT IT IS PROPERLY REPRESENTED IN THE IOSTATE FILE.")
             throw new Exception("[BeapiController > handleRequest] : NoSuchMethodException - full stack trace follows :", e)
         };
@@ -298,19 +299,18 @@ class BeapiRequestHandler implements HttpRequestHandler {
         return output
     };
 
-    // Todo : Move to exchangeService??
     /**
      * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
      * @param HttpServletResponse response
      * @param String statusCode
      * @return LinkedHashMap commonly formatted linkedhashmap
      */
-     private void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
+    private void writeErrorResponse(HttpServletResponse response, int statusCode, String uri){
         response.setContentType("application/json")
-        response.setStatus(Integer.valueOf(statusCode))
-        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
-        response.getWriter().write(message)
-        response.writer.flush()
+        response.setStatus(statusCode)
+        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode.toString()]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode.toString()]['long']}\",\"path\":\"${uri}\"}"
+        response.sendError(statusCode,message)
+        response.flushBuffer()
     };
 
     // Todo : Move to exchangeService??
@@ -320,15 +320,13 @@ class BeapiRequestHandler implements HttpRequestHandler {
      * @param String statusCode
      * @return LinkedHashMap commonly formatted linkedhashmap
      */
-    private void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
+    private void writeErrorResponse(HttpServletResponse response, int statusCode, String uri, String msg){
         response.setContentType("application/json")
-        response.setStatus(Integer.valueOf(statusCode))
-        if(msg.isEmpty()){
-            msg = ErrorCodes.codes[statusCode]['long']
-        }
-        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
-        response.getWriter().write(message)
-        //response.writer.flush()
+        response.setStatus(statusCode)
+        if(msg.isEmpty()){ msg = ErrorCodes.codes[statusCode.toString()]['long'] }
+        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode.toString()]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
+        response.sendError(statusCode,message)
+        response.flushBuffer()
     };
 
 }

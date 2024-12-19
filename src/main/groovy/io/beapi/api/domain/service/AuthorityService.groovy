@@ -40,6 +40,7 @@ public class AuthorityService implements IAuthority {
             authrepo.saveAndFlush(authority);
             return authority;
         }catch (DataAccessException e){
+            throw new Exception("{AuhtorityService :: save] ",e)
             throw new Exception(e.getCause().getCause().getLocalizedMessage())
         }
     }

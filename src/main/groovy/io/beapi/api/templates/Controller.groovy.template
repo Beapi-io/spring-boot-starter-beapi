@@ -1,4 +1,4 @@
-package $packageName
+package $packageName;
 
 import io.beapi.api.controller.BeapiRequestHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,93 +6,75 @@ import org.springframework.stereotype.Controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
-import demo.application.domain.<%=logicalClassName%>;
-import demo.application.service.<%=logicalClassName%>Service;
+import ${domainPackage}.${logicalClassName};
+import ${(domainPackage-'domain')+'service'}.${logicalClassName}Service;
 
 
-@Controller("<%=realClassName%>")
-class <%=logicalClassName%>Controller extends BeapiRequestHandler{
+@Controller("${realClassName}")
+public class ${logicalClassName}Controller extends BeapiRequestHandler{
 
-	SpringSecurityService springSecurityService
+    @Autowired ${logicalClassName}Service ${realClassName}Service;
 
-    @Autowired
-    private <%=logicalClassName%>Service <%=realClassName%>Service;
-
-	LinkedHashMap list() {
-		def $realClassName = <%=logicalClassName%>.list()
-		return [<%=realClassName%>:<%=realClassName%>]
+	public List<${logicalClassName}> list(HttpServletRequest request, HttpServletResponse response) {
+		List<${logicalClassName}> $realClassName = ${realClassName}Service.findAll();
+		return $realClassName;
 	}
 
-	LinkedHashMap show(){
-		try{
-			$logicalClassName $realClassName = <%=logicalClassName%>.get(params.id)
-			if($realClassName){
-				return [$realClassName: $realClassName]
-			}else{
-				render(status: 500,text:"Id does not match record in database.")
-			}
+	public ${logicalClassName} show(HttpServletRequest request, HttpServletResponse response){
+	    Long tmp = Long.parseLong(this.params.get("id").toString());
+        ${logicalClassName} ${realClassName}= ${realClassName}Service.findById(tmp);
 
-		}catch(Exception e){
-			throw new Exception("[<%=logicalClassName%>Controller : show] : Exception - full stack trace follows:",e)
-		}
-    }
-
-	LinkedHashMap create(){
-		try{
-			$logicalClassName $realClassName = new <%=logicalClassName%>(<%=createData%>)
-
-			if($realClassName){
-				if(!<%=realClassName%>.save(flush:true,failOnError:true)){
-					<%=realClassName%>.errors.allErrors.each { println(it) }
-				}
-				return [$realClassName: $realClassName]
-			}else{
-				render(status: 500,text:"Id does not match record in database.")
-			}
-		}catch(Exception e){
-			throw new Exception("[<%=logicalClassName%>Controller : create] : Exception - full stack trace follows:",e)
-		}
-	}
-
-
-	LinkedHashMap update(){
-		try{
-			$logicalClassName $realClassName = new $logicalClassName()
-
-			if($realClassName){
-
-
-			    // updateData
-
-
-				if(!<%=realClassName%>.save(flush:true,failOnError:true)){
-					<%=realClassName%>.errors.allErrors.each { println(it) }
-				}
-				return [$realClassName : $realClassName ]
-			}else{
-				render(status: 500,text:"Id does not match record in database.")
-			}
-		}catch(Exception e){
-			throw new Exception("[<%=logicalClassName%>Controller : update] : Exception - full stack trace follows:",e)
-		}
-	}
-
-    LinkedHashMap delete() {
-        $logicalClassName $realClassName
-        try {
-            $realClassName = <%=logicalClassName%>.get(params.id)
-            if($realClassName){
-                    <%=realClassName%>.delete(flush: true, failOnError: true)
-                    return [$realClassName: [id: params.id.toLong()]]
-            }else{
-                render(status: 500,text:"Id " + params.id + " does not match record in database.")
-            }
-        }catch(Exception e){
-            throw new Exception("[<%=logicalClassName%>Controller : delete] : Exception - full stack trace follows:",e)
+        if (Objects.nonNull(${realClassName})) {
+            return ${realClassName};
         }
+        return null;
     }
 
-    protected boolean isSuperuser() {
-        springSecurityService.principal.authorities*.authority.any { grailsApplication.config.apitoolkit.admin.roles.contains(it) }
+	public ${logicalClassName} create(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        $logicalClassName $realClassName = new ${logicalClassName}();
+
+        if(Objects.nonNull($realClassName)){
+            ${createData}
+
+            if(!Objects.nonNull(${realClassName}Service.save($realClassName))){
+                 throw new Exception("[${logicalClassName}Controller : create] : could not save :");
+            }
+            return $realClassName;
+        }else{
+            return null;
+        }
+	}
+
+
+	public ${logicalClassName} update(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        Long tmp = Long.parseLong(this.params.get("id").toString());
+        ${logicalClassName} $realClassName = ${realClassName}Service.findById(tmp);
+
+        if(Objects.nonNull($realClassName)){
+            ${updateData}
+
+
+            if(!Objects.nonNull(${realClassName}Service.save($realClassName))){
+                throw new Exception("[${logicalClassName}Controller : update] : could not save :");
+            }
+            return $realClassName;
+        } else {
+            return null;
+        }
+	}
+
+    Map delete(HttpServletRequest request, HttpServletResponse response) {
+        Long tmp = Long.parseLong(this.params.get("id").toString());
+        ${logicalClassName} $realClassName = ${realClassName}Service.findById(tmp);
+        if(Objects.nonNull($realClassName)){
+                ${realClassName}Service.deleteById(Long.parseLong(this.params.get("id")));
+                ${realClassName}Service.flush();
+                Map data = Map.of("id",this.params.get("id"));
+                Map output = Map.of("$realClassName", data);
+                return output;
+                //return {$realClassName: {id: this.params.id.toLong()}};
+        } else {
+            return null;
+        }
     }
 }

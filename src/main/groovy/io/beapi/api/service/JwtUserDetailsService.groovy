@@ -55,7 +55,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 			updatedAuthorities.add(authority);
 		}
 
-		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), updatedAuthorities);
+		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.getEnabled(), user.getAccountNonExpired(), user.getCredentialsNonExpired(), user.getAccountNonLocked(), updatedAuthorities)
 	}
 
 	//@Override

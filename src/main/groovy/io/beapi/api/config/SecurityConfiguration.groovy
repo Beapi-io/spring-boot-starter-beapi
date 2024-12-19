@@ -3,7 +3,7 @@ package io.beapi.api.config;
 
 import io.beapi.api.domain.service.AuthorityService;
 import io.beapi.api.domain.service.UserAuthorityService;
-import io.beapi.api.domain.service.UserService;
+import io.beapi.api.domain.service.UserService
 import io.beapi.api.filter.JwtRequestFilter;
 import io.beapi.api.filter.RequestInitializationFilter;
 //import io.beapi.api.filter.FilterChainExceptionHandler;
@@ -48,55 +48,57 @@ import java.io.IOException;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private ApiProperties apiProperties;
+    @Autowired private ApiProperties apiProperties;
+    @Autowired private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    @Autowired private RequestInitializationFilter requestInitializationFilter;
+    @Autowired private FilterRegistrationBean requestInitializationFilterRegistration;
+    @Autowired protected AuthorityService authService;
+    @Autowired protected UserService userService;
+    @Autowired protected UserAuthorityService uAuthService;
 
-    @Autowired
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-    @Autowired
-    private RequestInitializationFilter requestInitializationFilter;
-
-    @Autowired
-    private FilterRegistrationBean requestInitializationFilterRegistration;
-
-    //@Autowired
-    //private FilterChainExceptionHandler filterChainExceptionHandler;
+   //@Autowired private FilterChainExceptionHandler filterChainExceptionHandler;
 
     private final PasswordEncoder passwordEncoder;
-
-    @Autowired
-    protected AuthorityService authService;
-
-    @Autowired
-    protected UserService userService;
-
-    @Autowired
-    protected UserAuthorityService uAuthService;
+    String version = getVersion()
 
     @Autowired
     public SecurityConfiguration(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
 
+/*
+    @Bean
+    public CommonsRequestLoggingFilter requestLoggingFilter() {
+        CommonsRequestLoggingFilter loggingFilter = new CommonsRequestLoggingFilter();
+        loggingFilter.setIncludeClientInfo(true);
+        loggingFilter.setIncludeQueryString(true);
+        loggingFilter.setIncludePayload(true);
+        loggingFilter.setMaxPayloadLength(64000);
+        return loggingFilter;
+    }
+ */
 
     @Bean
     public JwtRequestFilter jwtRequestFilter() {
-        return new JwtRequestFilter();
+        return new JwtRequestFilter(apiProperties, version);
     }
 
 
     // this registers filter with RequestMappingHandlerMapping
-    @Bean
-    @ConditionalOnMissingBean
-    public FilterRegistrationBean<JwtRequestFilter> jwtFilterRegistration() {
-        FilterRegistrationBean<JwtRequestFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(jwtRequestFilter());
-        registrationBean.setOrder(SecurityProperties.DEFAULT_FILTER_ORDER+1);
+    //@Bean
+    //@ConditionalOnMissingBean
+    //public FilterRegistrationBean<JwtRequestFilter> jwtFilterRegistration() {
+    //    FilterRegistrationBean<JwtRequestFilter> registrationBean = new FilterRegistrationBean<>();
+
+        // should not have this with public apis
+        //registrationBean.setFilter(jwtRequestFilter());
+
+     //   registrationBean.setOrder(SecurityProperties.DEFAULT_FILTER_ORDER+1);
         //registrationBean.setOrder(FilterRegistrationBean.REQUEST_WRAPPER_FILTER_MAX_ORDER-100)
-        registrationBean.addUrlPatterns("/authenticate","/register","/error");
-        return registrationBean;
-    }
+        //registrationBean.addUrlPatterns("/authenticate","/register","/error","/validate","/validate","/post-registration/good","/post-registration-bad")
+
+     //   return registrationBean;
+    //}
 
     @Override
     @Bean
@@ -104,35 +106,41 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return super.authenticationManager();
     }
 
-    // websocket security
-    /*
-    @Bean
-    public AuthorizationManager<Message<?>> messageAuthorizationManager(MessageMatcherDelegatingAuthorizationManager.Builder messages) {
-        messages
-                .nullDestMatcher().authenticated()
-                .simpSubscribeDestMatchers("/user/queue/errors").permitAll()
-                .simpDestMatchers("/app/**").hasRole("ROLE_USER","ROLE_ADMIN")
-                .simpSubscribeDestMatchers("/**").hasRole("ROLE_USER","ROLE_ADMIN")
-                .simpTypeMatchers(MESSAGE, SUBSCRIBE).denyAll()
-                .anyMessage().denyAll();
-        return messages.build();
-    }
-
-     */
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable().cors();
         //httpSecurity.authorizeRequests().antMatchers("/ws/**").permitAll();
-        httpSecurity.authorizeRequests().antMatchers("/authenticate", "/register").permitAll().anyRequest().authenticated();
+
+
+        httpSecurity.authorizeHttpRequests().antMatchers((String[])apiProperties.reservedUris).permitAll().anyRequest().authenticated();
         httpSecurity.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
         //httpSecurity.exceptionHandling((exceptionHandling) -> exceptionHandling.accessDeniedPage("/error"));
         httpSecurity.addFilterAfter(jwtRequestFilter(), ExceptionTranslationFilter.class);
         httpSecurity.addFilterAfter(requestInitializationFilter, JwtRequestFilter.class);
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        httpSecurity.sessionManagement(session -> session.maximumSessions(1).maxSessionsPreventsLogin(true));
     }
 
     public BootstrapService bootstrapService() throws IOException {
         return new BootstrapService(apiProperties, authService, userService, uAuthService, passwordEncoder);
+    }
+
+    /**
+     *
+     * @return
+     * @throws IOException
+     */
+    private String getVersion() throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL incoming = classLoader.getResource("META-INF/build-info.properties")
+
+        String version
+        if (incoming != null) {
+            Properties properties = new Properties();
+            properties.load(incoming.openStream());
+            version = properties.getProperty('build.version')
+        }
+        return version
     }
 }

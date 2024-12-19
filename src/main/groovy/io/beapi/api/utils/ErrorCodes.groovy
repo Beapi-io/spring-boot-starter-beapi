@@ -56,6 +56,7 @@ public final class ErrorCodes{
 			'416':['short':'Requested Range Not Satisfiable','long':'The client has asked for a portion of the file, but the server cannot supply that portion'],
 			'417':['short':'Expectation Failed','long':'The server cannot meet the requirements of the Expect request-header field'],
 			'422':['short':'Unprocessable Entity','long':'The server understands content-type and syntax but was unable to process contained instructions.'],
+			'423':['short':'Account Locked','long':'Account is currently locked. Please check your email for a verification code to unlock'],
 // Server Error
 			'500':['short':'Internal Server Error','long':''],
 			'501':['short':'Not Implemented','long':'The server either does not recognize the request method, or it lacks the ability to fulfill the request'],

@@ -84,7 +84,7 @@ class ApiDescriptor implements Serializable{
 			// is faster than strings
 			if(!rateLimit.isEmpty()){
 				rateLimit.each(){ k, v ->
-					if(v=="*"){
+					if(v.equals("*")){
 						this.rateLimit.add(k, -1)
 					}else{
 						this.rateLimit.add(k, (Integer)v)

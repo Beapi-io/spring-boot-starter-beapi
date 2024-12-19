@@ -2,15 +2,82 @@
 	"IOSTATE": {
 		"NAME": "${realName}",
 		"NETWORKGRP": "public",
-		"VALUES": { ${attList}
+		"VALUES": {
+		    ${attList}
 		},
 		"CURRENTSTABLE": "1",
 		"VERSION": {
 			"1": {
 				"DEFAULTACTION":"list",
-				"URI": { ${uris}
-				}
-			}
-		}
-	}
+				"URI": {
+                                    "list": {
+                                        "METHOD": "GET",
+                                        "DESCRIPTION": "List function for ${realName}",
+                                        "ROLES": {
+                                            "BATCH": ["ROLE_ADMIN"],
+                                        },
+                                        "REQUEST": {
+                                            "permitAll": ["id"]
+                                        },
+                                        "RESPONSE": {
+                                            "permitAll": [${allAtts}]
+                                        }
+                                    },
+                                    "create": {
+                                        "METHOD": "POST",
+                                        "DESCRIPTION": "Create function for ${realName}",
+                                        "ROLES": {
+                                            "BATCH": ["ROLE_ADMIN"],
+                                        },
+                                        "REQUEST": {
+                                            "permitAll": [${createAtts}]
+                                        },
+                                        "RESPONSE": {
+                                            "permitAll": ["id"]
+                                        }
+                                    },
+                                    "read": {
+                                        "METHOD": "GET",
+                                        "DESCRIPTION": "Read function for ${realName}",
+                                        "ROLES": {
+                                            "BATCH": ["ROLE_ADMIN"],
+                                        },
+                                        "REQUEST": {
+                                            "permitAll": ["id"]
+                                        },
+                                        "RESPONSE": {
+                                            "permitAll": [${allAtts}]
+                                        }
+                                    },
+                                    "update": {
+                                        "METHOD": "PUT",
+                                        "DESCRIPTION": "Update function for ${realName}",
+                                        "ROLES": {
+                                            "BATCH": ["ROLE_ADMIN"],
+                                        },
+                                        "REQUEST": {
+                                            "permitAll": [${allAtts}]
+                                        },
+                                        "RESPONSE": {
+                                            "permitAll": ["id"]
+                                        }
+                                    },
+                                    "delete": {
+                                        "METHOD": "DELETE",
+                                        "DESCRIPTION": "Delete function for ${realName}",
+                                        "ROLES": {
+                                            "BATCH": ["ROLE_ADMIN"],
+                                        },
+                                        "REQUEST": {
+                                            "permitAll": ["id"]
+                                        },
+                                        "RESPONSE": {
+                                            "permitAll": []
+                                        }
+                                    }
+                }
+            }
+        }
+    }
 }
+

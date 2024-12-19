@@ -18,6 +18,8 @@ package io.beapi.api.filter
 
 import groovy.json.JsonSlurper
 import io.beapi.api.service.LinkRelationService
+import io.beapi.api.service.SessionService
+import io.beapi.api.service.ThrottleService
 import io.beapi.api.utils.UriObject
 import org.json.JSONObject
 import io.beapi.api.properties.ApiProperties
@@ -45,15 +47,12 @@ import io.beapi.api.utils.ApiDescriptor
 import org.apache.commons.io.IOUtils
 import com.google.common.hash.Hashing
 
-import org.springframework.beans.factory.BeanFactoryUtils
-import org.springframework.web.servlet.HandlerMapping
 import org.springframework.http.HttpStatus
-
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.beans.factory.BeanFactoryUtils
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.cors.CorsUtils
 import javax.servlet.RequestDispatcher
 import org.springframework.web.servlet.DispatcherServlet;
@@ -62,9 +61,9 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
-
-import org.springframework.web.servlet.HandlerMapping
-
+import javax.servlet.http.HttpSession
+import org.springframework.web.util.WebUtils
+import javax.servlet.http.Cookie
 import java.util.regex.Pattern;
 
 /**
@@ -93,10 +92,12 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     @Autowired
     private ApplicationContext ctx
 
+    protected ThrottleService throttleService
     protected LinkRelationService linkRelationService
     protected PrincipleService principle
     protected ApiCacheService apiCacheService
     protected ApiProperties apiProperties
+    protected SessionService sessionService;
 
     // [CACHE]
     protected ApiDescriptor apiObject
@@ -117,6 +118,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     protected ArrayList deprecated
 
 
+
     /**
      * @param PrincipleService principle
      * @param ApiProperties apiProperties
@@ -124,13 +126,15 @@ class RequestInitializationFilter extends OncePerRequestFilter{
      * @param String version
      * @param ApplicationContext ctx
      */
-    public RequestInitializationFilter(LinkRelationService linkRelationService, PrincipleService principle, ApiProperties apiProperties, ApiCacheService apiCacheService, String version, ApplicationContext ctx) {
+    public RequestInitializationFilter(ThrottleService throttleService, LinkRelationService linkRelationService, PrincipleService principle, ApiProperties apiProperties, ApiCacheService apiCacheService, SessionService sessionService, String version, ApplicationContext ctx) {
+        this.throttleService = throttleService
         this.linkRelationService = linkRelationService
         this.apiProperties = apiProperties
         this.version = version
         this.ctx = ctx
         this.principle = principle
         this.apiCacheService = apiCacheService
+        this.sessionService = sessionService
     }
 
     /**
@@ -141,44 +145,68 @@ class RequestInitializationFilter extends OncePerRequestFilter{
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        //println("### RequestInitializationFilter...")
+        println("### RequestInitializationFilter > "+request.getRequestURI())
 
-        // only do request parsing for api's
-        Pattern p = ~/[v|b|c|r]${version}/
-        Matcher match = p.matcher(request.getRequestURI()[1..4])
-        if (match.find()) {
+        // [ SHOW SESSION VARIABLES ]
+        //if(sessionService.sessionExists()) {
+            println(sessionService.sessionExists()==true)
+            println(request.getSession().getId()+"=="+WebUtils.getCookie(request, 'JSESSIONID')?.getValue())
+
             request.setCharacterEncoding("UTF-8")
-            this.authority = this.principle.authorities()
+            this.authority = (this.principle.authorities()) ? this.principle.authorities() : "ROLE_ANONYMOUS"
 
-            if (processRequest(request, response)) {
+
+            Pattern p = ~/[v|b|c|r]${version}/
+            Matcher match = p.matcher(request.getRequestURI()[1..4])
+
+            // route for simpleHandlerMapping
+            if (match.find()) {
+                if (processRequest(request, response)) {
+                    try {
+                        Map<String, HandlerMapping> handlerMappingMap = BeanFactoryUtils.beansOfTypeIncludingAncestors(this.ctx, HandlerMapping.class, true, false);
+                        handlerMappingMap.each { k, v ->
+                            v.getHandler(request).getClass()
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 try {
-                    Map<String, HandlerMapping> handlerMappingMap = BeanFactoryUtils.beansOfTypeIncludingAncestors(this.ctx, HandlerMapping.class, true, false);
-                    handlerMappingMap.each { k, v ->
-                        v.getHandler(request).getClass()
+                    // ratelimiting
+                    if (apiProperties.throttle.active) {
+                        try {
+                            throttleService.incrementThrottle(this.authority)
+                            //chain.doFilter(request, response);
+                        } catch (Exception e) {
+                            // return response as ratelimit failure and do not continue with chain
+                            String msg = "Too many requests. Please wait " + (apiProperties.throttle.staleSession / 6000) + " minutes before making another request.: " + e
+                            writeErrorResponse(response, '400', request.getRequestURI(), msg);
+                        }
+                    }
+                } catch (org.springframework.security.access.AccessDeniedException ade) {
+                    if (this.authority == 'ROLE_ANONYMOUS') {
+                        logger.info("BAD AUTHORITY ACCESS ATTEMPT for {" + request.getRequestURI() + "} with  {\"ROLE_ANONYMOUS\"}")
+                    } else {
+                        logger.info("BAD AUTHORITY ACCESS ATTEMPT for {" + request.getRequestURI() + "} with auth {\"+this.authority+\"} by {" + principle.name + "}")
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Exception - full stack trace follows:", e)
                 }
+
+
             }
 
             try {
                 chain.doFilter(request, response);
-            } catch (org.springframework.security.access.AccessDeniedException ade) {
-                if (this.authority == 'ROLE_ANONYMOUS') {
-                    logger.info("BAD AUTHORITY ACCESS ATTEMPT for {" + request.getRequestURI() + "} with  {\"ROLE_ANONYMOUS\"}")
-                } else {
-                    logger.info("BAD AUTHORITY ACCESS ATTEMPT for {" + request.getRequestURI() + "} with auth {\"+this.authority+\"} by {" + principle.name + "}")
-                }
             } catch (Exception e) {
                 throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Exception - full stack trace follows:", e)
             }
-        }else{
-            try{
-                chain.doFilter(request, response);
-            } catch (Exception e) {
-                throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Exception - full stack trace follows:", e)
-            }
-        }
+        //}else{
+        //    String msg = "Invalid Session"
+        //    writeErrorResponse(response, '400', request.getRequestURI(), msg);
+        //}
+
     }
 
 
@@ -191,11 +219,15 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         //println("### processRequest ...")
 
         if(request){
+
             if(this.authority!='ROLE_ANONYMOUS') {
                 //logger.debug("doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : {}");
                 String cachedResult
                 this.uri = request.getRequestURI()
 
+                /*
+                * processing for 'static uris' in starter
+                */
                 if (apiProperties.reservedUris.contains(request.getRequestURI())) {
                     ArrayList uriVars = uri.split('/')
                     this.controller = uriVars[0]
@@ -225,6 +257,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                             // CHECKING REQUEST/RESPONSE DATASETS (RBAC/ABAC)
                             ArrayList networkRoles = cache.networkGrpRoles
+
                             if (checkNetworkGrp(networkRoles, this.authority)) {
                                 this.receivesList = (this.apiObject?.getReceivesList()[this.authority])?:this.apiObject?.getReceivesList()['permitAll']
                                 request.setAttribute('receivesList', this.receivesList)
@@ -238,15 +271,17 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                                 }
                             } else {
                                 logger.warn(devnotes,"[ BAD AUTHORITY ] : THE AUTHORITY '${this.authority}' DOES NOT EXIST IN THE 'NETWORKGRP' IN YOUR IOSTATE FILE FOR '${this.uObj.getController()}/${this.uObj.getAction()}'. IF THIS IS AN ISSUE, FIX BY ADDING 'ROLE' TO THE NETWORKGRP IN YOUR BEAPI_API.YML FILE")
+
                                 String msg = "Authority '${this.authority}' for '${uri}' does not exist in IOState NetworkGrp"
                                 writeErrorResponse(response, '401', request.getRequestURI(), msg);
+
                                 return false
                                 //throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Authority '${this.authority}' for '${uri}' does not exist in IOState NetworkGrp")
                             }
 
                             if (this.uObj.getId()) {
                                 if (!this.receivesList?.contains('id')) {
-                                    logger.warn(devnotes,"[ ATTRIBUTE BASED ACCESS CONTROL(ABAC) MISMATCH (1) ] : PARAMS SENT FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DO NOT MATCH EXPECTED 'REQUEST' PARAMS. IF THIS IS AN ISSUE, FIX BY ADDING THE PARAM TO THE IOSTATE FILE.")
+                                    logger.warn(devnotes, "[ ATTRIBUTE BASED ACCESS CONTROL(ABAC) MISMATCH (1) ] : PARAMS SENT FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DO NOT MATCH EXPECTED 'REQUEST' PARAMS. IF THIS IS AN ISSUE, FIX BY ADDING THE PARAM TO THE IOSTATE FILE.")
                                     writeErrorResponse(response, '400', request.getRequestURI());
                                     return false
                                 }
@@ -263,6 +298,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                             this.responseFileType = (this.requestFileType) ? this.requestFileType : getFormat(respMime[0])
                             if (!this.requestFileType || !this.responseFileType) {
                                 logger.warn(devnotes,"[ UNSUPPORTED MIMETYPE (1) ] : ACCEPT/CONTENT-TYPE HEADERS MUST BE A SUPPORTED MIMETYPE OF '${SUPPORTED_MIME_TYPES}'. IF THIS IS AN ISSUE, FILE A TICKET TO ADD A NEW SUPPORTED MIMETYPE (https://github.com/Beapi-io/spring-boot-starter-beapi/issues).")
+
                                 String msg = "Request MimeType must be one of the supported mimetypes (JSON/XML)"
                                 writeErrorResponse(response, '400', request.getRequestURI(), msg);
                                 return false
@@ -279,22 +315,18 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     } catch (Exception e) {
                         throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
                     }
-
                     parseParams(request, this.uObj.getId())
 
-
-                    /*
-                    * NOT REDUNDANT! DO NOT REMOVE!
-                     */
                     if (this.apiObject && this.uObj.callType==1) {
                         if(!checkRequestParams(request.getAttribute('params'))) {
                             logger.warn(devnotes,"[ ATTRIBUTE BASED ACCESS CONTROL(ABAC) MISMATCH (2) ] : PARAMS SENT FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DO NOT MATCH EXPECTED 'REQUEST' PARAMS. IF THIS IS AN ISSUE, FIX BY ADDING THE PARAM TO THE IOSTATE FILE.")
-                            writeErrorResponse(response, '400', request.getRequestURI());
+                            writeErrorResponse(response, '400', request.getRequestURI(), "PARAMS SENT FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DO NOT MATCH EXPECTED 'REQUEST' PARAMS. IF THIS IS AN ISSUE, FIX BY ADDING THE PARAM TO THE IOSTATE FILE.");
                             return false
                             //throw new Exception("[RequestInitializationFilter :: checkRequestParams] : Requestparams do not match expected params for this endpoint")
                         }
 
                         if (validCacheRequestMethod(this.method)) {
+
                             setCacheHash(request.getAttribute('params'), this.receivesList)
                             request.setAttribute('cacheHash', this.cacheHash)
 
@@ -308,6 +340,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                                 // todo : check throttle cache size
                                 if(cachedResult && cachedResult.size() > 0) {
+                                    // println("### RequestInitializationFilter (cachedResult)")
                                     // PLACEHOLDER FOR APITHROTTLING
                                     String linkRelations = linkRelationService.processLinkRelations(request, response, this.apiObject)
                                     String newResult = (linkRelations)?"[${cachedResult},${linkRelations}]":cachedResult
@@ -328,7 +361,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                 return true
             }
         }else{
-            println("No REQUEST")
+            // println("No REQUEST")
             //return true
         }
         return false
@@ -430,6 +463,9 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     } else {
                         paramsList = methodParams.keySet() as ArrayList
 
+                        //println("received :"+checkList)
+                        //println("expected :"+paramsList)
+
                         // remove reservedNames from List
                         reservedNames.each() { paramsList.remove(it) }
                         if (paramsList.size() == checkList?.intersect(paramsList).size()) {
@@ -453,6 +489,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     }
 
     protected void parseParams(HttpServletRequest request, String id){
+
         LinkedHashMap<String, String> get = [:]
 
         if(request.getQueryString()) {
@@ -462,6 +499,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         }
 
         LinkedHashMap<String, String> post = parsePutParams(IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8))
+
 
         // set batchVars if they are present
         switch (this.uObj.callType) {
@@ -637,35 +675,53 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     }
 
 
+
+    protected String getClientIpAddress(HttpServletRequest request) {
+        String[] IP_HEADER_CANDIDATES = ["X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_X_FORWARDED_FOR", "HTTP_X_FORWARDED", "HTTP_X_CLUSTER_CLIENT_IP", "HTTP_CLIENT_IP", "HTTP_FORWARDED_FOR", "HTTP_FORWARDED", "HTTP_VIA", "REMOTE_ADDR"];
+        for (String header : IP_HEADER_CANDIDATES) {
+            String ip = request.getHeader(header);
+            if (ip != null && ip.length() != 0 && !"unknown".equalsIgnoreCase(ip)) {
+                return ip;
+            }
+        }
+        return request.getRemoteAddr();
+    }
+
+
+    // Todo : Move to exchangeService??
     /**
      * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
      * @param HttpServletResponse response
      * @param String statusCode
-     * @param String uri
+     * @return LinkedHashMap commonly formatted linkedhashmap
      */
-    void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
+    private void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
         response.setContentType("application/json")
         response.setStatus(Integer.valueOf(statusCode))
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
         //response.writer.flush()
-    }
+        SecurityContextHolder.getContext().getRequestDispatcher("/error").forward(request, response);
+    };
 
+    // Todo : Move to exchangeService??
     /**
      * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
      * @param HttpServletResponse response
      * @param String statusCode
-     * @param String uri
-     * @param String msg
+     * @return LinkedHashMap commonly formatted linkedhashmap
      */
-    void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
+    private void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
         response.setContentType("application/json")
         response.setStatus(Integer.valueOf(statusCode))
-        if(msg.isEmpty()){ msg = ErrorCodes.codes[statusCode]['long'] }
+        if(msg.isEmpty()){
+            msg = ErrorCodes.codes[statusCode]['long']
+        }
         String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
         //response.writer.flush()
-    }
+        SecurityContextHolder.getContext().getRequestDispatcher("/error").forward(request, response);
+    };
 
     private void createUriObj() {
         this.uObj = new UriObject(this.uri, this.version)

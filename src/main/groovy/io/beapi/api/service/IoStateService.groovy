@@ -17,7 +17,7 @@
 package io.beapi.api.service
 
 
-import groovy.json.JsonSlurper
+
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ClassPathResource;
 
@@ -156,7 +156,7 @@ public class IoStateService{
 				parseJson(json.NAME.toString(), json)
 				// Store these in cache
 			}catch(java.lang.reflect.UndeclaredThrowableException e){
-				println("#### [IoStateService] UndeclaredThrowableException :"+e)
+				println("#### [IoStateService - ${json.NAME.toString()}] UndeclaredThrowableException :"+e)
 			}
 		}
 
@@ -188,8 +188,8 @@ public class IoStateService{
 
 								parseJson(json.IOSTATE.NAME.toString(), json.IOSTATE)
 							}catch(Exception e){
-								println("#### [IoStateService] Exception :"+e)
-								throw new Exception("#### [IoStateService] Exception :",e)
+								println("#### [IoStateService - ${json.NAME.toString()}] Exception :"+e)
+								throw new Exception("#### [IoStateService - ${json.NAME.toString()}] Exception :",e)
 							}
 						} else {
 							//logger.debug("parseFiles : {}","[Bad File Type ( ${tmp[1]} )] - Ignoring file : ${fileName}")
@@ -619,10 +619,13 @@ public class IoStateService{
 	}
 
 
+	/*
+	This function is meant to enforce ALL 'RequestMappingHandlerMapping' endpoints comply with RPCNaming.
+	 */
 	boolean validateRpcNamingConventions(ApplicationContext applicationContext,String version) throws Exception {
 		try {
 			boolean result = true
-			ArrayList reservedControllerNames = ['authenticate', 'register', 'error', 'jwtAuthentication']
+			ArrayList reservedControllerNames = ['authenticate', 'register', 'error', 'jwtAuthentication', 'validate','resetPassword']
 
 			RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
 			applicationContext.getBean(RequestMappingHandlerMapping.class).getHandlerMethods().each() { k, v ->
@@ -666,12 +669,12 @@ public class IoStateService{
 						} else {
 							if (info != "{ [/error]}") {
 								String msg = "${info} does not match expected requestmapping naming convention of '/*/controller/method**'. Also check your that you have a request method declared for your endpoint and try again."
-								throw new Exception("INVALID_RPC_NAMING : " + msg);
+								throw new Exception("INVALID_RPC_NAMING(1) : " + msg);
 								return false
 							}
 						}
 					} catch (Exception e) {
-						throw new Exception("INVALID_RPC_NAMING : " + e);
+						throw new Exception("INVALID_RPC_NAMING(2) 'reservedControllerNames' does not contain '${info}' : " + e);
 					}
 
 					if (!reservedControllerNames.contains(temp)) {
@@ -703,7 +706,7 @@ public class IoStateService{
 									}
 								}
 							}catch(Exception e){
-								throw new Exception("INVALID_RPC_NAMING : " + e);
+								throw new Exception("INVALID_RPC_NAMING(3) : " + e);
 							}
 						}
 					}

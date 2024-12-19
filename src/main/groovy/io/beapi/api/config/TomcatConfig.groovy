@@ -82,13 +82,14 @@ public class TomcatConfig  {
                             connector.addUpgradeProtocol(new Http2Protocol());
                             //AbstractHttp11Protocol<?> httpHandler = ((AbstractHttp11Protocol<?>) connector.getProtocolHandler());
                             Http11NioProtocol httpHandler = (Http11NioProtocol) connector.getProtocolHandler();
-                            httpHandler.setMaxKeepAliveRequests(-1);
+                            httpHandler.setMaxKeepAliveRequests(500);
+                            //httpHandler.setMaxKeepAliveRequests(-1);
                             httpHandler.setRejectIllegalHeader(true);
                             httpHandler.setMaxThreads(maxThreads);
                             httpHandler.setMinSpareThreads(minSpareThreads);
                             httpHandler.setMaxConnections(maxConnections);
-                            //httpHandler.setUseKeepAliveResponseHeader(true);
-                            //httpHandler.setKeepAliveTimeout(keepAliveTimeout);
+                            httpHandler.setUseKeepAliveResponseHeader(true);
+                            httpHandler.setKeepAliveTimeout(apiProperties.getThrottle().getStaleSession());
                         }
                     });
                 }

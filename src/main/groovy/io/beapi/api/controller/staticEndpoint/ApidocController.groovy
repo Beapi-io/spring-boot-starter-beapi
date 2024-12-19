@@ -35,11 +35,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class ApidocController extends BeapiRequestHandler{
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApidocController.class);
+	private static final ArrayList reservedUris = ['/authenticate','/register','/error','/login','/logout','/validate','/resetPassword']
 
-	@Autowired
-	protected ApiCacheService apiCacheService
+	@Autowired protected ApiCacheService apiCacheService
 
 	List show(HttpServletRequest request, HttpServletResponse response){
+		// params.id == controller
+		// so you can get just the docs back for a specific controller
 
 		LinkedHashMap controllerResults = [:]
 		ArrayList controllers = apiCacheService.getCacheKeys()
@@ -51,8 +53,11 @@ public class ApidocController extends BeapiRequestHandler{
 				def temp = createApidocs(it)
 				controllerResults[it] = temp[it]
 			}
+			def tmp = getPublicApis()
+			controllerResults["/"] = tmp["/"]
 			returnData = [controllerResults]
 		}
+
 		return returnData
     }
 
@@ -88,6 +93,90 @@ public class ApidocController extends BeapiRequestHandler{
 		return result
 	}
 	 */
+
+	private LinkedHashMap getPublicApis(){
+		LinkedHashMap controllerResults = [:]
+		controllerResults["[ROOT]"] = [:]
+		controllerResults["[ROOT]"][apiversion] = [:]
+		controllerResults["[ROOT]"][apiversion] = [
+				"authenticate":[
+						"returnsList":["permitAll":["token"]],
+						"hook":false,
+						"method":"GET",
+						"receivesList":["permitAll":["username","password"]],
+						"name":"authenticate",
+						"batch":false,
+						"returns":[["name":"token", "type":"String","mockData":"cfwer5yw4y376w3g73738"]],
+						"receives":[
+								["name":"username","type":"String","mockData":"test"],
+								["name":"password","type": "String","mockData": "password"]
+						]
+				],
+				"logout":[
+						"returnsList":["permitAll":["statusCode"]],
+						"hook":false,
+						"method":"GET",
+						"receivesList":["permitAll":[]],
+						"name":"logout",
+						"batch":false,
+						"returns":[
+								["name":"statusCode", "type":"Integer","mockData":"200"],
+						],
+						"receives":[[]]
+				],
+				"validate":[
+						"returnsList":["permitAll":["statusCode"]],
+						"hook":false,
+						"method":"GET",
+						"receivesList":["permitAll":["id"]],
+						"name":"validate",
+						"batch":false,
+						"returns":[["name":"statusCode", "type":"Integer","mockData":"200"]],
+						"receives":[["name":"id","type":"String","mockData":"3df4t34r2e3rt2t2"]]
+				],
+				"resetPassword":[
+						"returnsList":["permitAll":[""]],
+						"hook":false,
+						"method":"POST",
+						"receivesList":["permitAll":["email"]],
+						"name":"resetPassword",
+						"batch":false,
+						"returns":[[]],
+						"receives":[["email":"email","type":"String","mockData":"email@email.com"]]
+				],
+				"register":[
+						"returnsList":["permitAll":["firstName", "passwordExpired", "accountExpired", "oauthProvider", "username", "accountLocked", "password", "lastName", "oauthId", "enabled", "avatarUrl", "email", "id", "version"]],
+						"hook":false,
+						"method":"POST",
+						"receivesList":["permitAll":["username","password","email"]],
+						"name":"register",
+						"batch":false,
+						"returns":[
+								["name":"firstName", "type":"String","mockData":"null_fname"],
+								["name":"passwordExpired","type":"boolean","mockData":"false"],
+								["name":"accountExpired","type":"boolean","mockData":"false"],
+								["name":"oauthProvider","type":"String","mockData":"http:///test.com"],
+								["name":"username","type":"String","mockData":"test"],
+								["name":"accountLocked","type": "boolean","mockData": "false"],
+								["name":"password","type": "String","mockData": "password"],
+								["name":"lastName","type": "String","mockData": "null_lname"],
+								["name":"oauthId","type": "String","mockData": "1"],
+								["name":"enabled","type": "boolean","mockData": "true"],
+								["name":"avatarUrl","type": "String","mockData": "http://test.com"],
+								["name":"email","type": "String","mockData": "test@test.com"],
+								["name":"id","type": "Long","mockData": "112"],
+								["name":"version","type":"Long","mockData":"0"]
+						],
+						"receives":[
+								["name":"username","type":"String","mockData":"test"],
+								["name":"password","type": "String","mockData": "password"],
+								["name":"email","type": "String","mockData": "test@test.com"]
+						]
+				]
+
+		]
+		return controllerResults
+	}
 
 	private LinkedHashMap createApidocs(String controller){
 		LinkedHashMap controllerResults = [:]
