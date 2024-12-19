@@ -28,7 +28,6 @@
 package io.beapi.api.interceptor
 
 import io.beapi.api.service.ApiCacheService
-import io.beapi.api.service.ThrottleCacheService
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ExchangeService
@@ -87,7 +86,7 @@ class ApiInterceptor implements HandlerInterceptor{
 
 
 
-	ThrottleCacheService throttle
+	//ThrottleCacheService throttle
 	PrincipleService principle
 	private ApiProperties apiProperties
 	ExchangeService exchangeService
@@ -104,8 +103,8 @@ class ApiInterceptor implements HandlerInterceptor{
 	int callType
 	KeyGenerator keyGenerator
 
-	public ApiInterceptor(ThrottleCacheService throttle, ExchangeService exchangeService, BatchExchangeService batchService, ChainExchangeService chainService, TraceExchangeService traceService, ApiProperties apiProperties) {
-		this.throttle = throttle
+	public ApiInterceptor(ExchangeService exchangeService, BatchExchangeService batchService, ChainExchangeService chainService, TraceExchangeService traceService, ApiProperties apiProperties) {
+		//this.throttle = throttle
 		this.exchangeService = exchangeService
 		this.batchService = batchService
 		this.chainService = chainService
@@ -115,8 +114,8 @@ class ApiInterceptor implements HandlerInterceptor{
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		//logger.info("preHandle(HttpServletRequest, HttpServletResponse, Object) : {}");
-		//println("### prehandle")
+		//println("### ApiInterceptor / prehandle")
+
 
 		if (handler instanceof ResourceHttpRequestHandler) {
 			writeErrorResponse(response,'422',request.getRequestURI(),"No data returned for this call. This is an 'API Server'; Please limit your calls to API's only")
@@ -130,14 +129,10 @@ class ApiInterceptor implements HandlerInterceptor{
 
 				switch (this.callType) {
 					case 1:
-						// todo : check throttle cache size
-						// println(apiProperties.throttle.rateLimit[this.authority])
-
 						return exchangeService.apiRequest(request, response, this.authority)
 						break
 					case 2:
 						if (apiProperties.batchingEnabled) {
-							// todo : check throttle cache size
 							return batchService.apiRequest(request, response, this.authority)
 						} else {
 							writeErrorResponse(response, '401', request.getRequestURI())
@@ -146,10 +141,8 @@ class ApiInterceptor implements HandlerInterceptor{
 						break
 					case 3:
 						if (apiProperties.chainingEnabled) {
-							// todo : check throttle cache size
 							return chainService.apiRequest(request, response, this.authority)
 						} else {
-							// todo : check throttle cache size
 							writeErrorResponse(response, '401', request.getRequestURI())
 							return false
 						}
@@ -176,7 +169,7 @@ class ApiInterceptor implements HandlerInterceptor{
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mv) throws Exception {
 		//logger.info("postHandle(HttpServletRequest, HttpServletResponse, Object, ModelAndView) : {}")
-		//println("### posthandle")
+		//println("### ApiInterceptor / posthandle")
 
 		ArrayList body = []
 		if(request.getAttribute('responseBody')){
@@ -188,15 +181,10 @@ class ApiInterceptor implements HandlerInterceptor{
 		}else {
 			switch (callType){
 				case 1:
-					// todo: increment throttle cache
-					if(apiProperties.throttle.active) {
-						throttle.incrementThrottleCache(principle.name())
-					}
 					exchangeService.apiResponse(request,response,body)
 					break
 				case 2:
 					if(apiProperties.batchingEnabled) {
-						// todo: increment throttle cache
 						batchService.batchResponse(request, response, body)
 					}else{
 						writeErrorResponse(response,'401',request.getRequestURI())
@@ -204,7 +192,6 @@ class ApiInterceptor implements HandlerInterceptor{
 					break
 				case 3:
 					if(apiProperties.chainingEnabled) {
-						// todo: increment throttle cache
 						chainService.chainResponse(request, response, body)
 					}else{
 						writeErrorResponse(response,'401',request.getRequestURI())

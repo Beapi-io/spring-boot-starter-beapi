@@ -16,28 +16,27 @@
  */
 package io.beapi.api.config
 
-
-
+import io.beapi.api.properties.ApiProperties
 import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.BootstrapService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ConnectorScaffoldService
 import io.beapi.api.service.LinkRelationService
+import io.beapi.api.service.SessionService
 import io.beapi.api.service.TestScaffoldService
 import io.beapi.api.service.ExchangeService
+import io.beapi.api.service.ThrottleService
 import io.beapi.api.service.TraceExchangeService
 //import io.beapi.api.service.EndpointMappingService
 //import io.beapi.api.service.IoStateService
-//import io.beapi.api.properties.ApiProperties
-
 import io.beapi.api.service.PrincipleService
 import io.beapi.api.service.TraceCacheService
 //import io.beapi.api.service.HookCacheService
 import io.beapi.api.service.TraceService
-
 import io.beapi.api.service.CliService
 //import io.beapi.api.service.WebHookService
+
 
 //import io.beapi.api.filter.RequestInitializationFilter
 //import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -57,17 +56,10 @@ import org.springframework.context.ApplicationContext
 @AutoConfigureBefore([BeapiWebAutoConfiguration.class])
 public class BeapiServiceAutoConfiguration {
 
-	@Autowired
-	protected ApplicationContext applicationContext;
-
-	@Autowired
-	protected TraceCacheService traceCacheService
-
-	//@Autowired
-	//HookCacheService hookCacheService
-
-	@Autowired
-	protected ApiCacheService apiCacheService
+	@Autowired protected ApplicationContext applicationContext;
+	@Autowired protected TraceCacheService traceCacheService
+	@Autowired protected ApiCacheService apiCacheService
+	@Autowired protected ApiProperties apiProperties
 
 	public BeapiServiceAutoConfiguration() {}
 
@@ -207,5 +199,19 @@ public class BeapiServiceAutoConfiguration {
 	public TraceExchangeService traceExchangeService() throws IOException {
 		return new TraceExchangeService(apiCacheService, traceService())
 	}
+
+
+
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
+	@Bean(name='throttleService')
+	@ConditionalOnMissingBean
+	public ThrottleService throttleService() throws IOException {
+		return new ThrottleService(apiProperties, sessionService)
+	}
+
 
 }

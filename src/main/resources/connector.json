@@ -88,15 +88,10 @@
 		"1": {
 		    "DEFAULTACTION":"list",
             "URI": {
-              "list": {
+              "listFiles": {
                 "METHOD":"GET",
                 "DESCRIPTION":"list IOState names",
                 "UPDATECACHE": true,
-                "RATELIMIT": {
-                  "ROLE_ANONYMOUS": "20",
-                  "ROLE_USER": "100",
-                  "ROLE_ADMIN" : "*"
-                },
                 "ROLES": {},
                 "REQUEST": {
                   "permitAll":[]
@@ -109,11 +104,6 @@
                   "METHOD":"POST",
                   "DESCRIPTION":"Update IOState",
                   "UPDATECACHE": true,
-                  "RATELIMIT": {
-                      "ROLE_ANONYMOUS": "20",
-                      "ROLE_USER": "100",
-                      "ROLE_ADMIN" : "*"
-                  },
                   "ROLES": {
                       "HOOK":["ROLE_ADMIN"]
                   },

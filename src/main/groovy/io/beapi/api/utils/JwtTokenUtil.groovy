@@ -40,8 +40,16 @@ public class JwtTokenUtil implements Serializable {
 
 	//retrieve username from jwt token
 	public String getUsernameFromToken(String token) {
-		Claims claims = Jwts.parser().setSigningKey(secretGenerator.getSecret()).parseClaimsJws(token).getBody();
-		return claims.getSubject();
+		try {
+			Claims claims = Jwts.parser().setSigningKey(secretGenerator.getSecret()).parseClaimsJws(token).getBody();
+			return claims.getSubject();
+		}catch(Exception e){
+			throw new Exception("[JwtTokenUtil :: getUsernameFromToken] : Exception - full stack trace follows:", e)
+		} catch (io.jsonwebtoken.SignatureException e){
+			//println("ExpiredJwtException found " + e);
+			// old token / no token
+		}
+		return
 	}
 
 	//retrieve expiration date from jwt token

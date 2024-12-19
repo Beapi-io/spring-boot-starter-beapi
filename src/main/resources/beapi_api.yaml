@@ -3,8 +3,7 @@ api:
     procCores: 4
     documentationUrl: 'http://orubel.github.io/Beapi-API-Framework/'
     views: ['admin','apidoc','api','login','logout']
-    reserveduris: ['/authenticate','/register','/error','/login','/logout']
-    publicEndpoint: ['jwtAuthentication','beapiError']
+    reserveduris: ['/authenticate','/register','/error','/login','/logout','/validate','/resetPassword']
     staticEndpoint : ['apidoc','connector','properties','user','authority','hook']
     apiServer: 'http://localhost:8080'
     apichainLimit: 3
@@ -14,14 +13,13 @@ api:
     encoding: UTF-8
     iostateDir: '.boot/.iostate'
     serverType: master
-    testingProtocol: http
     autoTest: false
     throttle:
         active: false
         rateLimit: {'ROLE_USER':1000,'ROLE_ADMIN':10000}
         dataLimit: {'ROLE_USER':1000000,'ROLE_ADMIN':1000000}
-        # in seconds (3600 = 60 minutes)
-        expires: 3600
+        # minutes
+        staleSession: 10
     webhook:
         active: false
         services: ['iostate']

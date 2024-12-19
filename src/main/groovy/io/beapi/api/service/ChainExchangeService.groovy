@@ -155,10 +155,10 @@ public class ChainExchangeService extends ApiExchange{
 						apiCacheService.unsetApiCachedResult(this.controller,  this.action, this.apiversion)
 					}
 				}
-
-				def servletCtx = this.ctx.getServletContext()
-				def rd = servletCtx?.getRequestDispatcher(this.newPath)
-				rd.forward(request, response)
+				request.getSession().getServletContext().getRequestDispatcher(this.newPath).forward(request, response);
+				//def servletCtx = this.ctx.getServletContext()
+				//def rd = servletCtx?.getRequestDispatcher(this.newPath)
+				//rd.forward(request, response)
 			}
 		}else{
 			writeErrorResponse(response,'422',this.uri,'No data returned for this call')

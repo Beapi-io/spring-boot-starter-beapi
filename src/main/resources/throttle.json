@@ -1,6 +1,6 @@
 {
-    "NAME": "apidoc",
-    "NETWORKGRP": "public",
+    "NAME": "throttle",
+    "NETWORKGRP": "private",
     "VALUES": {
         "*": {
             "type": "String",
@@ -11,18 +11,18 @@
     "CURRENTSTABLE": "1",
     "VERSION": {
         "1": {
-            "DEFAULTACTION": "show",
+            "DEFAULTACTION": "dump",
             "URI": {
-                "show": {
+                "dump": {
                     "METHOD": "GET",
-                    "DESCRIPTION": "Show ApiDocs",
-                    "UPDATECACHE": true,
+                    "DESCRIPTION": "dump throttle cache",
+                    "UPDATECACHE": false,
                     "ROLES": {},
                     "REQUEST": {
-                        "permitAll": []
+                        "ROLE_ADMIN": []
                     },
                     "RESPONSE": {
-                        "permitAll": ["*"]
+                        "ROLE_ADMIN": ["*"]
                     }
                 }
             }

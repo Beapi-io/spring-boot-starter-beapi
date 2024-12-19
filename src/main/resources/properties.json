@@ -22,11 +22,6 @@
             "description": "",
             "mockData": "*"
         },
-        "publicEndpoint": {
-            "type": "ArrayList",
-            "description": "",
-            "mockData": "*"
-        },
         "apichainLimit": {
             "type": "Integer",
             "description": "",
@@ -112,7 +107,7 @@
                         "ROLE_ADMIN": []
                     },
                     "RESPONSE": {
-                        "ROLE_ADMIN": ["attempts","procCores","documentationUrl","reservedUris","publicEndpoint","apichainLimit","chainingEnabled","batchingEnabled","encoding","iostateDir","staticEndpoint","serverType","supportedFormats","throttle","webhook","security"]
+                        "ROLE_ADMIN": ["attempts","procCores","documentationUrl","reservedUris","apichainLimit","chainingEnabled","batchingEnabled","encoding","iostateDir","staticEndpoint","serverType","supportedFormats","throttle","webhook","security"]
                     }
                 },
                 "getProperties": {
@@ -124,7 +119,7 @@
                         "ROLE_ADMIN": []
                     },
                     "RESPONSE": {
-                        "ROLE_ADMIN": ["attempts","procCores","documentationUrl","reservedUris","publicEndpoint","apichainLimit","chainingEnabled","batchingEnabled","encoding","iostateDir","staticEndpoint","serverType","supportedFormats"]
+                        "ROLE_ADMIN": ["attempts","procCores","documentationUrl","reservedUris","apichainLimit","chainingEnabled","batchingEnabled","encoding","iostateDir","staticEndpoint","serverType","supportedFormats"]
                     }
                 },
                 "throttleProps": {
@@ -155,11 +150,6 @@
                     "METHOD": "GET",
                     "DESCRIPTION": "Show securityProps",
                     "UPDATECACHE": false,
-                    "RATELIMIT": {
-                        "ROLE_ANONYMOUS": "20",
-                        "ROLE_USER": "100",
-                        "ROLE_ADMIN" : "*"
-                    },
                     "ROLES": {},
                     "REQUEST": {
                         "ROLE_ADMIN": []

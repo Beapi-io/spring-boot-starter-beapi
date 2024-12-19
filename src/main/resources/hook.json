@@ -53,11 +53,6 @@
 						"METHOD":"GET",
 						"DESCRIPTION":"List Hook",
 						"UPDATECACHE": true,
-						"RATELIMIT": {
-							"ROLE_ANONYMOUS": "20",
-							"ROLE_USER": "100",
-							"ROLE_ADMIN" : "*"
-						},
 						"ROLES": {},
 						"REQUEST": {
 						    "permitAll":[]
@@ -70,11 +65,6 @@
 						"METHOD":"GET",
 						"DESCRIPTION":"Show Hooks",
 						"UPDATECACHE": true,
-						"RATELIMIT": {
-							"ROLE_ANONYMOUS": "20",
-							"ROLE_USER": "100",
-							"ROLE_ADMIN" : "*"
-						},
 						"ROLES": {
 							"BATCH":["ROLE_ADMIN"]
 						},
@@ -89,11 +79,6 @@
 						"METHOD":"PUT",
 						"DESCRIPTION":"Create Hook",
 						"UPDATECACHE": true,
-						"RATELIMIT": {
-							"ROLE_ANONYMOUS": "20",
-							"ROLE_USER": "100",
-							"ROLE_ADMIN" : "*"
-						},
 						"ROLES": {
 							"BATCH":["ROLE_ADMIN"]
 						},
@@ -108,11 +93,6 @@
 						"METHOD":"POST",
 						"DESCRIPTION":"Update Hook",
 						"UPDATECACHE": true,
-						"RATELIMIT": {
-							"ROLE_ANONYMOUS": "20",
-							"ROLE_USER": "100",
-							"ROLE_ADMIN" : "*"
-						},
 						"ROLES": {
 							"BATCH":["ROLE_ADMIN"]
 						},
@@ -127,11 +107,6 @@
 						"METHOD":"DELETE",
 						"DESCRIPTION":"Delete Hook",
 						"UPDATECACHE": true,
-						"RATELIMIT": {
-							"ROLE_ANONYMOUS": "20",
-							"ROLE_USER": "100",
-							"ROLE_ADMIN" : "*"
-						},
 						"ROLES": {
 							"BATCH":["ROLE_ADMIN"]
 						},
@@ -146,11 +121,6 @@
 						"METHOD":"GET",
 						"DESCRIPTION":"Reset Hook attempts",
 						"UPDATECACHE": true,
-						"RATELIMIT": {
-							"ROLE_ANONYMOUS": "20",
-							"ROLE_USER": "100",
-							"ROLE_ADMIN" : "*"
-						},
 						"ROLES": {
 							"BATCH":["ROLE_ADMIN"]
 						},
@@ -165,11 +135,6 @@
 					    "METHOD":"GET",
 					    "DESCRIPTION":"get list of hook services",
 						"UPDATECACHE": true,
-						"RATELIMIT": {
-							"ROLE_ANONYMOUS": "20",
-							"ROLE_USER": "100",
-							"ROLE_ADMIN" : "*"
-						},
 					    "ROLES": {},
 					    "REQUEST": {
 							"permitAll":[]

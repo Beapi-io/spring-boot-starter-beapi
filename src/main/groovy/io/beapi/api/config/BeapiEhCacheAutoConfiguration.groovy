@@ -18,11 +18,11 @@ package io.beapi.api.config
 
 import io.beapi.api.properties.ApiProperties
 import io.beapi.api.properties.CacheProperties
-
-//import io.beapi.api.service.HookCacheService
 import io.beapi.api.service.IoStateService
-import io.beapi.api.service.ThrottleCacheService
+import io.beapi.api.service.SessionService
 import io.beapi.api.service.TraceCacheService
+import io.beapi.api.service.ApiCacheService
+//import io.beapi.api.service.HookCacheService
 
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
@@ -36,19 +36,17 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 import org.springframework.beans.factory.annotation.Autowired
-//import org.springframework.boot.info.BuildProperties
 
 import net.sf.ehcache.config.DiskStoreConfiguration
 import net.sf.ehcache.config.CacheConfiguration
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 
-import io.beapi.api.service.ApiCacheService
+
 
 
 @Configuration(proxyBeanMethods = false)
@@ -60,11 +58,23 @@ public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
 
     @Autowired private CacheProperties cacheProperties;
     @Autowired private ApiProperties apiProperties;
+
     private HashMap evictPolicy = [
             'LRU':net.sf.ehcache.store.MemoryStoreEvictionPolicy.LRU,
             'LFU':net.sf.ehcache.store.MemoryStoreEvictionPolicy.LFU,
             'FIFO':net.sf.ehcache.store.MemoryStoreEvictionPolicy.FIFO
     ]
+
+    /**
+     *
+     * @return
+     * @throws IOException
+     */
+    @Bean(name='sessionService')
+    @ConditionalOnMissingBean
+    public SessionService sessionService() throws IOException {
+        return new SessionService();
+    }
 
     /**
      *
@@ -111,14 +121,6 @@ public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
     @ConditionalOnMissingBean
     public TraceCacheService traceCacheService() throws IOException { return new TraceCacheService(cacheManager()); }
 
-    /**
-     *
-     * @return
-     * @throws IOException
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public ThrottleCacheService throttleCacheService() throws IOException { return new ThrottleCacheService(cacheManager()); }
 
     /**
      *
@@ -184,6 +186,7 @@ public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
             throw new Exception("[EhCacheAutoConfiguration ] : ERROR3 - ",e)
         }
 
+        /*
         CacheConfiguration cacheConfig3 = new CacheConfiguration()
         CacheProperties.ThrottleProps throttle = cacheProperties.getThrottle()
         try{
@@ -202,6 +205,8 @@ public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
         }catch(Exception e){
             throw new Exception("[EhCacheAutoConfiguration ] : ERROR4 - ",e)
         }
+
+         */
 
         CacheConfiguration cacheConfig4 = new CacheConfiguration()
         CacheProperties.TraceProps trace = cacheProperties.getTrace()
@@ -225,7 +230,7 @@ public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
         net.sf.ehcache.config.Configuration config = new net.sf.ehcache.config.Configuration()
         if(cacheConfig1){ config.addCache(cacheConfig1) }
         if(cacheConfig2){ config.addCache(cacheConfig2) }
-        if(cacheConfig3){ config.addCache(cacheConfig3) }
+        //if(cacheConfig3){ config.addCache(cacheConfig3) }
         if(cacheConfig4){ config.addCache(cacheConfig4) }
         //config.addDiskStore(diskStoreConfiguration)
 

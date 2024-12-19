@@ -87,11 +87,6 @@
                   "METHOD":"POST",
                   "DESCRIPTION":"Update IOState",
                   "UPDATECACHE": false,
-                  "RATELIMIT": {
-                      "ROLE_ANONYMOUS": "20",
-                      "ROLE_USER": "100",
-                      "ROLE_ADMIN" : "*"
-                  },
                   "ROLES": {
                       "BATCH":["ROLE_ADMIN"],
                       "HOOK":["ROLE_ADMIN"]

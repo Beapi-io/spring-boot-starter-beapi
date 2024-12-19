@@ -38,6 +38,7 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import org.apache.commons.lang3.StringUtils
 
 import groovy.text.Template
 import groovy.text.GStringTemplateEngine
@@ -68,27 +69,34 @@ public class ConnectorScaffoldService {
 	String logicalClassName
 	String realClassName
 	String packageName
-	private LinkedHashMap data = [:]
+	LinkedHashMap data = [:]
+	String allAtts = ''
+	String createAtts = ''
+
 	//private Object obj;
 	//String dirPath
 	//String templateDir = "${System.getProperty('user.dir')}/src/main/groovy/templates/"
 	List variables = []
+	Set<Attribute<?,?>> attributes = []
 
 	public ConnectorScaffoldService(ApplicationContext applicationContext) {
+		println("### [ConnectorScaffoldService ] ###")
 		this.ctx = applicationContext
 	}
 
 	//static transactional = false
 
 	void scaffoldConnector(String domainArg) {
+		//println("### [ConnectorScaffoldService :: scaffoldConnector] ###")
 		def entityManager = ctx.getBean('entityManagerFactory')
 		Set<EntityType<?>> entities = entityManager.getMetamodel().getEntities();
 
-		LinkedHashMap values = [:]
+		String values = ""
 		for (EntityType tempEntityType : entities) {
 			if (!domainFound) {
 
 				if (tempEntityType.getJavaType().getCanonicalName() == domainArg) {
+
 
 					domainFound = true
 
@@ -97,34 +105,49 @@ public class ConnectorScaffoldService {
 
 					realClassName = logicalClassName.toLowerCase()
 					packageName = (tempEntityType.getJavaType().getPackage().getName() - ".${realClassName}")
+					this.data['realName'] = realClassName
 
+					attributes = tempEntityType.getAttributes()
+					attributes.each(){ it5 ->
 
+						if(it5.getName()!="version") {
+							allAtts += "\"${it5.getName()}\","
+							if (it5.getName() != "id") {
+								createAtts += "\"${it5.getName()}\","
+							}
+						}
+
+						values += """
+			"${it5.getName()}": {
+				"type" : "${it5.getJavaType().getSimpleName()}",
+				"mockData": ""
+			},"""
+					}
+
+					data['allAtts'] = StringUtils.substring(allAtts, 0, allAtts.length() - 1);
+					data['createAtts'] = StringUtils.substring(createAtts, 0, createAtts.length() - 1);
 				}
 			}
 		}
+		data['attList'] = values
 
-		// create attList
-		data['realName'] = realClassName
-		if(connectorDir) {
-			data['attList'] = createAttList(values)
-		}
 
 		// todo : create method to check if controller exists
 		// if exists, fill out 'URI' json
 		// else template URI json using params from values
 		String uris = createUriAtts(realClassName)
-		data['uris'] = uris
 
 		if (domainFound) {
 			if (connectorDir) {
-				createConnector(data)
+				createConnector(this.data)
 			}
 		} else {
 			error(1, "Entity name '${domainArg}' not found. Please try again.")
 		}
 	}
 
-	private String createUriAtts(String controllerName){
+	protected String createUriAtts(String controllerName){
+		//println("### [ConnectorScaffoldService :: createUriAtts] ###")
 		ArrayList ignoreList = [
 				'setMetaClass',
 				'getMetaClass',
@@ -159,74 +182,64 @@ public class ConnectorScaffoldService {
 				Method[] actions = v.getClass().getMethods()
 				// get methods as 'actions'
 				actions.each() { it4 ->
-					if(!ignoreList.contains(it4.getName())) {
-						String method = ""
-						String req
-						String resp
-						Pattern listPattern = Pattern.compile("list|listBy")
-						Pattern getPattern = Pattern.compile("get|getBy|show|showBy|enable")
-						Pattern postPattern = Pattern.compile("create|make|generate|build|save|new")
-						Pattern putPattern = Pattern.compile("edit|update")
-						Pattern deletePattern = Pattern.compile("delete|deleteBy|disable|disableBy|destroy|kill|reset|resetBy")
+					try {
+						if (!ignoreList.contains(it4.getName())) {
+							String method = ""
+							String req
+							String resp
+							Pattern listPattern = Pattern.compile("list|listBy")
+							Pattern getPattern = Pattern.compile("get|getBy|show|showBy|enable")
+							Pattern postPattern = Pattern.compile("create|make|generate|build|save|new")
+							Pattern putPattern = Pattern.compile("edit|update")
+							Pattern deletePattern = Pattern.compile("delete|deleteBy|disable|disableBy|destroy|kill|reset|resetBy")
 
-						Matcher getm = getPattern.matcher(it4.getName())
-						if (getm.find()) {
-							method = 'GET'
-							req = "[\"id\"]"
-							resp = varString
-						}
-
-						Matcher listm = listPattern.matcher(it4.getName())
-						if (listm.find()) {
-							method = 'GET'
-							resp = varString
-						}
-
-						if (method.isEmpty()) {
-							Matcher postm = postPattern.matcher(it4.getName())
-							if (postm.find()) {
-								method = 'POST'
-								req = varString
-								resp = "[\"id\"]"
-							}
-						}
-
-						if (method.isEmpty()) {
-							Matcher putm = putPattern.matcher(it4.getName())
-							if (putm.find()) {
-								method = 'PUT'
-								req = varString
-								resp = "[\"id\"]"
-							}
-						}
-
-						if (method.isEmpty()) {
-							Matcher delm = deletePattern.matcher(it4.getName());
-							if (delm.find()) {
-								method = 'DELETE'
+							Matcher getm = getPattern.matcher(it4.getName())
+							if (getm.find()) {
+								method = 'GET'
 								req = "[\"id\"]"
-								resp = "[\"id\"]"
+								resp = varString
 							}
+
+							Matcher listm = listPattern.matcher(it4.getName())
+							if (listm.find()) {
+								method = 'GET'
+								resp = varString
+							}
+
+							if (method.isEmpty()) {
+								Matcher postm = postPattern.matcher(it4.getName())
+								if (postm.find()) {
+									method = 'POST'
+									req = varString
+									resp = "[\"id\"]"
+								}
+							}
+
+							if (method.isEmpty()) {
+								Matcher putm = putPattern.matcher(it4.getName())
+								if (putm.find()) {
+									method = 'PUT'
+									req = varString
+									resp = "[\"id\"]"
+								}
+							}
+
+							if (method.isEmpty()) {
+								Matcher delm = deletePattern.matcher(it4.getName());
+								if (delm.find()) {
+									method = 'DELETE'
+									req = "[\"id\"]"
+									resp = "[\"id\"]"
+								}
+							}
+
 						}
-
-
-String uri = """
-\t\t\t\t\t\"${it4.getName()}\": {
-\t\t\t\t\t\t\"METHOD\": "${method}",
-\t\t\t\t\t\t\"DESCRIPTION\": \"Description for ${it4.getName()}\",
-\t\t\t\t\t\t"ROLES\": {
-\t\t\t\t\t\t\t"BATCH\": [\"ROLE_ADMIN\"]
-\t\t\t\t\t\t},
-\t\t\t\t\t\t\"REQUEST\": {
-\t\t\t\t\t\t\t\"permitAll\": ${req}
-\t\t\t\t\t\t},
-\t\t\t\t\t\t\"RESPONSE\": {
-\t\t\t\t\t\t\t\"permitAll\": ${resp}
-\t\t\t\t\t\t}
-\t\t\t\t\t},"""
-						uris <<= uri
+					}catch(Exception e){
+						println("No URIs : "+e)
 					}
 				}
+			}else{
+				println("NO CONTROLLER for ${controllerName}")
 			}
 
 		}
@@ -234,6 +247,7 @@ String uri = """
 	}
 
 	private String createVarString(ArrayList variables){
+		//println("### [ConnectorScaffoldService :: createVarString] ###")
 		String varString = "["
 		int inc = 1
 		variables.each(){
@@ -248,6 +262,7 @@ String uri = """
 	}
 
 	private String createAttList(LinkedHashMap values){
+		//println("### [ConnectorScaffoldService :: createAttList] ###")
 		String json = ""
 		int inc=1
 		values.each() { k, v ->
@@ -283,7 +298,8 @@ json += """
 		return json
 	}
 
-	private void createConnector(LinkedHashMap data){
+	protected void createConnector(LinkedHashMap data){
+		//println("### [ConnectorScaffoldService :: createConnector] ###")
 		String connectorPath = "${System.getProperty('user.home')}/${connectorDir}"
 		if(!dirExists(connectorPath)){
 			// need to create path
@@ -292,11 +308,12 @@ json += """
 
 
 		//writeConnector("templates/Connector.json.template", "${System.getProperty('user.home')}/${connectorDir}/${logicalClassName}.json", data)
+
 		writeConnector("io/beapi/api/templates/Connector.json.template", "${System.getProperty('user.home')}/${connectorDir}/${logicalClassName}.json", data)
 		error(0, "")
 	}
 
-	private boolean dirExists(String path) {
+	protected boolean dirExists(String path) {
 		boolean exists = false
 		//def ant = new AntBuilder()
 		def file = new File(path)
@@ -307,7 +324,7 @@ json += """
 		return exists
 	}
 
-	private boolean fileExists(String path){
+	protected boolean fileExists(String path){
 		def cfile = new File(path)
 		if (cfile.exists()) {
 			return true
@@ -315,7 +332,7 @@ json += """
 		return false
 	}
 
-	private void error(int i, String msg) {
+	protected void error(int i, String msg) {
 		if (msg != "") {
 			System.err << "[ERROR] ${msg}"
 		}
@@ -324,12 +341,9 @@ json += """
 
 
 	void writeConnector(String inPath, String outPath, LinkedHashMap attribs){
-		println("### inPath: "+inPath)
-		println("### outPath: "+outPath)
-
 		String starterDir = new File(getClass().protectionDomain.codeSource.location.path).path
 		def starter = new File(starterDir)
-		println("## starterDir : "+starterDir)
+
 		if (starter.isFile() && starter.name.endsWith("jar")) {
 			JarFile jar = new JarFile(starter)
 
@@ -342,24 +356,28 @@ json += """
 
 			InputStream inStream = jar.getInputStream(entry)
 
-			OutputStream out = new FileOutputStream(outPath)
-			int c
-			while ((c = inStream.read()) != -1) {
-				out.write(c)
+			try {
+				OutputStream out = new FileOutputStream(outPath)
+				int c
+				while ((c = inStream.read()) != -1) {
+					out.write(c)
+				}
+				inStream.close()
+				out.close()
+				jar.close()
+
+				def templateFile = new File(outPath)
+				def engine = new groovy.text.GStringTemplateEngine()
+				def template = engine.createTemplate(templateFile).make(attribs)
+
+				String controller = template.toString()
+
+				BufferedWriter writer = new BufferedWriter(new FileWriter(outPath))
+				writer.write(controller)
+				writer.close()
+			}catch(Exception e){
+				println("exception : "+e)
 			}
-			inStream.close()
-			out.close()
-			jar.close()
-
-			def templateFile = new File(outPath)
-			def engine = new groovy.text.GStringTemplateEngine()
-			def template = engine.createTemplate(templateFile).make(attribs)
-
-			String controller = template.toString()
-
-			BufferedWriter writer = new BufferedWriter(new FileWriter(outPath))
-			writer.write(controller)
-			writer.close()
 		}else{
 			// throw error
 			error(1, "Project is trying to use CLI but does not use 'spring-boot-starter-beapi'. Please include the starter to use this service.");

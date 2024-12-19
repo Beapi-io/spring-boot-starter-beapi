@@ -49,11 +49,11 @@ import java.util.regex.Pattern
 class ApiCacheService{
 
 
-	@Autowired
+	//@Autowired
 	private CacheManager cacheManager;
 
 
-	//private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApiCacheService.class);
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApiCacheService.class);
 
 
 	public ApiCacheService(CacheManager cacheManager) {
@@ -256,7 +256,8 @@ class ApiCacheService{
 	 */
 	//@Cacheable(value='ApiCache',key="#controllername",sync=false)
 	ApiDescriptor getApiDescriptor(String controllername, String version, String action) throws Exception{
-		//logger.debug("getApiCache(String) : {}",controllername)
+		println("getApiDescriptor : "+version+"/"+controllername+"/"+action)
+		logger.warn("getApiCache(String) : {}",controllername)
 		if(controllername!=null) {
 			try {
 				//cacheManager.setTransactionAware(false);
@@ -264,8 +265,16 @@ class ApiCacheService{
 				// do check; check with put
 				LinkedHashMap cache2 = temp.get(controllername)?.getObjectValue()
 				def temp2 = cache2[version]
-				ApiDescriptor apiObject = temp2[action]
-				return apiObject
+				if(action=='null'){
+					String tmpAction = temp2['defaultAction']
+					logger.warn("action is null; using 'defaultAction' : "+tmpAction)
+					ApiDescriptor apiObject = temp2[tmpAction]
+					return apiObject
+				}else{
+					logger.warn("action is NOT null : "+action)
+					ApiDescriptor apiObject = temp2[action]
+					return apiObject
+				}
 			} catch (Exception e) {
 				throw new Exception("[ApiCacheService :: getApiCache] : no cache found for handler '${controllername}'. full stack trace follows:", e)
 			}
@@ -284,7 +293,6 @@ class ApiCacheService{
 		//cacheManager.setTransactionAware(false);
 		net.sf.ehcache.Ehcache temp = cacheManager.getCache('ApiCache').getNativeCache()
 		return temp.getKeys()
-
 	}
 
 }

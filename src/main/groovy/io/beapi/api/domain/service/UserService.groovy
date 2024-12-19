@@ -1,6 +1,7 @@
 package io.beapi.api.domain.service;
 
 import io.beapi.api.domain.User;
+import io.beapi.api.repositories.AuthenticationTokenRepository;
 import io.beapi.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,11 +12,11 @@ import java.util.Optional;
 import org.springframework.scheduling.annotation.Async
 import java.util.concurrent.CompletableFuture;
 
+
 @Service
 public class UserService implements IUser {
 
-    @Autowired
-    UserRepository userrepo;
+    @Autowired UserRepository userrepo;
 
     @Autowired
     public UserService(UserRepository userrepo) {
@@ -23,7 +24,9 @@ public class UserService implements IUser {
     }
 
     @Override
-    public List<User> getAllUsers() { return userrepo.findAll(); }
+    public List<User> getAllUsers() {
+        return userrepo.findAll();
+    }
 
     //@Override
     public User findById(Long id) {
@@ -40,7 +43,10 @@ public class UserService implements IUser {
         return userrepo.findByEmail(email);
     }
 
-
+    //@Override
+    public User findByVerificationCode(String id) {
+        return userrepo.findByVerificationCode(id);
+    }
 
     @Override
     public User findByUsername(String username) {
@@ -77,6 +83,7 @@ public class UserService implements IUser {
             userrepo.flush();
             return usr;
         }catch (DataAccessException e){
+            System.out.println("Cause of Exception: " + e.getCause());
             throw new Exception(e.getCause().getCause().getLocalizedMessage())
         }
     }

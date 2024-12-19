@@ -1,0 +1,68 @@
+/*
+ * Copyright 2013-2022 Owen Rubel
+ * API Chaining(R) 2022 Owen Rubel
+ *
+ * Licensed under the AGPL v2 License;
+ * you may not use this file except in compliance with the License.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author Owen Rubel (orubel@gmail.com)
+ *
+ */
+package io.beapi.api.service
+
+import groovyx.gpars.*
+import io.beapi.api.domain.User
+import io.beapi.api.properties.ApiProperties
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.*
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.stereotype.Service
+import io.beapi.api.domain.service.UserService
+import java.math.*
+
+@Service
+// @EnableConfigurationProperties([ApiProperties.class])
+class UserService {
+
+	@Autowired ApiProperties apiProperties
+	@Autowired private UserService userService;
+
+	//private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PrincipleService.class);
+
+	public UserService() {
+		//this.apiProperties = apiProperties
+	}
+
+	// determine principal and return currentUser
+	User getCurrentUser(){
+		//logger.debug("principle : {}")
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName();
+		User user = userService.findByUsername(username);
+		if(user.isempty()){
+			throw new Exception("[UserService :: getId] : Exception - No User with the name (${username}) exists. Try again.")
+		}else{
+			return user
+		}
+	}
+
+	Integer getId() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName();
+
+		User user = userService.findByUsername(username);
+		if(user.isempty()){
+			throw new Exception("[UserService :: getId] : Exception - No User with the name (${username}) exists. Try again.")
+		}else{
+			return user.id
+		}
+	}
+}
+

@@ -30,7 +30,9 @@ public class AuthorityController extends BeapiRequestHandler {
 			if (!Objects.nonNull(auth)) {
 				Authority newAuth = new Authority(); ;
 				newAuth.setAuthority(authority);
-				return authService.save(newAuth);
+				if(authService.save(newAuth)){
+					return ["id":newAuth.id,"authority":newAuth.authority]
+				}
 			}
 		}
 		return null;

@@ -219,7 +219,7 @@ public class BatchExchangeService extends ApiExchange{
 			//LinkedHashMap tempNetworkRoles = networkGrpRoles[this.networkGrp].each(){ it-> it.getValue() }
 			//this.networkRoles = tempNetworkRoles.collect{entry -> entry.value}
 		} catch (Exception e) {
-			throw new Exception("[ExchangeObject :: init] : Exception. full stack trace follows:", e)
+			throw new Exception("[BatchExchangeService :: initVars] : Exception. full stack trace follows:", e)
 		}
 	}
 

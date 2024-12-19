@@ -6,7 +6,8 @@ import javax.persistence.*;
 //import lombok.Getter;
 //import lombok.Setter;
 import java.util.*;
-
+import java.time.Clock;
+import org.hibernate.annotations.BatchSize
 //@Cacheable
 //@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Entity
@@ -45,8 +46,14 @@ public class User implements Serializable {
 	@Column(nullable = false, name = "email", unique = true)
 	String email;
 
-	@Column(nullable = true, name = "registration_verification_code")
-	String registrationVerificationCode;
+	@Column(nullable = true, name = "verification_code")
+	String verificationCode;
+
+	@Column(nullable = true, name = "verification_expiry")
+	Long verificationExpiry
+
+	@Column(nullable = false, name = "credentials_expired")
+	boolean credentialsExpired=false;
 
 	@Column(nullable = true, name = "email_verified")
 	Boolean emailVerified=false;
@@ -135,6 +142,10 @@ public class User implements Serializable {
 		this.email = email;
 	}
 
+	public boolean isEnabled() {
+		return this.enabled
+	}
+
 	public Boolean getEnabled(){
 		return this.enabled;
 	}
@@ -143,12 +154,20 @@ public class User implements Serializable {
 		this.enabled = enabled;
 	}
 
+	public boolean getAccountNonExpired(){
+		return (this.accountExpired)?false:true
+	}
+
 	public Boolean getAccountExpired(){
 		return this.accountExpired;
 	}
 
 	public void setAccountExpired(Boolean accountExpired){
 		this.accountExpired=accountExpired;
+	}
+
+	public boolean getAccountNonLocked(){
+		return (this.accountLocked)?false:true
 	}
 
 	public Boolean getAccountLocked(){
@@ -201,12 +220,28 @@ public class User implements Serializable {
 		//return this.hooks;
 	//}
 
-	public String getRegistrationVerificationCode(){
-		return this.registrationVerificationCode
+	public String getVerificationCode(){
+		return this.verificationCode
 	}
 
-	public void setRegistrationVerificationCode(String registrationVerificationCode){
-		this.registrationVerificationCode = registrationVerificationCode
+	public void setVerificationCode(String verificationCode){
+		this.verificationCode = verificationCode
+	}
+
+	public Long getVerificationExpiry(){
+		return this.verificationExpiry
+	}
+
+
+	public void setVerificationExpiry(){
+		// current time plus 10 minutes
+		Clock clock = Clock.systemUTC();
+		long unixTime = Instant.now(clock).getEpochSecond();
+		this.verificationCode = (unixTime+600000)
+	}
+
+	public boolean getCredentialsNonExpired(){
+		return (this.credentialsExpired)?false:true
 	}
 
 	public Boolean getEmailVerified(){

@@ -148,7 +148,6 @@ public class ExchangeService extends ApiExchange{
 		// TODO : set 'max'
 		// TODO : set 'offset'
 
-
 		try {
 			this.apiObject = apiCacheService.getApiDescriptor(this.controller, this.apiversion, this.action)
 
