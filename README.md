@@ -1,9 +1,9 @@
 ![alt text](https://github.com/orubel/logos/blob/master/beapi_logo_large.png)
 # BeAPI Spring Boot Starter
 
-### Stable Version : 0.8.61-SNAPSHOT
+### Stable Version : 0.9.0-SNAPSHOT
 
-### In-Development : 0.9.X
+### In-Development : 1.x
 
 ### Springboot Version : 2.6.2 (or greater)
 
@@ -92,7 +92,7 @@ repositories {
 
 dependencies {
     ...
-    implementation 'io.beapi:spring-boot-starter-beapi:0.6.5'
+    implementation 'io.beapi:spring-boot-starter-beapi:0.9.0'
     ...
 }
  ```
