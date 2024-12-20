@@ -146,7 +146,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
   - (DOCS) documentation for scaffolding functionality
 
 
- ## 0.9.x - (planned release 11/01/2023 - revised to 9/30/2024) (LATE due to additional testing and integration requirements)
+ ## 0.9.x - (released 12/19/2024)
  
  ### Added
   - email registration & validation for SDK
@@ -180,12 +180,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - added 'register' functionality with email validation
    
  ### Documentation
- - document mailserver setup
  - document rate limiting
  - add setting 'server.servlet.session.cookie.http-only' in application.properties; needs to be 'true' in prod environment
  - document authorization/authentication
    - document forgotPassword/resetPassword
- - document register
+   - document mailserver setup
+   - document register
  - connector/iostate scaffolding
  - controller scaffolding
 
