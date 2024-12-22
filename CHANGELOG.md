@@ -179,13 +179,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - added Forgot pasword functionality for validating by email
  - added 'register' functionality with email validation
    
- ### Documentation
+ ### Documentation (todo)
  - document rate limiting
  - add setting 'server.servlet.session.cookie.http-only' in application.properties; needs to be 'true' in prod environment
- - document authorization/authentication
-   - document forgotPassword/resetPassword
-   - document mailserver setup
-   - document register
  - connector/iostate scaffolding
  - controller scaffolding
 
