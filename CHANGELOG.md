@@ -190,25 +190,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 
 
-## 1.0.x - (planned 01.30.2025)
+## 1.0.x - (planned 03.30.2025)
  
  ### Added
  - (todo) trace functionality
  
  ### Changed
+ - (in progress) convert apidocs to OpenApi format
+   - (todo) convert frontend to handle openapi doc
 
  ### Documentation
  - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
    - currently only handling PRIVATE API'S (must have token/role to view); this will add public ones as well and separate  
 
  ### planned
-  - (Feature) CLI INITIALIZATION of PROJECT (ie beapi new-project your.domain.project)
   - (feature) integrate micrometer
-  - (PRIORITY) Unit Tests/better code coverage - we have integration/functional testing but need to add unit as well
-  - (PRIORITY) Extensibility: Alot of classes are not extensible when they need to be (ie almost all services)
   - classes need to be cleaned up
-  - gradle plugins can probably be reduced to only what classes we are using
-  - Implement Automated Apidocs for PUBLIC endpoints using RequestMappingHandlerMapping
   - Finish internationalizing messages
 
 
