@@ -196,8 +196,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (todo) trace functionality
  
  ### Changed
- - (in progress) convert apidocs to OpenApi format
-   - (todo) convert frontend to handle openapi doc
+ - (DONE)convert apidocs to OpenApi format
+   - (todo) convert frontend to handle openapi doc; just need to integrate swagger tools
 
  ### Documentation
  - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
