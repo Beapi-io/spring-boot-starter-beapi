@@ -192,6 +192,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  
  ### Added
  - (todo) trace functionality
+ - statistics reporting/logging
  - domain scaffolding
  
  ### Changed
