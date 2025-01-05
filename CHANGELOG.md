@@ -196,8 +196,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - domain scaffolding
  
  ### Changed
- - (DONE)convert apidocs to OpenApi format
-   - (todo) convert frontend to handle openapi doc; just need to integrate swagger tools
+ - add OpenApi format for docs; needs to be separate class/controller
  
 
  ### Documentation
