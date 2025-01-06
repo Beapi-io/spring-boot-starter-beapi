@@ -193,7 +193,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Added
  - (done) trace functionality
  - statistics reporting/logging
- - domain scaffolding
  
  ### Changed
  - add OpenApi format for docs; needs to be separate class/controller
