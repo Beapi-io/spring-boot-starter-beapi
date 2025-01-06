@@ -191,7 +191,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ## 1.0.x - (planned 03.30.2025)
  
  ### Added
- - (todo) trace functionality
+ - (done) trace functionality
  - statistics reporting/logging
  - domain scaffolding
  
