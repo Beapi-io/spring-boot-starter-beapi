@@ -26,9 +26,11 @@
 
 - bootstrap your connectors
 - bootstrap your controllers
-- automate batching
-- automate chaining
+- [automate batching](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-1)
+- [automate chaining](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-3)
 - automate webhooks
+- automated api docs/openapi generation
+- automated HATEOS link relations
 
 ---
   ### BeAPI is Security
@@ -50,21 +52,10 @@ Tradional API application's bind all rules/data to controllers (ie handlers) mak
 
 ## BeAPI simplifies configuration...
 BeAPI abstracts these [RULES/data](https://gist.github.com/orubel/159e94db62023c78a07ebe6d86633763) as a 'config' file which is **loaded at runtime and can be reloaded and SYNCHRONIZED** with distributed services **without requiring a restart**.
-
-## BeAPI automates common usage...
-By abstracting the rules, this allows for easier automation and allows for:
-- [automated batching](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-1)
-- [Api Chaining&reg;](https://beapi-io.github.io/spring-boot-starter-beapi/advanced.html#section-3)
-- extremely simplified security setup
-- automated api docs
-- automated HATEOS link relations
-- and more
-
 ---
 
 ## Functionality
 - **Security**
-  - [Zero Trust Security](https://www.ibm.com/topics/zero-trust) by default
   - Cors
   - Oauth2/JWT
   - Automated [Role Based Access Control (RBAC)](https://digitalguardian.com/blog/what-role-based-access-control-rbac-examples-benefits-and-more); 
@@ -83,8 +74,6 @@ By abstracting the rules, this allows for easier automation and allows for:
   - Automated LinkRelations ([SEE HATEOS](https://en.wikipedia.org/wiki/HATEOAS))
   - Connector Scaffolding (coming in 0.8.X)
   - Automated Role-based Webhooks (coming in 0.8.X)
-- **Data**
-  - CQRS for plugin data handling
 
 ---
 
