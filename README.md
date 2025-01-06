@@ -22,15 +22,25 @@
 **Configuration Files** - https://github.com/orubel/spring-boot-starter-beapi-config (Note : Move these into your 'iostateDir' location as found in your demo-application/src/main/resources/beapi_api.yaml file)
 
 ---
-### BeAPI is an automated API backend.
-It enables you to simply create the: 
+### BeAPI is Automation
 
-- API schemas
-- controllers
-- domain models
+- bootstrap connectors
+- bootstrap controllers
+- automated batching
+- automated chaining
+- automated webhooks
 
-  ... and everything else is automated for you! Security (JWT/CORS/RBAC/ABAC), Apidocs, Hateoas Link Relations, Tracing, Batching, Statistics, Governance, etc. It is a platform to simplify the weight of deploying an API backend so you can focus on other things.
-  
+---
+  ### BeAPI is Security
+
+- user management
+- CORS
+- Oauth2
+- JWT
+- RBAC/ABAC
+- secured cache
+- session management
+
 ---
 ## BeAPI stresses convention over config...
 Most everything you need for API development should be provided & configured 'out of the box' **BUT** you have the ability to configure and override everything to your hearts content
