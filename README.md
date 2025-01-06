@@ -24,20 +24,20 @@
 ---
 ### BeAPI is Automation
 
-- bootstrap connectors
-- bootstrap controllers
-- automated batching
-- automated chaining
-- automated webhooks
+- bootstrap your connectors
+- bootstrap your controllers
+- automate batching
+- automate chaining
+- automate webhooks
 
 ---
   ### BeAPI is Security
 
 - user management
-- CORS
-- Oauth2
-- JWT
-- RBAC/ABAC
+- [CORS](https://aws.amazon.com/what-is/cross-origin-resource-sharing/#:~:text=your%20CORS%20requirements%3F-,What%20is%20Cross%2DOrigin%20Resource%20Sharing%3F,resources%20in%20a%20different%20domain.)
+- [Oauth2](https://auth0.com/intro-to-iam/what-is-oauth-2)
+- [JWT](https://jwt.io/introduction#:~:text=JSON%20Web%20Token%20(JWT)%20is,because%20it%20is%20digitally%20signed.)
+- [RBAC/ABAC](https://www.okta.com/identity-101/role-based-access-control-vs-attribute-based-access-control/)
 - secured cache
 - session management
 
