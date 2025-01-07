@@ -123,4 +123,7 @@ flowchart TD
     E --> G[Controller extends BeapiRequestHandler]
     F --> G[Controller extends BeapiRequestHandler]
     G --> |postHandler| C
+    C --> |v0.1| D
+    C --> |b0.1| E
+    C --> |c0.1| F
 ```
