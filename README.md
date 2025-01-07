@@ -1,7 +1,7 @@
 ![alt text](https://github.com/orubel/logos/blob/master/beapi_logo_large.png)
 # BeAPI Spring Boot Starter
 
-### Stable Version : 0.9.0-SNAPSHOT
+### Stable Version : [0.9.1-SNAPSHOT](https://s01.oss.sonatype.org/service/local/repositories/snapshots/content/io/beapi/spring-boot-starter-beapi/0.9.1-SNAPSHOT/spring-boot-starter-beapi-0.9.1-20241224.203643-1-plain.jar)
 
 ### In-Development : 1.x
 
