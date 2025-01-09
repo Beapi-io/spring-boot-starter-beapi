@@ -195,7 +195,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - statistics reporting/logging
  
  ### Changed
- - add OpenApi format for docs; needs to be separate class/controller
+ - (done) add OpenApi format for docs; needs to be separate class/controller
+ - (done) added UPDATECACHE to all IO State files
  
 
  ### Documentation
@@ -205,7 +206,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### planned
   - (feature) integrate micrometer
   - classes need to be cleaned up
-  - Finish internationalizing messages
+  - Finish internationalizing messages for all errors/exceptions (start with german/french)
 
 
 
