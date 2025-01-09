@@ -193,11 +193,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Added
  - (done) trace functionality
  - statistics reporting/logging
+ - support XML content-type and parsing; test
  
  ### Changed
  - (done) add OpenApi format for docs; needs to be separate class/controller
  - (done) added UPDATECACHE to all IO State files
- 
+ - test webhooks and finalize functionality
 
  ### Documentation
  - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
