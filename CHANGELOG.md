@@ -199,6 +199,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) add OpenApi format for docs; needs to be separate class/controller
  - (done) added UPDATECACHE to all IO State files
  - test webhooks and finalize functionality
+ - move IO State json files from 'resources' to beapi cpnfig (and test)
 
  ### Documentation
  - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
