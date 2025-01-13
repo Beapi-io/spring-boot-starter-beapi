@@ -192,7 +192,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  
  ### Added
  - (done) trace functionality
- - statistics reporting/logging
+ - (in progress) statistics reporting/logging
+ - (in progress) scaffold repository and service for domains
  - support XML content-type and parsing; test
  
  ### Changed
