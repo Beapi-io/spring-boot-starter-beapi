@@ -196,6 +196,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (in progress) scaffold repository and service for domains
  - support XML content-type and parsing; test
  - reussue token endpoint; reissue token when token about to expire (does not work with expired tokens)
+ - [session management](https://stackoverflow.com/questions/49539076/how-can-i-get-a-list-of-all-sessions-in-spring)
  
  ### Changed
  - (done) add OpenApi format for docs; needs to be separate class/controller
