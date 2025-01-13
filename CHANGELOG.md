@@ -195,6 +195,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (in progress) statistics reporting/logging
  - (in progress) scaffold repository and service for domains
  - support XML content-type and parsing; test
+ - reussue token endpoint; reissue token when token about to expire (does not work with expired tokens)
  
  ### Changed
  - (done) add OpenApi format for docs; needs to be separate class/controller
