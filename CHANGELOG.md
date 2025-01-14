@@ -204,6 +204,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) added UPDATECACHE to all IO State files
  - test webhooks and finalize functionality
  - move IO State json files from 'resources' to beapi cpnfig (and test)
+ - add username to session
 
  ### Documentation
  - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
