@@ -193,7 +193,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  ### Added
  - (done) trace functionality
  - (done) statistics reporting/logging
- - [CLI to scaffold repository and service for domains](https://www.tutorialspoint.com/java-databasemetadata-gettables-method-with-example)
+ - (done) cli for scaffolding repository
+ - [CLI to scaffold service for domains](https://www.tutorialspoint.com/java-databasemetadata-gettables-method-with-example)
  - support XML content-type and parsing; test
  - reussue token endpoint; reissue token when token about to expire (does not work with expired tokens)
  - [session management](https://stackoverflow.com/questions/49539076/how-can-i-get-a-list-of-all-sessions-in-spring)
