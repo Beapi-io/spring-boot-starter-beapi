@@ -188,11 +188,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 
 
-## 1.0.x - (planned 03.30.2025)
+## 1.0.x - (planned 05.30.2025)
  
  ### Added
  - (done) trace functionality
- - (in progress) statistics reporting/logging
+ - (done) statistics reporting/logging
  - [CLI to scaffold repository and service for domains](https://www.tutorialspoint.com/java-databasemetadata-gettables-method-with-example)
  - support XML content-type and parsing; test
  - reussue token endpoint; reissue token when token about to expire (does not work with expired tokens)
