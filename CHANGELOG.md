@@ -194,7 +194,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) trace functionality
  - (done) statistics reporting/logging
  - (done) cli for scaffolding repository
- - [CLI to scaffold service for domains](https://www.tutorialspoint.com/java-databasemetadata-gettables-method-with-example)
+ - (done, need to test) CLI to scaffold service for domains
  - support XML content-type and parsing; test
  - reussue token endpoint; reissue token when token about to expire (does not work with expired tokens)
  - [session management](https://stackoverflow.com/questions/49539076/how-can-i-get-a-list-of-all-sessions-in-spring)
@@ -204,8 +204,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) add OpenApi format for docs; needs to be separate class/controller
  - (done) added UPDATECACHE to all IO State files
  - test webhooks and finalize functionality
- - move IO State json files from 'resources' to beapi cpnfig (and test)
- - add username to session
+ - move IO State json files from 'resources' (in plugin) to beapi config (and test)
+ - (done) add username to session
 
  ### Documentation
  - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
