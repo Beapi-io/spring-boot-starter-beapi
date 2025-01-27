@@ -196,25 +196,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) cli for scaffolding repository
  - (done, need to test) CLI to scaffold service for domains
  - support XML content-type and parsing; test
- - reussue token endpoint; reissue token when token about to expire (does not work with expired tokens)
+ - [check token status](https://stackoverflow.com/questions/46478267/spring-boot-security-how-to-check-verify-access-token)
  - [session management](https://stackoverflow.com/questions/49539076/how-can-i-get-a-list-of-all-sessions-in-spring)
- - IP blacklisting (via session check)
  
  ### Changed
  - (done) add OpenApi format for docs; needs to be separate class/controller
  - (done) added UPDATECACHE to all IO State files
  - test webhooks and finalize functionality
- - move IO State json files from 'resources' (in plugin) to beapi config (and test)
  - (done) add username to session
 
- ### Documentation
- - (DOCUMENTATION DEMO) stats tracking (with google or integrated Matamo : https://developer.matomo.org/api-reference/tracking-api)
-   - currently only handling PRIVATE API'S (must have token/role to view); this will add public ones as well and separate  
-
  ### planned
-  - (feature) integrate micrometer
-  - classes need to be cleaned up
-  - Finish internationalizing messages for all errors/exceptions (start with german/french)
+ - classes need to be cleaned up
+ - Finish internationalizing messages for all errors/exceptions (start with german/french)
 
 
 
