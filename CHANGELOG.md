@@ -196,8 +196,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) cli for scaffolding repository
  - (done, need to test) CLI to scaffold service for domains
  - support XML content-type and parsing; test
- - [check token status](https://stackoverflow.com/questions/46478267/spring-boot-security-how-to-check-verify-access-token)
- - [session management](https://stackoverflow.com/questions/49539076/how-can-i-get-a-list-of-all-sessions-in-spring)
+ - (done) refreshToken functionality
+ - (backburner) [session management](https://stackoverflow.com/questions/49539076/how-can-i-get-a-list-of-all-sessions-in-spring)
  
  ### Changed
  - (done) add OpenApi format for docs; needs to be separate class/controller
