@@ -204,6 +204,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) added UPDATECACHE to all IO State files
  - test webhooks and finalize functionality
  - (done) add username to session
+ - (done) documented adding public endpoints
 
  ### planned
  - classes need to be cleaned up
