@@ -206,6 +206,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) add username to session
  - (done) documented adding public endpoints
  - (done) documented refreshToken
+ - (done) added actuator endpoints to documentation
 
  ### planned
  - classes need to be cleaned up
