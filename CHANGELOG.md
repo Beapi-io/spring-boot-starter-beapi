@@ -194,7 +194,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) trace functionality
  - (done) statistics reporting/logging
  - (done) cli for scaffolding repository
- - (done, need to test) CLI to scaffold service for domains
+ - (done) CLI to scaffold service for domains
  - support XML content-type and parsing; test
  - (done) refreshToken functionality
  - (backburner) [session management](https://stackoverflow.com/questions/49539076/how-can-i-get-a-list-of-all-sessions-in-spring)
@@ -205,6 +205,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - test webhooks and finalize functionality
  - (done) add username to session
  - (done) documented adding public endpoints
+ - (done) documented refreshToken
 
  ### planned
  - classes need to be cleaned up
