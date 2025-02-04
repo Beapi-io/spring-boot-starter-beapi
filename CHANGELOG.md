@@ -209,8 +209,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) added actuator endpoints to documentation
 
  ### planned
- - classes need to be cleaned up
- - Finish internationalizing messages for all errors/exceptions (start with german/french)
+ - (in progress) Finish internationalizing messages for all errors/exceptions (start with german/french)
 
 
 
