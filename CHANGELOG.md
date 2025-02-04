@@ -198,6 +198,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - support XML content-type and parsing; test
  - (done) refreshToken functionality
  - (backburner) [session management](https://stackoverflow.com/questions/49539076/how-can-i-get-a-list-of-all-sessions-in-spring)
+ - (in progress) internationalizing messages for all errors/exceptions (start with chinese, spanish, french, german in that order)
+   - (done) chinese(CN)
+   - (done) Mexico(MX), Colombia(CO), Spain(ES), Argentina(AR)
+   - (in progress) french(FR)
+   - german(DE)
  
  ### Changed
  - (done) add OpenApi format for docs; needs to be separate class/controller
@@ -208,12 +213,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) documented refreshToken
  - (done) added actuator endpoints to documentation
 
- ### planned
- - (in progress) Finish internationalizing messages for all errors/exceptions (start with chinese, spanish, french, german in that order)
-   - (done) chinese(CN)
-   - (in progress) Mexico(MX), Colombia(CO), Spain(ES), Argentina(AR)
-   - french(FR)
-   - german(DE)
+
 
 
 
