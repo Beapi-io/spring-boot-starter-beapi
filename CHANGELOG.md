@@ -210,6 +210,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
  ### planned
  - (in progress) Finish internationalizing messages for all errors/exceptions (start with chinese, spanish, french, german in that order)
+   - chinese done
 
 
 
