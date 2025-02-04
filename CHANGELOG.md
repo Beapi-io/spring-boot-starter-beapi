@@ -209,7 +209,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) added actuator endpoints to documentation
 
  ### planned
- - (in progress) Finish internationalizing messages for all errors/exceptions (start with german/french)
+ - (in progress) Finish internationalizing messages for all errors/exceptions (start with chinese, spanish, french, german in that order)
 
 
 
