@@ -196,7 +196,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) cli for scaffolding repository
  - (done) CLI to scaffold service for domains
  - (done) refreshToken functionality
- - (in progress) internationalizing messages for all errors/exceptions (start with chinese, spanish, french, german in that order)
+ - (in progress) [internationalizing messages for all errors/exceptions (start with chinese, spanish, french, german in that order)](https://www.oracle.com/java/technologies/javase/jdk8-jre8-suported-locales.html)
    - (done) chinese(CN)
    - (done) Mexico(MX), Colombia(CO), Spain(ES), Argentina(AR)
    - (in progress) french(FR)
