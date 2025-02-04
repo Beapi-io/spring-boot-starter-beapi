@@ -196,14 +196,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) cli for scaffolding repository
  - (done) CLI to scaffold service for domains
  - (done) refreshToken functionality
- - edit error messaging to correctly get locale from request
-   - import org.springframework.web.servlet.support.RequestContextUtils;
-   - Locale locale = RequestContextUtils.getLocale(request);
- - (in progress) [internationalizing messages for all errors/exceptions (start with chinese, spanish, french, german in that order)](https://www.oracle.com/java/technologies/javase/jdk8-jre8-suported-locales.html)
-   - (done) chinese(CN)
-   - (done) Mexico(MX), Colombia(CO), Spain(ES), Argentina(AR)
-   - (done) french(FR)
-   - german(DE)
+ - (done) internationalizing messages for all errors/exceptions (start with chinese, spanish, french, german in that order)
  
  ### Changed
  - (done) add OpenApi format for docs; needs to be separate class/controller
