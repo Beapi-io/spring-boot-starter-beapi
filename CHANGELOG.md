@@ -209,6 +209,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### moved to next version
  - (backburner) [session management](https://stackoverflow.com/questions/49539076/how-can-i-get-a-list-of-all-sessions-in-spring)
- -  - (backburner)support XML content-type and parsing; test
+ - (backburner)support XML content-type and parsing; test
 
 
