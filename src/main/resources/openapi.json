@@ -1,0 +1,31 @@
+{
+    "NAME": "openapi",
+    "NETWORKGRP": "public",
+    "VALUES": {
+        "*": {
+            "type": "String",
+            "description": "*",
+            "mockData": "*"
+        }
+    },
+    "CURRENTSTABLE": "1",
+    "VERSION": {
+        "1": {
+            "DEFAULTACTION": "show",
+            "URI": {
+                "show": {
+                    "METHOD": "GET",
+                    "DESCRIPTION": "Show ApiDocs",
+                    "UPDATECACHE": true,
+                    "ROLES": {},
+                    "REQUEST": {
+                        "permitAll": []
+                    },
+                    "RESPONSE": {
+                        "permitAll": ["*"]
+                    }
+                }
+            }
+        }
+    }
+}

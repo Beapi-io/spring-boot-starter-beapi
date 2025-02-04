@@ -22,9 +22,12 @@ import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.BootstrapService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ConnectorScaffoldService
+import io.beapi.api.service.ErrorService
 import io.beapi.api.service.LinkRelationService
 import io.beapi.api.service.SessionService
-import io.beapi.api.service.TestScaffoldService
+import io.beapi.api.service.StatsCacheService
+import io.beapi.api.service.StatsService
+
 import io.beapi.api.service.ExchangeService
 import io.beapi.api.service.ThrottleService
 import io.beapi.api.service.TraceExchangeService
@@ -36,7 +39,6 @@ import io.beapi.api.service.TraceCacheService
 import io.beapi.api.service.TraceService
 import io.beapi.api.service.CliService
 //import io.beapi.api.service.WebHookService
-
 
 //import io.beapi.api.filter.RequestInitializationFilter
 //import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -59,6 +61,7 @@ public class BeapiServiceAutoConfiguration {
 	@Autowired protected ApplicationContext applicationContext;
 	@Autowired protected TraceCacheService traceCacheService
 	@Autowired protected ApiCacheService apiCacheService
+	@Autowired protected StatsCacheService statsCacheService
 	@Autowired protected ApiProperties apiProperties
 
 	public BeapiServiceAutoConfiguration() {}
@@ -80,6 +83,13 @@ public class BeapiServiceAutoConfiguration {
 			version = properties.getProperty('build.version')
 		}
 		return version
+	}
+
+
+	@Bean(name='errorService')
+	@ConditionalOnMissingBean
+	public ErrorService errorService() throws IOException {
+		return new ErrorService();
 	}
 
 	/**
@@ -115,16 +125,6 @@ public class BeapiServiceAutoConfiguration {
 		return new ConnectorScaffoldService(applicationContext);
 	}
 
-	/**
-	 *
-	 * @return
-	 * @throws IOException
-	 */
-	@Bean(name='testScaffoldService')
-	@ConditionalOnMissingBean
-	public TestScaffoldService testScaffoldService() throws IOException {
-		return new TestScaffoldService(applicationContext);
-	}
 
 	/**
 	 *
@@ -145,38 +145,7 @@ public class BeapiServiceAutoConfiguration {
 	}
 	 */
 
-	/**
-	 *
-	 * @return
-	 * @throws IOException
-	 */
-	@Bean(name='exchangeService')
-	@ConditionalOnMissingBean
-	public ExchangeService exchangeService() throws IOException {
-		return new ExchangeService(linkRelationService(), apiCacheService);
-	}
 
-	/**
-	 *
-	 * @return
-	 * @throws IOException
-	 */
-	@Bean(name='batchService')
-	@ConditionalOnMissingBean
-	public BatchExchangeService batchService() throws IOException {
-		return new BatchExchangeService(apiCacheService, applicationContext);
-	}
-
-	/**
-	 *
-	 * @return
-	 * @throws IOException
-	 */
-	@Bean(name='chainService')
-	@ConditionalOnMissingBean
-	public ChainExchangeService chainService() throws IOException {
-		return new ChainExchangeService(apiCacheService, applicationContext);
-	}
 
 	/**
 	 *
@@ -200,7 +169,16 @@ public class BeapiServiceAutoConfiguration {
 		return new TraceExchangeService(apiCacheService, traceService())
 	}
 
-
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
+	@Bean(name='statsService')
+	@ConditionalOnMissingBean
+	public StatsService statsService() throws IOException {
+		return new StatsService(statsCacheService)
+	}
 
 	/**
 	 *

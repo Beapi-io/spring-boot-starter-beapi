@@ -21,6 +21,14 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory
 
+/**
+ *
+ * This class provides basic methods for calltype=1 (ie endpoints requested like '/v0.1/')
+ * @author Owen Rubel
+ *
+ * @see ApiExchange
+ *
+ */
 public class MailService {
 
     @Autowired

@@ -87,7 +87,7 @@ class TraceCacheService {
 		try{
 			cacheManager.getCache('Trace').clear()
 		}catch(Exception e){
-			throw new Exception("[TraceCacheService :: getTraceCache] : Exception - full stack trace follows:",e)
+			throw new Exception("[TraceCacheService :: flushCache] : Exception - full stack trace follows:",e)
 		}
 	}
 

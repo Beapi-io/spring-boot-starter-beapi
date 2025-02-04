@@ -48,14 +48,17 @@ import java.util.regex.Pattern
 //@EnableConfigurationProperties([ApiProperties.class])
 class ApiCacheService{
 
-
 	//@Autowired
 	private CacheManager cacheManager;
 
-
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApiCacheService.class);
 
-
+	/**
+	 * ApiCache class constructor.
+	 * @param  cacheManager cache manager to use for this cache
+	 * @return instance of ApiCacheService
+	 * @see RequestInitializationFilter#processRequest
+	 */
 	public ApiCacheService(CacheManager cacheManager) {
 		this.cacheManager = cacheManager
 		//this.version = version
@@ -63,7 +66,7 @@ class ApiCacheService{
 
 
 
-	/*
+	/**
 	 * Only flush on RESTART.
 	 * DO NOT flush while LIVE!!!
 	 * Need to lock this down to avoid process calling this.
@@ -76,11 +79,10 @@ class ApiCacheService{
 	void flushAllApiCache(){}
 
 
-	//@org.springframework.cache.annotation.CachePut(value="ApiCache",key="#controllername")
 	/**
 	 * Method to set the apicache associated with the controller name
-	 * @param String controllername for designated endpoint
-	 * @param LinkedHashMap a map of all apidoc information for all roles which can be easily traversed
+	 * @param controllername String representing controllername for designated endpoint
+	 * @param apidesc LinkedHashMap a map of all apidoc information for all roles which can be easily traversed
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	@CachePut(value='ApiCache',key="#controllername")
@@ -93,10 +95,10 @@ class ApiCacheService{
 
 	/**
 	 * Method to set the apicache associated with the controller name using pregenerated ApiDescriptor
-	 * @param String controllername for designated endpoint
-	 * @param String methodname for designated endpoint
-	 * @param ApiDescriptor apidoc for current application
-	 * @param String apiversion of current application
+	 * @param controllername String representing controller name for designated endpoint
+	 * @param methodname String representing methodname for designated endpoint
+	 * @param apidoc Object representing ApiDescriptor for current application
+	 * @param apiversion String representing apiversion of current request
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	@CachePut(value='ApiCache',key="#controllername")
@@ -133,7 +135,8 @@ class ApiCacheService{
 
 	/**
 	 * Method to set the 'ApiCache' cache object
-	 * @param String controller name for designated endpoint
+	 * @param controllername String representing controller name for designated endpoint
+	 * @param apidesc LinkedHashMap representing api object
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	@CachePut(value='ApiCache',key="#controllername")
@@ -159,14 +162,14 @@ class ApiCacheService{
 	/**
 	 * Method to set the cached result associated with endpoint; only works with GET method
 	 * and uses HASH of all id's as ID for the cache itself. Also checks authority and format
-	 * @param String hash of all ids sent for given endpoint
-	 * @param String controllername for designated endpoint
-	 * @param String apiversion of current application
-	 * @param String methodname for designated endpoint
-	 * @param String authority of user making current request for cache which we are storing
-	 * @param String format of cache being stored (ie xml/json)
-	 * @param String content of 'response' to be added to endpoint cache
-	 * @return A LinkedHashMap of Cached data associated with controllername
+	 * @param cacheHash String hash of all ids sent for given endpoint
+	 * @param controllerName String representing controllername for designated endpoint
+	 * @param apiversion String representing  current request version
+	 * @param methodname String representing request method
+	 * @param authority String representing authority of user making current request for cache which we are storing
+	 * @param format String representing format of cache being stored (ie xml/json)
+	 * @param content String representing content of 'response' to be added to endpoint cache
+	 * @return LinkedHashMap of Cached data associated with controllername
 	 */
 	// TODO: parse for XML as well
 	// todo : turn into object
@@ -221,13 +224,9 @@ class ApiCacheService{
 		}
 	}
 
-
-
-
-
 	/**
 	 * Method to get the 'ApiCache' cache object
-	 * @param String controller name for designated endpoint
+	 * @param controllername String representing controller name for designated endpoint
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	//@Cacheable(value='ApiCache',key="#controllername",sync=false)
@@ -251,12 +250,11 @@ class ApiCacheService{
 
 	/**
 	 * Method to get the 'ApiCache' cache object
-	 * @param String controller name for designated endpoint
+	 * @param controllername String representing controller name for designated endpoint
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	//@Cacheable(value='ApiCache',key="#controllername",sync=false)
 	ApiDescriptor getApiDescriptor(String controllername, String version, String action) throws Exception{
-		println("getApiDescriptor : "+version+"/"+controllername+"/"+action)
 		logger.warn("getApiCache(String) : {}",controllername)
 		if(controllername!=null) {
 			try {

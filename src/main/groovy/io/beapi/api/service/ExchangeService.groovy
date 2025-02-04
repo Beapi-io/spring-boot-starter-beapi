@@ -25,9 +25,20 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
-
-
+import io.beapi.api.service.StatsService
+import io.beapi.api.service.ErrorService
+import org.springframework.web.context.request.RequestAttributes
+import org.springframework.web.context.request.RequestContextHolder as RCH
+import org.springframework.web.context.request.ServletRequestAttributes
 // NOTE : CALLTYPE = 1
+/**
+ *
+ * This class provides basic methods for calltype=1 (ie endpoints requested like '/v0.1/')
+ * @author Owen Rubel
+ *
+ * @see ApiExchange
+ *
+ */
 @Service
 public class ExchangeService extends ApiExchange{
 
@@ -37,23 +48,52 @@ public class ExchangeService extends ApiExchange{
 
 	private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
 
+	StatsService statsService
 	ApiCacheService apiCacheService
 	LinkRelationService linkRelationService
+	ErrorService errorService
 
 	boolean overrideAutoMimeTypes = false
 
-	public ExchangeService(LinkRelationService linkRelationService, ApiCacheService apiCacheService) {
+
+
+
+	/**
+	 *
+	 * Constructor for ExchangeService
+	 * @author Owen Rubel
+	 *
+	 * @param statsService Injected Bean for StatsService
+	 * @param linkRelationService Injected Bean for linkRelationService
+	 * @param apiCacheService Injected Bean for apiCacheService
+	 * @see ApiExchange
+	 *
+	 */
+	public ExchangeService(ErrorService errorService, StatsService statsService, LinkRelationService linkRelationService, ApiCacheService apiCacheService) {
 		try {
 			this.linkRelationService = linkRelationService
 			this.apiCacheService = apiCacheService
+			this.statsService = statsService
+			this.errorService = errorService
 		} catch (Exception e) {
 			println("# [Beapi] ExchangeService - initialization Exception - ${e}")
 			System.exit(0)
 		}
 	}
 
-    // [REQUEST]
+	/**
+	 *
+	 * method for handling endpoint requests
+	 * @author Owen Rubel
+	 *
+	 * @param request injected HttpServletRequest for handling request
+	 * @param response injected HttpServletResponse for handling response
+	 * @param authority injected principal authority
+	 * @see ApiExchange
+	 *
+	 */
     boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority){
+		//println("### ExchangeService :: apiRequest")
 		initVars(request,response,authority)
 
 		if(this.apiObject) {
@@ -86,17 +126,32 @@ public class ExchangeService extends ApiExchange{
 
 		if(!validateMethod()){
 			logger.warn(devnotes,"[ INVALID REQUEST METHOD ] : SENT REQUEST METHOD FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DOES NOT MATCH EXPECTED 'REQUEST' METHOD OF '${apiObject['method'].toUpperCase()}'. IF THIS IS AN ISSUE, CHECK THE REQUESTMETHOD IN THE IOSTATE FILE FOR THIS CONTROLLER/ACTION.")
-			writeErrorResponse(response,'405',request.getRequestURI());
+println("not valid method")
+			try {
+				writeErrorResponse(request, response, '405');
+			}catch(Exception e){
+				println("exception :"+e)
+			}
 			return false
 		}else{
 			return true
 		}
     }
 
+	/**
+	 *
+	 * method for handling endpoint response
+	 * @author Owen Rubel
+	 *
+	 * @param request injected HttpServletRequest for handling request
+	 * @param response injected HttpServletResponse for handling response
+	 * @param body injected response body for parsing
+	 * @see ApiExchange
+	 *
+	 */
     void apiResponse(HttpServletRequest request,HttpServletResponse response, ArrayList body){
-		//println("### apiResponse ###")
+		//println("### ExchangeService :: apiResponse")
         String output = parseOutput(body, responseFileType)
-
 		// return/update cache if 'updateCache' is true
 		if(this.apiObject.updateCache && method == 'GET') {
 			apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
@@ -105,6 +160,15 @@ public class ExchangeService extends ApiExchange{
 				apiCacheService.unsetApiCachedResult(this.controller, this.action, this.apiversion)
 			}
 		}
+
+
+
+		try{
+			statsService.setStat((String)response.getStatus(),(String)request.getRequestURI())
+		}catch(Exception e){
+			println("### [statsService :: postHandle] exception (1) : "+e)
+		}
+
 
 
 		/*
@@ -122,6 +186,17 @@ public class ExchangeService extends ApiExchange{
         //response.writer.flush()
     }
 
+	/**
+	 *
+	 * method for initializing variables used for handling request/response
+	 * @author Owen Rubel
+	 *
+	 * @param request injected HttpServletRequest for handling request
+	 * @param response injected HttpServletResponse for handling response
+	 * @param authority injected principal authority
+	 * @see ApiExchange
+	 *
+	 */
 	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) throws Exception{
 		//String accept = request.getHeader('Accept')
 		//String contentType = request.getContentType()

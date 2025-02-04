@@ -24,9 +24,16 @@ import javax.json.*
 import org.springframework.security.web.header.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import io.beapi.api.service.StatsService
 
-
-// NOTE : CALLTYPE = 2
+/**
+ *
+ * Class for handling calltype=2 (batching); called in URI as /b0.1/
+ * @author Owen Rubel
+ *
+ * @see ApiExchange
+ *
+ */
 @Service
 public class BatchExchangeService extends ApiExchange{
 
@@ -36,17 +43,43 @@ public class BatchExchangeService extends ApiExchange{
 	LinkedList batch = []
 	ApiCacheService apiCacheService
 	ApplicationContext ctx
+	StatsService statsService
+	ErrorService errorService
 
-	public BatchExchangeService(ApiCacheService apiCacheService, ApplicationContext applicationContext) {
+	/**
+	 *
+	 * Constructor for BatchExchangeService
+	 * @author Owen Rubel
+	 *
+	 * @param statsService Injected Bean for StatsService
+	 * @param apiCacheService Injected Bean for apiCacheService
+	 * @param applicationContext application context for handling batching
+	 * @see ApiExchange
+	 *
+	 */
+	public BatchExchangeService(ErrorService errorService, StatsService statsService,ApiCacheService apiCacheService, ApplicationContext applicationContext) {
 		try {
 			this.apiCacheService = apiCacheService
 			this.ctx = applicationContext
+			this.statsService = statsService
+			this.errorService = errorService
 		} catch (Exception e) {
 			println("# [Beapi] BatchExchangeService - initialization Exception - ${e}")
 			System.exit(0)
 		}
 	}
 
+	/**
+	 *
+	 * method for handling endpoint requests for batching
+	 * @author Owen Rubel
+	 *
+	 * @param request injected HttpServletRequest for handling request
+	 * @param response injected HttpServletResponse for handling response
+	 * @param authority injected principal authority
+	 * @see ApiExchange
+	 *
+	 */
 	boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority) {
 
 		initVars(request,response,authority)
@@ -82,12 +115,12 @@ public class BatchExchangeService extends ApiExchange{
 
 		if(!validateMethod()){
 			logger.warn(devnotes,"[ INVALID REQUEST METHOD ] : SENT REQUEST METHOD FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DOES NOT MATCH EXPECTED 'REQUEST' METHOD OF '${apiObject['method'].toUpperCase()}'. IF THIS IS AN ISSUE, CHECK THE REQUESTMETHOD IN THE IOSTATE FILE FOR THIS CONTROLLER/ACTION.")
-			writeErrorResponse(response,'405',request.getRequestURI());
+			errorService.writeErrorResponse(request,response,'405');
 			return false;
 		}
 
 		if (!checkRequestParams(request.getAttribute('params'))) {
-			writeErrorResponse(response, '400', request.getRequestURI());
+			errorService.writeErrorResponse(request,response, '400');
 			return false;
 		}
 
@@ -95,6 +128,17 @@ public class BatchExchangeService extends ApiExchange{
 		return true
 	}
 
+	/**
+	 *
+	 * method for handling endpoint response for batching
+	 * @author Owen Rubel
+	 *
+	 * @param request injected HttpServletRequest for handling request
+	 * @param response injected HttpServletResponse for handling response
+	 * @param body injected response body for parsing
+	 * @see ApiExchange
+	 *
+	 */
 	void batchResponse(HttpServletRequest request, HttpServletResponse response, ArrayList body){
 		if (body) {
 			if(request.getAttribute('batchVars').isEmpty()) {
@@ -108,6 +152,13 @@ public class BatchExchangeService extends ApiExchange{
 						apiCacheService.unsetApiCachedResult(this.controller,  this.action, this.apiversion)
 					}
 				}
+
+				try{
+					statsService.setStat((String)response.getStatus(),(String)request.getRequestURI())
+				}catch(Exception e){
+					println("### [statsService :: postHandle] exception (1) : "+e)
+				}
+
 			}else{
 				// concat and forward
 				parseBatchOutput(body, request, response, this.responseFileType)
@@ -144,6 +195,12 @@ public class BatchExchangeService extends ApiExchange{
 				}
 				 */
 
+				try{
+					statsService.setStat((String)response.getStatus(),(String)request.getRequestURI())
+				}catch(Exception e){
+					println("### [statsService :: postHandle] exception (1) : "+e)
+				}
+
 				String path = "/b${version}/${controller}/${action}/**";
 				try {
 					this.ctx.getServletContext().getRequestDispatcher(path).forward(request, response);
@@ -155,11 +212,21 @@ public class BatchExchangeService extends ApiExchange{
 				}
 			}
 		}else{
-			writeErrorResponse(response,'422',this.uri,'No data returned for this call');
+			errorService.writeErrorResponse(request, response,'422','No data returned for this call');
 		}
 	}
 
-
+	/**
+	 *
+	 * method for initializing variables used for handling request/response
+	 * @author Owen Rubel
+	 *
+	 * @param request injected HttpServletRequest for handling request
+	 * @param response injected HttpServletResponse for handling response
+	 * @param authority injected principal authority
+	 * @see ApiExchange
+	 *
+	 */
 	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) throws Exception{
 		String accept = request.getHeader('Accept')
 		String contentType = request.getContentType()
@@ -223,6 +290,18 @@ public class BatchExchangeService extends ApiExchange{
 		}
 	}
 
+	/**
+	 *
+	 * method for parsing body response for request/response
+	 * @author Owen Rubel
+	 *
+	 * @param responseBody returning responseBody
+	 * @param request injected HttpServletRequest for handling request
+	 * @param response injected HttpServletResponse for handling response
+	 * @param responseFileType format for returning responseBody
+	 * @see ApiExchange
+	 *
+	 */
 	void parseBatchOutput(ArrayList responseBody, HttpServletRequest request, HttpServletResponse response, String responseFileType){
 		this.batch.add(responseBody[0])
 
@@ -240,6 +319,16 @@ public class BatchExchangeService extends ApiExchange{
 		}
 	}
 
+	/**
+	 *
+	 * method for parsing body response by fileType
+	 * @author Owen Rubel
+	 *
+	 * @param responseBody returning responseBody
+	 * @param responseFileType format for returning responseBody
+	 * @see ApiExchange
+	 *
+	 */
 	String parseBodyByFiletype(LinkedHashMap responseBody, String responseFileType){
 		switch(responseFileType){
 			case 'JSON':
@@ -257,6 +346,15 @@ public class BatchExchangeService extends ApiExchange{
 		}
 	}
 
+	/**
+	 *
+	 * method for setting params used by batch with each iteration
+	 * @author Owen Rubel
+	 *
+	 * @param request injected HttpServletRequest for handling request
+	 * @see ApiExchange
+	 *
+	 */
 	void setBatchParams(HttpServletRequest request) throws Exception{
 		try {
 			if(request.getAttribute('batchVars')) {

@@ -26,7 +26,7 @@ import java.util.Optional;
 
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
 @Service
-public class HookService implements IHook {
+public class HookService {
 
 	HookRepository hookrepo;
 

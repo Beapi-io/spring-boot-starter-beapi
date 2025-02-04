@@ -46,6 +46,14 @@ import org.springframework.core.io.Resource;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 
+/**
+ *
+ * Class for parsing connectors (IO State) in a usable form for starter
+ * @author Owen Rubel
+ *
+ * @see ApiDescriptor
+ *
+ */
 @Service
 @EnableConfigurationProperties([ApiProperties.class])
 public class IoStateService{
@@ -60,6 +68,17 @@ public class IoStateService{
 
 	//private static final org.slf4j.Logger logger = LoggerFactory.getLogger(IoStateService.class);
 
+	/**
+	 *
+	 * Constructor for ExchangeService
+	 * @author Owen Rubel
+	 *
+	 * @param apiProperties properties object for comparison and validating
+	 * @param applicationContext Application context used for recursive lookups
+	 * @param apiCacheService Injected Bean for apiCacheService
+	 * @param version application version; used in path comparison
+	 *
+	 */
 	public IoStateService(ApiProperties apiProperties, ApplicationContext applicationContext, ApiCacheService apiCacheService, String version)  throws Exception {
 		ApplicationContext ctx
 		this.version = version
@@ -91,7 +110,13 @@ public class IoStateService{
 		return version
 	}
 
-
+	/**
+	 *
+	 * method for initializinf IO State directory
+	 * @author Owen Rubel
+	 *
+	 *
+	 */
 	void initIoStateDir(){
 		try{
 			this.apiCacheService.flushAllApiCache();
@@ -138,6 +163,14 @@ public class IoStateService{
 
 	}
 
+	/**
+	 *
+	 * method for retrieving each file for parsing
+	 * @author Owen Rubel
+	 *
+	 * @param path path for each IO State file being parsed
+	 *
+	 */
 	private void parseResource(String path) throws IOException, UndeclaredThrowableException, IllegalArgumentException{
 		//logger.debug("parseResource : {}")
 
@@ -162,15 +195,23 @@ public class IoStateService{
 
 	}
 
+	/**
+	 *
+	 * method for parsing each IO State file
+	 * @author Owen Rubel
+	 *
+	 * @param path path for each IO State file being parsed
+	 *
+	 */
 	private void parseFiles(String path) throws Exception{
 		//logger.debug("parseFiles : {}")
 		LinkedHashMap methods = [:]
-		println(" ###  Loading IO State Files : ${path}")
 
 		try {
 			new File(path).eachFile() { file ->
 				if(!file.isDirectory()) {
 					String fileName = file.name.toString()
+
 					ArrayList tmp = fileName.split('\\.')
 					String fileChar1 = fileName.charAt(fileName.length() - 1)
 
@@ -188,7 +229,6 @@ public class IoStateService{
 
 								parseJson(json.IOSTATE.NAME.toString(), json.IOSTATE)
 							}catch(Exception e){
-								println("#### [IoStateService - ${json.NAME.toString()}] Exception :"+e)
 								throw new Exception("#### [IoStateService - ${json.NAME.toString()}] Exception :",e)
 							}
 						} else {
@@ -203,7 +243,15 @@ public class IoStateService{
 		}
 	}
 
-
+	/**
+	 *
+	 * method for parsing IO State JSON into a commonly used object
+	 * @author Owen Rubel
+	 *
+	 * @param apiName baseline name for json file
+	 * @param json JSON data retrieved from file
+	 *
+	 */
 	void parseJson(String apiName,LinkedHashMap json) throws Exception{
 		//logger.debug("parseJson : {}")
 
@@ -283,6 +331,7 @@ public class IoStateService{
 							hookRoles = uriObject.ROLES.HOOK as Set
 						}
 					}catch(Exception e){ println("### parseJson > hookroles error :"+e)}
+
 
 					boolean updateCache = false
 					try{
@@ -395,6 +444,24 @@ public class IoStateService{
 		//return methods
 	}
 
+	/**
+	 *
+	 * constructor for commonly used object from parsed IO State file
+	 * @author Owen Rubel
+	 *
+	 * @param networkGrp
+	 * @param apiName
+	 * @param apiMethod
+	 * @param apiRoles
+	 * @param batchRoles
+	 * @param hookRoles
+	 * @param uri
+	 * @param vals
+	 * @param json
+	 * @param updateCache
+	 * @param rateLimit
+	 *
+	 */
 	protected ApiDescriptor createApiDescriptor(String networkGrp, String apiname, String apiMethod, ArrayList apiRoles, LinkedHashSet batchRoles, LinkedHashSet hookRoles, String uri, LinkedHashMap vals, LinkedHashMap json, boolean updateCache, LinkedHashMap rateLimit) throws Exception{
 		//logger.debug("createApiDescriptor : {}")
 		LinkedHashMap<String, ParamsDescriptor> apiObject = new LinkedHashMap()
@@ -406,6 +473,7 @@ public class IoStateService{
 
 		try{
 			vals.each(){k,v ->
+
 
 				keys.add(k)
 
@@ -463,6 +531,7 @@ public class IoStateService{
 		[BeAPIFramework] : No IO State Files found for initialization :groovy.lang.MissingMethodException: No signature of method: demo.service.IoStateService$_getIOSet_closure6.doCall()
 		is applicable for argument types: (org.json.JSONObject) values: [{"permitAll":[],"ROLE_ADMIN":["id"]}]
 		 */
+
 		LinkedHashMap requestObj = json.URI[uri].REQUEST
 		LinkedHashMap responseObj =json.URI[uri].RESPONSE
 
@@ -522,7 +591,17 @@ public class IoStateService{
 
 
 
-
+	/**
+	 *
+	 * method for getting ABAC values for an endpoint
+	 * @author Owen Rubel
+	 *
+	 * @param io
+	 * @param apiObject
+	 * @param valuseKeys
+	 * @param apiName
+	 *
+	 */
 	private LinkedHashMap getIOSet(LinkedHashMap io, LinkedHashMap apiObject, List valueKeys, String apiName) throws Exception{
 		//logger.debug("getIOSet : {}")
 
@@ -576,6 +655,14 @@ public class IoStateService{
 		return ioSet
 	}
 
+	/**
+	 *
+	 * convert object to a LinkedHashMap
+	 * @author Owen Rubel
+	 *
+	 * @param obj
+	 *
+	 */
 	def toToLinkedHashMap(def obj) {
 		if (obj instanceof org.apache.groovy.json.internal.LazyMap) {
 			Map copy = [:];
@@ -619,8 +706,14 @@ public class IoStateService{
 	}
 
 
-	/*
-	This function is meant to enforce ALL 'RequestMappingHandlerMapping' endpoints comply with RPCNaming.
+	/**
+	 *
+	 * This function is meant to enforce ALL 'RequestMappingHandlerMapping' endpoints comply with RPCNaming
+	 * @author Owen Rubel
+	 *
+	 * @param applicationContect
+	 * @param version
+	 *
 	 */
 	boolean validateRpcNamingConventions(ApplicationContext applicationContext,String version) throws Exception {
 		try {

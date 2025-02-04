@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class UserAuthorityService implements IUserAuthority{
+public class UserAuthorityService{
 
     UserAuthorityRepository userauthrepo;
 
@@ -19,17 +19,17 @@ public class UserAuthorityService implements IUserAuthority{
         this.userauthrepo = userauthrepo;
     }
 
-    @Override
+    //@Override
     public List<UserAuthority> findByUser(User user){
         return userauthrepo.findByUser(user);
     }
 
-    @Override
+    //@Override
     public List<UserAuthority> findByAuthority(Authority auth){
         return userauthrepo.findByAuthority(auth);
     }
 
-    @Override
+    //@Override
     public UserAuthority save(UserAuthority userAuthority){
         userauthrepo.save(userAuthority);
         userauthrepo.flush();

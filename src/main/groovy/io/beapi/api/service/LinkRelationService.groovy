@@ -25,7 +25,11 @@ import org.json.JSONObject
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-// todo: rename as ExchangeService : encompasses both request/response methods for interceptor
+
+/**
+ * A class for serving related links such as via HATEOS
+ * @author Owen Rubel
+ */
 @Service
 public class LinkRelationService {
 
@@ -36,6 +40,11 @@ public class LinkRelationService {
 	protected ApiDescriptor apiObject
 	protected String authority
 
+	/**
+	 * LinkRelationService class constructor.
+	 * @param  apiCacheService
+	 * @return principal
+	 */
 	public LinkRelationService(ApiCacheService apiCacheService, PrincipleService principle){
 		this.apiCacheService = apiCacheService
 		this.authority=principle.authorities()
@@ -48,6 +57,14 @@ public class LinkRelationService {
 	//
 	// keep in mind, 'linkRelations 'dataset' are based on RETURNSET
 	// so companyId FOREIGNKEY will be in RETURNSET which influences the links for 'LinkRelations'
+
+	/**
+	* method for outputting related links
+	 * @param request injected HttpServletRequest for handling request
+	 * @param response injected HttpServletResponse for handling response
+	 * @param apiObject injected api object; describes api rules for called endpoint
+	 *
+	 */
 	private String processLinkRelations(HttpServletRequest request, HttpServletResponse response, ApiDescriptor apiObject){
 		// can only be used on callType 'v' (not with BATCH / CHAIN / TRACE / etc)
 		this.uObj = request.getAttribute('uriObj')
@@ -68,6 +85,14 @@ public class LinkRelationService {
 	// for each 'fkey'(ie controller), check all 'foreign reference' endpoints against
 	// this.authority (ie ROLE) and if user has access, build out REQUEST/RESPONSE json for each
 	// and return
+	/**
+	 * method for generating related links like via HATEOAS
+	 * @param id
+	 * @param controller
+	 * @param contentType
+	 * @param apiObject
+	 *
+	 */
 	private String generateLinks(String id, String controller, String contentType, ApiDescriptor apiObject){
 		contentType = (contentType)?:"application/json"
 		LinkedHashMap output = [:]
@@ -130,6 +155,12 @@ public class LinkRelationService {
 		return out
 	}
 
+	/**
+	 * method for getting output sent content-type
+	 * @param contentType
+	 * @param output
+	 *
+	 */
 	protected String formatOutput(String contentType, LinkedHashMap output){
 		String out
 		switch(contentType){
@@ -146,38 +177,6 @@ public class LinkRelationService {
 		return out
 	}
 
-	// Todo : Move to exchangeService??
-	/**
-	 * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
-	 * @param HttpServletResponse response
-	 * @param String statusCode
-	 * @return LinkedHashMap commonly formatted linkedhashmap
-	 */
-	void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
-		response.setContentType("application/json")
-		response.setStatus(Integer.valueOf(statusCode))
-		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
-		response.getWriter().write(message)
-		response.writer.flush()
-	}
-
-	// Todo : Move to exchangeService??
-	/**
-	 * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
-	 * @param HttpServletResponse response
-	 * @param String statusCode
-	 * @return LinkedHashMap commonly formatted linkedhashmap
-	 */
-	void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
-		response.setContentType("application/json")
-		response.setStatus(Integer.valueOf(statusCode))
-		if(msg.isEmpty()){
-			msg = ErrorCodes.codes[statusCode]['long']
-		}
-		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
-		response.getWriter().write(message)
-		response.writer.flush()
-	}
 
 }
 

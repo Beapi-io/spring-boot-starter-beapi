@@ -17,22 +17,48 @@
 package io.beapi.api.utils
 
 /**
+ * Used in conjunction with ApiParams in created params holder for use by ApiDescriptor
  *
- * Used in conjunction with ApiParams in created params for use by ApiDescriptor
- *
+ * @author Owen Rubel
  * @see ApiParams
  * @see ApiDescriptor
  *
  */
-
 class ParamsDescriptor{
 
+	/**
+	 * String holder for paramType (ie String, Integer, etc)
+	 */
 	String paramType
+
+	/**
+	 * String holder for keyType, if this param is read in as a key (OPTIONAL)
+	 */
 	String keyType
+
+	/**
+	 * String holder for param name
+	 */
 	String name
+
+	/**
+	 * String holder for idReference. If keyType is equal to 'FKEY'/'PKEY', this will contain the domain/entity that it references (OPTIONAL)
+	 */
 	String idReferences
+
+	/**
+	 * Brief description of param; used for apidocs
+	 */
 	String description = ""
+
+	/**
+	 * String representing Mockdata; used in testing
+	 */
 	String mockData
+
+	/**
+	 * list of all param values
+	 */
 	ParamsDescriptor[] values = []
 
 	static constraints = { 

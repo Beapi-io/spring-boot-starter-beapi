@@ -3,8 +3,7 @@ api:
     procCores: 4
     documentationUrl: 'http://orubel.github.io/Beapi-API-Framework/'
     views: ['admin','apidoc','api','login','logout']
-    reserveduris: ['/authenticate','/register','/error','/login','/logout','/validate','/resetPassword']
-    staticEndpoint : ['apidoc','connector','properties','user','authority','hook']
+    reserveduris: ['/authenticate','/register','/error','/logout','/validate','/validateResetPassword','/resetPassword','/forgotPassword','/refreshToken','/hello']
     apiServer: 'http://localhost:8080'
     apichainLimit: 3
     postcrement: false
@@ -29,7 +28,7 @@ api:
         anonRole: 'ROLE_ANONYMOUS'
         networkGroups: ['open','public','private']
         networkRoles: {'open':['ROLE_ADMIN','ROLE_ANONYMOUS','ROLE_USER'],'public':['ROLE_ADMIN','ROLE_USER'],'private':['ROLE_ADMIN']}
-        corscorsWhiteList: ['http://localhost','http://localhost:8080','http://127.0.0.1','http://test.nosegrind.net','http://test.nosegrind.net:8080']
+        corsWhiteList: ['http://localhost','http://localhost:80','http://localhost:8080','http://127.0.0.1','http://127.0.0.1:80','http://127.0.0.1:8080']
 
 
 

@@ -66,7 +66,7 @@ dependencies {
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
     implementation "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
     implementation "jakarta.persistence:jakarta.persistence-api:2.2.3"
-    implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.3"
+    //implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.3"
     implementation "org.apache.tomcat.embed:tomcat-embed-core:9.0.56"
     implementation "org.slf4j:slf4j-api:1.7.32"
     implementation "org.springframework.boot:spring-boot-autoconfigure:2.6.2"
@@ -81,7 +81,6 @@ dependencies {
     implementation "org.springframework:spring-webmvc:5.3.14"
     implementation "org.springframework.boot:spring-boot:${springBootVersion}"
     implementation 'org.json:json:20210307'
-
 
     // [DATABASE]
     implementation('org.apache.tomcat:tomcat-annotations-api:9.0.56')
@@ -99,9 +98,6 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.0'
     implementation 'com.google.guava:guava:26.0-jre'
 
-    // [LOGGING FOR GRAFANA/ GRAPHITE / CARBON]
-    //implementation "io.micrometer:micrometer-registry-graphite:1.3.0"
-
     // [GROOVY]
     implementation 'org.apache.groovy:groovy:4.0.8'
     implementation('org.apache.groovy:groovy-ant:4.0.8'){
@@ -111,25 +107,21 @@ dependencies {
         exclude group:'org.apache.groovy', module: 'groovy-all'
     }
     //implementation('org.codehaus.gpars:gpars:1.2.1'){
-     //   exclude group:'org.multiverse', module:'multiverse-core'
+    //   exclude group:'org.multiverse', module:'multiverse-core'
     //    exclude group:'org.codehaus.groovy', module: 'groovy-all'
     //}
 
 
-    // CRON / SCHEDULER
-    //implementation 'org.quartz-scheduler:quartz:2.3.0'
-
-
     // [APACHE LIBS]
-    implementation('org.apache.groovy:groovy-cli-commons:4.0.8'){
-        exclude group:'org.apache.groovy', module: 'groovy-all'
-    }
+    //implementation('org.apache.groovy:groovy-cli-commons:4.0.8'){
+    //    exclude group:'org.apache.groovy', module: 'groovy-all'
+    //}
     implementation 'commons-io:commons-io:2.8.0'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation('org.apache.groovy:groovy-templates:4.0.8') {
         exclude group:'org.apache.groovy', module: 'groovy-all'
     }
-    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    //implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 
 
     // [IOUTILS]
@@ -152,20 +144,19 @@ dependencies {
     //implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
     //implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
 
-
     // [NEW]
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation("jakarta.validation:jakarta.validation-api:2.0.2")
 
     // [TEST]
     implementation 'org.apache.groovy:groovy-json:4.0.8'
-    implementation('org.spockframework:spock-core:2.3-groovy-4.0')
+    //implementation('org.spockframework:spock-core:2.3-groovy-4.0')
     testImplementation('org.spockframework:spock-spring:2.3-groovy-4.0')
     testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
     //testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
-    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    //implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 }
 
 jar {

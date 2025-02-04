@@ -16,7 +16,9 @@ package io.beapi.api.service
 import io.beapi.api.utils.ErrorCodes
 import org.json.JSONObject
 import io.beapi.api.utils.ApiDescriptor
-
+import org.springframework.web.servlet.support.RequestContextUtils;
+import java.lang.reflect.Field
+import java.lang.reflect.Method;
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.forward.*
@@ -33,6 +35,10 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.beapi.api.service.StatsCacheService
+import org.springframework.beans.factory.annotation.Autowired
+import io.beapi.api.service.StatsService
 
 /**
  *
@@ -52,6 +58,9 @@ abstract sealed class ApiExchange permits ExchangeService, BatchExchangeService,
 
     //private static final ArrayList formats = ['XML','JSON']
     //private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml']
+
+    @Autowired
+    StatsService statsService
 
     protected int callType
     protected String defaultAction
@@ -99,9 +108,10 @@ abstract sealed class ApiExchange permits ExchangeService, BatchExchangeService,
     protected String id
 
 
-    /*
+    /**
     * Validates request method in interceptors for each type of functionality;
-    * validating here to better handle routing (filter is 'once per request')
+    * validating here to better handle routing (filter is 'onceperrequest')
+     * @return boolean based on whether request method matches expected method for endpoint
      */
     protected boolean validateMethod(){
         boolean result = false
@@ -111,7 +121,14 @@ abstract sealed class ApiExchange permits ExchangeService, BatchExchangeService,
         return result
     }
 
+    /**
+     * Method to set the apicache associated with the controller name
+     * @param responseBody ArrayList representing the response body
+     * @param responseFileType String representing response fileType
+     * @return A JSON/XML String representing the response body
+     */
     protected String parseOutput(ArrayList responseBody, String responseFileType){
+        //println("### parseOutput")
         if(responseBody.size()<2) {
             String output = parseBodyByFiletype(responseBody[0], responseFileType);
             return output
@@ -123,13 +140,24 @@ abstract sealed class ApiExchange permits ExchangeService, BatchExchangeService,
         return ''
     }
 
-
+    /**
+     * Secondary Method to set the apicache associated with the controller name
+     * @param responseBody ArrayList representing the response body
+     * @param responseFileType String representing response fileType
+     * @return A JSON/XML String representing the response body
+     */
     protected String parseBodyByFiletype(LinkedHashMap responseBody, String responseFileType){
+        //println("### parseBodyByFiletype : "+responseFileType)
         String test
         switch(responseFileType){
             case 'JSON':
-                test = (responseBody!=null)?new JSONObject(responseBody).toString():'{}'
-                //test = new JSONObject(responseBody).toString()
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    test = (responseBody != null) ? objectMapper.writeValueAsString(responseBody) : '{}'
+                }catch(Exception e){
+                    println("[ApiExchange :: parseBodyByFiletype] : "+e)
+                    throw new Exception("[ApiExchange :: parseBodyByFiletype] : "+e)
+                }
                 break;
             case 'XML':
                 // TODO : move to an XMLService(??)
@@ -246,12 +274,34 @@ abstract sealed class ApiExchange permits ExchangeService, BatchExchangeService,
      * @param String statusCode
      * @return LinkedHashMap commonly formatted linkedhashmap
      */
-    protected void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
+    protected void writeErrorResponse(HttpServletRequest request,HttpServletResponse response, String statusCode){
+        //println("apiexchange :: writeerrorresponse")
+        String uri = request.getRequestURI()
+        Locale tmp = RequestContextUtils.getLocale(request);
+        String lang = (tmp)?tmp.getLanguage():"en"
+
+        ArrayList keys = []
+        Field[] fields = ErrorCodes.getDeclaredFields();
+        for (Field field : fields) {
+            if(!['$staticClassInfo', '__$stMC', 'metaClass'].contains(field.getName())){
+                keys.add(field.getName());
+            }
+        }
+        lang = (keys.contains(lang))?lang:"en"
+
+        try{
+            statsService.setStat((String)statusCode,uri)
+        }catch(Exception e){
+            println("### [ApiExchange :: writeErrorResponse1] exception2 : "+e)
+        }
+
+        //statsCacheService.putStatsCache(statusCode, uri)
         response.setContentType("application/json")
         response.setStatus(Integer.valueOf(statusCode))
-        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
+        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes."$lang"[statusCode]['short']}\",\"message\": \"${ErrorCodes."$lang"[statusCode]['long']}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
         response.writer.flush()
+
     }
 
     // Todo : Move to exchangeService??
@@ -261,13 +311,34 @@ abstract sealed class ApiExchange permits ExchangeService, BatchExchangeService,
      * @param String statusCode
      * @return LinkedHashMap commonly formatted linkedhashmap
      */
-    protected void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
+    protected void writeErrorResponse(HttpServletRequest request, HttpServletResponse response, String statusCode, String msg){
+        //println("apiexchange :: writeerrorresponse2")
+        String uri = request.getRequestURI()
+        Locale tmp = RequestContextUtils.getLocale(request);
+        String lang = (tmp)?tmp.getLanguage():"en"
+
+        ArrayList keys = []
+        Field[] fields = ErrorCodes.getDeclaredFields();
+        for (Field field : fields) {
+            if(!['$staticClassInfo', '__$stMC', 'metaClass'].contains(field.getName())){
+                keys.add(field.getName());
+            }
+        }
+        lang = (keys.contains(lang))?lang:"en"
+
+        try{
+            statsService.setStat((String)statusCode,uri)
+        }catch(Exception e){
+            println("### [ApiExchange :: writeErrorResponse2] exception : "+e)
+        }
+
+        //statsCacheService.putStatsCache(statusCode, uri)
         response.setContentType("application/json")
         response.setStatus(Integer.valueOf(statusCode))
         if(msg.isEmpty()){
-            msg = ErrorCodes.codes[statusCode]['long']
+            msg = ErrorCodes."$lang"[statusCode]['long']
         }
-        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
+        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes."$lang"[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
         response.getWriter().write(message)
         response.writer.flush()
     }

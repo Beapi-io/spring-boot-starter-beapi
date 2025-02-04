@@ -20,6 +20,7 @@ import io.beapi.api.properties.ApiProperties
 import io.beapi.api.properties.CacheProperties
 import io.beapi.api.service.IoStateService
 import io.beapi.api.service.SessionService
+import io.beapi.api.service.StatsCacheService
 import io.beapi.api.service.TraceCacheService
 import io.beapi.api.service.ApiCacheService
 //import io.beapi.api.service.HookCacheService
@@ -125,6 +126,17 @@ public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
     /**
      *
      * @return
+     * @throws IOException
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public StatsCacheService statsCacheService() throws IOException {
+        return new StatsCacheService(cacheManager());
+    }
+
+    /**
+     *
+     * @return
      * @throws Exception
      */
     @Bean(destroyMethod = "shutdown")
@@ -165,6 +177,7 @@ public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
         //PersistenceConfiguration persistConfig = new PersistenceConfiguration();
         //persistConfig.strategy(Strategy.LOCALRESTARTABLE);
 
+        /*
         CacheConfiguration cacheConfig2 = new CacheConfiguration()
         CacheProperties.HookProps hook = cacheProperties.getHook()
         try{
@@ -186,27 +199,29 @@ public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
             throw new Exception("[EhCacheAutoConfiguration ] : ERROR3 - ",e)
         }
 
-        /*
+         */
+
+
         CacheConfiguration cacheConfig3 = new CacheConfiguration()
-        CacheProperties.ThrottleProps throttle = cacheProperties.getThrottle()
+        CacheProperties.StatsProps stat = cacheProperties.getStats()
         try{
-            // Throttle
-            if(throttle) {
-                cacheConfig3.setName("Throttle")
-                cacheConfig3.eternal(false)
+            if(stat) {
+                cacheConfig3.setName("StatsCache")
+                cacheConfig3.eternal(true)
                 cacheConfig3.overflowToDisk(true)
-                cacheConfig3.diskExpiryThreadIntervalSeconds(throttle.getDiskExpiryThreadIntervalSeconds())
-                cacheConfig3.maxEntriesLocalHeap(throttle.getMaxEntriesLocalHeap())
-                cacheConfig3.maxEntriesLocalDisk(throttle.getMaxEntriesLocalDisk())
-                cacheConfig3.maxEntriesLocalDisk(throttle.getTimeToLiveSeconds())
-                cacheConfig3.maxEntriesLocalDisk(throttle.getTimeToIdleSeconds())
-                cacheConfig3.memoryStoreEvictionPolicy(evictPolicy[throttle.getMemoryStoreEvictionPolicy()])
+                //cacheConfig2.diskPersistent(true)
+                //cacheConfig2.persistence(persistConfig);
+                cacheConfig3.diskExpiryThreadIntervalSeconds(stat.getDiskExpiryThreadIntervalSeconds())
+                cacheConfig3.setMaxElementsInMemory(stat.getMaxElementsInMemory())
+                cacheConfig3.setMaxElementsOnDisk(stat.getMaxElementsOnDisk())
+                cacheConfig3.maxEntriesLocalHeap(stat.getMaxEntriesLocalHeap())
+                cacheConfig3.maxEntriesLocalDisk(stat.getMaxEntriesLocalDisk())
+                cacheConfig3.memoryStoreEvictionPolicy(evictPolicy[stat.getMemoryStoreEvictionPolicy()])
             }
         }catch(Exception e){
             throw new Exception("[EhCacheAutoConfiguration ] : ERROR4 - ",e)
         }
 
-         */
 
         CacheConfiguration cacheConfig4 = new CacheConfiguration()
         CacheProperties.TraceProps trace = cacheProperties.getTrace()
@@ -229,8 +244,8 @@ public class BeapiEhCacheAutoConfiguration implements CachingConfigurer{
 
         net.sf.ehcache.config.Configuration config = new net.sf.ehcache.config.Configuration()
         if(cacheConfig1){ config.addCache(cacheConfig1) }
-        if(cacheConfig2){ config.addCache(cacheConfig2) }
-        //if(cacheConfig3){ config.addCache(cacheConfig3) }
+        //if(cacheConfig2){ config.addCache(cacheConfig2) }
+        if(cacheConfig3){ config.addCache(cacheConfig3) }
         if(cacheConfig4){ config.addCache(cacheConfig4) }
         //config.addDiskStore(diskStoreConfiguration)
 

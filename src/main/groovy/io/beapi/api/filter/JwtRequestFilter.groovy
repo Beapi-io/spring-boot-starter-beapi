@@ -4,6 +4,7 @@ import io.beapi.api.domain.Authority;
 import io.beapi.api.domain.User;
 import io.beapi.api.domain.service.UserService
 import io.beapi.api.service.ApiCacheService
+import io.beapi.api.service.ErrorService
 import io.beapi.api.service.JwtUserDetailsService
 import io.beapi.api.service.LinkRelationService
 import io.beapi.api.utils.JwtTokenUtil;
@@ -12,7 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.method.HandlerMethod
-
+import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.context.annotation.PropertySource;
 import io.beapi.api.properties.ApiProperties;
 import org.springframework.core.env.Environment;
@@ -29,6 +30,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.beapi.api.utils.ErrorCodes;
 import java.io.*;
 import java.util.*;
+import java.lang.reflect.Field
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.web.cors.CorsUtils;
 import org.slf4j.LoggerFactory;
@@ -66,7 +68,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-		println("### JwtRequestFilter > "+request.getRequestURI())
+		//println("### JwtRequestFilter > "+request.getRequestURI())
 
 // TESTING
 //println("Header : "+request.getHeader("Content-Type"))
@@ -88,98 +90,101 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		if(CorsUtils.isCorsRequest(request)==true && request.getMethod()=="OPTIONS"){
 			chain.doFilter(request, response);
 		}else{
-			Pattern p = ~/[v|b|c|r]${version}/
-			Matcher match = p.matcher(request.getRequestURI()[1..4])
-			if (match.find()) {
-				String username = null;
-				String jwtToken = null;
-				String uri = request.getRequestURI();
+			Pattern p = ~/[v|b|c|t]${version}/
+			if(request.getRequestURI().length()>3) {
 
-				final String requestTokenHeader = request.getHeader("Authorization");
-				// TODO : make sure they are not logging in/ logging out else will throw logger.warn message
-				if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
-					jwtToken = requestTokenHeader.substring(7);
-					if(jwtToken!='null') {
-						try {
-							username = jwtTokenUtil.getUsernameFromToken(jwtToken.replaceAll("\\s+", ""));
-						} catch (IllegalArgumentException e) {
-							println("IllegalArgumentException found " + e);
-						} catch (ExpiredJwtException e) {
-							println("ExpiredJwtException found " + e);
-						} catch (io.jsonwebtoken.SignatureException e) {
-							println("ExpiredJwtException found " + e);
-							// old token / no token
-						}
+				Matcher match = p.matcher(request.getRequestURI()[1..4])
+				if (match.find()) {
+					String username = null;
+					String jwtToken = null;
+					String uri = request.getRequestURI();
 
-						//Map tokenHeader = jwtTokenUtil.getHeaders(jwtToken)
-
-						// check session token == cookie token
-						if (!validateTokenHeaders(jwtToken, request)) {
-							logger.warn("tokenHeaders do not match (possible token hijack or using token at different location/browser)");
-							writeErrorResponse(request, response, '403', request.getRequestURI(), "Invalid Token or Token is empty")
-						}
-
-						// todo : need to build in a check to make sure the JWT timeout is always HIGHER than session expiry
-
-
-					}else{
-						// no token
-					}
-				} else {
-					logger.warn("JWT Token does not begin with Bearer String");
-				}
-
-				// Once we get the token validate it.
-				if (!apiProperties.getReservedUris().contains(uri)) {
-					if (username != null) {
-						UserDetails userDetails = loadUserByUsername(username);
-
-						// if token is valid configure Spring Security to manually set
-						// authentication
-						if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+					final String requestTokenHeader = request.getHeader("Authorization");
+					// TODO : make sure they are not logging in/ logging out else will throw logger.warn message
+					if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
+						jwtToken = requestTokenHeader.substring(7);
+						if (jwtToken != 'null') {
 							try {
-								UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-								usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-								SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
-								// check cookie against existing session
-								if(request.getSession().getId()==WebUtils.getCookie(request, 'JSESSIONID')?.getValue()) {
-									chain.doFilter(request, response)
-								}else{
-									//println("session does not match: "+WebUtils.getCookie(request, 'JSESSIONID')?.getValue())
-									logger.warn("session does not match");
-									writeErrorResponse(request, response, '403', request.getRequestURI(), "Invalid session or session cookie not sent")
-								}
-
-							} catch (Exception ignored) {
-								//ignored.printStackTrace();
+								//def expiry = jwtTokenUtil.getExpirationDateFromToken(jwtToken.replaceAll("\\s+", ""));
+								username = jwtTokenUtil.getUsernameFromToken(jwtToken.replaceAll("\\s+", ""));
+							} catch (IllegalArgumentException e) {
+								println("IllegalArgumentException found " + e);
+							} catch (ExpiredJwtException e) {
+								println("ExpiredJwtException found " + e);
+							} catch (io.jsonwebtoken.SignatureException e) {
+								println("ExpiredJwtException found " + e);
+								// old token / no token
 							}
-							// After setting the Authentication in the context, we specify
-							// that the current user is authenticated. So it passes the
-							// Spring Security Configurations successfully.
-						}
 
+							//Map tokenHeader = jwtTokenUtil.getHeaders(jwtToken)
+
+							// check session token == cookie token
+							if (!validateTokenHeaders(jwtToken, request)) {
+								logger.warn("tokenHeaders do not match (possible token hijack or using token at different location/browser)");
+								writeErrorResponse(request, response, '403', "Invalid Token or Token is empty")
+							}
+
+							// todo : need to build in a check to make sure the JWT timeout is always HIGHER than session expiry
+
+
+						} else {
+							// no token
+						}
 					} else {
-						writeErrorResponse(request, response, '403', request.getRequestURI(),"no username/authentication for " + request.getRequestURI())
+						logger.warn("JWT Token does not begin with Bearer String");
 					}
-				}else{
-					println(apiProperties.getReservedUris())
-					// fix for errorController
+
+					// Once we get the token validate it.
+					if (!apiProperties.getReservedUris().contains(uri)) {
+						if (username != null) {
+							UserDetails userDetails = loadUserByUsername(username);
+
+							// if token is valid configure Spring Security to manually set
+							// authentication
+							if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+								try {
+									UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+									usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+									SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+									// check cookie against existing session
+									if (request.getSession().getId() == WebUtils.getCookie(request, 'JSESSIONID')?.getValue()) {
+										chain.doFilter(request, response)
+									} else {
+										//println("session does not match: "+WebUtils.getCookie(request, 'JSESSIONID')?.getValue())
+										logger.warn("session does not match");
+										writeErrorResponse(request, response, '403', "Invalid session or session cookie not sent")
+									}
+
+								} catch (Exception ignored) {
+									//ignored.printStackTrace();
+								}
+								// After setting the Authentication in the context, we specify
+								// that the current user is authenticated. So it passes the
+								// Spring Security Configurations successfully.
+							}
+
+						} else {
+							writeErrorResponse(request, response, '403', "no username/authentication for " + request.getRequestURI())
+						}
+					} else {
+						// fix for errorController
+						try {
+							chain.doFilter(request, response);
+						} catch (Exception ignored) {
+							//println("ignoring stacktrace")
+							//ignored.printStackTrace();
+						}
+					}
+
+				} else {
+					// ### fix for public api
 					try {
 						chain.doFilter(request, response);
 					} catch (Exception ignored) {
-						//println("ignoring stacktrace")
+						//println("ignoring jwtrequestfilter stacktrace")
 						//ignored.printStackTrace();
 					}
-				}
-
-			}else{
-				// ### fix for public api
-				try {
-					chain.doFilter(request, response);
-				} catch (Exception ignored) {
-					//println("ignoring jwtrequestfilter stacktrace")
-					//ignored.printStackTrace();
 				}
 			}
 
@@ -247,10 +252,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	 * @param String statusCode
 	 * @return LinkedHashMap commonly formatted linkedhashmap
 	 */
-	private void writeErrorResponse(HttpServletRequest request, HttpServletResponse response, String statusCode, String uri){
+	private void writeErrorResponse(HttpServletRequest request, HttpServletResponse response, String statusCode){
+		String uri = request.getRequestURI()
+		Locale tmp = RequestContextUtils.getLocale(request);
+		String lang = (tmp)?tmp.getLanguage():"en"
+
+		ArrayList keys = []
+		Field[] fields = ErrorCodes.getDeclaredFields();
+		for (Field field : fields) {
+			if(!['$staticClassInfo', '__$stMC', 'metaClass'].contains(field.getName())){
+				keys.add(field.getName());
+			}
+		}
+		lang = (keys.contains(lang))?lang:"en"
+
 		response.setContentType("application/json")
 		response.setStatus(Integer.valueOf(statusCode));
-		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
+		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes."$lang"[statusCode]['short']}\",\"message\": \"${ErrorCodes."$lang"[statusCode]['long']}\",\"path\":\"${uri}\"}"
 		response.getWriter().write(message)
 		response.writer.flush()
 		//request.getRequestDispatcher("/error").forward(request, response);
@@ -268,13 +286,26 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	 * @param String statusCode
 	 * @return LinkedHashMap commonly formatted linkedhashmap
 	 */
-	private void writeErrorResponse(HttpServletRequest request, HttpServletResponse response, String statusCode, String uri, String msg){
+	private void writeErrorResponse(HttpServletRequest request, HttpServletResponse response, String statusCode, String msg){
+		String uri = request.getRequestURI()
+		Locale tmp = RequestContextUtils.getLocale(request);
+		String lang = (tmp)?tmp.getLanguage():"en"
+
+		ArrayList keys = []
+		Field[] fields = ErrorCodes.getDeclaredFields();
+		for (Field field : fields) {
+			if(!['$staticClassInfo', '__$stMC', 'metaClass'].contains(field.getName())){
+				keys.add(field.getName());
+			}
+		}
+		lang = (keys.contains(lang))?lang:"en"
+
 		response.setContentType("application/json")
 		response.setStatus(Integer.valueOf(statusCode));
 		if (msg.isEmpty()) {
-			msg = ErrorCodes.codes[statusCode]['long']
+			msg = ErrorCodes."$lang"[statusCode]['long']
 		}
-		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
+		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes."$lang"[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
 		response.getWriter().write(message)
 		response.writer.flush()
 		//request.getRequestDispatcher("/error").forward(request, response);

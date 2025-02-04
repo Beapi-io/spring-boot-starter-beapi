@@ -17,26 +17,33 @@
 package io.beapi.api.controller
 
 import io.beapi.api.domain.User
+import io.beapi.api.service.ErrorService
 import io.beapi.api.service.PrincipleService
 import io.beapi.api.utils.ErrorCodes
 import io.beapi.api.utils.UriObject
-
+import org.springframework.web.servlet.support.RequestContextUtils;
+import java.lang.reflect.Field
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.ServletException
-import org.springframework.beans.factory.annotation.Autowired
-import com.fasterxml.jackson.databind.ObjectMapper
 import javax.persistence.Entity
+import com.fasterxml.jackson.databind.ObjectMapper
+
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.context.ApplicationContext
+import org.springframework.web.context.support.WebApplicationContextUtils
 import org.springframework.web.HttpRequestHandler
 
 import io.beapi.api.service.TraceService
 import io.beapi.api.service.PrincipleService
-import java.lang.reflect.Method
 import io.beapi.api.service.ApiCacheService
-import org.springframework.context.ApplicationContext
+import io.beapi.api.service.StatsService
 import io.beapi.api.properties.ApiProperties
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.web.context.support.WebApplicationContextUtils
+
+import java.lang.reflect.Field
+import java.lang.reflect.Method
+
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker
 import org.slf4j.MarkerFactory
@@ -52,10 +59,16 @@ class BeapiRequestHandler implements HttpRequestHandler {
     protected Marker devnotes = MarkerFactory.getMarker(markerText)
 
     @Autowired
+    protected ErrorService errorService
+
+    @Autowired
     protected TraceService traceService
 
     @Autowired
     protected ApiProperties apiProperties
+
+    @Autowired
+    StatsService statsService
 
     private static final ArrayList SUPPORTED_MIME_TYPES = ['text/json','application/json','text/xml','application/xml','multipart/form-data']
     private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
@@ -103,7 +116,11 @@ class BeapiRequestHandler implements HttpRequestHandler {
         Object output
 
         // TRACESERVICE CHECK
-        if (trace == true) { traceService.startTrace(controller, action, request.getSession().getId()); }
+        if (trace == true) {
+            println("### starting trace ###")
+            traceService.startTrace(controller, action, request.getSession().getId());
+        }
+
 
         // create method call
         Class<?> classObj = this.getClass()
@@ -116,11 +133,11 @@ class BeapiRequestHandler implements HttpRequestHandler {
                     output = method.invoke(this, request, response)
                 } catch (IllegalArgumentException e) {
                     logger.warn(devnotes,"[ BAD URI ] : YOU ARE ATTEMPTING TO CALL AN ENDPOINT THAT DOES NOT EXIST. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD EXISTS AND THAT IT IS PROPERLY REPRESENTED IN THE IOSTATE FILE.")
-                    writeErrorResponse(response, 422, request.getRequestURI())
+                    errorService.writeErrorResponse(request, response, 422)
                     throw new Exception("[BeapiController > handleRequest] : IllegalArgumentException - full stack trace follows :", e)
                 } catch (IllegalAccessException e) {
                     logger.warn(devnotes, "[ BAD URI ] : YOU ARE ATTEMPTING TO CALL AN ENDPOINT THAT DOES NOT EXIST. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD EXISTS AND THAT IT IS PROPERLY REPRESENTED IN THE IOSTATE FILE.")
-                    writeErrorResponse(response, 422, request.getRequestURI())
+                    errorService.writeErrorResponse(request, response, 422)
                     throw new Exception("[BeapiController > handleRequest] : IllegalAccessException - full stack trace follows :", e)
                 }catch (java.lang.reflect.InvocationTargetException e){
                     // ignore
@@ -143,7 +160,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
                         if(Objects.nonNull(tmp)){
                             result = tmp
                         }else{
-                            writeErrorResponse(response, 422, request.getRequestURI(),"Expected Output does not match IOState RESPONSE params. Please conact the administrator.")
+                            errorService.writeErrorResponse(request, response, 422,"Expected Output does not match IOState RESPONSE params. Please conact the administrator.")
                         };
                     }else{
                         result = tempResult
@@ -152,15 +169,15 @@ class BeapiRequestHandler implements HttpRequestHandler {
                 request.setAttribute('responseBody', result)
             } else {
                 logger.warn(devnotes,"[ NO OUTPUT ] : OUTPUT EXPECTED AND NONE RETURNED. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD IS RETURNING THE PARAMS AS REPRESENTED IN THE APPROPRIATE IOSTATE FILE UNDER FOR THIS/CONTROLLER/METHOD (UNDER 'RESPONSE') AS A LINKEDHASHMAP.")
-                writeErrorResponse(response, 204, request.getRequestURI(), "[ NO OUTPUT ] : OUTPUT EXPECTED AND NONE RETURNED. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD IS RETURNING THE PARAMS AS REPRESENTED IN THE APPROPRIATE IOSTATE FILE UNDER FOR THIS/CONTROLLER/METHOD (UNDER 'RESPONSE') AS A LINKEDHASHMAP.")
+                errorService.writeErrorResponse(request, response, 204)
             };
         } catch (SecurityException e) {
             // bad privileges for endpoint; shouldn't hit this
-            writeErrorResponse(response,422,request.getRequestURI())
+            errorService.writeErrorResponse(request, response,422)
             throw new Exception("[BeapiController > handleRequest] : SecurityException - full stack trace follows :", e)
         } catch (NoSuchMethodException e) {
             // cannot find endpoint
-            writeErrorResponse(response,422,request.getRequestURI(),"[ BAD URI ] : YOU ARE ATTEMPTING TO CALL AN ENDPOINT THAT DOES NOT EXIST. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD EXISTS AND THAT IT IS PROPERLY REPRESENTED IN THE IOSTATE FILE.")
+            errorService.writeErrorResponse(request, response,422,"[ BAD URI ] : YOU ARE ATTEMPTING TO CALL AN ENDPOINT THAT DOES NOT EXIST. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD EXISTS AND THAT IT IS PROPERLY REPRESENTED IN THE IOSTATE FILE.")
             logger.warn(devnotes,"[ BAD URI ] : YOU ARE ATTEMPTING TO CALL AN ENDPOINT THAT DOES NOT EXIST. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD EXISTS AND THAT IT IS PROPERLY REPRESENTED IN THE IOSTATE FILE.")
             throw new Exception("[BeapiController > handleRequest] : NoSuchMethodException - full stack trace follows :", e)
         };
@@ -299,35 +316,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
         return output
     };
 
-    /**
-     * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
-     * @param HttpServletResponse response
-     * @param String statusCode
-     * @return LinkedHashMap commonly formatted linkedhashmap
-     */
-    private void writeErrorResponse(HttpServletResponse response, int statusCode, String uri){
-        response.setContentType("application/json")
-        response.setStatus(statusCode)
-        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode.toString()]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode.toString()]['long']}\",\"path\":\"${uri}\"}"
-        response.sendError(statusCode,message)
-        response.flushBuffer()
-    };
 
-    // Todo : Move to exchangeService??
-    /**
-     * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
-     * @param HttpServletResponse response
-     * @param String statusCode
-     * @return LinkedHashMap commonly formatted linkedhashmap
-     */
-    private void writeErrorResponse(HttpServletResponse response, int statusCode, String uri, String msg){
-        response.setContentType("application/json")
-        response.setStatus(statusCode)
-        if(msg.isEmpty()){ msg = ErrorCodes.codes[statusCode.toString()]['long'] }
-        String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode.toString()]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
-        response.sendError(statusCode,message)
-        response.flushBuffer()
-    };
 
 }
 

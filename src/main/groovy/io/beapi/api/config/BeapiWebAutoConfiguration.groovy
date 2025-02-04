@@ -16,6 +16,11 @@
  */
 package io.beapi.api.config
 
+import io.beapi.api.service.ErrorService
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
+
 
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
@@ -23,6 +28,8 @@ import io.beapi.api.service.ExchangeService
 import io.beapi.api.service.LinkRelationService
 import io.beapi.api.service.MailService
 import io.beapi.api.service.SessionService
+import io.beapi.api.service.StatsCacheService
+import io.beapi.api.service.StatsService
 import io.beapi.api.service.ThrottleService
 import io.beapi.api.service.TraceExchangeService
 import io.beapi.api.utils.SecretGenerator
@@ -38,6 +45,7 @@ import io.beapi.api.properties.ApiProperties
 import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.PrincipleService
 
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.context.MessageSource
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -80,7 +88,9 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	@Autowired private ApplicationContext context;
 	@Autowired protected LinkRelationService linkRelationService
 	@Autowired private PrincipleService principleService
+	@Autowired private ErrorService errorService
 	@Autowired private ApiCacheService apiCacheService
+	@Autowired private StatsService statsService
 	@Autowired private ExchangeService exchangeService
 	@Autowired private BatchExchangeService batchService
 	@Autowired private SessionService sessionService
@@ -88,6 +98,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	@Autowired private TraceExchangeService traceExchangeService
 	@Autowired private ThrottleService throttleService
 	@Autowired protected ApiProperties apiProperties
+
 
 	List publicEndpoint =  ['jwtAuthentication','beapiError']
 
@@ -99,6 +110,25 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		this.version = getVersion()
 	}
 
+	/*
+	@Bean
+	public SimpleUrlHandlerMapping customFaviconHandlerMapping() {
+		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
+		mapping.setOrder(Integer.MIN_VALUE);
+		mapping.setUrlMap(Collections.singletonMap("/favicon.ico", faviconRequestHandler()));
+		return mapping;
+	}
+
+	@Bean
+	protected ResourceHttpRequestHandler faviconRequestHandler() {
+		ResourceHttpRequestHandler requestHandler = new ResourceHttpRequestHandler();
+		ClassPathResource classPathResource = new ClassPathResource("com/baeldung/images/");
+		List<Resource> locations = Arrays.asList(classPathResource);
+		requestHandler.setLocations(locations);
+		return requestHandler;
+	}
+	 */
+
 	// strictly for public endpoints
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -106,7 +136,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		converters.add(mappingJackson2HttpMessageConverter);
 		converters.add(new StringHttpMessageConverter()); // THIS WAS MISSING
 	}
-
 
 	/**
 	 *
@@ -221,6 +250,39 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	/**
 	 *
 	 * @return
+	 * @throws IOException
+	 */
+	@Bean(name='exchangeService')
+	@ConditionalOnMissingBean
+	public ExchangeService exchangeService() throws IOException {
+		return new ExchangeService(errorService, statsService, linkRelationService(), apiCacheService);
+	}
+
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
+	@Bean(name='batchService')
+	@ConditionalOnMissingBean
+	public BatchExchangeService batchService() throws IOException {
+		return new BatchExchangeService(errorService, statsService, apiCacheService, context);
+	}
+
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
+	@Bean(name='chainService')
+	@ConditionalOnMissingBean
+	public ChainExchangeService chainService() throws IOException {
+		return new ChainExchangeService(errorService, statsService,apiCacheService, context);
+	}
+
+	/**
+	 *
+	 * @return
 	 */
 	@Bean
 	@ConditionalOnMissingBean
@@ -298,7 +360,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		mapping.setUrlMap(urlMap);
 		mapping.setOrder(Integer.MAX_VALUE - 5);
 		try {
-			mapping.setInterceptors(new Object[]{new ApiInterceptor(exchangeService, batchService, chainService, traceExchangeService, apiProperties)})
+			mapping.setInterceptors(new Object[]{new ApiInterceptor(errorService, statsService, exchangeService, batchService, chainService, traceExchangeService, apiProperties)})
 		}catch(Exception e){
 			println("Bad Interceptor : "+e)
 		}
@@ -335,19 +397,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return handler;
 	}
 
-	/* DEPRECATED
-	protected Map<String, CorsConfiguration> getCorsConfigurations() {
-		CorsRegistry registry = new CorsRegistry()
-		registry.addMapping("/**")
-				.allowedOrigins("http://localhost","http://test.nosegrind.net","http://test.nosegrind.net/")
-				.allowedMethods("*")
-				.allowedHeaders("*")
-				.exposedHeaders("*")
-				.allowCredentials(true);
-		return registry.getCorsConfigurations();
-	}
-	 */
-
 
 
     @Bean
@@ -365,8 +414,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		source.registerCorsConfiguration("/**", config);
 		return source;
 	}
-
-
 
 
 	/**

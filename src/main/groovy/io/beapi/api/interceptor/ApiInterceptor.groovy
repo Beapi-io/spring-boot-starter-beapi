@@ -30,7 +30,10 @@ package io.beapi.api.interceptor
 import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
+import io.beapi.api.service.ErrorService
 import io.beapi.api.service.ExchangeService
+import io.beapi.api.service.StatsService
+import java.lang.reflect.Field
 import io.beapi.api.service.TraceExchangeService
 //import io.beapi.api.service.HookExchangeService
 import io.beapi.api.service.PrincipleService
@@ -38,7 +41,7 @@ import io.beapi.api.service.TraceService
 import io.beapi.api.utils.ErrorCodes
 import io.beapi.api.utils.UriObject
 import org.slf4j.LoggerFactory;
-
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 import io.beapi.api.properties.ApiProperties
 
@@ -62,6 +65,8 @@ import javax.crypto.KeyGenerator;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Autowired
 
 /**
  *
@@ -102,14 +107,18 @@ class ApiInterceptor implements HandlerInterceptor{
 	ArrayList privateRoles = []
 	int callType
 	KeyGenerator keyGenerator
+	StatsService statsService
+	ErrorService errorService
 
-	public ApiInterceptor(ExchangeService exchangeService, BatchExchangeService batchService, ChainExchangeService chainService, TraceExchangeService traceService, ApiProperties apiProperties) {
+	public ApiInterceptor(ErrorService errorService,StatsService statsService, ExchangeService exchangeService, BatchExchangeService batchService, ChainExchangeService chainService, TraceExchangeService traceService, ApiProperties apiProperties) {
 		//this.throttle = throttle
 		this.exchangeService = exchangeService
 		this.batchService = batchService
 		this.chainService = chainService
 		this.traceExchangeService = traceService
 		this.apiProperties = apiProperties
+		this.statsService = statsService
+		this.errorService = errorService
 	}
 
 	@Override
@@ -118,7 +127,7 @@ class ApiInterceptor implements HandlerInterceptor{
 
 
 		if (handler instanceof ResourceHttpRequestHandler) {
-			writeErrorResponse(response,'422',request.getRequestURI(),"No data returned for this call. This is an 'API Server'; Please limit your calls to API's only")
+			errorService.writeErrorResponse(request, response,'422',"No data returned for this call. This is an 'API Server'; Please limit your calls to API's only")
 		}else {
 			privateRoles = apiProperties.security.networkRoles['private'].collect() { k, v -> v }
 			this.uObj = request.getAttribute('uriObj')
@@ -135,7 +144,7 @@ class ApiInterceptor implements HandlerInterceptor{
 						if (apiProperties.batchingEnabled) {
 							return batchService.apiRequest(request, response, this.authority)
 						} else {
-							writeErrorResponse(response, '401', request.getRequestURI())
+							errorService.writeErrorResponse(request, response, '401')
 							return false
 						}
 						break
@@ -143,7 +152,7 @@ class ApiInterceptor implements HandlerInterceptor{
 						if (apiProperties.chainingEnabled) {
 							return chainService.apiRequest(request, response, this.authority)
 						} else {
-							writeErrorResponse(response, '401', request.getRequestURI())
+							errorService.writeErrorResponse(request, response, '401')
 							return false
 						}
 						break
@@ -156,11 +165,11 @@ class ApiInterceptor implements HandlerInterceptor{
 				//	return hookExchangeService.apiRequest(request, response, this.authority)
 				//	break
 					default:
-						writeErrorResponse(response, '400', request.getRequestURI())
+						errorService.writeErrorResponse(request, response, '400')
 						return false
 				}
 			}else{
-				writeErrorResponse(response, '400', request.getRequestURI(),"bad uri")
+				errorService.writeErrorResponse(request, response, '400')
 				return false
 			}
 		}
@@ -176,8 +185,11 @@ class ApiInterceptor implements HandlerInterceptor{
 			body = request.getAttribute('responseBody')
 		}
 
+		String stat = (String)response.getStatus()
+		String uri = (String)request.getRequestURI()
+
 		if(body == null){
-			writeErrorResponse(response,'204',request.getRequestURI(),'No data returned for this call.')
+			errorService.writeErrorResponse(request, response,'204','No data returned for this call.')
 		}else {
 			switch (callType){
 				case 1:
@@ -187,14 +199,14 @@ class ApiInterceptor implements HandlerInterceptor{
 					if(apiProperties.batchingEnabled) {
 						batchService.batchResponse(request, response, body)
 					}else{
-						writeErrorResponse(response,'401',request.getRequestURI())
+						errorService.writeErrorResponse(request, response,'401')
 					}
 					break
 				case 3:
 					if(apiProperties.chainingEnabled) {
 						chainService.chainResponse(request, response, body)
 					}else{
-						writeErrorResponse(response,'401',request.getRequestURI())
+						errorService.writeErrorResponse(request, response,'401')
 					}
 					break
 				case 4:
@@ -204,45 +216,11 @@ class ApiInterceptor implements HandlerInterceptor{
 				//	hookExchangeService.apiResponse(response,body)
 				//	break
 				default:
-					writeErrorResponse(response, '400', request.getRequestURI())
+					errorService.writeErrorResponse(request, response, '400')
 
 			}
 		}
 		response.writer.flush()
 	}
-
-	// Todo : Move to exchangeService??
-	/**
-	 * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
-	 * @param HttpServletResponse response
-	 * @param String statusCode
-	 * @return LinkedHashMap commonly formatted linkedhashmap
-	 */
-	void writeErrorResponse(HttpServletResponse response, String statusCode, String uri){
-		response.setContentType("application/json")
-		response.setStatus(Integer.valueOf(statusCode))
-		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${ErrorCodes.codes[statusCode]['long']}\",\"path\":\"${uri}\"}"
-		response.getWriter().write(message)
-		response.writer.flush()
-	}
-
-	// Todo : Move to exchangeService??
-	/**
-	 * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
-	 * @param HttpServletResponse response
-	 * @param String statusCode
-	 * @return LinkedHashMap commonly formatted linkedhashmap
-	 */
-	void writeErrorResponse(HttpServletResponse response, String statusCode, String uri, String msg){
-		response.setContentType("application/json")
-		response.setStatus(Integer.valueOf(statusCode))
-		if(msg.isEmpty()){
-			msg = ErrorCodes.codes[statusCode]['long']
-		}
-		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
-		response.getWriter().write(message)
-		response.writer.flush()
-	}
-
 
 }

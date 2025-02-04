@@ -1,0 +1,58 @@
+package $packageName;
+
+import $domainPackage;
+import $repoPackage;
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataAccessException
+import org.springframework.stereotype.Service
+
+@Service
+public class ${logicalClassName}Service {
+
+    @Autowired ${repoName} repo;
+
+    @Autowired
+    public ${logicalClassName}Service(${logicalClassName} repo) {
+        this.repo = repo;
+    }
+
+    //@Override
+    public List<${logicalClassName}> getAllUsers() {
+        return repo.findAll();
+    }
+
+    //@Override
+    public User findById(Long id) {
+        return repo.findById(id);
+    }
+
+    //@Override
+    public Optional<${logicalClassName}> findById(int id) {
+        return repo.findById(Long.valueOf(id));
+    }
+
+    //@Override
+    public User save(${logicalClassName} obj) {
+        try{
+            repo.save(obj);
+            repo.flush();
+            return obj;
+        }catch (DataAccessException e){
+            throw new Exception(e.getCause().getCause().getLocalizedMessage())
+        }
+    }
+
+    //@Override
+    public void deleteById(Long id) {
+        repo.deleteById(id);
+        repo.flush();
+    }
+
+    //@Override
+    public void deleteById(int id) {
+        repo.deleteById(Long.valueOf(id));
+        repo.flush();
+    }
+
+
+}

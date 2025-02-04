@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Objects;
 
+
 import org.springframework.scheduling.annotation.Async;
 import java.util.concurrent.CompletableFuture;
 
@@ -35,15 +36,23 @@ public class UserController extends BeapiRequestHandler {
 	@Autowired
 	private UserAuthorityService uAuthService;
 
+
+	// [MICROMETER]
+	/*
+	public UserController(MeterRegistry registry) {
+		this.counter = registry.counter("user");
+	}
+	 */
+
 	public List<User> list(HttpServletRequest request, HttpServletResponse response){
 		println("### user/list")
 		List<User> users = userService.getAllUsers();
 		return users;
 	}
 
-
 	public User show(HttpServletRequest request, HttpServletResponse response){
 		//println("### user/show")
+
 		String username
 		if(principle.isSuperuser()){
 			username = (this.params?.get("id"))?this.params.get("id").toString():principle.name();
@@ -52,6 +61,8 @@ public class UserController extends BeapiRequestHandler {
 		}
 
 		User user = userService.findByUsername(username);
+
+		// check time
 
 		if (Objects.nonNull(user)) {
 			return user

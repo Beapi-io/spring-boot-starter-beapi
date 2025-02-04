@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 //@Qualifier
-public class AuthorityService implements IAuthority {
+public class AuthorityService {
 
     @Autowired
     private SessionFactory sessionFactory;
@@ -28,12 +28,12 @@ public class AuthorityService implements IAuthority {
         this.authrepo = authrepo;
     }
 
-    @Override
+    //@Override
     public List<Authority> findAll() {
         return authrepo.findAll();
     }
 
-    @Override
+    //@Override
     @Transactional(rollbackFor = Exception.class)
     public Authority save(Authority authority) {
         try{
@@ -53,7 +53,7 @@ public class AuthorityService implements IAuthority {
         return authrepo.findById(id);
     }
 
-    @Override
+    //@Override
     public Optional<Authority> findById(int id) {
         return authrepo.findById(Long.valueOf(id));
     }

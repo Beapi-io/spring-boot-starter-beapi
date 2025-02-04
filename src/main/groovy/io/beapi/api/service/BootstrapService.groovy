@@ -50,7 +50,13 @@ import javax.crypto.spec.GCMParameterSpec;
 
 import java.security.SecureRandom;
 
-// todo: rename as ExchangeService : encompasses both request/response methods for interceptor
+
+/**
+ *
+ * Class used for bootstrapping application; used through main 'Application' class
+ * @author Owen Rubel
+ *
+ */
 @Service
 public class BootstrapService {
 
@@ -60,6 +66,18 @@ public class BootstrapService {
 	private UserAuthorityService uAuthService;
 	private PasswordEncoder passwordEncoder;
 
+	/**
+	 *
+	 * Constructor for BootstrapService
+	 * @author Owen Rubel
+	 *
+	 * @param apiProperties
+	 * @param authService
+	 * @param userService
+	 * @param uAuthService
+	 * @param passwordEncoder
+	 *
+	 */
 	public BootstrapService(ApiProperties apiProperties, AuthorityService authService, UserService userService, UserAuthorityService uAuthService, PasswordEncoder passwordEncoder) {
 		this.apiProperties = apiProperties
 		this.authService = authService
@@ -69,12 +87,26 @@ public class BootstrapService {
 		this.passwordEncoder = passwordEncoder
 	}
 
+	/**
+	 *
+	 * method for bootstrapping the application
+	 * @author Owen Rubel
+	 *
+	 *
+	 */
 	public void bootstrapAll(){
 		bootstrapAuthorities()
 		bootstrapSuperUser()
 		bootstrapTestUser()
 	}
 
+	/**
+	 *
+	 * method for bootstrapping the application authorities
+	 * @author Owen Rubel
+	 *
+	 *
+	 */
 	public void bootstrapAuthorities(){
 		ArrayList<String> roles = new ArrayList();
 		roles.add(apiProperties.getSecurity().getSuperuserRole());
@@ -95,7 +127,13 @@ public class BootstrapService {
 		}
 	}
 
-
+	/**
+	 *
+	 * method for bootstrapping the application superuser/admin
+	 * @author Owen Rubel
+	 *
+	 *
+	 */
 	public void bootstrapSuperUser(){
 		LinkedHashMap superUser = apiProperties.getBootstrap().getSuperUser();
 		Authority adminAuth = authService.findByAuthority(apiProperties.getSecurity().getSuperuserRole());
@@ -132,6 +170,13 @@ public class BootstrapService {
 		}
 	}
 
+	/**
+	 *
+	 * method for bootstrapping the applications test user (used in tests/testing)
+	 * @author Owen Rubel
+	 *
+	 *
+	 */
 	public void bootstrapTestUser(){
 		Authority testAuth = authService.findByAuthority(apiProperties.getSecurity().getUserRole());
 		LinkedHashMap testUser = apiProperties.getBootstrap().getTestUser();

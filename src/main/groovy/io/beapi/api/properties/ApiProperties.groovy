@@ -43,14 +43,14 @@ public class ApiProperties{
         private Integer attempts = 5
         private Integer procCores = 8
         private String documentationUrl = 'http://orubel.github.io/Beapi-API-Framework/'
-        private ArrayList reservedUris = ['/authenticate','/register','/error','/login','/logout','/validate','/resetPassword','/forgotPassword']
+        private ArrayList reservedUris
         private Integer apichainLimit = 3
         private Boolean postcrement = false
         private Boolean chainingEnabled = true
         private Boolean batchingEnabled = true
         private String encoding = 'UTF-8'
         private String iostateDir = '.boot/.iostate'
-        private ArrayList staticEndpoint = ['apidoc','connector','properties','throttle']
+        private ArrayList staticEndpoint = ['apidoc','openapi','connector','throttle','actuator']
         private ArrayList supportedFormats = ['JSON','XML']
 
         // todo : current master/slave (change to parent/child)

@@ -25,16 +25,22 @@ import javax.json.*
 import org.springframework.security.web.header.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import io.beapi.api.service.StatsService
 
-/*
-*PARAMS located in :
-*request.getSession().getAttribute('chainOrder')
-*request.getSession().getAttribute('chainType')
-*request.getSession().getAttribute('chainKey')
-*request.getSession().getAttribute('chainSize')
-*
+/**
+ *
+ * Class for handling calltype=3 (chaining); called in URI as /c0.1/
+ * Class PARAMS located in :
+ * request.getSession().getAttribute('chainOrder')
+ * request.getSession().getAttribute('chainType')
+ * request.getSession().getAttribute('chainKey')
+ * request.getSession().getAttribute('chainSize')
+ *
+ * @author Owen Rubel
+ *
+ * @see ApiExchange
+ *
  */
-// NOTE : CALLTYPE = 3
 @Service
 public class ChainExchangeService extends ApiExchange{
 
@@ -51,12 +57,26 @@ public class ChainExchangeService extends ApiExchange{
 	PrincipleService principle
 	ApplicationContext ctx
 	boolean overrideAutoMimeTypes = false
+	StatsService statsService
+	ErrorService errorService
 
-
-	public ChainExchangeService(ApiCacheService apiCacheService, ApplicationContext applicationContext) {
+	/**
+	 *
+	 * Constructor for ChainExchangeService
+	 * @author Owen Rubel
+	 *
+	 * @param statsService Injected Bean for StatsService
+	 * @param apiCacheService Injected Bean for apiCacheService
+	 * @param applicationContext application context for handling batching
+	 * @see ApiExchange
+	 *
+	 */
+	public ChainExchangeService(ErrorService errorService, StatsService statsService, ApiCacheService apiCacheService, ApplicationContext applicationContext) {
 		try {
 			this.apiCacheService = apiCacheService
 			this.ctx = applicationContext
+			this.statsService = statsService
+			this.errorService = errorService
 		} catch (Exception e) {
 			println("# [Beapi] ChainExchangeService - initialization Exception - ${e}")
 			System.exit(0)
@@ -64,7 +84,17 @@ public class ChainExchangeService extends ApiExchange{
 	}
 
 
-
+	/**
+	 *
+	 * method for handling endpoint requests for chaining
+	 * @author Owen Rubel
+	 *
+	 * @param request injected HttpServletRequest for handling request
+	 * @param response injected HttpServletResponse for handling response
+	 * @param authority injected principal authority
+	 * @see ApiExchange
+	 *
+	 */
 	boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority) {
 		initChainVars(request, response,authority)
 
@@ -98,6 +128,17 @@ public class ChainExchangeService extends ApiExchange{
 		return true
 	}
 
+	/**
+	 *
+	 * method for handling endpoint response for chaining
+	 * @author Owen Rubel
+	 *
+	 * @param request injected HttpServletRequest for handling request
+	 * @param response injected HttpServletResponse for handling response
+	 * @param body injected response body for parsing
+	 * @see ApiExchange
+	 *
+	 */
 	void chainResponse(HttpServletRequest request, HttpServletResponse response, ArrayList body){
 		// first compare to cache for ROLE and parse out appropriate data to return
 		if (body) {
@@ -115,6 +156,12 @@ public class ChainExchangeService extends ApiExchange{
 					if(response.getStatus()==200){
 						apiCacheService.unsetApiCachedResult(this.controller,  this.action, this.apiversion)
 					}
+				}
+
+				try{
+					statsService.setStat((String)response.getStatus(),(String)request.getRequestURI())
+				}catch(Exception e){
+					println("### [statsService :: postHandle] exception (1) : "+e)
 				}
 
 				this.chain=[]
@@ -155,16 +202,34 @@ public class ChainExchangeService extends ApiExchange{
 						apiCacheService.unsetApiCachedResult(this.controller,  this.action, this.apiversion)
 					}
 				}
+
+				try{
+					statsService.setStat((String)response.getStatus(),(String)request.getRequestURI())
+				}catch(Exception e){
+					println("### [statsService :: postHandle] exception (1) : "+e)
+				}
+
 				request.getSession().getServletContext().getRequestDispatcher(this.newPath).forward(request, response);
 				//def servletCtx = this.ctx.getServletContext()
 				//def rd = servletCtx?.getRequestDispatcher(this.newPath)
 				//rd.forward(request, response)
 			}
 		}else{
-			writeErrorResponse(response,'422',this.uri,'No data returned for this call')
+			errorService.writeErrorResponse(request,response,'422','No data returned for this call')
 		}
 	}
 
+	/**
+	 *
+	 * method for initializing variables used for handling request/response
+	 * @author Owen Rubel
+	 *
+	 * @param request injected HttpServletRequest for handling request
+	 * @param response injected HttpServletResponse for handling response
+	 * @param authority injected principal authority
+	 * @see ApiExchange
+	 *
+	 */
 	private void initChainVars(HttpServletRequest request, HttpServletResponse response, String authority){
 		this.chainType = request.getAttribute('chainType')
 		this.chainSize = request.getAttribute('chainSize')
@@ -270,30 +335,30 @@ public class ChainExchangeService extends ApiExchange{
 					if (request.getAttribute('chainOrder').size() == 0) {
 						//check method
 						if(this.apiObject['method'].toUpperCase() != this.method){
-							writeErrorResponse(response,'405',request.getRequestURI());
+							errorService.writeErrorResponse(request,response,'405');
 						}
 						request.setAttribute('params', request.getAttribute('chainParams'))
 					}else{
 						if(this.apiObject['method'].toUpperCase() != 'GET'){
-							writeErrorResponse(response,'405',request.getRequestURI());
+							errorService.writeErrorResponse(request,response,'405');
 						}
 					}
 					break
 				case 'prechain':
 					if (request.getAttribute('chainOrder').size() == request.getAttribute('chainSize')) {
 						if(this.apiObject['method'].toUpperCase() != this.method){
-							writeErrorResponse(response,'405',request.getRequestURI());
+							errorService.writeErrorResponse(request,response,'405');
 						}
 						request.setAttribute('params', request.getAttribute('chainParams'))
 					}else{
 						if(this.apiObject['method'].toUpperCase() != 'GET'){
-							writeErrorResponse(response,'405',request.getRequestURI());
+							errorService.writeErrorResponse(request,response,'405');
 						}
 					}
 					break;
 				default:
 					if(this.apiObject['method'].toUpperCase() != 'GET'){
-						writeErrorResponse(response,'405',request.getRequestURI());
+						errorService.writeErrorResponse(request, response,'405');
 					}
 					break;
 
@@ -301,12 +366,31 @@ public class ChainExchangeService extends ApiExchange{
 		}
 	}
 
+	/**
+	 *
+	 * method for clearing chain variables
+	 * @author Owen Rubel
+	 *
+	 * @param request injected HttpServletRequest for handling request
+	 * @see ApiExchange
+	 *
+	 */
 	private void clearChainVars(HttpServletRequest request){
 		['controller','action','receivesList','returnsList','uriList'].each {
 			request.removeAttribute(it)
 		}
 	}
 
+	/**
+	 *
+	 * method for initializing new chain path with each increment
+	 * @author Owen Rubel
+	 *
+	 * @param request injected HttpServletRequest for handling request
+	 * @param body response body for existing chain
+	 * @see ApiExchange
+	 *
+	 */
 	private void setNewChainPath(HttpServletRequest request, ArrayList body) throws Exception{
 		String method = request.getMethod()
 		LinkedHashMap chainParams = [:]
@@ -374,6 +458,18 @@ public class ChainExchangeService extends ApiExchange{
 		this.newPath = newPath
 	}
 
+	/**
+	 *
+	 * method for concatenating body response for request/response chain
+	 * @author Owen Rubel
+	 *
+	 * @param responseBody returning responseBody
+	 * @param request injected HttpServletRequest for handling request
+	 * @param response injected HttpServletResponse for handling response
+	 * @param responseFileType format for returning responseBody
+	 * @see ApiExchange
+	 *
+	 */
 	private void concatChainOutput(ArrayList responseBody, HttpServletRequest request, HttpServletResponse response, String responseFileType){
 		this.chain.add(responseBody[0])
 		if(request.getAttribute('chainOrder').isEmpty()) {
@@ -390,6 +486,16 @@ public class ChainExchangeService extends ApiExchange{
 		}
 	}
 
+	/**
+	 *
+	 * method for parsing responseBody by given filetype
+	 * @author Owen Rubel
+	 *
+	 * @param responseBody returning responseBody
+	 * @param responseFileType format for returning responseBody
+	 * @see ApiExchange
+	 *
+	 */
 	protected String parseBodyByFiletype(LinkedHashMap responseBody, String responseFileType){
 		switch(responseFileType){
 			case 'JSON':

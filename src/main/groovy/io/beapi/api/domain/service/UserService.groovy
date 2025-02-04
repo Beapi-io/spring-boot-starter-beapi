@@ -1,20 +1,14 @@
 package io.beapi.api.domain.service;
 
 import io.beapi.api.domain.User;
-import io.beapi.api.repositories.AuthenticationTokenRepository;
+
 import io.beapi.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.dao.DataAccessException;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.scheduling.annotation.Async
-import java.util.concurrent.CompletableFuture;
-
+import org.springframework.dao.DataAccessException
 
 @Service
-public class UserService implements IUser {
+public class UserService {
 
     @Autowired UserRepository userrepo;
 
@@ -23,7 +17,7 @@ public class UserService implements IUser {
         this.userrepo = userrepo;
     }
 
-    @Override
+    //@Override
     public List<User> getAllUsers() {
         return userrepo.findAll();
     }
@@ -33,12 +27,12 @@ public class UserService implements IUser {
         return userrepo.findById(id);
     }
 
-    @Override
+    //@Override
     public Optional<User> findById(int id) {
         return userrepo.findById(Long.valueOf(id));
     }
 
-    @Override
+    //@Override
     public User findByEmail(String email) {
         return userrepo.findByEmail(email);
     }
@@ -48,12 +42,12 @@ public class UserService implements IUser {
         return userrepo.findByVerificationCode(id);
     }
 
-    @Override
+    //@Override
     public User findByUsername(String username) {
         return userrepo.findByUsername(username);
     }
 
-    @Override
+    //@Override
     public User save(User usr) {
         try{
             userrepo.save(usr);
@@ -70,13 +64,13 @@ public class UserService implements IUser {
         userrepo.flush();
     }
 
-    @Override
+    //@Override
     public void deleteById(int id) {
         userrepo.deleteById(Long.valueOf(id));
         userrepo.flush();
     }
 
-    @Override
+    //@Override
     public User bootstrapUser(User usr) {
         try{
             userrepo.save(usr);

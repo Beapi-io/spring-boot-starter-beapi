@@ -145,18 +145,17 @@ class RequestInitializationFilter extends OncePerRequestFilter{
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        println("### RequestInitializationFilter > "+request.getRequestURI())
+        //println("### RequestInitializationFilter > "+request.getRequestURI())
 
         // [ SHOW SESSION VARIABLES ]
         //if(sessionService.sessionExists()) {
-            println(sessionService.sessionExists()==true)
-            println(request.getSession().getId()+"=="+WebUtils.getCookie(request, 'JSESSIONID')?.getValue())
+            //println(sessionService.sessionExists()==true)
+            //println(request.getSession().getId()+"=="+WebUtils.getCookie(request, 'JSESSIONID')?.getValue())
 
             request.setCharacterEncoding("UTF-8")
             this.authority = (this.principle.authorities()) ? this.principle.authorities() : "ROLE_ANONYMOUS"
 
-
-            Pattern p = ~/[v|b|c|r]${version}/
+            Pattern p = ~/[v|b|c|t]${version}/
             Matcher match = p.matcher(request.getRequestURI()[1..4])
 
             // route for simpleHandlerMapping
@@ -193,8 +192,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                 } catch (Exception e) {
                     throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Exception - full stack trace follows:", e)
                 }
-
-
             }
 
             try {
@@ -219,7 +216,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
         //println("### processRequest ...")
 
         if(request){
-
             if(this.authority!='ROLE_ANONYMOUS') {
                 //logger.debug("doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : {}");
                 String cachedResult
@@ -250,6 +246,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                             if (this.apiObject?.'returns') {
                                 this.rturns = this.apiObject['returns'] as LinkedHashMap
                             } else {
+                                //println("[ BAD IOSTATE DEFINITION ] ")
                                 logger.warn(devnotes,"[ BAD IOSTATE DEFINITION ] : IOSTATE DEFINITION FOR '${this.uObj.getController()}/${this.uObj.getAction()}' does not have 'RESPONSE' dataset for the authority '${this.authority}'. IF THIS IS AN ISSUE, FIX THIS BY ADDING THE 'ROLE' TO THE 'RESPONSE' DATASETS.")
                                 writeErrorResponse(response, '400', request.getRequestURI());
                                 return false
@@ -317,7 +314,11 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     }
                     parseParams(request, this.uObj.getId())
 
-                    if (this.apiObject && this.uObj.callType==1) {
+                    /*
+                    * Normal API Call (v)
+                     */
+                    if (this.apiObject && (this.uObj.callType==1)) {
+
                         if(!checkRequestParams(request.getAttribute('params'))) {
                             logger.warn(devnotes,"[ ATTRIBUTE BASED ACCESS CONTROL(ABAC) MISMATCH (2) ] : PARAMS SENT FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DO NOT MATCH EXPECTED 'REQUEST' PARAMS. IF THIS IS AN ISSUE, FIX BY ADDING THE PARAM TO THE IOSTATE FILE.")
                             writeErrorResponse(response, '400', request.getRequestURI(), "PARAMS SENT FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DO NOT MATCH EXPECTED 'REQUEST' PARAMS. IF THIS IS AN ISSUE, FIX BY ADDING THE PARAM TO THE IOSTATE FILE.");
@@ -326,7 +327,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                         }
 
                         if (validCacheRequestMethod(this.method)) {
-
                             setCacheHash(request.getAttribute('params'), this.receivesList)
                             request.setAttribute('cacheHash', this.cacheHash)
 
@@ -361,7 +361,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                 return true
             }
         }else{
-            // println("No REQUEST")
             //return true
         }
         return false

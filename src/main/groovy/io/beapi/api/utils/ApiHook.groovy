@@ -8,27 +8,85 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import java.util.regex.Matcher
 
+/**
+ * Class is used for instantiating Webhook object
+ *
+ * @author Owen Rubel
+ * @see HookCacheService
+ */
 class ApiHook implements Serializable{
 
 	@Autowired
 	ApiCacheService apiCacheService
 	// todo : create function to check roles for endpoint for EVERY function; (ie hasAuthority() )
 
+	/**
+	 * String representing version number of the application
+	 */
 	private String appVersion
+
+	/**
+	 * String representing version for the requested api endpoint
+	 */
 	private String apiVersion
+
+	/**
+	 * String representing controller for the requested api endpoint
+	 */
 	private String controller
+
+	/**
+	 * String representing action for the requested api endpoint
+	 */
 	private String action
+
+	/**
+	 * Supported formats for the requested api endpoint
+	 */
 	private ArrayList formats = ['JSON','XML']
+
+	/**
+	 * String representing forwardURI for Hook
+	 */
 	private String forwardUrl
+
+	/**
+	 * String representing format for Hook
+	 */
 	private String format = 'JSON'
+
+	/**
+	 * String representing secret for Hook
+	 */
 	private String secretHash
+
+	/**
+	 * boolean representing if Hook is active
+	 */
 	private boolean isActive = 0
-	// increment for 404's when sending hook
+
+	/**
+	 * Long representing number of attempts to send made so far
+	 */
 	private Long retryAttempts = 0
-	// retry attempt limit
+
+	/**
+	 * integer representing number of attempts allowed for sending the hook
+	 */
 	private int retryLimit = 5
 
-	ApiHook(String appVersion, String apiVersion, String controller, String action, String forwardUrl, String format, String internalEndpoint, String secretHash) {
+	/**
+	 * UriObject class constructor.
+	 * @param appVersion
+	 * @param apiVersion
+	 * @param controller
+	 * @param action
+	 * @param forwardUrl
+	 * @param format
+	 * @param secretHash
+	 * @return instance of ApiHook
+	 */
+	ApiHook(String appVersion, String apiVersion, String controller, String action, String forwardUrl, String format, String secretHash) {
 		// check hookEndpointExists
 		this.appVersion = appVersion
 		if(apiVersion) {
@@ -38,31 +96,48 @@ class ApiHook implements Serializable{
 		this.action = action
 		this.forwardUrl = forwardUrl
 		this.format = formats.contains(format)?format:'JSON'
-		//this.internalEndpoint = internalEndpoint
 		this.isActive = false
 		this.secretHash = secretHash
 		this.retryAttempts=0
 	}
 
+	/**
+	 * Method for returning appVersion associated with Hook
+	 * @return  String representing the appVersion for the Hook
+	 */
 	public Long getAppVersion() {
 		return this.appVersion;
 	}
 
+	/**
+	 * Method for returning apiVersion associated with Hook
+	 * @return  String representing the apiVersion for the Hook
+	 */
 	public Long getApiVersion() {
 		return this.apiVersion;
 	}
 
+	/**
+	 * Method for returning controller associated with Hook
+	 * @return  String representing the controller for the Hook
+	 */
 	public Long getController() {
 		return this.controller;
 	}
 
+	/**
+	 * Method for returning action/method associated with Hook
+	 * @return  String representing the action/method for the Hook
+	 */
 	public Long getAction() {
 		return this.action;
 	}
 
-	/*
+	/**
 	* for easy comparison of URI against users hooks
 	* have to store this way so we can check 'apiVersions'
+	 * @param uri String representing URI associated with Hook
+	 * @return boolean representing if URI is valid or not
 	 */
 	public boolean compareUri(String uri){
 		String tempUri
@@ -81,37 +156,51 @@ class ApiHook implements Serializable{
 		return false
 	}
 
+	/**
+	 * Method for returning URI associated with Hook
+	 * @return  String representing the URI for the Hook
+	 */
 	public String getUri(){
 		String version = (this.apiVersion)?"/${this.appVersion}-${this.apiVersion}":"/${this.appVersion}"
 		return "/${version}/${this.controller}/${this.action}".toString()
 	}
 
+	/**
+	 * Method for returning forward URL
+	 * @return  String representing the forwardUrl for the Hook
+	 */
 	public String getForwardUrl() {
 		return this.forwardUrl;
 	}
 
+	/**
+	 * Method for returning format used with webhook
+	 * @return  String representing the format for the Hook
+	 */
 	public String getFormat() {
 		return this.format;
 	}
 
-	public String getInternalEndpoint() {
-		return this.internalEndpoint
-	}
-
+	/**
+	 * Method for returning secret used with webhook
+	 * @return  String representing the secret for the Hook
+	 */
 	public String getSecretHash() {
 		return this.secretHash
 	}
 
+	/**
+	 * Method for returning whether Hook is active or not
+	 * @return  boolean representing whether Hook is active or not
+	 */
 	public boolean getIsActive() {
 		return this.isActive
 	}
 
-	/*
-	* must respond via https with secret to compare against secretHash
-	* 	HashCode hash = murmur3_32().hashBytes(secret.getBytes(Charsets.UTF_8));
-	*	assertEquals(hashUtf8, murmur3_32().newHasher().putBytes(str.getBytes(Charsets.UTF_8)).hash());
-	*	assertEquals(hashUtf8, murmur3_32().hashString(str, Charsets.UTF_8));
-	*	assertEquals(hashUtf8, murmur3_32().newHasher().putString(str, Charsets.UTF_8).hash());
+	/**
+	* Method which sets Hook activity(true/false) if given valid 'secret'
+	 * @param isActive boolean representing whether Hook is active or not
+	 * @param secret String representing the hash for the Hook
 	 */
 	public void setIsActive(boolean isActive, String secret) {
 		String hash = Hashing.murmur3_32().hashBytes(secret.getBytes(StandardCharsets.UTF_8)).toString()
@@ -120,12 +209,10 @@ class ApiHook implements Serializable{
 		}
 	}
 
-	/*
-	* must respond via https with secret to compare against secretHash
-	* 	HashCode hash = murmur3_32().hashBytes(secret.getBytes(Charsets.UTF_8));
-	*	assertEquals(hashUtf8, murmur3_32().newHasher().putBytes(str.getBytes(Charsets.UTF_8)).hash());
-	*	assertEquals(hashUtf8, murmur3_32().hashString(str, Charsets.UTF_8));
-	*	assertEquals(hashUtf8, murmur3_32().newHasher().putString(str, Charsets.UTF_8).hash());
+
+	/**
+	 * Method which resets Hook attempts if given a valid secret
+	 * @param secret String representing the hash for the Hook
 	 */
 	public void resetRetryAttempts(String secret) {
 		String hash = Hashing.murmur3_32().hashBytes(secret.getBytes(StandardCharsets.UTF_8)).toString()
@@ -134,6 +221,10 @@ class ApiHook implements Serializable{
 		}
 	}
 
+	/**
+	 * For converting the object to a LinkedHashMap for usability
+	 * @return LinkedHashMap representing the APIHook
+	 */
 	public LinkedHashMap toLinkedHashMap() {
 		return [appVersion:this.appVersion, apiVersion:this.apiVersion, controller:this.controller, action:this.action, forwardUrl:this.forwardUrl, formats:this.format, isActive:this.isActive, secretHash:this.secretHash, retryAttempts:this.retryAttempts]
 	}

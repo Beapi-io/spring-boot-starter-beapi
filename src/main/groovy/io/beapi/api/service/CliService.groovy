@@ -53,15 +53,18 @@ public class CliService {
 	private List<String> argsString
 
 	@Autowired
+	RepositoryScaffoldService repoScaffoldService
+
+	@Autowired
 	ConnectorScaffoldService connScaffoldService
 
 	@Autowired
 	ControllerScaffoldService contScaffoldService
 
 	@Autowired
-	TestScaffoldService testScaffoldService
+	DomainServiceScaffoldService domservScaffoldService
 
-	ArrayList validArgKeys = ['connector','help','test','controller']
+	ArrayList validArgKeys = ['connector','help','controller','repository','domainservice']
 
 	public CliService() {}
 
@@ -150,20 +153,38 @@ public class CliService {
 ##########################################################################################
 USAGE: gradle scaffold -Pargs="<option>=<associated package name>"
 
+# SCAFFOLD CONNECTOR #
+gradle scaffold -Pargs="connector=<domain name>"
 ex. gradle scaffold -Pargs="connector=demo.application.domain.Company"
+
+# SCAFFOLD CONTROLLER #
+ex. gradle scaffold -Pargs="<domain name>, <service name>, java"
 ex. gradle scaffold -Pargs="controller=demo.application.domain.Company, demo.application.service.CompanyService, java"
-ex. gradle scaffold -Pargs="test=demo.application.controller.Company"
+
+# SCAFFOLD REPOSITORY #
+gradle scaffold -Pargs="repository=<domain name>"
+ex. gradle scaffold -Pargs="repository=demo.application.domain.Company, java"
+
+# SCAFFOLD DOMAIN SERVICE #
+gradle scaffold -Pargs="repository=<domain name>"
+ex. gradle scaffold -Pargs="domainservice=demo.application.domain.Company, io.beapi.api.repositories.CompanyRepository, java"
+
+# HELP #
 ex. gradle scaffold -Pargs="help"
 
 [ARGS]
 connector = <an associated entity/domain>
--- scaffolds connectors
+-- scaffolds connector
 
 controller = <an associated entity/domain>,<the entity/domain service>,<output format>
--- scaffolds integration tests for endpoints.
+-- scaffolds controller
 
-test = <an associated controller>
--- scaffolds integration tests for endpoints.
+repository = <an associated entity/domain>,<output format>
+-- scaffolds repository
+
+domainservice = <an associated entity/domain>,<the entity/domain service>,<output format>
+-- scaffolds domain service for repository
+
 
 help
 -- CLI usage and help information
@@ -182,8 +203,10 @@ help
 
 	// parse args from argString
 	private ArrayList parseArgs(String argString, ArrayList validArgKeys){
+
 		ArrayList matches = []
-		Pattern pattern = ~/\[[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_] (connector|Connector|CONNECTOR|controller|CONTROLLER|Controller)=(.+)\]/
+		Pattern pattern = ~/\[[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_] (connector|Connector|CONNECTOR|controller|CONTROLLER|Controller|repository|Repository|REPOSITORY|domainService|DomainService|domainservice|DOMAINSERVICE)=(.+)\]/
+
 		Matcher match = pattern.matcher(argString)
 		if (match.find()) {
 			if(!validArgKeys.contains(match[0][2])) {
@@ -191,6 +214,7 @@ help
 				error(1, "Invalid argument: "+match[0][2]+". Valid arguments for scaffolding are : "+validArgKeys)
 			}else{
 				if(match[0][2]){
+
 					switch(match[0][2]){
 						case 'connector':
 							if(match[0][3] ==~ /[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_]/){
@@ -200,6 +224,43 @@ help
 								connScaffoldService.scaffoldConnector(match[0][3])
 							}else{
 								error(1, "Invalid package. Package value for '" + k + "' is not recognized as a valid Domain package name")
+							}
+							break
+
+						case 'repository':
+							println("case repository")
+							Pattern p = ~/(.+)\,(.+)/
+							println(match[0][3])
+							Matcher match2 = p.matcher(match[0][3])
+							if (match2.find()) {
+								String arg1 = match2[0][1].trim()
+								String arg3 = match2[0][2].trim()
+								println(arg1)
+								println(arg3)
+
+
+								if(arg1 ==~ /[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_]/) {
+
+								}else{
+									//error: unrecognized format for domain
+									println("[repo] invalid package : "+match2[0][1])
+									error(1, "Invalid package. Package value for '" + arg1 + "' is not recognized as a valid Domain package name")
+								}
+
+								if(['java','groovy'].contains(arg3)) {
+									println("pass : "+arg3)
+								}else{
+
+									//error: unrecognized format for service
+									println("arg3 : "+arg3)
+									println("class : "+arg3.class)
+									error(1, "Invalid format. '" + arg3 + "' is not recognized as a valid format. Choose between [java,groovy]")
+								}
+
+								repoScaffoldService.scaffoldRepository(arg1,arg3)
+							}else{
+								println("[repo] invalid package : "+match2[0][1])
+								error(1, "Invalid args. '" + match[0][3] + "' is not recognized set of arguments. Use 'help' to see the proper args.")
 							}
 							break
 
@@ -240,16 +301,46 @@ help
 
 								contScaffoldService.scaffoldController(arg1, arg2, arg3)
 							}
-						case 'test':
-							if (match[0][3] ==~ /[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_]/) {
-								if (match[0][3].isEmpty()) {
-									error(1, "'controller' value cannot be NULL/empty. Please try again.")
+							break
+						case 'domainservice':
+							// test for comma then split and test each value separately
+							println("controller")
+							Pattern p = ~/(.+)\,(.+)\,(.+)/
+
+							Matcher match2 = p.matcher(match[0][3])
+							if (match2.find()) {
+								String arg1 = match2[0][1].trim()
+								String arg2 = match2[0][2].trim()
+								String arg3 = match2[0][3].trim()
+
+								if(arg1 ==~ /[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_]/) {
+
+								}else{
+									//error: unrecognized format for domain
+									error(1, "Invalid package. Package value for '" + match2[0][1] + "' is not recognized as a valid Domain package name")
 								}
-								testScaffoldService.scaffoldTest(match[0][2])
-							}else{
-								error(1, "Invalid package. Package value for '" + match[0][3] + "' is not recognized as a valid Controller package name")
+
+								if(arg2 ==~ /[a-z][a-z0-9_]*(\.[a-zA-Z0-9_]+)+[0-9a-z_]/) {
+
+								}else{
+									//error: unrecognized format for service
+									error(1, "Invalid package. Package value for '" + match2[0][2] + "' is not recognized as a valid Service package name")
+								}
+
+								if(arg3 ==~ /(java|groovy)/) {
+
+								}else{
+									//error: unrecognized format for service
+									error(1, "Invalid package. Package value for '" + match2[0][2] + "' is not recognized as a valid Service package name")
+								}
+								if (arg1.isEmpty() || arg2.isEmpty()) {
+									error(1, "'domain' and 'service' values are required and cannot be NULL/empty. Please try again.")
+								}
+
+								domservScaffoldService.scaffoldDomainService(arg1, arg2, arg3)
 							}
 							break
+
 						case 'help':
 							usage()
 					}
@@ -263,7 +354,7 @@ help
 				error(1, "'domain' and 'service' values are required and cannot be NULL/empty. Please try again.")
 			}
 		}else{
-			// error(0, "'Invalid Arg. Please try again.")
+			 //error(0, "'Invalid Arg. Please try again.")
 		}
 	}
 

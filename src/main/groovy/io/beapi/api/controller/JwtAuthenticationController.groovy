@@ -1,39 +1,38 @@
 package io.beapi.api.controller
 
 
-import io.beapi.api.domain.AuthenticationToken;
 import io.beapi.api.domain.Authority;
 import io.beapi.api.domain.JwtRequest;
 import io.beapi.api.domain.JwtResponse;
 import io.beapi.api.domain.UserAuthority;
-import io.beapi.api.domain.service.AuthorityService;
-import io.beapi.api.domain.service.AuthenticationTokenService;
+import io.beapi.api.domain.service.AuthorityService
+import io.beapi.api.service.ErrorService
+import io.beapi.api.utils.SecretGenerator;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import org.springframework.web.servlet.support.RequestContextUtils;
 import io.beapi.api.domain.service.UserAuthorityService;
 import io.beapi.api.domain.service.UserService;
-import io.beapi.api.service.JwtUserDetailsService;
 import io.beapi.api.service.MailService
 import io.beapi.api.service.PrincipleService;
+import io.beapi.api.service.ErrorService;
 import io.beapi.api.service.SessionService;
-import io.beapi.api.properties.ApiProperties;
+import io.beapi.api.service.JwtUserDetailsService
+import io.beapi.api.properties.ApiProperties
+import io.beapi.api.service.StatsService;
 import io.beapi.api.utils.ErrorCodes;
 import io.beapi.api.utils.JwtTokenUtil;
-import io.beapi.api.domain.User;
-import groovy.json.JsonSlurper;
-
+import io.beapi.api.domain.User
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.bind.annotation.CrossOrigin;
+//import org.springframework.web.ErrorResponse;
+import org.springframework.context.ApplicationContext
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,40 +41,42 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Controller;
-
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.nio.charset.StandardCharsets;
+import javax.servlet.http.HttpServletResponse
 
-import net.bytebuddy.utility.RandomString;
 import groovy.json.JsonSlurper
 
-import java.util.*;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.lang.reflect.Field
+import io.beapi.api.utils.SecretGenerator
 
 @RestController
-public class JwtAuthenticationController {
-
+public class JwtAuthenticationController  extends JwtTokenUtil{
+	@Autowired ErrorService errorService
+	@Autowired StatsService statsService
 	@Autowired ApiProperties apiProperties;
 	@Autowired PasswordEncoder passwordEncoder;
 	@Autowired private AuthenticationManager authenticationManager;
-	@Autowired private JwtTokenUtil jwtTokenUtil;
-	@Autowired private JwtUserDetailsService userDetailsService;
+	@Autowired private SecretGenerator secretGenerator
+
+	@Autowired
+	private JwtTokenUtil jwtTokenUtil;
+
+	@Autowired
+	private JwtUserDetailsService userDetailsService;
+
 	@Autowired private SessionService sessionService;
 	@Autowired private MailService mailService;
 	@Autowired private UserService userService;
 	@Autowired private UserAuthorityService uAuthService;
 	@Autowired private AuthorityService authService;
 	@Autowired private PrincipleService principal
-	@Autowired private AuthenticationTokenService authTokenService
 	@Autowired private HttpServletRequest request;
 	@Autowired private HttpServletResponse response;
 	@Autowired ApplicationContext ctx
@@ -94,20 +95,20 @@ public class JwtAuthenticationController {
 		} catch (LockedException e){
 			// account locked
 			//response.setContentType("application/json")
-			String message = writeErrorResponse('423', request.getRequestURI())
+			String message = errorService.writeErrorResponse(request, '423')
 			return new ResponseEntity<>(message, HttpStatus.LOCKED);
 		} catch (Exception e) {
 			// todo : fix, throwing 'INVALID CREDENTIALS' when they are valid(??)
 			throw new Exception("Expired Token / Authentication Error", e);
 		}
 
-		String  userAgent =   request.getHeader("User-Agent");
+		String  userAgent =  request.getHeader("User-Agent");
 		String  user =   userAgent.toLowerCase();
-		String os = jwtTokenUtil.getOs(userAgent);
-		String browser = jwtTokenUtil.getBrowser(user, userAgent);
-		String ip = jwtTokenUtil.getIp(request)
+		String os = getOs(userAgent);
+		String browser = getBrowser(user, userAgent);
+		String ip = getIp(request)
 
-		final String token = jwtTokenUtil.generateToken(userDetails, os, browser, ip);
+		final String token = generateToken(userDetails, os, browser, ip);
 		return ResponseEntity.ok(new JwtResponse(token));
 	}
 
@@ -115,7 +116,7 @@ public class JwtAuthenticationController {
 	@RequestMapping(value = "/register", method = RequestMethod.POST, produces = "application/json")
 	//@Transactional(value="transactionManager")
 	public ResponseEntity<User> saveUser(@RequestBody User user) throws Exception {
-		System.out.println("### [JwtAuthenticationController :: register]")
+		//System.out.println("### [JwtAuthenticationController :: register]")
 		Authority auth = authService.findByAuthority(apiProperties.getSecurity().getUserRole());
 		//User user = User.get(springSecurityService.principal.id)
 		//User dupEmail = userService.findByEmail(user.getEmail())
@@ -160,6 +161,7 @@ public class JwtAuthenticationController {
 			mailService.sendVerificationEmail(user,apiProperties.apiServer + apiProperties.callback.getValidation());
 			return ResponseEntity.ok("A validation email was sent. Please check your inbox ");
 		}catch(Exception e){
+
 			return new ResponseEntity<>("Cannot send registration email : "+e, HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}
@@ -193,7 +195,7 @@ public class JwtAuthenticationController {
 					} else {
 						// return response as ratelimit failure and do not continue with chain
 						String msg = "Verification code has expired. Please request a new one."
-						writeErrorResponse(response, '498', request.getRequestURI(), msg);
+						errorService.writeErrorResponse(request, response, '498', msg);
 					}
 				}
 			}
@@ -228,7 +230,7 @@ public class JwtAuthenticationController {
 						return new ResponseEntity<>("Password must contain capitol, number and special character and be 8-characters or more. Please try again: " + e, HttpStatus.UNPROCESSABLE_ENTITY);
 					}
 				}else{
-					return new ResponseEntity<>("Passwords don't match. Please try again: " + e, HttpStatus.UNPROCESSABLE_ENTITY);
+					return new ResponseEntity<>("Passwords don't match. Please try again: ", HttpStatus.UNPROCESSABLE_ENTITY);
 				}
 			}
 		}catch(Exception e){
@@ -240,7 +242,7 @@ public class JwtAuthenticationController {
 	@RequestMapping(value = "/forgotPassword", method = RequestMethod.POST)
 	public ResponseEntity<?> forgotPassword(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) {
 		//System.out.println("### [JwtAuthenticationController :: forgotPassword]")
-
+		username = getUsernameFromToken(jwtToken.replaceAll("\\s+", ""));
 		def obj = new JsonSlurper().parseText(data)
 		User user = userService.findByUsername(obj.email)
 
@@ -261,6 +263,50 @@ public class JwtAuthenticationController {
 	}
 
 
+	// MUST BE called with a currently valid token
+	@RequestMapping(value = "/refreshToken", method = RequestMethod.GET)
+	private ResponseEntity generateAuthResponse(HttpServletRequest request, HttpServletResponse response, @RequestParam("name") String name){
+
+		String requestTokenHeader = request.getHeader("Authorization");
+
+		if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
+
+			String jwtToken = requestTokenHeader.substring(7);
+			if (jwtToken != 'null') {
+
+				try{
+					//final UserDetails userDetails = userDetailsService.loadUserByUsername(name)
+					UserDetails userDetails = loadUserByUsername(name);
+
+					if (validateToken(jwtToken, userDetails)) {
+						String username = getUsernameFromToken(jwtToken);
+
+						if (username == name) {
+							String userAgent = request.getHeader("User-Agent");
+							String user = userAgent.toLowerCase();
+							String os = getOs(userAgent);
+							String browser = getBrowser(user, userAgent);
+							String ip = getIp(request)
+
+
+							final String token = generateToken(userDetails, os, browser, ip);
+							return ResponseEntity.ok(new JwtResponse(token));
+						}
+					}
+				}catch(Exception e){
+					return new ResponseEntity<>("Unknown Error : "+e, HttpStatus.BAD_REQUEST);
+				}
+			}else{
+				// no token sent
+				//ErrorResponse error = new ErrorResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage());
+				return new ResponseEntity<>("No token sent.", HttpStatus.BAD_REQUEST);
+			}
+		}else{
+			//ErrorResponse error = new ErrorResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage());
+			return new ResponseEntity<>("No token sent.", HttpStatus.BAD_REQUEST);
+		}
+	}
+
 	@Transactional(value="transactionManager",readOnly = true)
 	//private void authenticate(UserDetails userDetails) throws Exception {
 	private void authenticate(String username, String password,UserDetails userDetails) throws Exception, DisabledException, BadCredentialsException, LockedException {
@@ -272,6 +318,7 @@ public class JwtAuthenticationController {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password, grantedAuthorities));
 			String ip = sessionService.getClientIpAddress()
 			sessionService.setAttribute("ip",ip)
+			sessionService.setAttribute("user",username)
 		} catch (DisabledException e) {
 			throw new Exception("USER_DISABLED", e);
 		} catch (BadCredentialsException e) {
@@ -281,20 +328,12 @@ public class JwtAuthenticationController {
 		}
 	}
 
-	// Todo : Move to exchangeService??
-	/**
-	 * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
-	 * @param HttpServletResponse response
-	 * @param String statusCode
-	 * @return LinkedHashMap commonly formatted linkedhashmap
-	 */
-	protected String writeErrorResponse(String statusCode, String uri){
-		String msg = ErrorCodes.codes[statusCode]['long']
-		String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes.codes[statusCode]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
-		return message
-	}
-
 	protected boolean passwordCriteria(password){
+		try{
+			statsService.setStat((String)statusCode,uri)
+		}catch(Exception e){
+			println("### [JwtAuthenticationController :: passwordCriteria] exception : "+e)
+		}
 		Pattern pass = ~/(?=.*[A-Z])(?=.*[! @# $&*])(?=.*[0-9])(?=.*[a-z]).{8,}/
 		Matcher match = pass.matcher(password)
 		if (match.find()) {
@@ -303,4 +342,29 @@ public class JwtAuthenticationController {
 			return false
 		}
 	}
+
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		//logger.debug("JwtRequestFilter > loadUserByUsername(String) : {}");
+
+		User user = userService.findByUsername(username);
+
+		if (!Objects.nonNull(user)) {
+			throw new UsernameNotFoundException("User not found with username: " + username);
+		}
+
+		List<Authority> authorities = user.getAuthorities();
+
+
+		HashSet<SimpleGrantedAuthority> updatedAuthorities = new HashSet();
+		//authorities.each(){ auth ->
+		for(Authority auth: authorities){
+			SimpleGrantedAuthority authority = new SimpleGrantedAuthority(auth.getAuthority());
+			//SimpleGrantedAuthority authority = new SimpleGrantedAuthority(auth);
+			updatedAuthorities.add(authority);
+		}
+
+		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), updatedAuthorities);
+	}
+
+
 }

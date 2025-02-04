@@ -12,6 +12,7 @@
 				"URI": {
                                     "list": {
                                         "METHOD": "GET",
+                                        "UPDATECACHE": true,
                                         "DESCRIPTION": "List function for ${realName}",
                                         "ROLES": {
                                             "BATCH": ["ROLE_ADMIN"],
@@ -25,6 +26,7 @@
                                     },
                                     "create": {
                                         "METHOD": "POST",
+                                        "UPDATECACHE": false,
                                         "DESCRIPTION": "Create function for ${realName}",
                                         "ROLES": {
                                             "BATCH": ["ROLE_ADMIN"],
@@ -38,6 +40,7 @@
                                     },
                                     "read": {
                                         "METHOD": "GET",
+                                        "UPDATECACHE": true,
                                         "DESCRIPTION": "Read function for ${realName}",
                                         "ROLES": {
                                             "BATCH": ["ROLE_ADMIN"],
@@ -51,6 +54,7 @@
                                     },
                                     "update": {
                                         "METHOD": "PUT",
+                                        "UPDATECACHE": false,
                                         "DESCRIPTION": "Update function for ${realName}",
                                         "ROLES": {
                                             "BATCH": ["ROLE_ADMIN"],
@@ -64,6 +68,7 @@
                                     },
                                     "delete": {
                                         "METHOD": "DELETE",
+                                        "UPDATECACHE": false,
                                         "DESCRIPTION": "Delete function for ${realName}",
                                         "ROLES": {
                                             "BATCH": ["ROLE_ADMIN"],

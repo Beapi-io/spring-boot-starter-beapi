@@ -66,6 +66,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         this.passwordEncoder = passwordEncoder;
     }
 
+
+
 /*
     @Bean
     public CommonsRequestLoggingFilter requestLoggingFilter() {
@@ -110,9 +112,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable().cors();
-        //httpSecurity.authorizeRequests().antMatchers("/ws/**").permitAll();
-
-
         httpSecurity.authorizeHttpRequests().antMatchers((String[])apiProperties.reservedUris).permitAll().anyRequest().authenticated();
         httpSecurity.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
         //httpSecurity.exceptionHandling((exceptionHandling) -> exceptionHandling.accessDeniedPage("/error"));

@@ -1,0 +1,12 @@
+package $packageName;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Sort;
+import $domainPackage.$logicalClassName;
+
+@Repository
+public interface ${logicalClassName}Repository extends JpaRepository<$logicalClassName, Long> {
+    public List<$logicalClassName> findAll();
+    public User findById(Long id);
+}
