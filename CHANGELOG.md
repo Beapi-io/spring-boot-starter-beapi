@@ -1,4 +1,4 @@
-# Change Log
+)# Change Log
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
@@ -195,9 +195,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) statistics reporting/logging
  - (done) cli for scaffolding repository
  - (done) CLI to scaffold service for domains
- - support XML content-type and parsing; test
  - (done) refreshToken functionality
- - (backburner) [session management](https://stackoverflow.com/questions/49539076/how-can-i-get-a-list-of-all-sessions-in-spring)
  - (in progress) internationalizing messages for all errors/exceptions (start with chinese, spanish, french, german in that order)
    - (done) chinese(CN)
    - (done) Mexico(MX), Colombia(CO), Spain(ES), Argentina(AR)
@@ -213,7 +211,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (done) documented refreshToken
  - (done) added actuator endpoints to documentation
 
-
-
+### moved to next version
+ - (backburner) [session management](https://stackoverflow.com/questions/49539076/how-can-i-get-a-list-of-all-sessions-in-spring)
+ -  - (backburner)support XML content-type and parsing; test
 
 
