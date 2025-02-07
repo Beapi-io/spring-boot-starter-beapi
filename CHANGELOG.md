@@ -215,7 +215,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ## 1.1.x
  
  ### Planned
- - migrate to 3.0
+ - [migrate to 3.0](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide)
  - migrate to 4.0
 
 
