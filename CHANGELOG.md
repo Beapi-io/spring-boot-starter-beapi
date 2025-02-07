@@ -188,7 +188,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 
 
-## 1.0.x - (planned 03.30.2025)
+## 1.0.x - (planned 02.05.2025)
  
  ### Added
  - (done) trace functionality
@@ -210,5 +210,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### moved to next version
  - (backburner) [session management](https://stackoverflow.com/questions/49539076/how-can-i-get-a-list-of-all-sessions-in-spring)
  - (backburner)support XML content-type and parsing; test
+
+
+## 1.1.x
+ 
+ ### Planned
+ - migrate to 3.0
+ - migrate to 4.0
+
 
 
