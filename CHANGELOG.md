@@ -215,8 +215,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ## 1.1.x
  
  ### Planned
+ - move all to a 3.0 branch for all conversions so as not to break main project.
+ - convert caching to caffeine; ehcache no longer supported.
+ - convert security configurer to not use WebSecurityConfigurerAdapter(deprecated)
  - [migrate to 3.0](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide)
- - migrate to 4.0
+ - 
 
 
 
