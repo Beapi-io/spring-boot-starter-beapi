@@ -212,9 +212,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
  - (backburner)support XML content-type and parsing; test
 
 
-## 1.1.x
+## 2.x
  
  ### Planned
+ - conversion to 3.0 requires complete rewrite.
  - move all to a 3.0 branch for all conversions so as not to break main project.
  - convert caching to caffeine; ehcache no longer supported.
  - convert security configurer to not use WebSecurityConfigurerAdapter(deprecated)
