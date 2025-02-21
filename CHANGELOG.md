@@ -215,9 +215,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ## 2.x
  
  ### Planned
- - conversion to 3.0 requires complete rewrite.
- - move all to a 3.0 branch for all conversions so as not to break main project.
- - convert caching to caffeine; ehcache no longer supported.
+  - convert caching to caffeine; ehcache 2 no longer supported. do in 2.7 version of springboot first
+ - [conversion to 3.0 requires complete rewrite](https://docs.openrewrite.org/recipes/java/spring/boot3/upgradespringboot_3_0)
  - convert security configurer to not use WebSecurityConfigurerAdapter(deprecated)
  - [migrate to 3.0](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide)
  - 
