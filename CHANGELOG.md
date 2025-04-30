@@ -215,14 +215,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ## 2.x
  
  ### Planned
-  - (done) convert caching from ehcache2 to caffeine; ehcache 2 no longer supported.
-  - (partially done) convert javax imports to jakarta
- - [conversion to 3.0 requires complete rewrite](https://docs.openrewrite.org/recipes/java/spring/boot3/upgradespringboot_3_0)
- - (done) convert security configurer to not use WebSecurityConfigurerAdapter(deprecated)
- - [migrate to 3.0](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide)
- - added additional tests
- - upgraded tests for 3.0
- - upgraded documentation for 1.X
+- (done) convert caching from ehcache2 to caffeine; ehcache 2 no longer supported.
+- (partially done) convert javax imports to jakarta
+- [conversion to 3.0 requires complete rewrite](https://docs.openrewrite.org/recipes/java/spring/boot3/upgradespringboot_3_0)
+- (done) convert security configurer to not use WebSecurityConfigurerAdapter(deprecated)
+- [migrate to 3.0](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide)
+- added additional tests
+- upgraded tests for 3.0
+- upgraded documentation for 1.X
 
 
 
