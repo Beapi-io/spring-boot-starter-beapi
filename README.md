@@ -23,13 +23,13 @@
 
 ---
 ## BeAPI stresses convention over config...
-Most everything you need for API development should be provided & configured 'out of the box' **BUT** you have the ability to configure and override everything to your hearts content
+Most everything you need for API development should be provided & configured 'out of the box' **BUT** you have the ability to configure and override everything to your hearts content. BeAPI abstracts all [RULES/data](https://gist.github.com/orubel/159e94db62023c78a07ebe6d86633763) as a 'JSON schema' file which is **loaded at runtime and can be reloaded and SYNCHRONIZED** with distributed services **without requiring a restart**.
 
-## BeAPI automates API Governance...
+## BeAPI automates APIs...
 Tradional API application's bind all rules/data to controllers/handlers using ANNOTATIONS making that data impossible to be shared amongst distributed services. Through the creation and support of standardized services in our configuration docs, Beapi automates all processes: security (RBAC/ABAC, CORS, JWT), caching, synchronization across all servers, etc.
 
-## BeAPI simplifies configuration...
-BeAPI abstracts these [RULES/data](https://gist.github.com/orubel/159e94db62023c78a07ebe6d86633763) as a 'JSON schema' file which is **loaded at runtime and can be reloaded and SYNCHRONIZED** with distributed services **without requiring a restart**.
+## BeAPI integrates Security...
+BeAPI comes complete with all security easily configurable for all endpoints out-of-the-box
 
 ---
 
@@ -51,7 +51,6 @@ BeAPI abstracts these [RULES/data](https://gist.github.com/orubel/159e94db62023c
   - [bootstrap your controllers](https://beapi-io.github.io/beapi-docs/0.9/bootstrap.html#section-2)
   - [automated batching](https://beapi-io.github.io/beapi-docs/0.9/advanced.html#section-1)
   - [automated chaining](https://beapi-io.github.io/beapi-docs/0.9/advanced.html#section-3)
-  - automated webhooks
   - [automated api docs/openapi generation](https://beapi-io.github.io/beapi-docs/0.9/priv_endpoints.html#section-4.1)
   - [automated HATEOS link relations](https://beapi-io.github.io/beapi-docs/0.9/advanced.html#section-6)
   - Return type inference (Accept)
