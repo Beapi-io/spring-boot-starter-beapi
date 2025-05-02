@@ -22,7 +22,7 @@
 **Configuration Files** - https://github.com/orubel/spring-boot-starter-beapi-config (Note : Move these into your 'iostateDir' location as found in your demo-application/src/main/resources/beapi_api.yaml file)
 
 ---
-## BeAPI stresses convention over config...
+## BeAPI provides convention over config...
 Most everything you need for API development should be provided & configured 'out of the box' **BUT** you have the ability to configure and override everything to your hearts content. BeAPI abstracts all [RULES/data](https://gist.github.com/orubel/159e94db62023c78a07ebe6d86633763) as a 'JSON schema' file which is **loaded at runtime and can be reloaded and SYNCHRONIZED** with distributed services **without requiring a restart**.
 
 ## BeAPI automates APIs...
@@ -30,6 +30,9 @@ Tradional API application's bind all rules/data to controllers/handlers using AN
 
 ## BeAPI integrates Security...
 BeAPI comes complete with all security easily configurable for all endpoints out-of-the-box
+
+## Beapi gives you SPEED/Scale...
+Benchmarks on a 4core 3.8ghz machine with 1GB dedicated RAM will give 6500-7000/rps with 500 concurrency. This is as fast as many ASYNC and AMQP implementations.
 
 ---
 
