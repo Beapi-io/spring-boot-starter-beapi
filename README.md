@@ -6,6 +6,7 @@
 ### In-Development : 1.x
 
 ### Springboot Version : 2.6.2 (or greater)
+### (sprinbgboot 3.x version available upon request)
 
 ### Java Version (for demo project) : 17
 
