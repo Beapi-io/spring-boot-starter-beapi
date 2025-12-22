@@ -25,8 +25,8 @@ import io.beapi.api.service.PrincipleService
 import io.beapi.api.controller.BeapiRequestHandler;
 import org.springframework.stereotype.Controller;
 import javax.json.*
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.json.JSONObject
@@ -39,11 +39,11 @@ public class ApidocController extends BeapiRequestHandler{
 	@Autowired ApiProperties apiProperties;
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApidocController.class);
-	private static final ArrayList reservedUris = ['/authenticate','/register','/error','/login','/logout','/validate','/resetPassword']
 
 	@Autowired protected ApiCacheService apiCacheService
 
 	List show(HttpServletRequest request, HttpServletResponse response){
+		println("apidoc/show called")
 		// params.id == controller
 		// so you can get just the docs back for a specific controller
 

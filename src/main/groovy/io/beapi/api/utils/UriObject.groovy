@@ -23,7 +23,7 @@ public class UriObject {
     /**
      * numeric representation of the calltype
      */
-    private Integer callType
+    private int callType
 
     /**
      * String representing version number of the application
@@ -72,9 +72,7 @@ public class UriObject {
             /**
              * Numeric representation of the callType character. (ex 1=v, 2=b, 3=c, 4=t)
              */
-            Integer callType
-            //boolean trace = false
-
+            int callType
 
             ArrayList uriVars = uri.split('/')
             String tempVersion = uriVars[1].toLowerCase()
@@ -91,8 +89,6 @@ public class UriObject {
                     setApiVersion(((m[0][3])?m[0][3]:'1'))
                     setController(uriVars[2].toString())
                     setAction(uriVars[3].toString())
-
-                    //if(callType==5){ trace=true }
                     setTrace()
 
                     if(uriVars[4]){ setId(URLDecoder.decode(uriVars[4], StandardCharsets.UTF_8.toString())) }
@@ -142,13 +138,13 @@ public class UriObject {
     * callType setter.
     * @param  callType Integer representing a numeric representation of the call type passed with version in the URI (ex 1=v, 2=b, 3=c, 4=t)
     */
-    private setCallType(Integer callType){ this.callType=new Integer(callType) }
+    private setCallType(int callType){ this.callType=new Integer(callType) }
 
     /**
     * callType getter.
     @return Integer representing the callType (ex 1=v, 2=b, 3=c, 4=t)
     */
-    public Integer getCallType() { return callType }
+    public int getCallType() { return callType }
 
     /**
     * version setter.

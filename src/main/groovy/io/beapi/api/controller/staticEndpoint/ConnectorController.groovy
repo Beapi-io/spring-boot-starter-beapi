@@ -26,8 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.web.header.*
 import org.springframework.stereotype.Controller
 import javax.json.*
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import groovy.json.JsonSlurper
 import org.json.JSONObject
 import io.beapi.api.properties.ApiProperties

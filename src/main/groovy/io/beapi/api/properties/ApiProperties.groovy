@@ -40,14 +40,13 @@ import org.springframework.context.annotation.PropertySources;
 //@PropertySource(value='file:${user.home}/.boot/${spring.profiles.active}/beapi_api.yaml', factory = YamlPropertySourceFactory.class)
 public class ApiProperties{
         private String apiServer
-        private Integer attempts = 5
-        private Integer procCores = 8
+        private int attempts = 5
+        private int procCores = 8
         private String documentationUrl = 'http://orubel.github.io/Beapi-API-Framework/'
-        private ArrayList reservedUris
-        private Integer apichainLimit = 3
-        private Boolean postcrement = false
-        private Boolean chainingEnabled = true
-        private Boolean batchingEnabled = true
+        private int apichainLimit = 3
+        private boolean postcrement = false
+        private boolean chainingEnabled = true
+        private boolean batchingEnabled = true
         private String encoding = 'UTF-8'
         private String iostateDir = '.boot/.iostate'
         private ArrayList staticEndpoint = ['apidoc','openapi','connector','throttle','actuator']
@@ -72,36 +71,34 @@ public class ApiProperties{
         private CallbackProps callback = new CallbackProps()
 
         String getApiServer() { return apiServer }
-        Integer getAttempts() { return attempts }
-        Integer getProcCores() { return procCores }
+        int getAttempts() { return attempts }
+        int getProcCores() { return procCores }
         String getDocumentationUrl() { return documentationUrl }
-        ArrayList getReservedUris() { return reservedUris }
-        Integer getApichainLimit() { return apichainLimit }
-        Boolean getPostcrement() { return postcrement }
-        Boolean getChainingEnabled() { return chainingEnabled }
-        Boolean getBatchingEnabled() { return batchingEnabled }
+        int getApichainLimit() { return apichainLimit }
+        boolean getPostcrement() { return postcrement }
+        boolean getChainingEnabled() { return chainingEnabled }
+        boolean getBatchingEnabled() { return batchingEnabled }
         String getEncoding() { return encoding }
         String getIostateDir() { return iostateDir }
         ArrayList getStaticEndpoint() { return staticEndpoint }
         String getServerType() { return serverType }
         String getConfigType() { return configType }
-        Boolean getAutoTest() { return autoTest }
+        boolean getAutoTest() { return autoTest }
         ArrayList getSupportedFormats() { return supportedFormats }
         String getTestingProtocol() { return testingProtocol }
 
         void setApiServer(String apiServer) { this.apiServer = apiServer }
-        void setAttempts(Integer attempts) { this.attempts = attempts }
-        void setProcCores(Integer procCores) { this.procCores = procCores }
-        void setReservedUris(ArrayList reservedUris) { this.reservedUris = reservedUris }
+        void setAttempts(int attempts) { this.attempts = attempts }
+        void setProcCores(int procCores) { this.procCores = procCores }
         void setApichainLimit(Integer apichainLimit) { this.apichainLimit = apichainLimit }
-        void setPostcrement(Boolean postcrement) { this.postcrement = postcrement }
-        void setChainingEnabled(Boolean chainingEnabled) { this.chainingEnabled = chainingEnabled }
-        void setBatchingEnabled(Boolean batchingEnabled) { this.batchingEnabled = batchingEnabled }
+        void setPostcrement(boolean postcrement) { this.postcrement = postcrement }
+        void setChainingEnabled(boolean chainingEnabled) { this.chainingEnabled = chainingEnabled }
+        void setBatchingEnabled(boolean batchingEnabled) { this.batchingEnabled = batchingEnabled }
         void setEncoding(String encoding) { this.encoding = encoding }
         void setIostateDir(String iostateDir) { this.iostateDir = iostateDir }
         void setServerType(String serverType) { this.serverType = serverType }
         void setConfigType(String configType) { this.configType = configType }
-        void setAutoTest(Boolean autoTest) { this.autoTest = autoTest }
+        void setAutoTest(boolean autoTest) { this.autoTest = autoTest }
         void setSupportedFormats(ArrayList supportedFormats) { this.supportedFormats = supportedFormats }
         void setTestingProtocol(String testingProtocol) { this.testingProtocol = testingProtocol }
 
@@ -149,22 +146,22 @@ public class ApiProperties{
         private Long staleSession
 
 
-        public Boolean getActive() { return this.active; }
+        public boolean getActive() { return this.active; }
         public LinkedHashMap getRateLimit() { return this.rateLimit; }
         public LinkedHashMap getDataLimit() { return this.dataLimit; }
         public Long getStaleSession() { return this.staleSession; }
 
-        public void setActive(Boolean active) { this.active = active }
+        public void setActive(boolean active) { this.active = active }
         public void setRateLimit(LinkedHashMap rateLimit) { this.rateLimit = rateLimit }
         public void setDataLimit(LinkedHashMap dataLimit) { this.dataLimit = dataLimit }
         public void setStaleSession(Long staleSession) { this.staleSession = staleSession }
     }
 
     public class WebhookProps {
-        private Boolean active
+        private boolean active
         private ArrayList<String> services
 
-        public Boolean getActive() { return this.active }
+        public boolean getActive() { return this.active }
         public ArrayList<String> getServices() { return this.services }
 
         public void setActive(Boolean active) { this.active = active; }
@@ -205,7 +202,7 @@ public class ApiProperties{
 
     public class MailProps {
         private String host
-        private Integer port
+        private int port
         private String username
         private String password
         private String validationCallback
@@ -216,7 +213,7 @@ public class ApiProperties{
         private String testEmail
 
         public String getHost(){ return this.host}
-        public Integer getPort(){ return this.port}
+        public int getPort(){ return this.port}
         public String getUsername(){ return this.username}
         public String getPassword(){ return this.password}
         public String getValidationCallback(){ return this.validationCallback}
@@ -227,7 +224,7 @@ public class ApiProperties{
         public String getTestEmail(){ return this.testEmail}
 
         public void setHost(String host){ this.host = host}
-        public void setPort(Integer port){ this.port = port}
+        public void setPort(int port){ this.port = port}
         public void setUsername(String username){ this.username = username}
         public void setPassword(String password){ this.password = password}
         public void setValidationCallback(String validationCallback){

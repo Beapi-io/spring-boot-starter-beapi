@@ -18,17 +18,11 @@ package io.beapi.api.config
 
 import io.beapi.api.properties.ApiProperties
 import io.beapi.api.service.ApiCacheService
-import io.beapi.api.service.BatchExchangeService
-import io.beapi.api.service.BootstrapService
-import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ConnectorScaffoldService
 import io.beapi.api.service.ErrorService
 import io.beapi.api.service.LinkRelationService
-import io.beapi.api.service.SessionService
 import io.beapi.api.service.StatsCacheService
 import io.beapi.api.service.StatsService
-
-import io.beapi.api.service.ExchangeService
 import io.beapi.api.service.ThrottleService
 import io.beapi.api.service.TraceExchangeService
 //import io.beapi.api.service.EndpointMappingService
@@ -51,10 +45,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.ApplicationContext
-
+import io.beapi.api.service.IoStateService
+import io.beapi.api.service.ApiTestService
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 
 @Configuration(proxyBeanMethods = false)
-@AutoConfigureAfter([BeapiEhCacheAutoConfiguration.class])
+@AutoConfigureAfter([CacheConfiguration.class])
+//@AutoConfigureAfter([CaffeineCacheManagerAutoConfiguration.class])//@AutoConfigureAfter([CaffeineCacheManagerAutoConfiguration.class])
 @AutoConfigureBefore([BeapiWebAutoConfiguration.class])
 public class BeapiServiceAutoConfiguration {
 
@@ -64,25 +61,11 @@ public class BeapiServiceAutoConfiguration {
 	@Autowired protected StatsCacheService statsCacheService
 	@Autowired protected ApiProperties apiProperties
 
-	public BeapiServiceAutoConfiguration() {}
+	String version
 
-	/**
-	 *
-	 * @return
-	 * @throws IOException
-	 */
-	@Bean(name='appVersion')
-	String appVersion() throws IOException {
-		ClassLoader classLoader = getClass().getClassLoader();
-		URL incoming = classLoader.getResource("META-INF/build-info.properties")
-
-		String version
-		if (incoming != null) {
-			Properties properties = new Properties();
-			properties.load(incoming.openStream());
-			version = properties.getProperty('build.version')
-		}
-		return version
+	public BeapiServiceAutoConfiguration() {
+		AppMetadata metadata = new AppMetadata()
+		this.version = metadata.getAppVersion()
 	}
 
 
@@ -90,6 +73,20 @@ public class BeapiServiceAutoConfiguration {
 	@ConditionalOnMissingBean
 	public ErrorService errorService() throws IOException {
 		return new ErrorService();
+	}
+
+	@Bean
+	@ConditionalOnBean(name = ["cacheManager"])
+	@ConditionalOnMissingBean
+	public ApiTestService testService() throws IOException {
+		return new ApiTestService(apiProperties, apiCacheService, version);
+	}
+
+	@Bean
+	@ConditionalOnBean(name = ["cacheManager"])
+	@ConditionalOnMissingBean
+	public IoStateService ioService() throws IOException {
+		return new IoStateService(apiProperties, applicationContext, apiCacheService, version);
 	}
 
 	/**
@@ -137,13 +134,14 @@ public class BeapiServiceAutoConfiguration {
 		return new LinkRelationService(apiCacheService, principleService());
 	}
 
-	/*
+/*
 	@Bean(name='webHookService')
 	@ConditionalOnMissingBean
 	public WebHookService webHookService() throws IOException {
 		return new WebHookService(apiCacheService, principleService());
 	}
-	 */
+ */
+
 
 
 

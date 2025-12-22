@@ -44,8 +44,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 
 import groovy.json.JsonSlurper
 
@@ -87,6 +87,7 @@ public class JwtAuthenticationController  extends JwtTokenUtil{
 	public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 		String username = authenticationRequest.getUsername();
 		String password = authenticationRequest.getPassword();
+
 
 		final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
@@ -226,7 +227,6 @@ public class JwtAuthenticationController  extends JwtTokenUtil{
 						userService.save(user)
 						return ResponseEntity.ok("Password successfully changed. Please login. ")
 					}else{
-						println("bad cirteria")
 						return new ResponseEntity<>("Password must contain capitol, number and special character and be 8-characters or more. Please try again: " + e, HttpStatus.UNPROCESSABLE_ENTITY);
 					}
 				}else{
@@ -265,8 +265,8 @@ public class JwtAuthenticationController  extends JwtTokenUtil{
 
 	// MUST BE called with a currently valid token
 	@RequestMapping(value = "/refreshToken", method = RequestMethod.GET)
-	private ResponseEntity generateAuthResponse(HttpServletRequest request, HttpServletResponse response, @RequestParam("name") String name){
-
+	@Transactional(value="transactionManager",readOnly = true)
+	private ResponseEntity<JwtResponse> generateAuthResponse(HttpServletRequest request, HttpServletResponse response, @RequestParam("name") String name){
 		String requestTokenHeader = request.getHeader("Authorization");
 
 		if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
@@ -274,7 +274,7 @@ public class JwtAuthenticationController  extends JwtTokenUtil{
 			String jwtToken = requestTokenHeader.substring(7);
 			if (jwtToken != 'null') {
 
-				try{
+
 					//final UserDetails userDetails = userDetailsService.loadUserByUsername(name)
 					UserDetails userDetails = loadUserByUsername(name);
 
@@ -282,20 +282,22 @@ public class JwtAuthenticationController  extends JwtTokenUtil{
 						String username = getUsernameFromToken(jwtToken);
 
 						if (username == name) {
-							String userAgent = request.getHeader("User-Agent");
-							String user = userAgent.toLowerCase();
-							String os = getOs(userAgent);
-							String browser = getBrowser(user, userAgent);
-							String ip = getIp(request)
+							try{
+								String userAgent = request.getHeader("User-Agent");
+								String user = userAgent.toLowerCase();
+								String os = getOs(userAgent);
+								String browser = getBrowser(user, userAgent);
+								String ip = getIp(request)
 
 
-							final String token = generateToken(userDetails, os, browser, ip);
-							return ResponseEntity.ok(new JwtResponse(token));
+								final String token = generateToken(userDetails, os, browser, ip);
+								return ResponseEntity.ok(new JwtResponse(token));
+							}catch(Exception e){
+								return new ResponseEntity<>("Unknown Error : "+e, HttpStatus.BAD_REQUEST);
+							}
 						}
 					}
-				}catch(Exception e){
-					return new ResponseEntity<>("Unknown Error : "+e, HttpStatus.BAD_REQUEST);
-				}
+
 			}else{
 				// no token sent
 				//ErrorResponse error = new ErrorResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage());
@@ -329,11 +331,6 @@ public class JwtAuthenticationController  extends JwtTokenUtil{
 	}
 
 	protected boolean passwordCriteria(password){
-		try{
-			statsService.setStat((String)statusCode,uri)
-		}catch(Exception e){
-			println("### [JwtAuthenticationController :: passwordCriteria] exception : "+e)
-		}
 		Pattern pass = ~/(?=.*[A-Z])(?=.*[! @# $&*])(?=.*[0-9])(?=.*[a-z]).{8,}/
 		Matcher match = pass.matcher(password)
 		if (match.find()) {

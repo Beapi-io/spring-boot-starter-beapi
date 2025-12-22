@@ -25,8 +25,8 @@ import org.springframework.security.web.header.*
 import org.springframework.stereotype.Controller
 
 import javax.json.*
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
 @Controller("openapi")
@@ -35,7 +35,6 @@ public class OpenapiController extends BeapiRequestHandler{
 	@Autowired ApiProperties apiProperties;
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(OpenapiController.class);
-	private static final ArrayList reservedUris = ['/authenticate','/register','/error','/login','/logout','/validate','/resetPassword']
 
 	@Autowired protected ApiCacheService apiCacheService
 

@@ -20,7 +20,7 @@ import groovy.json.JsonOutput
 import groovyx.gpars.*
 import io.beapi.api.properties.ApiProperties
 import io.beapi.api.utils.ApiDescriptor
-import net.sf.ehcache.Cache
+//import net.sf.ehcache.Cache
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.ListableBeanFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,7 +30,7 @@ import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.*
 import org.springframework.stereotype.Service
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 /**
  * A class for caching processed api calls and returning them
@@ -110,11 +110,14 @@ class TraceCacheService {
 	// issue here
 	@CachePut(value='Trace',key="#uri")
 	LinkedHashMap setTraceMethod(String uri, LinkedHashMap input) throws Exception{
+
 		try{
-			def cache = cacheManager.getCache('Trace');
-			cache.put(uri,input);
-			return input;
-		}catch(Exception e){
+			def cache = getTraceCache(uri)
+			LinkedHashMap cache2 = (cache)?cache:[:]
+
+			//cache2.put(uri,input);
+			return input                                                                                                                          ;
+		}catch(java.lang.NullPointerException e){
 			throw new Exception("[TraceCacheService :: setTraceMethod] : Exception - full stack trace follows:",e)
 		}
 	}
@@ -128,12 +131,13 @@ class TraceCacheService {
 	//@Cacheable(value='ApiCache',key="#controllername",sync=false)
 	LinkedHashMap getTraceCache(String uri) throws Exception{
 		//logger.debug("getTraceCache(String) : {}",uri)
-
+		LinkedHashMap cache2 = [:]
 		if(uri!=null) {
 			try {
-				net.sf.ehcache.Ehcache temp = cacheManager?.getCache('Trace')?.getNativeCache()
-				LinkedHashMap cache = temp?.get(uri)?.getObjectValue()
-				return cache
+				org.springframework.cache.caffeine.CaffeineCache temp = cacheManager?.getCache('Trace')
+				// do check; check with put
+				cache2 = temp?.get(uri)?.get()
+				return cache2
 			} catch (Exception e) {
 				throw new Exception("[TraceCacheService :: getTraceCache] : no cache found for handler '${uri}'. full stack trace follows:", e)
 			}
@@ -150,8 +154,10 @@ class TraceCacheService {
 	ArrayList getCacheKeys(){
 		//logger.debug("getCacheKeys() : {}")
 		//cacheManager.setTransactionAware(false);
-		net.sf.ehcache.Ehcache temp = cacheManager.getCache('Trace').getNativeCache()
-		return temp.getKeys()
+		org.springframework.cache.caffeine.CaffeineCache temp = cacheManager?.getCache('Trace')
+		com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache = temp.getNativeCache();
+		ArrayList keys = nativeCache.asMap().keySet() as ArrayList
+		return keys
 
 	}
 

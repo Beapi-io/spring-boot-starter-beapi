@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired
 //import org.json.JSONObject;
 
@@ -109,7 +109,7 @@ public class JwtTokenUtil implements Serializable {
 	 * @param  token String representing the JWT token
 	 * @return Boolean representing whether the JWT token is expired or not
 	 */
-	private Boolean isTokenExpired(String token) {
+	private boolean isTokenExpired(String token) {
 		final Date expiration = getExpirationDateFromToken(token);
 		return expiration.before(new Date());
 	}
@@ -163,7 +163,7 @@ public class JwtTokenUtil implements Serializable {
 	 * @param  userDetails Object created from the token with information about PRINCIPLE
 	 * @return Boolean representing whether this is a valid token or not
 	 */
-	public Boolean validateToken(String token, UserDetails userDetails) {
+	public boolean validateToken(String token, UserDetails userDetails) {
 		final String username = getUsernameFromToken(token);
 		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
 	}

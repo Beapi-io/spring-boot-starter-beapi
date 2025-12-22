@@ -15,12 +15,24 @@ import io.beapi.api.properties.ServerProperties;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.support.TaskExecutorAdapter;
+import java.util.concurrent.Executors;
 
 import org.apache.coyote.http2.Http2Protocol;
 //import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
+import org.springframework.core.task.TaskExecutor
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
+import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer
+
 //@Slf4j
 @Configuration
+@EnableAsync
 public class TomcatConfig  {
 
     @Autowired
@@ -29,10 +41,22 @@ public class TomcatConfig  {
     @Autowired
     protected ServerProperties serverProperties;
 
-    protected Boolean compression;
-    protected Integer maxThreads;
-    protected Integer minSpareThreads;
-    protected Integer maxConnections;
+    protected boolean compression;
+    protected int maxThreads;
+    protected int minSpareThreads;
+    protected int maxConnections;
+
+
+    @Bean("otherExecutor")
+    public AsyncTaskExecutor threadPoolTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(32);
+        executor.setQueueCapacity(200);
+        executor.setThreadNamePrefix("Async-");
+        executor.initialize();
+        return executor;
+    }
 
     @Bean
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> servletContainerCustomizer() {
@@ -82,7 +106,8 @@ public class TomcatConfig  {
                             connector.addUpgradeProtocol(new Http2Protocol());
                             //AbstractHttp11Protocol<?> httpHandler = ((AbstractHttp11Protocol<?>) connector.getProtocolHandler());
                             Http11NioProtocol httpHandler = (Http11NioProtocol) connector.getProtocolHandler();
-                            httpHandler.setMaxKeepAliveRequests(500);
+                            httpHandler.setAcceptCount(500);
+                            httpHandler.setMaxKeepAliveRequests(20);
                             //httpHandler.setMaxKeepAliveRequests(-1);
                             httpHandler.setRejectIllegalHeader(true);
                             httpHandler.setMaxThreads(maxThreads);
@@ -90,6 +115,7 @@ public class TomcatConfig  {
                             httpHandler.setMaxConnections(maxConnections);
                             httpHandler.setUseKeepAliveResponseHeader(true);
                             httpHandler.setKeepAliveTimeout(apiProperties.getThrottle().getStaleSession());
+                            httpHandler.setExecutor(Executors.newVirtualThreadPerTaskExecutor())
                         }
                     });
                 }
@@ -97,5 +123,6 @@ public class TomcatConfig  {
 
         };
     }
+
 
 }

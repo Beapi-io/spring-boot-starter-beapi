@@ -28,81 +28,81 @@ public class ServerProperties {
 
 
     public static class NanoProps {
-        private Integer backgroundProcessorDelay;
-        private Integer maxThreads;
-        private Integer minSpareThreads;
-        private Integer maxConnections;
+        private int backgroundProcessorDelay;
+        private int maxThreads;
+        private int minSpareThreads;
+        private int maxConnections;
         private String uriEncoding;
-        private Boolean compression;
+        private boolean compression;
         private ArrayList compressableMimeTypes;
 
-        public Integer getBackgroundProcessorDelay() { return backgroundProcessorDelay; }
-        public Integer getMaxThreads() { return maxThreads; }
-        public Integer getMinSpareThreads() { return minSpareThreads; }
-        public Integer getMaxConnections() { return maxConnections; }
+        public int getBackgroundProcessorDelay() { return backgroundProcessorDelay; }
+        public int getMaxThreads() { return maxThreads; }
+        public int getMinSpareThreads() { return minSpareThreads; }
+        public int getMaxConnections() { return maxConnections; }
         public String getUriEncoding() { return uriEncoding; }
-        public Boolean getCompression() { return compression; }
+        public boolean getCompression() { return compression; }
         public ArrayList getCompressableMimeTypes() { return compressableMimeTypes; }
 
-        void setBackgroundProcessorDelay(Integer backgroundProcessorDelay) { this.backgroundProcessorDelay = backgroundProcessorDelay; }
-        void setMaxThreads(Integer maxThreads) { this.maxThreads = maxThreads; }
-        void setMinSpareThreads(Integer minSpareThreads) { this.minSpareThreads = minSpareThreads; }
-        void setMaxConnections(Integer maxConnections) { this.maxConnections = maxConnections; }
+        void setBackgroundProcessorDelay(int backgroundProcessorDelay) { this.backgroundProcessorDelay = backgroundProcessorDelay; }
+        void setMaxThreads(int maxThreads) { this.maxThreads = maxThreads; }
+        void setMinSpareThreads(int minSpareThreads) { this.minSpareThreads = minSpareThreads; }
+        void setMaxConnections(int maxConnections) { this.maxConnections = maxConnections; }
         void setUriEncoding(String uriEncoding) { this.uriEncoding = uriEncoding; }
-        void setCompression(Boolean compression) { this.compression = compression; }
+        void setCompression(boolean compression) { this.compression = compression; }
         void setCompressableMimeTypes(ArrayList compressableMimeTypes) { this.compressableMimeTypes = compressableMimeTypes; }
     }
 
 
     public static class MediumProps {
-        private Integer backgroundProcessorDelay;
-        private Integer maxThreads;
-        private Integer minSpareThreads;
-        private Integer maxConnections;
+        private int backgroundProcessorDelay;
+        private int maxThreads;
+        private int minSpareThreads;
+        private int maxConnections;
         private String uriEncoding;
-        private Boolean compression;
+        private boolean compression;
         private ArrayList compressableMimeTypes;
 
-        public Integer getBackgroundProcessorDelay() { return backgroundProcessorDelay; }
-        public Integer getMaxThreads() { return maxThreads; }
-        public Integer getMinSpareThreads() { return minSpareThreads; }
-        public Integer getMaxConnections() { return maxConnections; }
+        public int getBackgroundProcessorDelay() { return backgroundProcessorDelay; }
+        public int getMaxThreads() { return maxThreads; }
+        public int getMinSpareThreads() { return minSpareThreads; }
+        public int getMaxConnections() { return maxConnections; }
         public String getUriEncoding() { return uriEncoding; }
-        public Boolean getCompression() { return compression; }
+        public boolean getCompression() { return compression; }
         public ArrayList getCompressableMimeTypes() { return compressableMimeTypes; }
 
-        void setBackgroundProcessorDelay(Integer backgroundProcessorDelay) { this.backgroundProcessorDelay = backgroundProcessorDelay; }
-        void setMaxThreads(Integer maxThreads) { this.maxThreads = maxThreads; }
-        void setMinSpareThreads(Integer minSpareThreads) { this.minSpareThreads = minSpareThreads; }
-        void setMaxConnections(Integer maxConnections) { this.maxConnections = maxConnections; }
+        void setBackgroundProcessorDelay(int backgroundProcessorDelay) { this.backgroundProcessorDelay = backgroundProcessorDelay; }
+        void setMaxThreads(int maxThreads) { this.maxThreads = maxThreads; }
+        void setMinSpareThreads(int minSpareThreads) { this.minSpareThreads = minSpareThreads; }
+        void setMaxConnections(int maxConnections) { this.maxConnections = maxConnections; }
         void setUriEncoding(String uriEncoding) { this.uriEncoding = uriEncoding; }
-        void setCompression(Boolean compression) { this.compression = compression; }
+        void setCompression(boolean compression) { this.compression = compression; }
         void setCompressableMimeTypes(ArrayList compressableMimeTypes) { this.compressableMimeTypes = compressableMimeTypes; }
     }
 
     public static class LargeProps {
-        private Integer backgroundProcessorDelay;
-        private Integer maxThreads;
-        private Integer minSpareThreads;
-        private Integer maxConnections;
+        private int backgroundProcessorDelay;
+        private int maxThreads;
+        private int minSpareThreads;
+        private int maxConnections;
         private String uriEncoding;
-        private Boolean compression;
+        private boolean compression;
         private ArrayList compressableMimeTypes;
 
-        public Integer getBackgroundProcessorDelay() { return backgroundProcessorDelay; }
-        public Integer getMaxThreads() { return maxThreads; }
-        public Integer getMinSpareThreads() { return minSpareThreads; }
-        public Integer getMaxConnections() { return maxConnections; }
+        public int getBackgroundProcessorDelay() { return backgroundProcessorDelay; }
+        public int getMaxThreads() { return maxThreads; }
+        public int getMinSpareThreads() { return minSpareThreads; }
+        public int getMaxConnections() { return maxConnections; }
         public String getUriEncoding() { return uriEncoding; }
-        public Boolean getCompression() { return compression; }
+        public boolean getCompression() { return compression; }
         public ArrayList getCompressableMimeTypes() { return compressableMimeTypes; }
 
-        void setBackgroundProcessorDelay(Integer backgroundProcessorDelay) { this.backgroundProcessorDelay = backgroundProcessorDelay; }
-        void setMaxThreads(Integer maxThreads) { this.maxThreads = maxThreads; }
-        void setMinSpareThreads(Integer minSpareThreads) { this.minSpareThreads = minSpareThreads; }
-        void setMaxConnections(Integer maxConnections) { this.maxConnections = maxConnections; }
+        void setBackgroundProcessorDelay(int backgroundProcessorDelay) { this.backgroundProcessorDelay = backgroundProcessorDelay; }
+        void setMaxThreads(int maxThreads) { this.maxThreads = maxThreads; }
+        void setMinSpareThreads(int minSpareThreads) { this.minSpareThreads = minSpareThreads; }
+        void setMaxConnections(int maxConnections) { this.maxConnections = maxConnections; }
         void setUriEncoding(String uriEncoding) { this.uriEncoding = uriEncoding; }
-        void setCompression(Boolean compression) { this.compression = compression; }
+        void setCompression(boolean compression) { this.compression = compression; }
         void setCompressableMimeTypes(ArrayList compressableMimeTypes) { this.compressableMimeTypes = compressableMimeTypes; }
     }
 

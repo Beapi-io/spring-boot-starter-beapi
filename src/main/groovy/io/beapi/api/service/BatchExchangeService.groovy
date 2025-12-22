@@ -22,9 +22,8 @@ import org.springframework.stereotype.Service
 import org.springframework.context.ApplicationContext
 import javax.json.*
 import org.springframework.security.web.header.*
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-import io.beapi.api.service.StatsService
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 
 /**
  *
@@ -43,7 +42,6 @@ public class BatchExchangeService extends ApiExchange{
 	LinkedList batch = []
 	ApiCacheService apiCacheService
 	ApplicationContext ctx
-	StatsService statsService
 	ErrorService errorService
 
 	/**
@@ -57,11 +55,10 @@ public class BatchExchangeService extends ApiExchange{
 	 * @see ApiExchange
 	 *
 	 */
-	public BatchExchangeService(ErrorService errorService, StatsService statsService,ApiCacheService apiCacheService, ApplicationContext applicationContext) {
+	public BatchExchangeService(ErrorService errorService,ApiCacheService apiCacheService, ApplicationContext applicationContext) {
 		try {
 			this.apiCacheService = apiCacheService
 			this.ctx = applicationContext
-			this.statsService = statsService
 			this.errorService = errorService
 		} catch (Exception e) {
 			println("# [Beapi] BatchExchangeService - initialization Exception - ${e}")
@@ -147,59 +144,17 @@ public class BatchExchangeService extends ApiExchange{
 
 				if(this.apiObject.updateCache && method == 'GET') {
 					apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, responseBody[0])
-				}else{
-					if(response.getStatus()==200){
-						apiCacheService.unsetApiCachedResult(this.controller,  this.action, this.apiversion)
-					}
 				}
 
-				try{
-					statsService.setStat((String)response.getStatus(),(String)request.getRequestURI())
-				}catch(Exception e){
-					println("### [statsService :: postHandle] exception (1) : "+e)
-				}
 
 			}else{
 				// concat and forward
 				parseBatchOutput(body, request, response, this.responseFileType)
 
-				if(this.apiObject.updateCache && method == 'GET') {
+				if(request.getMethod() == 'GET') {
 					apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, responseBody[0])
-				}else{
-					if(response.getStatus()==200){
-						apiCacheService.unsetApiCachedResult(this.controller,  this.action, this.apiversion)
-					}
 				}
 
-				/*
-				if (apiThrottle) {
-					if(checkLimit(contentLength.length,this.authority)) {
-						statsService.setStatsCache(userId, response.status, request.requestURI)
-						render(text: getContent(content, contentType), contentType: contentType)
-						return false
-					}else{
-						statsService.setStatsCache(userId, 404, request.requestURI)
-						return false
-					}
-				} else {
-					if(controller=='apidoc') {
-						render(text: newModel as JSON, contentType: contentType)
-					}else {
-						render(text: content, contentType: contentType)
-					}
-					if(cachedEndpoint['hookRoles']) {
-						List hookRoles = cachedEndpoint['hookRoles'] as List
-						String service = "${controller}/${action}"
-						hookService.postData(service, content, hookRoles, this.mthdKey)
-					}
-				}
-				 */
-
-				try{
-					statsService.setStat((String)response.getStatus(),(String)request.getRequestURI())
-				}catch(Exception e){
-					println("### [statsService :: postHandle] exception (1) : "+e)
-				}
 
 				String path = "/b${version}/${controller}/${action}/**";
 				try {
@@ -329,6 +284,7 @@ public class BatchExchangeService extends ApiExchange{
 	 * @see ApiExchange
 	 *
 	 */
+	/*
 	String parseBodyByFiletype(LinkedHashMap responseBody, String responseFileType){
 		switch(responseFileType){
 			case 'JSON':
@@ -345,6 +301,7 @@ public class BatchExchangeService extends ApiExchange{
 				break;
 		}
 	}
+	 */
 
 	/**
 	 *

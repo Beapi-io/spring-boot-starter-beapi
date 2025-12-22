@@ -2,7 +2,7 @@ package io.beapi.api.domain;
 
 //import org.hibernate.annotations.CacheConcurrencyStrategy;
 import java.io.Serializable;
-import javax.persistence.*;
+import jakarta.persistence.*;
 //import lombok.Getter;
 //import lombok.Setter;
 import java.util.*;
@@ -56,7 +56,7 @@ public class User implements Serializable {
 	boolean credentialsExpired=false;
 
 	@Column(nullable = true, name = "email_verified")
-	Boolean emailVerified=false;
+	boolean emailVerified=false;
 
 	@Column(nullable = true, name = "oauth_id")
 	String oauthId;
@@ -68,16 +68,16 @@ public class User implements Serializable {
 	String avatarUrl;
 
 	@Column(nullable = false, name = "enabled")
-	Boolean enabled=true;
+	boolean enabled=true;
 
 	@Column(nullable = false, name = "password_expired")
-	Boolean passwordExpired=false;
+	boolean passwordExpired=false;
 
 	@Column(nullable = false, name = "account_expired")
-	Boolean accountExpired=false;
+	boolean accountExpired=false;
 
 	@Column(nullable = false, name = "account_locked")
-	Boolean accountLocked=false;
+	boolean accountLocked=false;
 
 	@Column(nullable = false, name = "throttle_lock")
 	private boolean throttleLock=false;
@@ -146,11 +146,11 @@ public class User implements Serializable {
 		return this.enabled
 	}
 
-	public Boolean getEnabled(){
+	public boolean getEnabled(){
 		return this.enabled;
 	}
 
-	public void setEnabled(Boolean enabled){
+	public void setEnabled(boolean enabled){
 		this.enabled = enabled;
 	}
 
@@ -158,11 +158,11 @@ public class User implements Serializable {
 		return (this.accountExpired)?false:true
 	}
 
-	public Boolean getAccountExpired(){
+	public boolean getAccountExpired(){
 		return this.accountExpired;
 	}
 
-	public void setAccountExpired(Boolean accountExpired){
+	public void setAccountExpired(boolean accountExpired){
 		this.accountExpired=accountExpired;
 	}
 
@@ -170,19 +170,19 @@ public class User implements Serializable {
 		return (this.accountLocked)?false:true
 	}
 
-	public Boolean getAccountLocked(){
+	public boolean getAccountLocked(){
 		return this.accountLocked;
 	}
 
-	public void setAccountLocked(Boolean accountLocked){
+	public void setAccountLocked(boolean accountLocked){
 		this.accountLocked = accountLocked;
 	}
 
-	public Boolean getPasswordExpired(){
+	public boolean getPasswordExpired(){
 		return this.passwordExpired;
 	}
 
-	public void setPasswordExpired(Boolean passwordExpired){
+	public void setPasswordExpired(boolean passwordExpired){
 		this.passwordExpired = passwordExpired;
 	}
 
@@ -244,11 +244,11 @@ public class User implements Serializable {
 		return (this.credentialsExpired)?false:true
 	}
 
-	public Boolean getEmailVerified(){
+	public boolean getEmailVerified(){
 		return this.emailVerified
 	}
 
-	public void getEmailVerified(Boolean emailVerified){
+	public void getEmailVerified(boolean emailVerified){
 		this.emailVerified = emailVerified
 	}
 }

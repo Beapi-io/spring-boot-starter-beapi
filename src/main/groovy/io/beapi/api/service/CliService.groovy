@@ -36,9 +36,9 @@ import groovy.text.GStringTemplateEngine
 
 import org.springframework.context.ApplicationContext
 import org.springframework.beans.factory.annotation.Value;
-import javax.persistence.EntityManager
-import javax.persistence.metamodel.EntityType
-import javax.persistence.metamodel.Attribute
+import jakarta.persistence.EntityManager
+import jakarta.persistence.metamodel.EntityType
+import jakarta.persistence.metamodel.Attribute
 import org.springframework.beans.factory.ListableBeanFactory
 import org.springframework.stereotype.Controller
 import java.lang.reflect.Field

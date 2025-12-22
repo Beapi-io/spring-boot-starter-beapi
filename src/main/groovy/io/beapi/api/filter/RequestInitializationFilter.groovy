@@ -20,19 +20,19 @@ import groovy.json.JsonSlurper
 import io.beapi.api.service.LinkRelationService
 import io.beapi.api.service.SessionService
 import io.beapi.api.service.ThrottleService
-import io.beapi.api.utils.UriObject
 import org.json.JSONObject
+import org.json.XML;
 import io.beapi.api.properties.ApiProperties
 import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.PrincipleService
 import io.beapi.api.utils.ErrorCodes
 import org.springframework.context.ApplicationContext
 import org.springframework.beans.factory.annotation.Autowired
-import javax.servlet.FilterChain
-import javax.servlet.ServletException
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-import org.apache.catalina.util.ParameterMap
+import jakarta.servlet.FilterChain
+import jakarta.servlet.ServletException
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+//import org.apache.catalina.util.ParameterMap
 
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -52,19 +52,22 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.beans.factory.BeanFactoryUtils
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.web.cors.CorsUtils
-import javax.servlet.RequestDispatcher
+//import jakarta.servlet.RequestDispatcher
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.HandlerMapping;
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
-import javax.servlet.http.HttpSession
+//import jakarta.servlet.http.HttpSession
 import org.springframework.web.util.WebUtils
-import javax.servlet.http.Cookie
+//import jakarta.servlet.http.Cookie
 import java.util.regex.Pattern;
+
+import io.beapi.api.service.TraceService
+import io.beapi.api.utils.UriObject
 
 /**
  * This class parses the URI attributes on initial request &
@@ -77,6 +80,9 @@ import java.util.regex.Pattern;
 @Component
 @EnableConfigurationProperties([ApiProperties.class])
 class RequestInitializationFilter extends OncePerRequestFilter{
+    @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
+
+    @Autowired protected TraceService traceService
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RequestInitializationFilter.class);
     private String markerText = "DEVNOTES";
@@ -89,8 +95,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
     private static final ArrayList CALL_TYPES = ['v','b','c','t']
 
-    @Autowired
-    private ApplicationContext ctx
+    @Autowired private ApplicationContext ctx
 
     protected ThrottleService throttleService
     protected LinkRelationService linkRelationService
@@ -105,8 +110,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
     // todo : parse headers
     protected LinkedHashMap<String, List<String>> headers = [:]
-    protected UriObject uObj
-    protected String uri
     protected LinkedHashMap receives = [:]
     protected ArrayList receivesList
     protected LinkedHashMap rturns = [:]
@@ -117,7 +120,9 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     protected String authority
     protected ArrayList deprecated
 
-
+    private UriObject uObj
+    protected boolean trace
+    protected String uri
 
     /**
      * @param PrincipleService principle
@@ -147,6 +152,13 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         //println("### RequestInitializationFilter > "+request.getRequestURI())
 
+        this.uObj = request.getAttribute('uriObj')
+        this.uri = request.getRequestURI()
+        this.trace = this.uObj.isTrace()
+        if (trace == true) {
+            traceService.startTrace('RequestInitializationFilter','doFilterInternal', request.getSession().getId());
+        }
+
         // [ SHOW SESSION VARIABLES ]
         //if(sessionService.sessionExists()) {
             //println(sessionService.sessionExists()==true)
@@ -160,17 +172,6 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
             // route for simpleHandlerMapping
             if (match.find()) {
-                if (processRequest(request, response)) {
-                    try {
-                        Map<String, HandlerMapping> handlerMappingMap = BeanFactoryUtils.beansOfTypeIncludingAncestors(this.ctx, HandlerMapping.class, true, false);
-                        handlerMappingMap.each { k, v ->
-                            v.getHandler(request).getClass()
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
                 try {
                     // ratelimiting
                     if (apiProperties.throttle.active) {
@@ -184,7 +185,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                         }
                     }
                 } catch (org.springframework.security.access.AccessDeniedException ade) {
-                    if (this.authority == 'ROLE_ANONYMOUS') {
+                    if (this.authority.equals('ROLE_ANONYMOUS')) {
                         logger.info("BAD AUTHORITY ACCESS ATTEMPT for {" + request.getRequestURI() + "} with  {\"ROLE_ANONYMOUS\"}")
                     } else {
                         logger.info("BAD AUTHORITY ACCESS ATTEMPT for {" + request.getRequestURI() + "} with auth {\"+this.authority+\"} by {" + principle.name + "}")
@@ -192,9 +193,15 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                 } catch (Exception e) {
                     throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Exception - full stack trace follows:", e)
                 }
+
+                processRequest(request, response)
+
             }
 
             try {
+                if (trace == true) {
+                    traceService.endTrace('RequestInitializationFilter','doFilterInternal', request.getSession().getId())
+                }
                 chain.doFilter(request, response);
             } catch (Exception e) {
                 throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Exception - full stack trace follows:", e)
@@ -215,39 +222,37 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     private boolean processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception{
         //println("### processRequest ...")
 
+        ArrayList publicUris = request.getAttribute('publicUris')
+
         if(request){
             if(this.authority!='ROLE_ANONYMOUS') {
                 //logger.debug("doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : {}");
-                String cachedResult
-                this.uri = request.getRequestURI()
+
 
                 /*
                 * processing for 'static uris' in starter
                 */
-                if (apiProperties.reservedUris.contains(request.getRequestURI())) {
-                    ArrayList uriVars = uri.split('/')
-                    this.controller = uriVars[0]
+                if (publicUris.contains(request.getRequestURI())) {
+                    //ArrayList uriVars = uri.split('/')
+                    //this.controller = uriVars[0]
                 } else {
-                    createUriObj()
+                    //createUriObj()
 
-                    request.setAttribute('uriObj', this.uObj)
                     setPrinciple(request)
 
                     try {
                         this.method = request.getMethod()
-                        this.reservedUri = (apiProperties.reservedUris.contains(this.uri)) ? true : false
                         def cache = apiCacheService?.getApiCache(this.uObj.getController())
 
                         if (cache) {
+
                             def temp = cache[this.uObj.getApiVersion()]
                             this.deprecated = temp['deprecated'] as List
                             this.apiObject = temp[this.uObj.getAction()]
 
-                            if (this.apiObject?.'returns') {
-                                this.rturns = this.apiObject['returns'] as LinkedHashMap
-                            } else {
+                            if (!this.apiObject?.'returns') {
                                 //println("[ BAD IOSTATE DEFINITION ] ")
-                                logger.warn(devnotes,"[ BAD IOSTATE DEFINITION ] : IOSTATE DEFINITION FOR '${this.uObj.getController()}/${this.uObj.getAction()}' does not have 'RESPONSE' dataset for the authority '${this.authority}'. IF THIS IS AN ISSUE, FIX THIS BY ADDING THE 'ROLE' TO THE 'RESPONSE' DATASETS.")
+                                //logger.warn(devnotes,"[ BAD IOSTATE DEFINITION ] : IOSTATE DEFINITION FOR '${this.uObj.getController()}/${this.uObj.getAction()}' does not have 'RESPONSE' dataset for the authority '${this.authority}'. IF THIS IS AN ISSUE, FIX THIS BY ADDING THE 'ROLE' TO THE 'RESPONSE' DATASETS.")
                                 writeErrorResponse(response, '400', request.getRequestURI());
                                 return false
                             }
@@ -263,11 +268,11 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                                 if (returnsList != null) {
                                     request.setAttribute('returnsList', returnsList)
                                 }else{
-                                    logger.warn(devnotes,"[ BAD IOSTATE DEFINITION ] : THE AUTHORITY '${this.authority}' DOES NOT EXIST IN THE 'RESPONSE' DATASET FOR '${this.uObj.getController()}/${this.uObj.getAction()}' IN YOUR IOSTATE FILE. IF THIS IS AN ISSUE, FIX THIS BY ADDING THIS 'ROLE' TO THE 'RESPONSE' DATASETS.")
+                                    //logger.warn(devnotes,"[ BAD IOSTATE DEFINITION ] : THE AUTHORITY '${this.authority}' DOES NOT EXIST IN THE 'RESPONSE' DATASET FOR '${this.uObj.getController()}/${this.uObj.getAction()}' IN YOUR IOSTATE FILE. IF THIS IS AN ISSUE, FIX THIS BY ADDING THIS 'ROLE' TO THE 'RESPONSE' DATASETS.")
                                     throw new Exception("[RequestInitializationFilter :: doFilterInternal] : Authority '${this.authority}' for '${uri}' does not exist in IOSTATE 'REQUEST'")
                                 }
                             } else {
-                                logger.warn(devnotes,"[ BAD AUTHORITY ] : THE AUTHORITY '${this.authority}' DOES NOT EXIST IN THE 'NETWORKGRP' IN YOUR IOSTATE FILE FOR '${this.uObj.getController()}/${this.uObj.getAction()}'. IF THIS IS AN ISSUE, FIX BY ADDING 'ROLE' TO THE NETWORKGRP IN YOUR BEAPI_API.YML FILE")
+                                //logger.warn(devnotes,"[ BAD AUTHORITY ] : THE AUTHORITY '${this.authority}' DOES NOT EXIST IN THE 'NETWORKGRP' IN YOUR IOSTATE FILE FOR '${this.uObj.getController()}/${this.uObj.getAction()}'. IF THIS IS AN ISSUE, FIX BY ADDING 'ROLE' TO THE NETWORKGRP IN YOUR BEAPI_API.YML FILE")
 
                                 String msg = "Authority '${this.authority}' for '${uri}' does not exist in IOState NetworkGrp"
                                 writeErrorResponse(response, '401', request.getRequestURI(), msg);
@@ -278,7 +283,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                             if (this.uObj.getId()) {
                                 if (!this.receivesList?.contains('id')) {
-                                    logger.warn(devnotes, "[ ATTRIBUTE BASED ACCESS CONTROL(ABAC) MISMATCH (1) ] : PARAMS SENT FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DO NOT MATCH EXPECTED 'REQUEST' PARAMS. IF THIS IS AN ISSUE, FIX BY ADDING THE PARAM TO THE IOSTATE FILE.")
+                                    //logger.warn(devnotes, "[ ATTRIBUTE BASED ACCESS CONTROL(ABAC) MISMATCH (1) ] : PARAMS SENT FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DO NOT MATCH EXPECTED 'REQUEST' PARAMS. IF THIS IS AN ISSUE, FIX BY ADDING THE PARAM TO THE IOSTATE FILE.")
                                     writeErrorResponse(response, '400', request.getRequestURI());
                                     return false
                                 }
@@ -294,7 +299,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                             this.requestFileType = (SUPPORTED_MIME_TYPES.contains(requestMimeType)) ? getFormat(requestMimeType) : 'JSON'
                             this.responseFileType = (this.requestFileType) ? this.requestFileType : getFormat(respMime[0])
                             if (!this.requestFileType || !this.responseFileType) {
-                                logger.warn(devnotes,"[ UNSUPPORTED MIMETYPE (1) ] : ACCEPT/CONTENT-TYPE HEADERS MUST BE A SUPPORTED MIMETYPE OF '${SUPPORTED_MIME_TYPES}'. IF THIS IS AN ISSUE, FILE A TICKET TO ADD A NEW SUPPORTED MIMETYPE (https://github.com/Beapi-io/spring-boot-starter-beapi/issues).")
+                                //logger.warn(devnotes,"[ UNSUPPORTED MIMETYPE (1) ] : ACCEPT/CONTENT-TYPE HEADERS MUST BE A SUPPORTED MIMETYPE OF '${SUPPORTED_MIME_TYPES}'. IF THIS IS AN ISSUE, FILE A TICKET TO ADD A NEW SUPPORTED MIMETYPE (https://github.com/Beapi-io/spring-boot-starter-beapi/issues).")
 
                                 String msg = "Request MimeType must be one of the supported mimetypes (JSON/XML)"
                                 writeErrorResponse(response, '400', request.getRequestURI(), msg);
@@ -318,9 +323,9 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                     * Normal API Call (v)
                      */
                     if (this.apiObject && (this.uObj.callType==1)) {
-
                         if(!checkRequestParams(request.getAttribute('params'))) {
-                            logger.warn(devnotes,"[ ATTRIBUTE BASED ACCESS CONTROL(ABAC) MISMATCH (2) ] : PARAMS SENT FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DO NOT MATCH EXPECTED 'REQUEST' PARAMS. IF THIS IS AN ISSUE, FIX BY ADDING THE PARAM TO THE IOSTATE FILE.")
+
+                            //logger.warn(devnotes,"[ ATTRIBUTE BASED ACCESS CONTROL(ABAC) MISMATCH (2) ] : PARAMS SENT FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DO NOT MATCH EXPECTED 'REQUEST' PARAMS. IF THIS IS AN ISSUE, FIX BY ADDING THE PARAM TO THE IOSTATE FILE.")
                             writeErrorResponse(response, '400', request.getRequestURI(), "PARAMS SENT FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DO NOT MATCH EXPECTED 'REQUEST' PARAMS. IF THIS IS AN ISSUE, FIX BY ADDING THE PARAM TO THE IOSTATE FILE.");
                             return false
                             //throw new Exception("[RequestInitializationFilter :: checkRequestParams] : Requestparams do not match expected params for this endpoint")
@@ -331,16 +336,15 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                             request.setAttribute('cacheHash', this.cacheHash)
 
                             if ((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${this.cacheHash}" || apiObject?.cachedResult?."permitAll"?."${responseFileType}"?."${this.cacheHash}")) {
-                                try {
-                                    cachedResult = (apiObject['cachedResult'][authority]) ? apiObject['cachedResult'][authority][responseFileType][cacheHash] : apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
-                                } catch (Exception e) {
-                                    logger.warn(devnotes,"[ BAD CACHED RESULT ] : THIS SHOULD NOT HAPPEN. PLEASE FILE A TICKET WITH A FULL STACKTRACE AND EXPLANATION OF WHAT YOU WERE TRYING TO DO (https://github.com/Beapi-io/spring-boot-starter-beapi/issues).")
-                                    throw new Exception("[RequestInitializationFilter :: processFilterChain] : Exception - full stack trace follows:", e)
-                                }
+
+
+                                def cachedResult = (apiObject['cachedResult'][authority]) ? apiObject['cachedResult'][authority][responseFileType][cacheHash] : apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
+
+
 
                                 // todo : check throttle cache size
                                 if(cachedResult && cachedResult.size() > 0) {
-                                    // println("### RequestInitializationFilter (cachedResult)")
+
                                     // PLACEHOLDER FOR APITHROTTLING
                                     String linkRelations = linkRelationService.processLinkRelations(request, response, this.apiObject)
                                     String newResult = (linkRelations)?"[${cachedResult},${linkRelations}]":cachedResult
@@ -350,14 +354,17 @@ class RequestInitializationFilter extends OncePerRequestFilter{
 
                                     writer.write(newResult);
                                     writer.close()
-                                    //response.writer.flush()
+                                    response.writer.flush()
                                     return false
+                                }else{
+
                                 }
                             }
                         }
 
                     }
                 }
+
                 return true
             }
         }else{
@@ -391,7 +398,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     }
 
     private boolean validCacheRequestMethod(String method){
-        if(method == 'GET' && this.apiObject['method'].toUpperCase()==method){
+        if(this.apiObject['method'].toUpperCase().equals(method)){
             return true
         }
         return false
@@ -488,7 +495,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
     }
 
     protected void parseParams(HttpServletRequest request, String id){
-
+        //println("parse params")
         LinkedHashMap<String, String> get = [:]
 
         if(request.getQueryString()) {
@@ -586,7 +593,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                         object = new JSONObject(formData)
                         break
                     case 'XML':
-                        //object = XML.toJSONObject(formData)
+                        object = XML.toJSONObject(formData)
                         break
                 }
             } catch (Exception e) {
@@ -603,7 +610,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                         LinkedHashMap temp = [:]
                         while (keys.hasNext()) {
                             String key = keys.next();
-                            if (key.toString() == 'chain') {
+                            if (key.toString().equals('chain')) {
                                 LinkedHashMap chainOrder = [:]
                                 def temp2 = object.get('chain').remove('order').entrySet()
                                 temp2.each() { it ->
@@ -627,7 +634,7 @@ class RequestInitializationFilter extends OncePerRequestFilter{
                         output['batchVars'] = []
                         while (keys.hasNext()) {
                             String key = keys.next();
-                            if (key.toString() == 'batch') {
+                            if (key.toString().equals('batch')) {
                                 output['batchVars'] = object.get('batch') as LinkedList
                             }else{
                                 output[key] = object.get(key)

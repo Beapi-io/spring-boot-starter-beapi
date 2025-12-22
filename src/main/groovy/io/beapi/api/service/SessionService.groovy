@@ -20,8 +20,8 @@ import org.springframework.stereotype.Service
 import org.springframework.web.context.request.RequestAttributes
 import org.springframework.web.context.request.RequestContextHolder as RCH
 import org.springframework.web.context.request.ServletRequestAttributes
-import javax.servlet.http.HttpSession
-import javax.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpSession
+import jakarta.servlet.http.HttpServletRequest
 
 @Service
 public class SessionService {

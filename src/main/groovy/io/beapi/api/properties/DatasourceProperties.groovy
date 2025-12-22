@@ -11,7 +11,7 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource(value = "file:\${user.home}/.boot/\${spring.profiles.active}/beapi_db.yaml", factory = YamlPropertySourceFactory.class)
 public class DatasourceProperties {
 
-    public Boolean jmxexport;
+    public boolean jmxexport;
     public String driverclassname;
     public String dialect;
     public String username;
@@ -22,7 +22,7 @@ public class DatasourceProperties {
     public Hibernate hibernate  = new Hibernate();
 
 
-    void setJmxexport(Boolean jmxExport) { this.jmxexport = jmxexport; }
+    void setJmxexport(boolean jmxExport) { this.jmxexport = jmxexport; }
     void setDriverclassname(String driverclassname) { this.driverclassname = driverclassname; }
     void setDialect(String dialect) { this.dialect = dialect; }
     void setUsername(String username) { this.username = username; }
@@ -33,7 +33,7 @@ public class DatasourceProperties {
     //void setHibernate(Hibernate hibernate) { this.hibernate = hibernate; }
 
 
-    public Boolean getJmxexport() { return jmxexport; }
+    public boolean getJmxexport() { return jmxexport; }
     public String getDriverclassname() { return this.driverclassname; }
     public String getDialect() { return dialect; }
     public String getUsername() { return username; }
@@ -46,64 +46,64 @@ public class DatasourceProperties {
 
 
     public static class DbProps {
-        private Boolean pooled = true;
-        private Boolean jmxEnabled = true;
-        private Integer initialSize = 5;
-        private Integer maxActive = 50;
-        private Integer minIdle = 5;
-        private Integer maxIdle = 25;
-        private Integer maxWait = 10000;
-        private Integer maxAge = 600000;
-        private Integer timeBetweenEvictionRunsMillis = 5000;
-        private Integer minEvictableIdleTimeMillis = 60000;
+        private boolean pooled = true;
+        private boolean jmxEnabled = true;
+        private int initialSize = 5;
+        private int maxActive = 50;
+        private int minIdle = 5;
+        private int maxIdle = 25;
+        private int maxWait = 10000;
+        private int maxAge = 600000;
+        private int timeBetweenEvictionRunsMillis = 5000;
+        private int minEvictableIdleTimeMillis = 60000;
         private String validationQuery = "SELECT 1";
-        private Integer validationQueryTimeout = 3;
-        private Integer validationInterval = 15000;
-        private Boolean testOnBorrow = true;
-        private Boolean testWhileIdle = true;
-        private Boolean testOnReturn = false;
+        private int validationQueryTimeout = 3;
+        private int validationInterval = 15000;
+        private boolean testOnBorrow = true;
+        private boolean testWhileIdle = true;
+        private boolean testOnReturn = false;
         private String jdbcInterceptors = "ConnectionState";
         // "java.sql.Connection.TRANSACTION_READ_COMMITTED";
-        private Integer defaultTransactionIsolation = 2;
+        private int defaultTransactionIsolation = 2;
 
-        void setPooled(Boolean pooled) { this.pooled = pooled; }
-        void setJmxEnabled(Boolean jmxEnabled) { this.jmxEnabled = jmxEnabled; }
-        void setInitialSize(Integer initialSize) { this.initialSize = initialSize; }
-        void setMaxActive(Integer maxActive) { this.maxActive = maxActive; }
-        void setMinIdle(Integer minIdle) { this.minIdle = minIdle; }
-        void setMaxIdle(Integer maxIdle) { this.maxIdle = maxIdle; }
-        void setMaxWait(Integer maxWait) { this.maxWait = maxWait; }
-        void setMaxAge(Integer maxAge) { this.maxAge = maxAge; }
-        void setTimeBetweenEvictionRunsMillis(Integer timeBetweenEvictionRunsMillis) { this.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis; }
-        void setMinEvictableIdleTimeMillis(Integer minEvictableIdleTimeMillis) { this.minEvictableIdleTimeMillis = minEvictableIdleTimeMillis; }
+        void setPooled(boolean pooled) { this.pooled = pooled; }
+        void setJmxEnabled(boolean jmxEnabled) { this.jmxEnabled = jmxEnabled; }
+        void setInitialSize(int initialSize) { this.initialSize = initialSize; }
+        void setMaxActive(int maxActive) { this.maxActive = maxActive; }
+        void setMinIdle(int minIdle) { this.minIdle = minIdle; }
+        void setMaxIdle(int maxIdle) { this.maxIdle = maxIdle; }
+        void setMaxWait(int maxWait) { this.maxWait = maxWait; }
+        void setMaxAge(int maxAge) { this.maxAge = maxAge; }
+        void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) { this.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis; }
+        void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) { this.minEvictableIdleTimeMillis = minEvictableIdleTimeMillis; }
         void setValidationQuery(String validationQuery) { this.validationQuery = validationQuery; }
-        void setValidationQueryTimeout(Integer validationQueryTimeout) { this.validationQueryTimeout = validationQueryTimeout; }
-        void setValidationInterval(Integer validationInterval) { this.validationInterval = validationInterval; }
-        void setTestOnBorrow(Boolean testOnBorrow) { this.testOnBorrow = testOnBorrow; }
-        void setTestWhileIdle(Boolean testWhileIdle) { this.testWhileIdle = testWhileIdle; }
-        void setTestOnReturn(Boolean testOnReturn) { this.testOnReturn = testOnReturn; }
+        void setValidationQueryTimeout(int validationQueryTimeout) { this.validationQueryTimeout = validationQueryTimeout; }
+        void setValidationInterval(int validationInterval) { this.validationInterval = validationInterval; }
+        void setTestOnBorrow(boolean testOnBorrow) { this.testOnBorrow = testOnBorrow; }
+        void setTestWhileIdle(boolean testWhileIdle) { this.testWhileIdle = testWhileIdle; }
+        void setTestOnReturn(boolean testOnReturn) { this.testOnReturn = testOnReturn; }
         void setJdbcInterceptors(String jdbcInterceptors) { this.jdbcInterceptors = jdbcInterceptors; }
-        void setDefaultTransactionIsolation(Integer defaultTransactionIsolation) { this.defaultTransactionIsolation = defaultTransactionIsolation; }
+        void setDefaultTransactionIsolation(int defaultTransactionIsolation) { this.defaultTransactionIsolation = defaultTransactionIsolation; }
 
 
-        Boolean getPooled() { return pooled; }
-        Boolean getJmxEnabled() { return jmxEnabled; }
-        Integer getInitialSize() { return initialSize; }
-        Integer getMaxActive() { return maxActive; }
-        Integer getMinIdle() { return minIdle; }
-        Integer getMaxIdle() { return maxIdle; }
-        Integer getMaxWait() { return maxWait; }
-        Integer getMaxAge() { return maxAge; }
-        Integer getTimeBetweenEvictionRunsMillis() { return timeBetweenEvictionRunsMillis; }
-        Integer getMinEvictableIdleTimeMillis() { return minEvictableIdleTimeMillis; }
+        boolean getPooled() { return pooled; }
+        boolean getJmxEnabled() { return jmxEnabled; }
+        int getInitialSize() { return initialSize; }
+        int getMaxActive() { return maxActive; }
+        int getMinIdle() { return minIdle; }
+        int getMaxIdle() { return maxIdle; }
+        int getMaxWait() { return maxWait; }
+        int getMaxAge() { return maxAge; }
+        int getTimeBetweenEvictionRunsMillis() { return timeBetweenEvictionRunsMillis; }
+        int getMinEvictableIdleTimeMillis() { return minEvictableIdleTimeMillis; }
         String getValidationQuery() { return validationQuery; }
-        Integer getValidationQueryTimeout() { return validationQueryTimeout; }
-        Integer getValidationInterval() { return validationInterval; }
-        Boolean getTestOnBorrow() { return testOnBorrow; }
-        Boolean getTestWhileIdle() { return testWhileIdle; }
-        Boolean getTestOnReturn() { return testOnReturn; }
+        int getValidationQueryTimeout() { return validationQueryTimeout; }
+        int getValidationInterval() { return validationInterval; }
+        boolean getTestOnBorrow() { return testOnBorrow; }
+        boolean getTestWhileIdle() { return testWhileIdle; }
+        boolean getTestOnReturn() { return testOnReturn; }
         String getJdbcInterceptors() { return jdbcInterceptors; }
-        Integer getDefaultTransactionIsolation() { return defaultTransactionIsolation; }
+        int getDefaultTransactionIsolation() { return defaultTransactionIsolation; }
     }
 
 

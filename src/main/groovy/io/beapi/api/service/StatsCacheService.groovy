@@ -166,7 +166,8 @@ class StatsCacheService {
 
 		if(status!=null) {
 			try {
-				net.sf.ehcache.Ehcache temp = cacheManager?.getCache('StatsCache')?.getNativeCache()
+				def temp = cacheManager?.getCache('StatsCache')?.getNativeCache()
+
 				LinkedHashMap cache = temp?.get(status)?.getObjectValue()
 				if(cache){
 					return cache
@@ -187,7 +188,7 @@ class StatsCacheService {
 	ArrayList getCacheKeys(){
 		//logger.debug("getCacheKeys() : {}")
 		//cacheManager.setTransactionAware(false);
-		net.sf.ehcache.Ehcache temp = cacheManager.getCache('StatsCache').getNativeCache()
+		def temp = cacheManager.getCache('StatsCache').getNativeCache()
 		return temp.getKeys()
 
 	}

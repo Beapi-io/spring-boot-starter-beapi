@@ -20,16 +20,16 @@ import io.beapi.api.utils.ErrorCodes
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.support.RequestContextUtils;
 import java.lang.reflect.Field
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import io.beapi.api.service.StatsService
 import org.springframework.beans.factory.annotation.Autowired
 
 @Service
 public class ErrorService {
 
-	@Autowired
-	StatsService statsService
+	//@Autowired
+	//StatsService statsService
 
 	/**
 	 * Standardized error handler for all interceptors; simplifies RESPONSE error handling in interceptors
@@ -53,14 +53,17 @@ public class ErrorService {
 			}
 			lang = (keys.contains(lang))?lang:"en"
 		}catch(Exception e){
-			println("### [BeapiRequestHandler :: writeErrorResponse1] exception1  : "+e)
+			println("### [ErrorService :: writeErrorResponse1] exception1  : "+e)
 		}
 
+		/*
 		try{
 			statsService.setStat((String)statusCode,uri)
 		}catch(Exception e){
 			println("### [BeapiRequestHandler :: writeErrorResponse1] exception2  : "+e)
 		}
+
+		 */
 
 		try{
 			response.setContentType("application/json")
@@ -96,13 +99,15 @@ public class ErrorService {
 		}
 		lang = (keys.contains(lang))?lang:"en"
 
-
+/*
 		// stat recording
 		try{
 			statsService.setStat((String)statusCode,uri)
 		}catch(Exception e){
 			println("### [BeapiRequestHandler :: writeErrorResponse2] exception2 : "+e)
 		}
+
+ */
 
 
 		response.setContentType("application/json")

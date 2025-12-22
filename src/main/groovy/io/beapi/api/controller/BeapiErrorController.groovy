@@ -18,9 +18,9 @@ package io.beapi.api.controller
 
 import io.beapi.api.service.PrincipleService
 
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-import javax.servlet.RequestDispatcher
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import jakarta.servlet.RequestDispatcher
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.stereotype.Controller

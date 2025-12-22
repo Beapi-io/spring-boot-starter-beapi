@@ -321,6 +321,10 @@ class ApiDescriptor implements Serializable{
 		return this.cachedResult
 	}
 
+	public LinkedHashMap removeCachedResult() {
+		return this.cachedResult = null
+	}
+
 	/**
 	 * LinkedHashMap represention of the instance
 	 * @return

@@ -21,15 +21,19 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import javax.json.*
 import org.springframework.security.web.header.*
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
-import io.beapi.api.service.StatsService
+
+//import io.beapi.api.service.WebHookService
 import io.beapi.api.service.ErrorService
 import org.springframework.web.context.request.RequestAttributes
 import org.springframework.web.context.request.RequestContextHolder as RCH
 import org.springframework.web.context.request.ServletRequestAttributes
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.scheduling.annotation.Async;
+
 // NOTE : CALLTYPE = 1
 /**
  *
@@ -42,20 +46,20 @@ import org.springframework.web.context.request.ServletRequestAttributes
 @Service
 public class ExchangeService extends ApiExchange{
 
+
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ExchangeService.class);
 	String markerText = "DEVNOTES";
 	Marker devnotes = MarkerFactory.getMarker(markerText);
 
 	private static final ArrayList RESERVED_PARAM_NAMES = ['batch','chain']
 
-	StatsService statsService
 	ApiCacheService apiCacheService
 	LinkRelationService linkRelationService
 	ErrorService errorService
 
 	boolean overrideAutoMimeTypes = false
 
-
+	//@Autowired protected WebHookService hookService
 
 
 	/**
@@ -63,17 +67,15 @@ public class ExchangeService extends ApiExchange{
 	 * Constructor for ExchangeService
 	 * @author Owen Rubel
 	 *
-	 * @param statsService Injected Bean for StatsService
 	 * @param linkRelationService Injected Bean for linkRelationService
 	 * @param apiCacheService Injected Bean for apiCacheService
 	 * @see ApiExchange
 	 *
 	 */
-	public ExchangeService(ErrorService errorService, StatsService statsService, LinkRelationService linkRelationService, ApiCacheService apiCacheService) {
+	public ExchangeService(ErrorService errorService, LinkRelationService linkRelationService, ApiCacheService apiCacheService) {
 		try {
 			this.linkRelationService = linkRelationService
 			this.apiCacheService = apiCacheService
-			this.statsService = statsService
 			this.errorService = errorService
 		} catch (Exception e) {
 			println("# [Beapi] ExchangeService - initialization Exception - ${e}")
@@ -98,13 +100,14 @@ public class ExchangeService extends ApiExchange{
 
 		if(this.apiObject) {
 			// todo : create public api list
-
-			if(this.apiObject.updateCache && this.method == 'GET') {
+			// has apiObject
+			//if(this.apiObject.updateCache && this.method == 'GET') {
+				// updating cache
 				setCacheHash(request.getAttribute('cacheHash'))
 
 				// RETRIEVE CACHED RESULT (only if using 'GET' method)
 				if ((this.apiObject?.cachedResult) && (this.apiObject?.cachedResult?."${this.authority}"?."${this.responseFileType}"?."${cacheHash}")) {
-
+					// has cached result
 					String cachedResult = (this.apiObject['cachedResult'][authority][responseFileType][cacheHash]) ?: this.apiObject['cachedResult']['permitAll'][responseFileType][cacheHash]
 
 					if (cachedResult && cachedResult.size() > 0) {
@@ -120,13 +123,18 @@ public class ExchangeService extends ApiExchange{
 						return false
 					}
 				}
-			}
+			//}else{
+			//	println(this.method)
+			//	println(this.apiObject.updateCache)
+			//	println("### not cached")
+			//}
 
+		}else{
+			println("no apiObject after initVars")
 		}
 
 		if(!validateMethod()){
 			logger.warn(devnotes,"[ INVALID REQUEST METHOD ] : SENT REQUEST METHOD FOR '${this.uObj.getController()}/${this.uObj.getAction()}' DOES NOT MATCH EXPECTED 'REQUEST' METHOD OF '${apiObject['method'].toUpperCase()}'. IF THIS IS AN ISSUE, CHECK THE REQUESTMETHOD IN THE IOSTATE FILE FOR THIS CONTROLLER/ACTION.")
-println("not valid method")
 			try {
 				writeErrorResponse(request, response, '405');
 			}catch(Exception e){
@@ -149,26 +157,17 @@ println("not valid method")
 	 * @see ApiExchange
 	 *
 	 */
+	//@Async
     void apiResponse(HttpServletRequest request,HttpServletResponse response, ArrayList body){
 		//println("### ExchangeService :: apiResponse")
         String output = parseOutput(body, responseFileType)
-		// return/update cache if 'updateCache' is true
-		if(this.apiObject.updateCache && method == 'GET') {
+
+		// update cache if 'updateCache' is true
+
+		if(request.getMethod() == 'GET') {
+			// update Cache
 			apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
-		} else {
-			if (response.getStatus() == 200) {
-				apiCacheService.unsetApiCachedResult(this.controller, this.action, this.apiversion)
-			}
 		}
-
-
-
-		try{
-			statsService.setStat((String)response.getStatus(),(String)request.getRequestURI())
-		}catch(Exception e){
-			println("### [statsService :: postHandle] exception (1) : "+e)
-		}
-
 
 
 		/*
@@ -180,6 +179,7 @@ println("not valid method")
 			String newResult = (linkRelations)?"[${output},${linkRelations}]":"[${output}]"
 			writer.write(newResult);
 		}else{
+			// regular output
 			writer.write(output);
 		}
         writer.close()
@@ -197,6 +197,7 @@ println("not valid method")
 	 * @see ApiExchange
 	 *
 	 */
+	@Async
 	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) throws Exception{
 		//String accept = request.getHeader('Accept')
 		//String contentType = request.getContentType()
@@ -236,7 +237,7 @@ println("not valid method")
 
 			this.method = request.getMethod()
 		} catch (Exception e) {
-			logger.warn(devnotes,"[ NO IOSTATE ] : URI IS PARSEABLKE BUT NO IOSTATE FILE WAS PARSED THAT MATCHES THIS URI FOR '${this.controller}/${this.action}'. MAKE SURE YOU ARE USING 'camelCase' IN THE URI OR THAT THE IOSTATE FILE EXISTS AND IS PROPERLY DECLARED. ")
+			logger.warn(devnotes,"[ NO IOSTATE ] : URI IS PARSEABLE BUT NO IOSTATE FILE WAS PARSED THAT MATCHES THIS URI FOR '${this.controller}/${this.action}'. MAKE SURE YOU ARE USING 'camelCase' IN THE URI OR THAT THE IOSTATE FILE EXISTS AND IS PROPERLY DECLARED. ")
 			throw new Exception("[ExchangeService :: init] : Exception. full stack trace follows:", e)
 		}
 

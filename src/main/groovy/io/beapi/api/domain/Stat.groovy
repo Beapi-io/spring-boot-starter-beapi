@@ -3,8 +3,8 @@ package io.beapi.api.domain
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
-import javax.persistence.*
-import javax.validation.constraints.NotBlank
+import jakarta.persistence.*
+//import jakarta.validation.constraints.NotBlank
 
 //import org.hibernate.validator.constraints.NotEmpty;
 //import lombok.Getter;
@@ -24,19 +24,19 @@ public class Stat {
 
 
 	@Column(nullable = false, name = "statuscode")
-	@NotBlank
+	//@NotBlank
 	private Integer statusCode;
 
 	@Column(nullable = false, name = "url")
-	@NotBlank
+	//@NotBlank
 	private String url
 
 	@Column(nullable = false, name = "count")
-	@NotBlank
+	//@NotBlank
 	private Integer count
 
 	@Column(nullable = false, name = "date")
-	@NotBlank
+	//@NotBlank
 	private Long date
 
 

@@ -20,8 +20,9 @@ import org.springframework.web.context.request.RequestContextHolder as RCH
 import org.springframework.web.context.request.ServletRequestAttributes
 import org.springframework.stereotype.Service
 import org.springframework.context.ApplicationContext
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.RequestDispatcher
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import jakarta.servlet.RequestDispatcher
 import org.springframework.web.context.request.RequestAttributes
 
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
@@ -46,7 +47,7 @@ public class TraceService{
 	public void startTrace(String className, String methodName, String sessionId){
 		Long mStart = System.nanoTime()
 
-		LinkedHashMap cache = traceCacheService.getTraceCache(sessionId)
+		LinkedHashMap cache = traceCacheService?.getTraceCache(sessionId)
 		if(cache == null){
 			cache = [:]
 			cache.calls = [:]
@@ -60,10 +61,13 @@ public class TraceService{
 		cache['calls']["${order}"][loc]['start'] = mStart
 		cache['calls']["${order}"][loc]['stop'] = 0
 
-		def temp = traceCacheService.setTraceMethod(sessionId, cache)
+		try{
+			def temp = traceCacheService.setTraceMethod(sessionId, cache)
+		} catch (Exception e) {
+			println("TraceService::startTrace : error with setTraceMethod : " + e);
+			// old token / no token
+		}
 
-		//println('63 : '+uri)
-		//LinkedHashMap cache2 = traceCacheService.getTraceCache(uri)
 	}
 
 
@@ -72,13 +76,18 @@ public class TraceService{
 
 		String loc = "${className}/${methodName}".toString()
 		Long order = (cache['calls']?.size())?cache['calls']?.size():0
-
 		cache['calls']["${order}"][loc]['stop'] = System.nanoTime()
-		return traceCacheService.setTraceMethod(sessionId, cache)
+
+		try{
+			LinkedHashMap cache2 = traceCacheService.setTraceMethod(sessionId, cache)
+			return cache2
+		} catch (Exception e) {
+			println("error setting trace method(1) : " + e);
+			// old token / no token
+		}
 	}
 
 	public LinkedHashMap endAndReturnTrace(String className, String methodName, String sessionId){
-
 		LinkedHashMap returnCache = endTrace(className, methodName,sessionId)
 		LinkedHashMap newTrace = processTrace(returnCache)
 		traceCacheService.flushCache()
@@ -104,8 +113,6 @@ public class TraceService{
 					newTrace['elapsedTime'] += newTrace[it.key]['time']
 				}
 			}
-
-			//newTrace['elapsedTime'] = getElapsedTime(startTime,stopTime)
 		}
 		return newTrace
 	}

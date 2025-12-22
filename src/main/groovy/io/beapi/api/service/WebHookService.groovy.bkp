@@ -20,13 +20,15 @@ import io.beapi.api.domain.Authority;
 import org.springframework.beans.factory.annotation.Autowired;
 import io.beapi.api.repositories.HookRepository;
 import io.beapi.api.domain.Hook;
+import io.beapi.api.domain.service.HookService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import static groovyx.gpars.GParsPool.withPool;
-import javax.servlet.http.HttpServletRequest;
+import static groovyx.gpars.GParsPool.*;
+import jakarta.servlet.http.HttpServletRequest;
 import com.google.common.hash.Hashing;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
@@ -40,11 +42,15 @@ import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.PrincipleService
 import org.springframework.beans.factory.ListableBeanFactory
 
+
 @Service
 public class WebHookService{
 
 	@Autowired
 	private ListableBeanFactory listableBeanFactory;
+
+	@Autowired
+	HookService hookService
 
 	ApiCacheService apiCacheService
 	PrincipleService principle;
@@ -56,6 +62,25 @@ public class WebHookService{
 	}
 
 
+	void postData(String service, String data, List hookRoles,String method) {
+		println("postdata called")
+		if (hookRoles.size() < 0) {
+			println("data1 : "+data)
+			String msg = "The hookRoles in your IO State for " + params.controller + "is undefined.";
+			println("postData(String service, String data, List hookRoles,String method) : no receivers of hook")
+		}else if(method=="GET") {
+			println("data2 : "+data)
+			String msg = "Webhooks are not applicable with GET method. Please check your IO State file as to what endpoints you are using webhooks with.";
+			println(msg)
+			//logger.info("postData(String service, String data, List hookRoles,String method) : {}")
+		}else{
+			println("sending data")
+			send(data, service);
+		}
+	}
+
+
+
 	/**
 	 * Given the data to be sent and 'service' for which hook is defined,
 	 * will send data to all 'subscribers'
@@ -63,68 +88,60 @@ public class WebHookService{
 	 * @param String data to be sent to all subscribers
 	 * @return
 	 */
-	private boolean send(String data, String service, String key) {
-		def hooks = findByEnabledTrueAndService(service);
+	private boolean send(String data, String service) {
+		println("WebHookService / send called...")
+		def hooks = hookService.findByEnabledTrueAndService(service);
 		//def hooks = Class.forName('net.nosegrind.apiframework.Hook').findAll("from Hook where is_enabled=true and service=?",[service])
 
-		GParsPool.withPool(this.cores){ pool ->
+		//GParsPool.withPool(this.cores){ pool ->
 
 			HttpURLConnection myConn = null;
 			DataOutputStream os = null;
 			BufferedReader stdInput = null;
 
-			hooks.eachParallel(){ Hook hook ->
+			hooks.each(){ Hook hook ->
 				String format = hook.format.toLowerCase();
 				if (hook.attempts >= grailsApplication.config.apitoolkit.attempts) {
-					data = [message:'Number of attempts exceeded. Please reset hook via web interface'];
-				}else{
-					String encData
-					try{
-						encData = encode(key,data)
-					}catch(Exception e){
-						println("###BAD ENCRYPTION FOR HOOK ###")
-					}
-					data = 	[message:encData];
-				}
+					data = [message: 'Number of attempts exceeded. Please reset hook via web interface'];
 
-
-				try {
-					URL hostURL = new URL(hook.callback.toString());
-					myConn = (HttpURLConnection) hostURL.openConnection();
-					myConn.setRequestMethod("POST");
-					myConn.setRequestProperty("Content-Type", "application/json");
-					if (hook?.authorization) {
-						myConn.setRequestProperty("Authorization", "${hook.authorization}");
-					}
-					myConn.setUseCaches(false);
-					myConn.setDoInput(true);
-					myConn.setDoOutput(true);
-					myConn.setReadTimeout(15 * 1000);
-
-					myConn.connect();
-
-					OutputStreamWriter out = new OutputStreamWriter(myConn.getOutputStream());
-					out.write(data);
-					out.close();
-
-					int code = myConn.getResponseCode();
-					myConn.diconnect();
-
-					return code;
-				} catch (Exception e) {
 					try {
-						Thread.sleep(15000);
-					} catch (InterruptedException ie) {
-						println(e);
-					}
-				} finally {
-					if (myConn != null) {
-						myConn.disconnect();
+						URL hostURL = new URL(hook.callback.toString());
+						myConn = (HttpURLConnection) hostURL.openConnection();
+						myConn.setRequestMethod("POST");
+						myConn.setRequestProperty("Content-Type", "application/json");
+						if (hook?.authorization) {
+							myConn.setRequestProperty("Authorization", "${hook.authorization}");
+						}
+						myConn.setUseCaches(false);
+						myConn.setDoInput(true);
+						myConn.setDoOutput(true);
+						myConn.setReadTimeout(15 * 1000);
+
+						myConn.connect();
+
+						OutputStreamWriter out = new OutputStreamWriter(myConn.getOutputStream());
+						out.write(data);
+						out.close();
+
+						int code = myConn.getResponseCode();
+						myConn.diconnect();
+
+						return code;
+					} catch (Exception e) {
+						try {
+							Thread.sleep(15000);
+						} catch (InterruptedException ie) {
+							println(e);
+						}
+					} finally {
+						if (myConn != null) {
+							myConn.disconnect();
+						}
 					}
 				}
 				return 400;
 			}
-		}
+		//}
 	}
 
 	/**
@@ -135,7 +152,8 @@ public class WebHookService{
 	 * @return
 	 */
 	private boolean sendErr(String data, String service, String key) {
-		def hooks = findByEnabledTrueAndService(service);
+		println("WebHookService / sendErr called...")
+		def hooks = hookService.findByEnabledTrueAndService(service);
 		//def hooks = grailsApplication.getClassForName('net.nosegrind.apiframework.Hook').findAll("from Hook where is_enabled=true and service=?",[service])
 
 		hooks.each { hook ->
