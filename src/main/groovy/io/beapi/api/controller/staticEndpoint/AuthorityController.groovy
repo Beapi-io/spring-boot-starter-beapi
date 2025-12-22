@@ -6,8 +6,8 @@ import io.beapi.api.domain.service.AuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import java.util.List;
 import java.util.Objects;
 
@@ -24,14 +24,19 @@ public class AuthorityController extends BeapiRequestHandler {
 	}
 
 	public Authority create(HttpServletRequest request, HttpServletResponse response){
+		println("authority/create called ...")
 		String authority = this.params?.get("authority");
+		println("auth : "+authority)
 		if(authority) {
 			Authority auth = authService.findByAuthority(authority);
 			if (!Objects.nonNull(auth)) {
+				println("auth not found")
 				Authority newAuth = new Authority(); ;
 				newAuth.setAuthority(authority);
 				if(authService.save(newAuth)){
-					return ["id":newAuth.id,"authority":newAuth.authority]
+					println("data returned")
+					println(newAuth)
+					return newAuth
 				}
 			}
 		}

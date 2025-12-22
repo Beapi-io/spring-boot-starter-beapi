@@ -23,10 +23,10 @@ import io.beapi.api.utils.ErrorCodes
 import io.beapi.api.utils.UriObject
 import org.springframework.web.servlet.support.RequestContextUtils;
 import java.lang.reflect.Field
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-import javax.servlet.ServletException
-import javax.persistence.Entity
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.persistence.Entity
 import com.fasterxml.jackson.databind.ObjectMapper
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -49,7 +49,7 @@ import org.slf4j.Marker
 import org.slf4j.MarkerFactory
 
 import java.util.concurrent.CompletableFuture
-
+import org.springframework.scheduling.annotation.Async;
 
 @EnableConfigurationProperties([ApiProperties.class])
 class BeapiRequestHandler implements HttpRequestHandler {
@@ -57,6 +57,9 @@ class BeapiRequestHandler implements HttpRequestHandler {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BeapiRequestHandler.class)
     protected String markerText = "DEVNOTES"
     protected Marker devnotes = MarkerFactory.getMarker(markerText)
+
+    @Autowired
+    protected ApiCacheService cacheService;
 
     @Autowired
     protected ErrorService errorService
@@ -109,15 +112,14 @@ class BeapiRequestHandler implements HttpRequestHandler {
         this.controller = request.getAttribute('controller')
         this.action = request.getAttribute('action')
 
-        trace = this.uObj.isTrace()
         this.params = request.getAttribute('params') as LinkedHashMap
         this.keyList = request.getAttribute('keyList')
 
         Object output
 
         // TRACESERVICE CHECK
+        trace = this.uObj.isTrace()
         if (trace == true) {
-            println("### starting trace ###")
             traceService.startTrace(controller, action, request.getSession().getId());
         }
 
@@ -129,6 +131,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
 
             // invoke method
             if (Objects.nonNull(method)) {
+
                 try {
                     output = method.invoke(this, request, response)
                 } catch (IllegalArgumentException e) {
@@ -141,10 +144,12 @@ class BeapiRequestHandler implements HttpRequestHandler {
                     throw new Exception("[BeapiController > handleRequest] : IllegalAccessException - full stack trace follows :", e)
                 }catch (java.lang.reflect.InvocationTargetException e){
                     // ignore
+                    println(e.printStackTrace())
                 };
             };
 
             if (output != null) {
+
                 ArrayList result = []
                 if (trace == true) {
                     Object trace = traceService.endAndReturnTrace(controller, action, request.getSession().getId())
@@ -166,9 +171,11 @@ class BeapiRequestHandler implements HttpRequestHandler {
                         result = tempResult
                     };
                 };
+
                 request.setAttribute('responseBody', result)
             } else {
-                logger.warn(devnotes,"[ NO OUTPUT ] : OUTPUT EXPECTED AND NONE RETURNED. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD IS RETURNING THE PARAMS AS REPRESENTED IN THE APPROPRIATE IOSTATE FILE UNDER FOR THIS/CONTROLLER/METHOD (UNDER 'RESPONSE') AS A LINKEDHASHMAP.")
+                //logger.warn(devnotes,"[ NO OUTPUT ] : OUTPUT EXPECTED AND NONE RETURNED. IF THIS IS AN ISSUE, CHECK THAT THE CONTROLLER/METHOD IS RETURNING THE PARAMS AS REPRESENTED IN THE APPROPRIATE IOSTATE FILE UNDER FOR THIS/CONTROLLER/METHOD (UNDER 'RESPONSE') AS A LINKEDHASHMAP.")
+                println("### NO OUTPUT ###")
                 errorService.writeErrorResponse(request, response, 204)
             };
         } catch (SecurityException e) {
@@ -182,6 +189,10 @@ class BeapiRequestHandler implements HttpRequestHandler {
             throw new Exception("[BeapiController > handleRequest] : NoSuchMethodException - full stack trace follows :", e)
         };
     };
+
+    void flushCachedResult(String controller, String action, String version){
+        cacheService.flushCachedResult(controller, action,version)
+    }
 
     protected ArrayList convertModel(Object obj) throws Exception{
         try{
@@ -213,7 +224,7 @@ class BeapiRequestHandler implements HttpRequestHandler {
                                     output.add(tmp)
                                     break;
                                 default:
-                                    logger.warn(devnotes,"[ BAD DATASET ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
+                                    logger.warn(devnotes,"[ BAD DATASET(3) ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
                                     // todo : throw error; response values MUST have at least ONE KEY to be checked against IO State / constructors
                                     throw new Exception("[ControllerUtil > convertModel] : List/Set for '${controller}/${action}'must contain MAP or DOMAIN OBJECT")
                                     break;
@@ -221,15 +232,21 @@ class BeapiRequestHandler implements HttpRequestHandler {
                         };
                         return output
                         break;
+                    case {it instanceof java.util.concurrent.CompletableFuture}:
+                        def temp = obj.get()
+                        return convertModel(temp)
+                        break
                     default:
-                        logger.warn(devnotes,"[ BAD DATASET ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
+                        //println("[ BAD DATASET(2) ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
+                        logger.warn(devnotes, "[ BAD DATASET(2) ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
                         // todo : throw error ; unsupported return type
                         throw new Exception("[ControllerUtil > convertModel] : Unsupported return type; Please file a support ticket to have this return type added.")
                 };
             };
             return output
         }catch(Exception e){
-            logger.warn(devnotes,"[ BAD DATASET ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
+            //println("[ BAD DATASET(1) ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
+            logger.warn(devnotes,"[ BAD DATASET(1) ] : YOU ARE ATTEMPTING TO CONVERT A BAD DATATYPE; ONLY [ENTITY,MAP,LINKEDHASHMAP,HASHMAP,LINKEDLIST,ARRAYLIST,SET] ARE SUPPORTED.")
             throw new Exception("[BeapiController > convertModel] : Exception - full stack trace follows :",e)
         };
     };

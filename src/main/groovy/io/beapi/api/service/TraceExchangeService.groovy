@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import javax.json.*
 import org.springframework.security.web.header.*
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 
 
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
@@ -52,44 +52,64 @@ public class TraceExchangeService extends ApiExchange{
 
     // [REQUEST]
     boolean apiRequest(HttpServletRequest request, HttpServletResponse response, String authority){
-		String sessionId = request.getSession().getId()
-
+		//println("traceexchangeservice called")
 		def post = request.getAttribute('POST')
 		def get = request.getAttribute('GET')
+		String sessionId = request.getSession().getId()
+		try {
+			LinkedHashMap<String, String> output
+			if(get){
+				output = get << post
+			}else{
+				output = post
+			}
 
-		LinkedHashMap<String,String> output = get + post
-		request.setAttribute('params',output)
+			request.setAttribute('params', output)
+		}catch(Exception e){
+			println(e)
+		}
 
-		traceService.startTrace('ApiInterceptor','initVars',sessionId)
-        initVars(request,response,authority)
-		traceService.endTrace('ApiInterceptor','initVars',sessionId)
+		traceService.startTrace('ApiInterceptor', 'initVars', sessionId)
+		initVars(request, response, authority)
+		traceService.endTrace('ApiInterceptor', 'initVars', sessionId)
 
-		if(!validateMethod()){
-			writeErrorResponse(response,'405',request.getRequestURI());
+
+		if (!validateMethod()) {
+			writeErrorResponse(response, '405', request.getRequestURI());
 			return false
-		}else{
+		} else {
 			//parseParams(request, IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8), request.getQueryString(),uList[7])
 			// routing call to controller
 			return true
 		}
-
     }
 
     void apiResponse(HttpServletResponse response,ArrayList body){
+		//println("TraceExchangeService :: apiResponse")
         String output = parseOutput(body, responseFileType)
 
         //if(method=='GET') {
         //    apiCacheService.setApiCachedResult(cacheHash, this.controller, this.apiversion, this.action, this.authority, responseFileType, output)
         //}
+		if(output) {
+			PrintWriter writer = response.getWriter();
+			writer.write(output);
+			writer.close()
+			response.writer.flush()
+		}else{
+			response.setContentType("application/json")
+			response.setStatus("401")
+			if(msg.isEmpty()){ msg = ErrorCodes."$lang"[statusCode.toString()]['long'] }
+			String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes."$lang"[statusCode.toString()]['short']}\",\"message\": \"${msg}\",\"path\":\"${uri}\"}"
+			response.sendError(statusCode,message)
+			response.flushBuffer()
+		}
 
-        PrintWriter writer = response.getWriter();
-        writer.write(output);
-        writer.close()
-        response.writer.flush()
     }
 
 
 	private void initVars(HttpServletRequest request, HttpServletResponse response, String authority) throws Exception{
+		//println("initVars")
 		String accept = request.getHeader('Accept')
 		String contentType = request.getContentType()
 

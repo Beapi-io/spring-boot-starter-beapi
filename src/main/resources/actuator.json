@@ -136,6 +136,11 @@
             "type": "LinkedHashMap",
             "description": "for actuator/stats",
             "mockData": "*"
+        },
+        "ping": {
+            "type": "Boolean",
+            "description": "",
+            "mockData": "*"
         }
     },
     "CURRENTSTABLE": "1",
@@ -298,7 +303,18 @@
                     "RESPONSE": {
                         "ROLE_ADMIN": ["stats"]
                     }
-                }
+                },
+                "info": {
+                    "METHOD": "GET",
+                    "DESCRIPTION": "Show logging",
+                    "UPDATECACHE": false,
+                    "ROLES": {},
+                    "REQUEST": {
+                        "permitAll": []
+                    },
+                    "RESPONSE": {
+                        "permitAll": ["ping"]
+                    }
             }
         }
     }

@@ -25,21 +25,21 @@ import org.springframework.security.web.header.*
 import org.springframework.stereotype.Controller
 
 import javax.json.*
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.info.BuildProperties
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.beans.factory.ListableBeanFactory
-import org.springframework.cache.ehcache.EhCacheCacheManager
+//import org.springframework.cache.ehcache.EhCacheCacheManager
 import org.springframework.cache.CacheManager
 
 import javax.sql.DataSource
 import java.sql.ResultSet;
 import java.sql.DatabaseMetaData;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 //import java.lang.management.ManagementFactory
 import java.lang.management.*
@@ -88,7 +88,10 @@ public class ActuatorController extends BeapiRequestHandler{
 		temp.put("attempts",apiProperties.getAttempts());
 		temp.put("procCores",apiProperties.getProcCores());
 		temp.put("documentationUrl",apiProperties.getDocumentationUrl());
-		temp.put("reservedUris",apiProperties.getReservedUris());
+
+		ArrayList publicUris = request.getAttribute('publicUris')
+		temp.put("reservedUris",publicUris);
+
 		temp.put("apichainLimit",apiProperties.getApichainLimit());
 		temp.put("postcrement",apiProperties.getPostcrement());
 		temp.put("chainingEnabled",apiProperties.getChainingEnabled());
@@ -129,7 +132,10 @@ public class ActuatorController extends BeapiRequestHandler{
         temp.put("attempts",apiProperties.getAttempts());
         temp.put("procCores",apiProperties.getProcCores());
         temp.put("documentationUrl",apiProperties.getDocumentationUrl());
-        temp.put("reservedUris",apiProperties.getReservedUris());
+
+		ArrayList publicUris = request.getAttribute('publicUris')
+		temp.put("reservedUris",publicUris);
+
         temp.put("apichainLimit",apiProperties.getApichainLimit());
         temp.put("postcrement",apiProperties.getPostcrement());
         temp.put("chainingEnabled",apiProperties.getChainingEnabled());
@@ -321,26 +327,29 @@ public class ActuatorController extends BeapiRequestHandler{
 
 		LinkedHashMap temp = new LinkedHashMap<>();
 
-		temp.put("classes", classLoading.getLoadedClassCount())
-		temp.put("classes.loaded", classLoading.getTotalLoadedClassCount())
-		temp.put("classes.unloaded", classLoading.getUnloadedClassCount())
+		try {
+			temp.put("classes", classLoading.getLoadedClassCount())
+			temp.put("classes.loaded", classLoading.getTotalLoadedClassCount())
+			temp.put("classes.unloaded", classLoading.getUnloadedClassCount())
 
-		temp.put("compiler", compile.getName())
-		temp.put("compiler.time", compile.getTotalCompilationTime())
+			temp.put("compiler", compile.getName())
+			temp.put("compiler.time", compile.getTotalCompilationTime())
 
-		temp.put("heap", mem.getHeapMemoryUsage())
-		temp.put("nonheap", mem.getNonHeapMemoryUsage())
+			temp.put("heap", mem.getHeapMemoryUsage())
+			temp.put("nonheap", mem.getNonHeapMemoryUsage())
 
-		temp.put("mem", Runtime.getRuntime().freeMemory())
-		temp.put("mem.free", Runtime.getRuntime().freeMemory())
-		temp.put("processors", os.getAvailableProcessors())
-		temp.put("threads", threads.getDaemonThreadCount())
-		temp.put("threads.peak", threads.getPeakThreadCount())
-		temp.put("threads.totalStarted", threads.getThreadCount())
+			temp.put("mem", Runtime.getRuntime().freeMemory())
+			temp.put("mem.free", Runtime.getRuntime().freeMemory())
+			temp.put("processors", os.getAvailableProcessors())
+			temp.put("threads", threads.getDaemonThreadCount())
+			temp.put("threads.peak", threads.getPeakThreadCount())
+			temp.put("threads.totalStarted", threads.getThreadCount())
 
-		temp.put("uptime", runtime.getUptime())
-		temp.put("instance.uptime", runtime.getUptime())
-
+			temp.put("uptime", runtime.getUptime())
+			temp.put("instance.uptime", runtime.getUptime())
+		}catch(Exception e){
+			println(e)
+		}
 
 		LinkedHashMap map = [:]
 		map.put("metrics", temp);
@@ -366,9 +375,11 @@ public class ActuatorController extends BeapiRequestHandler{
 	}
 
 	LinkedHashMap info(HttpServletRequest request, HttpServletResponse response) {
-		LinkedHashMap temp = new LinkedHashMap<>();
-		temp.put("status", "UP");
+		LinkedHashMap map = new LinkedHashMap<>();
+		map.put("info", true);
 
-		return temp
+		return map
 	}
+
+
 }

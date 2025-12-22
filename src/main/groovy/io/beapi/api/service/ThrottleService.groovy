@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.*
 import org.springframework.stereotype.Service
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 
 @Service
@@ -96,6 +96,10 @@ class ThrottleService{
 		//}catch(Exception e){
 		//	throw new Exception("[ThrottleService :: incrementThrottle] : Exception - full stack trace follows:", e)
 		//}
+	}
+
+	Integer showThrottle(String role){
+		return sessionService.getAttribute('throttleCurrentCnt')
 	}
 
 	protected void checkExpiry() throws Exception {

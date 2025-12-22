@@ -1,0 +1,84 @@
+/*
+ * Copyright 2013-2022 Owen Rubel
+ * API Chaining(R) 2022 Owen Rubel
+ *
+ * Licensed under the AGPL v2 License;
+ * you may not use this file except in compliance with the License.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author Owen Rubel (orubel@gmail.com)
+ *
+ */
+package io.beapi.api.utils
+
+/*
+ * Method		Idempotent	Safe
+ * OPTIONS		yes			yes
+ * HEAD			yes			yes
+ *
+ * GET			yes			yes
+ * PUT			yes			no
+ * POST			no			no
+ * DELETE		yes			no
+ * PATCH		no			no
+ * TRACE		no			yes
+ */
+
+/**
+ * @author Owen Rubel
+ */
+public enum RequestMethod {
+	 GET("get"),
+	 PUT("put"),
+	 POST("post"),
+	 DELETE("delete"),
+	 HEAD("head"),
+	 TRACE("trace"),
+	 OPTIONS("options")
+	
+	 private final String value
+	
+	 RequestMethod(String value){
+	  this.value = value;
+	 }
+	
+	 String toString() {
+	  value
+	 }
+	
+	 String getKey() {
+	  name()
+	 }
+	
+	 static list(){
+		 [GET,PUT,POST,DELETE,HEAD,TRACE,OPTIONS]
+	 }
+
+	 static restAltList(){
+		 [OPTIONS,TRACE,HEAD]
+	 }
+
+	 public static Boolean isRestAlt(String keyValue){
+		 for (wd in restAltList()) {
+			 if (wd.getKey().equals(keyValue)){
+				 return true
+			 }
+		 }
+		 return false
+	 }
+
+	 
+	 public static RequestMethod fromString(String keyValue) {
+		 for (wd in list()) {
+			 if (wd.getKey().equals(keyValue)){
+			 	return wd
+			}
+		 }
+		 throw new IllegalArgumentException("There's no RequestMethod value with key " + keyValue)
+	 }
+}

@@ -20,7 +20,7 @@
 * v : regular api call
 * b : batching call
 * c : chain call
-* r : resource call
+* t : resource call
 *
 * This allows us the ability to move different call to different servers (should we want/need)
 * so they do not affect 'regular calls' (ie 'v' callType)
@@ -32,7 +32,7 @@ import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
 import io.beapi.api.service.ErrorService
 import io.beapi.api.service.ExchangeService
-import io.beapi.api.service.StatsService
+
 import java.lang.reflect.Field
 import io.beapi.api.service.TraceExchangeService
 //import io.beapi.api.service.HookExchangeService
@@ -46,18 +46,18 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import io.beapi.api.properties.ApiProperties
 
 import javax.crypto.KeyGenerator
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 
 import org.springframework.web.servlet.HandlerInterceptor
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
-import javax.servlet.DispatcherType
+import jakarta.servlet.DispatcherType
 import javax.json.*
 import org.springframework.security.web.header.*
 //import groovyx.gpars.*
-import javax.servlet.RequestDispatcher
+import jakarta.servlet.RequestDispatcher
 import java.nio.charset.StandardCharsets
 import org.apache.commons.io.IOUtils
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
@@ -68,6 +68,14 @@ import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Autowired
 
+import org.springframework.scheduling.annotation.Async;
+
+import org.springframework.web.context.request.RequestAttributes
+import org.springframework.web.context.request.RequestContextHolder as RCH
+import org.springframework.web.context.request.ServletRequestAttributes
+
+import io.beapi.api.utils.ErrorCodes
+import org.springframework.web.servlet.support.RequestContextUtils;
 /**
  *
  * HandlerInterceptor for all API Calls. Routes call to appropriate ExchangeService methods for handling based on calltype.
@@ -89,6 +97,8 @@ class ApiInterceptor implements HandlerInterceptor{
 
 	// TODO : inject stats service into interceptor and then into here
 
+	private HttpServletRequest req;
+	private HttpServletResponse resp;
 
 
 	//ThrottleCacheService throttle
@@ -107,17 +117,16 @@ class ApiInterceptor implements HandlerInterceptor{
 	ArrayList privateRoles = []
 	int callType
 	KeyGenerator keyGenerator
-	StatsService statsService
+
 	ErrorService errorService
 
-	public ApiInterceptor(ErrorService errorService,StatsService statsService, ExchangeService exchangeService, BatchExchangeService batchService, ChainExchangeService chainService, TraceExchangeService traceService, ApiProperties apiProperties) {
+	public ApiInterceptor(ErrorService errorService, ExchangeService exchangeService, BatchExchangeService batchService, ChainExchangeService chainService, TraceExchangeService traceService, ApiProperties apiProperties) {
 		//this.throttle = throttle
 		this.exchangeService = exchangeService
 		this.batchService = batchService
 		this.chainService = chainService
 		this.traceExchangeService = traceService
 		this.apiProperties = apiProperties
-		this.statsService = statsService
 		this.errorService = errorService
 	}
 
@@ -125,6 +134,9 @@ class ApiInterceptor implements HandlerInterceptor{
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		//println("### ApiInterceptor / prehandle")
 
+		RequestAttributes requestAttributes = RCH.getRequestAttributes();
+		HttpServletRequest req = ((ServletRequestAttributes) requestAttributes).getRequest();
+		HttpServletResponse resp = ((ServletRequestAttributes) requestAttributes).getResponse();
 
 		if (handler instanceof ResourceHttpRequestHandler) {
 			errorService.writeErrorResponse(request, response,'422',"No data returned for this call. This is an 'API Server'; Please limit your calls to API's only")
@@ -144,21 +156,51 @@ class ApiInterceptor implements HandlerInterceptor{
 						if (apiProperties.batchingEnabled) {
 							return batchService.apiRequest(request, response, this.authority)
 						} else {
-							errorService.writeErrorResponse(request, response, '401')
-							return false
+							try {
+								int statusCode = 401
+								Locale tmp = RequestContextUtils.getLocale(request);
+								String lang = (tmp)?tmp.getLanguage():"en"
+								response.setStatus(statusCode)
+								String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes."$lang"[statusCode.toString()]['short']}\",\"message\": \"${ErrorCodes."$lang"[statusCode.toString()]['long']}\",\"path\":\"${request.request.getRequestURI()}\"}"
+								response.sendError(statusCode, message)
+								//response.flushBuffer()
+							}catch(Exception e){
+								println(e)
+							}
 						}
 						break
 					case 3:
 						if (apiProperties.chainingEnabled) {
 							return chainService.apiRequest(request, response, this.authority)
 						} else {
-							errorService.writeErrorResponse(request, response, '401')
-							return false
+							try {
+								int statusCode = 401
+								Locale tmp = RequestContextUtils.getLocale(request);
+								String lang = (tmp)?tmp.getLanguage():"en"
+								response.setStatus(statusCode)
+								String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes."$lang"[statusCode.toString()]['short']}\",\"message\": \"${ErrorCodes."$lang"[statusCode.toString()]['long']}\",\"path\":\"${request.getRequestURI()}\"}"
+								response.sendError(statusCode, message)
+								//response.flushBuffer()
+							}catch(Exception e){
+								println(e)
+							}
 						}
 						break
 					case 4:
 						if (privateRoles.contains(authority)) {
 							return traceExchangeService.apiRequest(request, response, this.authority)
+						}else{
+							try {
+								int statusCode = 401
+								Locale tmp = RequestContextUtils.getLocale(request);
+								String lang = (tmp)?tmp.getLanguage():"en"
+								response.setStatus(statusCode)
+								String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes."$lang"[statusCode.toString()]['short']}\",\"message\": \"${ErrorCodes."$lang"[statusCode.toString()]['long']}\",\"path\":\"${request.getRequestURI()}\"}"
+								response.sendError(statusCode, message)
+								//response.flushBuffer()
+							}catch(Exception e){
+								println(e)
+							}
 						}
 						break
 				//case 5:
@@ -176,6 +218,7 @@ class ApiInterceptor implements HandlerInterceptor{
 	}
 
 	@Override
+	//@Async
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mv) throws Exception {
 		//logger.info("postHandle(HttpServletRequest, HttpServletResponse, Object, ModelAndView) : {}")
 		//println("### ApiInterceptor / posthandle")
@@ -185,8 +228,8 @@ class ApiInterceptor implements HandlerInterceptor{
 			body = request.getAttribute('responseBody')
 		}
 
-		String stat = (String)response.getStatus()
-		String uri = (String)request.getRequestURI()
+		//String stat = (String)response.getStatus()
+		//String uri = (String)request.getRequestURI()
 
 		if(body == null){
 			errorService.writeErrorResponse(request, response,'204','No data returned for this call.')
@@ -199,14 +242,24 @@ class ApiInterceptor implements HandlerInterceptor{
 					if(apiProperties.batchingEnabled) {
 						batchService.batchResponse(request, response, body)
 					}else{
-						errorService.writeErrorResponse(request, response,'401')
+						int statusCode = 401
+						Locale tmp = RequestContextUtils.getLocale(request);
+						String lang = (tmp)?tmp.getLanguage():"en"
+						response.setStatus(statusCode)
+						String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes."$lang"[statusCode.toString()]['short']}\",\"message\": \"${ErrorCodes."$lang"[statusCode.toString()]['long']}\",\"path\":\"${request.getRequestURI()}\"}"
+						response.sendError(statusCode, message)
 					}
 					break
 				case 3:
 					if(apiProperties.chainingEnabled) {
 						chainService.chainResponse(request, response, body)
 					}else{
-						errorService.writeErrorResponse(request, response,'401')
+						int statusCode = 401
+						Locale tmp = RequestContextUtils.getLocale(request);
+						String lang = (tmp)?tmp.getLanguage():"en"
+						response.setStatus(statusCode)
+						String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes."$lang"[statusCode.toString()]['short']}\",\"message\": \"${ErrorCodes."$lang"[statusCode.toString()]['long']}\",\"path\":\"${request.getRequestURI()}\"}"
+						response.sendError(statusCode, message)
 					}
 					break
 				case 4:
@@ -216,10 +269,16 @@ class ApiInterceptor implements HandlerInterceptor{
 				//	hookExchangeService.apiResponse(response,body)
 				//	break
 				default:
-					errorService.writeErrorResponse(request, response, '400')
+					int statusCode = 400
+					Locale tmp = RequestContextUtils.getLocale(request);
+					String lang = (tmp)?tmp.getLanguage():"en"
+					response.setStatus(statusCode)
+					String message = "{\"timestamp\":\"${System.currentTimeMillis()}\",\"status\":\"${statusCode}\",\"error\":\"${ErrorCodes."$lang"[statusCode.toString()]['short']}\",\"message\": \"${ErrorCodes."$lang"[statusCode.toString()]['long']}\",\"path\":\"${request.getRequestURI()}\"}"
+					response.sendError(statusCode, message)
 
 			}
 		}
+
 		response.writer.flush()
 	}
 

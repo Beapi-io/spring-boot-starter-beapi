@@ -22,10 +22,10 @@ import org.springframework.security.web.header.*
 import org.springframework.stereotype.Controller
 import org.springframework.beans.factory.annotation.Autowired
 import javax.json.*
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 //import io.beapi.api.service.ThrottleService
-import javax.servlet.http.HttpSession
+import jakarta.servlet.http.HttpSession
 
 // todo: rename as ExchangeService : encompasses both request/response methods for interceptor
 @Controller("throttle")

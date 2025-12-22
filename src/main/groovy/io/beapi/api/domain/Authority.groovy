@@ -3,8 +3,8 @@ package io.beapi.api.domain;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import jakarta.persistence.*;
+//import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 //import org.hibernate.validator.constraints.NotEmpty;
@@ -25,7 +25,7 @@ public class Authority {
 
 
 	@Column(nullable = false, unique = true)
-	@NotBlank
+	//@NotBlank
 	private String authority;
 
 

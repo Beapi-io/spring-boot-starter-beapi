@@ -29,8 +29,8 @@ import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Controller
 import org.springframework.stereotype.Service
 
-import javax.persistence.metamodel.Attribute
-import javax.persistence.metamodel.EntityType
+import jakarta.persistence.metamodel.Attribute
+import jakarta.persistence.metamodel.EntityType
 import java.lang.annotation.Annotation
 import java.lang.reflect.Field
 import java.lang.reflect.Method

@@ -16,8 +16,8 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.annotation.Resource;
-import javax.persistence.*;
+import jakarta.annotation.Resource;
+import jakarta.persistence.*;
 import javax.sql.DataSource;
 import java.util.Properties;
 
@@ -40,17 +40,17 @@ public class DataSourceConfig {
         config.setDriverClassName(datasourceProperties.getDriverclassname());
         config.setUsername(datasourceProperties.getUsername());
         config.setPassword(datasourceProperties.getPassword());
-        config.setMinimumIdle(0);
-        config.setConnectionTimeout(3000);
-        config.setIdleTimeout(3500);
-        config.setMaxLifetime(45000);
+        config.setMinimumIdle(10);
+        config.setConnectionTimeout(10000);
+        config.setIdleTimeout(50000);
+        config.setMaxLifetime(1800000);
         config.setAutoCommit(true);
         config.setValidationTimeout(5000);
         config.setConnectionTestQuery("SELECT 1");
-        config.setMaximumPoolSize(4);
+        config.setMaximumPoolSize(20);
         config.setAllowPoolSuspension(false);
         config.setReadOnly(false);
-        config.setLeakDetectionThreshold(10000);
+        config.setLeakDetectionThreshold(30000);
         config.addDataSourceProperty( "cachePrepStmts" , "true" );
         config.addDataSourceProperty( "prepStmtCacheSize" , "250" );
         config.addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" );

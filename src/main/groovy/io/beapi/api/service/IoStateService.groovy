@@ -45,6 +45,8 @@ import java.util.stream.Collectors;
 import org.springframework.core.io.Resource;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.beans.factory.annotation.Value
+
 
 /**
  *
@@ -58,12 +60,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @EnableConfigurationProperties([ApiProperties.class])
 public class IoStateService{
 
-	@Autowired
 	ApiProperties apiProperties
-
-	@Autowired
 	ApiCacheService apiCacheService;
-
 	String version
 
 	//private static final org.slf4j.Logger logger = LoggerFactory.getLogger(IoStateService.class);
@@ -79,7 +77,7 @@ public class IoStateService{
 	 * @param version application version; used in path comparison
 	 *
 	 */
-	public IoStateService(ApiProperties apiProperties, ApplicationContext applicationContext, ApiCacheService apiCacheService, String version)  throws Exception {
+	public IoStateService(ApiProperties apiProperties, ApplicationContext applicationContext, ApiCacheService apiCacheService, @Value(value = "version")String version)  throws Exception {
 		ApplicationContext ctx
 		this.version = version
 		//try {
@@ -88,7 +86,7 @@ public class IoStateService{
 			this.apiCacheService = apiCacheService
 			initIoStateDir()
 			ego()
-			validateRpcNamingConventions(ctx,version)
+			//validateRpcNamingConventions(ctx,version)
 		//}catch(Exception e){
 		//	println("# [Beapi] IoStateService - initialization Exception - ${e}")
 		//	System.exit(0)
@@ -131,7 +129,6 @@ public class IoStateService{
 			String userDir = System.getProperty("user.home")
 			String apiObjectSrc = "${userDir}/${apiProperties.iostateDir}"
 
-			println("### IOStateDir : "+apiObjectSrc)
 
 			String projDir = ""
 
@@ -207,7 +204,7 @@ public class IoStateService{
 		//logger.debug("parseFiles : {}")
 		LinkedHashMap methods = [:]
 
-		try {
+		//try {
 			new File(path).eachFile() { file ->
 				if(!file.isDirectory()) {
 					String fileName = file.name.toString()
@@ -226,7 +223,6 @@ public class IoStateService{
 							//logger.debug("parseFiles : Loading file - {}","${path}/${fileName}")
 
 							try{
-
 								parseJson(json.IOSTATE.NAME.toString(), json.IOSTATE)
 							}catch(Exception e){
 								throw new Exception("#### [IoStateService - ${json.NAME.toString()}] Exception :",e)
@@ -237,10 +233,10 @@ public class IoStateService{
 				}
 			}
 
-		}catch(Exception e){
-			println('[IoStateService] : No IO State Files found for initialization :'+e)
-			throw new Exception('[IoStateService] : No IO State Files found for initialization :',e)
-		}
+		//}catch(Exception e){
+		//	println('[IoStateService] : No IO State Files found for initialization :'+e)
+		//	throw new Exception('[IoStateService] : No IO State Files found for initialization :',e)
+		//}
 	}
 
 	/**
@@ -335,7 +331,7 @@ public class IoStateService{
 
 					boolean updateCache = false
 					try{
-						if (uriObject.UPDATECACHE=="true") {
+						if (uriObject.UPDATECACHE == true) {
 							updateCache = true
 						}
 					}catch(Exception e){ println("### parseJson > updateCache error :"+e)}
@@ -413,10 +409,9 @@ public class IoStateService{
 				// TODO : SETUP CACHE
 				def cache
 				try {
-					println("#### Initializing connector cache for '${apiName}'")
+					// #### Initializing connector cache
 					cache = apiCacheService.setApiCache(apiName, methods)
 				}catch(Exception e){
-					println("#### IoStateService Exception1 : "+e)
 					throw new Exception("#### IoStateService Exception1 : ",e)
 				}
 
@@ -715,6 +710,7 @@ public class IoStateService{
 	 * @param version
 	 *
 	 */
+
 	boolean validateRpcNamingConventions(ApplicationContext applicationContext,String version) throws Exception {
 		try {
 			boolean result = true

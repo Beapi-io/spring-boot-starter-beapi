@@ -69,8 +69,8 @@
 				"URI": {
 					"show": {
 						"METHOD": "GET",
-						"DESCRIPTION": "Description for show",
 						"UPDATECACHE": true,
+						"DESCRIPTION": "Description for show",
 						"ROLES": {
 							"BATCH": ["ROLE_ADMIN"]
 						},
@@ -85,8 +85,8 @@
 					},
 					"showById": {
 						"METHOD": "GET",
-						"DESCRIPTION": "Description for show",
 						"UPDATECACHE": true,
+						"DESCRIPTION": "Description for show",
 						"ROLES": {
 							"BATCH": ["ROLE_ADMIN"]
 						},
@@ -99,14 +99,13 @@
 					},
 					"getByUsername": {
 						"METHOD": "GET",
-						"DESCRIPTION": "Description for getByUsername",
 						"UPDATECACHE": true,
+						"DESCRIPTION": "Description for getByUsername",
 						"ROLES": {
 							"BATCH": ["ROLE_ADMIN"]
 						},
 						"REQUEST": {
-							"permitAll": []
-                                                        "ROLE_ADMIN": ["username"]
+							"permitAll": ["username"]
 						},
 						"RESPONSE": {
 							"permitAll": ["firstName", "passwordExpired", "accountExpired", "oauthProvider", "username", "accountLocked", "password", "lastName", "oauthId", "enabled", "avatarUrl", "email", "id", "version"]
@@ -114,8 +113,8 @@
 					},
 					"update": {
 						"METHOD": "PUT",
+						"UPDATECACHE": false,
 						"DESCRIPTION": "Description for update",
-						"UPDATECACHE": true,
 						"ROLES": {
 							"BATCH": ["ROLE_ADMIN"]
 						},
@@ -128,8 +127,8 @@
 					},
 					"create": {
 						"METHOD": "POST",
+						"UPDATECACHE": false,
 						"DESCRIPTION": "Description for create",
-						"UPDATECACHE": true,
 						"ROLES": {
 							"BATCH": ["ROLE_ADMIN"]
 						},
@@ -142,8 +141,8 @@
 					},
 					"list": {
 						"METHOD": "GET",
-						"DESCRIPTION": "Description for list",
 						"UPDATECACHE": true,
+						"DESCRIPTION": "Description for list",
 						"ROLES": {
 							"BATCH": ["ROLE_ADMIN"]
 						},
@@ -156,8 +155,8 @@
 					},
 					"delete": {
 						"METHOD": "DELETE",
+						"UPDATECACHE": false,
 						"DESCRIPTION": "Description for delete",
-						"UPDATECACHE": true,
 						"ROLES": {
 							"BATCH": ["ROLE_ADMIN"]
 						},
@@ -168,6 +167,7 @@
 							"permitAll": ["id"]
 						}
 					}
+
 				}
 			}
 		}

@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
-import javax.persistence.metamodel.EntityType
+import jakarta.persistence.metamodel.EntityType
 
 import java.lang.annotation.Annotation
 import java.lang.reflect.Field

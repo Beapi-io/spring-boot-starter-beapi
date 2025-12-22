@@ -16,11 +16,11 @@
  */
 package io.beapi.api.config
 
-import io.beapi.api.service.ErrorService
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
+
+
+import io.beapi.api.service.ErrorService
+import org.springframework.boot.context.properties.ConfigurationProperties
 
 import io.beapi.api.service.BatchExchangeService
 import io.beapi.api.service.ChainExchangeService
@@ -28,8 +28,8 @@ import io.beapi.api.service.ExchangeService
 import io.beapi.api.service.LinkRelationService
 import io.beapi.api.service.MailService
 import io.beapi.api.service.SessionService
-import io.beapi.api.service.StatsCacheService
-import io.beapi.api.service.StatsService
+
+
 import io.beapi.api.service.ThrottleService
 import io.beapi.api.service.TraceExchangeService
 import io.beapi.api.utils.SecretGenerator
@@ -44,8 +44,6 @@ import io.beapi.api.interceptor.ApiInterceptor
 import io.beapi.api.properties.ApiProperties
 import io.beapi.api.service.ApiCacheService
 import io.beapi.api.service.PrincipleService
-
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.context.MessageSource
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -57,40 +55,27 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.ApplicationContext
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping
-import org.springframework.web.servlet.HandlerMapping;
-import org.springframework.beans.factory.ListableBeanFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanFactory
-import org.springframework.beans.BeansException
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.CorsRegistration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import org.springframework.boot.autoconfigure.security.SecurityProperties
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 
 @Configuration(proxyBeanMethods = false)
+@ConfigurationProperties(prefix = "webconfig")
+//@EnableAsync
 @ConditionalOnWebApplication
 @EnableConfigurationProperties([ApiProperties.class])
 @AutoConfigureAfter([org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration.class,BeapiServiceAutoConfiguration.class])
-public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryAware{
+//public class BeapiWebAutoConfiguration implements WebMvcConfigurer{
+public class BeapiWebAutoConfiguration{
+
 
 	@Autowired private ApplicationContext context;
 	@Autowired protected LinkRelationService linkRelationService
 	@Autowired private PrincipleService principleService
 	@Autowired private ErrorService errorService
 	@Autowired private ApiCacheService apiCacheService
-	@Autowired private StatsService statsService
+
 	@Autowired private ExchangeService exchangeService
 	@Autowired private BatchExchangeService batchService
 	@Autowired private SessionService sessionService
@@ -99,71 +84,29 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	@Autowired private ThrottleService throttleService
 	@Autowired protected ApiProperties apiProperties
 
-
 	List publicEndpoint =  ['jwtAuthentication','beapiError']
+	String version
 
-	String version = getVersion()
-	private ListableBeanFactory listableBeanFactory;
+
+	private LinkedHashMap<String, Object> controllers
+	private LinkedHashMap<String, Object> restControllers
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BeapiWebAutoConfiguration.class);
 
 	public BeapiWebAutoConfiguration() {
-		this.version = getVersion()
+		AppMetadata metadata = new AppMetadata()
+		this.version = metadata.getAppVersion()
 	}
-
-	/*
-	@Bean
-	public SimpleUrlHandlerMapping customFaviconHandlerMapping() {
-		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
-		mapping.setOrder(Integer.MIN_VALUE);
-		mapping.setUrlMap(Collections.singletonMap("/favicon.ico", faviconRequestHandler()));
-		return mapping;
-	}
-
-	@Bean
-	protected ResourceHttpRequestHandler faviconRequestHandler() {
-		ResourceHttpRequestHandler requestHandler = new ResourceHttpRequestHandler();
-		ClassPathResource classPathResource = new ClassPathResource("com/baeldung/images/");
-		List<Resource> locations = Arrays.asList(classPathResource);
-		requestHandler.setLocations(locations);
-		return requestHandler;
-	}
-	 */
 
 	// strictly for public endpoints
+	/*
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 		MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
 		converters.add(mappingJackson2HttpMessageConverter);
-		converters.add(new StringHttpMessageConverter()); // THIS WAS MISSING
+		converters.add(new StringHttpMessageConverter());
 	}
-
-	/**
-	 *
-	 * @param beanFactory
-	 * @throws BeansException
 	 */
-	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		this.listableBeanFactory = (ListableBeanFactory) beanFactory;
-	}
 
-	/**
-	 *
-	 * @return
-	 * @throws IOException
-	 */
-	private String getVersion() throws IOException {
-		ClassLoader classLoader = getClass().getClassLoader();
-		URL incoming = classLoader.getResource("META-INF/build-info.properties")
-
-		String version
-		if (incoming != null) {
-			Properties properties = new Properties();
-			properties.load(incoming.openStream());
-			version = properties.getProperty('build.version')
-		}
-		return version
-	}
 
 	/**
 	 *
@@ -178,15 +121,6 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	}
 
 
-
-	/**
-	 *
-	 * @return
-	 */
-	@Bean
-	public RequestInitializationFilter requestInitializationFilter() {
-		return new RequestInitializationFilter(throttleService, linkRelationService, principleService, apiProperties, apiCacheService, sessionService, version, this.context);
-	}
 
 
 	@Bean(name='mailSender')
@@ -255,7 +189,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	@Bean(name='exchangeService')
 	@ConditionalOnMissingBean
 	public ExchangeService exchangeService() throws IOException {
-		return new ExchangeService(errorService, statsService, linkRelationService(), apiCacheService);
+		return new ExchangeService(errorService, linkRelationService(), apiCacheService);
 	}
 
 	/**
@@ -266,7 +200,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	@Bean(name='batchService')
 	@ConditionalOnMissingBean
 	public BatchExchangeService batchService() throws IOException {
-		return new BatchExchangeService(errorService, statsService, apiCacheService, context);
+		return new BatchExchangeService(errorService, apiCacheService, context);
 	}
 
 	/**
@@ -277,24 +211,26 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	@Bean(name='chainService')
 	@ConditionalOnMissingBean
 	public ChainExchangeService chainService() throws IOException {
-		return new ChainExchangeService(errorService, statsService,apiCacheService, context);
+		return new ChainExchangeService(errorService,apiCacheService, context);
 	}
 
-	/**
-	 *
-	 * @return
-	 */
+	public LinkedHashMap<String, Object> getRestControllers(){
+		return restControllers
+	}
+
 	@Bean
-	@ConditionalOnMissingBean
-	public FilterRegistrationBean<RequestInitializationFilter> requestInitializationFilterRegistration() {
-		FilterRegistrationBean<RequestInitializationFilter> registrationBean = new FilterRegistrationBean<>();
-		registrationBean.setFilter(requestInitializationFilter());
-		registrationBean.setOrder(SecurityProperties.DEFAULT_FILTER_ORDER+2)
-		//registrationBean.setOrder(FilterRegistrationBean.REQUEST_WRAPPER_FILTER_MAX_ORDER-100)
-		registrationBean.addUrlPatterns("/v*/**","/b*/**","/c*/**","/r*/**");
-		return registrationBean;
+	public void setRestControllers(){
+		restControllers = context.getBeansWithAnnotation(org.springframework.web.bind.annotation.RestController.class)
 	}
 
+	public LinkedHashMap<String, Object> getControllers(){
+		return controllers
+	}
+
+	@Bean
+	public void setControllers(){
+		controllers = context.getBeansWithAnnotation(org.springframework.stereotype.Controller.class)
+	}
 
 	/**
 	 *
@@ -304,10 +240,13 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 	public SimpleUrlHandlerMapping simpleUrlHandlerMapping() {
 		Map<String, Object> urlMap = new LinkedHashMap<>();
 
-		LinkedHashMap<String, Object> cont = this.listableBeanFactory.getBeansWithAnnotation(org.springframework.stereotype.Controller.class)
-		cont.each() { k, v ->
+		// get list of 'restful controllers' (for checking routing)
+		ArrayList restKeys = restControllers.keySet();
 
-			if(!['beapiErrorController','jwtAuthenticationController'].contains(k)) {
+		//LinkedHashMap<String, Object> cont = this.listableBeanFactory.getBeansWithAnnotation(org.springframework.stereotype.Controller.class)
+		controllers.each() { k, v ->
+
+			if(!restKeys.contains(k)) {
 				String controller = k
 
 				def cache = apiCacheService.getApiCache(controller)
@@ -360,7 +299,7 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		mapping.setUrlMap(urlMap);
 		mapping.setOrder(Integer.MAX_VALUE - 5);
 		try {
-			mapping.setInterceptors(new Object[]{new ApiInterceptor(errorService, statsService, exchangeService, batchService, chainService, traceExchangeService, apiProperties)})
+			mapping.setInterceptors(new Object[]{new ApiInterceptor(errorService, exchangeService, batchService, chainService, traceExchangeService, apiProperties)})
 		}catch(Exception e){
 			println("Bad Interceptor : "+e)
 		}
@@ -388,17 +327,39 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		return origins
 	}
 
+	// setOrder for this mapping so it is evaluated FIRST before other HandlerMappings (ie RequestMappingHandlerMapping)
 	@Bean
 	public RequestMappingHandlerMapping requestMappingHandlerMapping() {
 		RequestMappingHandlerMapping handler = super.requestMappingHandlerMapping();
-		//now i have a handle on the handler i can lower it's priority
-		//in the super class implementation this is set to 0
 		handler.setOrder(Integer.MAX_VALUE);
 		return handler;
 	}
 
 
+	/**
+	 *
+	 * @return
+	 */
+	@Bean
+	public RequestInitializationFilter requestInitializationFilter() {
+		return new RequestInitializationFilter(throttleService, linkRelationService, principleService, apiProperties, apiCacheService, sessionService, version, this.context);
+	}
 
+	/**
+	 *
+	 * @return
+	 */
+	@Bean
+	@ConditionalOnMissingBean
+	public FilterRegistrationBean requestInitializationFilterRegistration() {
+		FilterRegistrationBean registrationBean = new FilterRegistrationBean<>();
+		registrationBean.setFilter(requestInitializationFilter());
+		registrationBean.setOrder(SecurityProperties.DEFAULT_FILTER_ORDER+2)
+		registrationBean.addUrlPatterns("/v*/**","/b*/**","/c*/**","/t*/**");
+		return registrationBean;
+	}
+
+/*
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
@@ -414,6 +375,8 @@ public class BeapiWebAutoConfiguration implements WebMvcConfigurer, BeanFactoryA
 		source.registerCorsConfiguration("/**", config);
 		return source;
 	}
+
+ */
 
 
 	/**

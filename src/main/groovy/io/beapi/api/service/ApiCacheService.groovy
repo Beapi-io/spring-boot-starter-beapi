@@ -21,10 +21,10 @@ import org.springframework.stereotype.Controller
 import org.slf4j.LoggerFactory
 import io.beapi.api.properties.ApiProperties
 import io.beapi.api.utils.ApiDescriptor
-import org.springframework.boot.info.BuildProperties
+//import org.springframework.boot.info.BuildProperties
 import org.springframework.cache.CacheManager
-import net.sf.ehcache.Cache
-import net.sf.ehcache.Ehcache;
+//import net.sf.ehcache.Cache
+// import net.sf.ehcache.Ehcache;
 
 import org.springframework.cache.annotation.*
 import org.springframework.stereotype.Service;
@@ -35,10 +35,12 @@ import groovy.json.JsonOutput
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.beans.factory.annotation.Autowired
 //import org.springframework.beans.factory.ListableBeanFactory
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+import java.lang.reflect.UndeclaredThrowableException
+import org.springframework.scheduling.annotation.Async;
 
 /**
  * A class for caching processed api calls and returning them
@@ -48,7 +50,7 @@ import java.util.regex.Pattern
 //@EnableConfigurationProperties([ApiProperties.class])
 class ApiCacheService{
 
-	//@Autowired
+	@Autowired
 	private CacheManager cacheManager;
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApiCacheService.class);
@@ -60,8 +62,8 @@ class ApiCacheService{
 	 * @see RequestInitializationFilter#processRequest
 	 */
 	public ApiCacheService(CacheManager cacheManager) {
-		this.cacheManager = cacheManager
 		//this.version = version
+		this.cacheManager = cacheManager
 	}
 
 
@@ -85,10 +87,11 @@ class ApiCacheService{
 	 * @param apidesc LinkedHashMap a map of all apidoc information for all roles which can be easily traversed
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
-	@CachePut(value='ApiCache',key="#controllername")
+	@CachePut(value='ApiCache',key="controllername")
+	//@Cacheable(value = "ApiCache", key ="#controllername")
 	LinkedHashMap setApiCache(String controllername,LinkedHashMap apidesc) throws Exception{
 		//logger.debug("setApiCache(String ,LinkedHashMap) : {}",controllername)
-		def cache = cacheManager.getCache('ApiCache');
+		def cache = cacheManager?.getCache('ApiCache')
 		cache.put(controllername,apidesc);
 		return apidesc;
 	}
@@ -102,23 +105,22 @@ class ApiCacheService{
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	@CachePut(value='ApiCache',key="#controllername")
+	//@Cacheable(value = "ApiCache", key ="#controllername")
 	LinkedHashMap setApiCache(String controllername, String methodname, ApiDescriptor apidoc, String apiversion){
 		//logger.debug("setApiCache(String ,String ,ApiDescriptor ,String) : {}","${controllername}/${methodname}")
 		try{
-			LinkedHashMap cache = getApiCache(controllername)
+			LinkedHashMap cache = [:]
 
-			if(!cache["${apiversion}"]){
-				cache["${apiversion}"] = new LinkedHashMap()
-			}
-
-			if(!cache["${apiversion}"][methodname]){
-				cache["${apiversion}"][methodname] = new LinkedHashMap()
-			}
-
+			cache["${apiversion}"] = new LinkedHashMap()
+			cache["${apiversion}"][methodname] = new LinkedHashMap()
 			cache["${apiversion}"][methodname]['name'] = apidoc.name
 			//cache["${apiversion}"][methodname]['description'] = apidoc.description
 			cache["${apiversion}"][methodname]['receives'] = apidoc.receives
 			cache["${apiversion}"][methodname]['returns'] = apidoc.returns
+
+
+			//def cache2 = cacheManager?.getCache('ApiCache')
+			//cache2.put(controllername,cache);
 
 			//cache["${apiversion}"][methodname]['stats'] = [] // [[code:200,cnt:56,time:123456789]]
 
@@ -128,7 +130,7 @@ class ApiCacheService{
 			//cache[apiversion][methodname]['doc']['batchRoles'] = cache[apiversion][methodname]['batchRoles']
 
 			return cache
-		}catch(Exception e){
+		}catch(UndeclaredThrowableException e){
 			throw new Exception("[ApiCacheService :: setApiCache] : Exception - full stack trace follows:",e)
 		}
 	}
@@ -140,15 +142,11 @@ class ApiCacheService{
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
 	@CachePut(value='ApiCache',key="#controllername")
+	//@Cacheable(value = "ApiCache", key ="#controllername")
 	boolean setCache(String controllername,LinkedHashMap apidesc) throws Exception{
 		//logger.debug("setCache(String, LinkedHashMap) : {}",controllername)
-
-		//if(controllername=='hook'){
-		//	println("setCache : ${apidesc}")
-		//}
-
 		try{
-			net.sf.ehcache.Cache temp = cacheManager.getCache('ApiCache').getNativeCache()
+			def temp = cacheManager?.getCache('ApiCache')
 			if(temp.put(controllername,apidesc)){
 				return true
 			}else{
@@ -174,6 +172,7 @@ class ApiCacheService{
 	// TODO: parse for XML as well
 	// todo : turn into object
 	@CachePut(value='ApiCache',key="#controllername")
+	//@Cacheable(value='ApiCache',key="#controllername")
 	LinkedHashMap setApiCachedResult(String cacheHash, String controllername, String apiversion, String methodname, String authority, String format, String content) throws Exception{
 		//logger.debug("setApiCachedResults(String, String, String, String, String, String, LinkedHashMap) : {}")
 		try {
@@ -204,6 +203,10 @@ class ApiCacheService{
 				cache["${apiversion}"][methodname]['cachedResult'][authority][format] =[:]
 				cache["${apiversion}"][methodname]['cachedResult'][authority][format][cacheHash] = content
 			}
+
+			def cache2 = cacheManager?.getCache('ApiCache')
+			cache2.put(controllername,cache);
+
 			return cache
 		}catch(Exception e){
 			throw new Exception("[ApiCacheService :: setApiCachedResults] : Exception - full stack trace follows:",e)
@@ -211,13 +214,16 @@ class ApiCacheService{
 	}
 
 	@CachePut(value='ApiCache',key="#controllername")
-	LinkedHashMap unsetApiCachedResult(String controllername, String actionname, String apiversion) throws Exception{
+	LinkedHashMap flushCachedResult(String controllername, String actionname, String apiversion) throws Exception{
 		//logger.debug("unsetApiCachedResults(String, String, String) : {}")
 		try {
 			LinkedHashMap cache = getApiCache(controllername)
 			if (cache["${apiversion}"]) {
-				cache["${apiversion}"][actionname]['cachedResult'] = [:]
+				cache["${apiversion}"][actionname].removeCachedResult()
 			}
+			def cache2 = cacheManager?.getCache('ApiCache')
+			cache2.put(controllername,cache);
+
 			return cache
 		}catch(Exception e){
 			throw new Exception("[ApiCacheService :: unsetApiCachedResults] : Exception - full stack trace follows:",e)
@@ -229,19 +235,20 @@ class ApiCacheService{
 	 * @param controllername String representing controller name for designated endpoint
 	 * @return A LinkedHashMap of Cached data associated with controllername
 	 */
-	//@Cacheable(value='ApiCache',key="#controllername",sync=false)
+	//@Cacheable(value='ApiCache',key="#controllername")
 	LinkedHashMap getApiCache(String controllername) throws Exception{
 		//logger.debug("getApiCache(String) : {}",controllername)
 		if(controllername!=null) {
-			try {
+			//try {
 				//cacheManager.setTransactionAware(false);
-				net.sf.ehcache.Ehcache temp = cacheManager?.getCache('ApiCache')?.getNativeCache()
+				def temp = cacheManager?.getCache('ApiCache')
 				// do check; check with put
-				LinkedHashMap cache2 = temp.get(controllername)?.getObjectValue()
+
+				LinkedHashMap cache2 = temp.get(controllername).get()
 				return cache2
-			} catch (Exception e) {
-				throw new Exception("[ApiCacheService :: getApiCache] : no cache found for handler '${controllername}'. full stack trace follows:", e)
-			}
+			//} catch (Exception e) {
+			//	throw new Exception("[ApiCacheService :: getApiCache] : no cache found for handler '${controllername}'. full stack trace follows:", e)
+			//}
 		}else{
 			throw new Exception("[ApiCacheService :: getApiCache] : no cache found for 'NULL_HANDLER' '${controllername}'.")
 		}
@@ -255,21 +262,21 @@ class ApiCacheService{
 	 */
 	//@Cacheable(value='ApiCache',key="#controllername",sync=false)
 	ApiDescriptor getApiDescriptor(String controllername, String version, String action) throws Exception{
-		logger.warn("getApiCache(String) : {}",controllername)
+		//logger.warn("getApiCache(String) : {}",controllername)
 		if(controllername!=null) {
 			try {
-				//cacheManager.setTransactionAware(false);
-				net.sf.ehcache.Ehcache temp = cacheManager?.getCache('ApiCache')?.getNativeCache()
+				//org.springframework.cache.caffeine.CaffeineCache temp = cacheManager?.getCache('ApiCache')
+
 				// do check; check with put
-				LinkedHashMap cache2 = temp.get(controllername)?.getObjectValue()
+				LinkedHashMap cache2 = cacheManager?.getCache('ApiCache')?.get(controllername)?.get()
 				def temp2 = cache2[version]
 				if(action=='null'){
 					String tmpAction = temp2['defaultAction']
-					logger.warn("action is null; using 'defaultAction' : "+tmpAction)
+					//logger.warn("action is null; using 'defaultAction' : "+tmpAction)
 					ApiDescriptor apiObject = temp2[tmpAction]
 					return apiObject
 				}else{
-					logger.warn("action is NOT null : "+action)
+					//logger.warn("action is NOT null : "+action)
 					ApiDescriptor apiObject = temp2[action]
 					return apiObject
 				}
@@ -289,8 +296,7 @@ class ApiCacheService{
 	ArrayList<String> getCacheKeys(){
 		//logger.debug("getCacheKeys() : {}")
 		//cacheManager.setTransactionAware(false);
-		net.sf.ehcache.Ehcache temp = cacheManager.getCache('ApiCache').getNativeCache()
-		return temp.getKeys()
+		return cacheManager?.getCache('ApiCache').getNativeCache().asMap().keySet() as ArrayList
 	}
 
 }

@@ -28,13 +28,12 @@ public class AuthorityService {
         this.authrepo = authrepo;
     }
 
-    //@Override
+
     public List<Authority> findAll() {
         return authrepo.findAll();
     }
 
-    //@Override
-    @Transactional(rollbackFor = Exception.class)
+    //@Transactional(rollbackFor = Exception.class)
     public Authority save(Authority authority) {
         try{
             authrepo.saveAndFlush(authority);

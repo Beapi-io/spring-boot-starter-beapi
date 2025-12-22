@@ -12,11 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import java.util.List;
 import java.util.Objects;
 
+import io.beapi.api.service.ApiCacheService
 
 import org.springframework.scheduling.annotation.Async;
 import java.util.concurrent.CompletableFuture;
@@ -26,6 +27,9 @@ public class UserController extends BeapiRequestHandler {
 
 	@Autowired
 	protected  PasswordEncoder passwordEncoder;
+
+	@Autowired
+	protected ApiCacheService cacheService;
 
 	@Autowired
 	protected UserService userService;
@@ -45,27 +49,24 @@ public class UserController extends BeapiRequestHandler {
 	 */
 
 	public List<User> list(HttpServletRequest request, HttpServletResponse response){
-		println("### user/list")
 		List<User> users = userService.getAllUsers();
 		return users;
 	}
 
-	public User show(HttpServletRequest request, HttpServletResponse response){
-		//println("### user/show")
 
-		String username
+	public User show(HttpServletRequest request, HttpServletResponse response){
+		//System.out.println("user/show called");
+
+		String username = principle.name();
 		if(principle.isSuperuser()){
 			username = (this.params?.get("id"))?this.params.get("id").toString():principle.name();
-		}else {
-			username = principle.name();
 		}
 
 		User user = userService.findByUsername(username);
 
 		// check time
-
 		if (Objects.nonNull(user)) {
-			return user
+			return user;
 		}
 		return null
     }
@@ -99,6 +100,11 @@ public class UserController extends BeapiRequestHandler {
 				uAuth.setAuthority(auth);
 				uAuthService.save(uAuth);
 			}
+
+			// flush cachedResult
+			flushCachedResult("user", "show", this.apiversion );
+			flushCachedResult("user", "showById", this.apiversion );
+
 			return user;
 
 	}
@@ -121,6 +127,10 @@ public class UserController extends BeapiRequestHandler {
 			}else{
 				writeErrorResponse(response, "404", request.getRequestURI());
 			}
+
+			// flush cachedResult
+			flushCachedResult("user", "show", this.apiversion );
+			flushCachedResult("user", "showById", this.apiversion );
 
 			return user;
 	}

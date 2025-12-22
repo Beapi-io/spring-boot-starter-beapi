@@ -21,8 +21,8 @@ import org.springframework.security.web.header.*
 import org.springframework.stereotype.Service
 
 import javax.json.*
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 
 // NOTE : CALLTYPE = 1
 @Service

@@ -22,8 +22,8 @@ import io.beapi.api.utils.ApiDescriptor
 import org.springframework.stereotype.Service
 import org.springframework.beans.factory.annotation.Autowired
 import org.json.JSONObject
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 
 
 /**

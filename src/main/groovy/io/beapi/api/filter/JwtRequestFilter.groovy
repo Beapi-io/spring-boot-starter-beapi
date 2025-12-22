@@ -8,10 +8,10 @@ import io.beapi.api.service.ErrorService
 import io.beapi.api.service.JwtUserDetailsService
 import io.beapi.api.service.LinkRelationService
 import io.beapi.api.utils.JwtTokenUtil;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.context.annotation.PropertySource;
@@ -43,41 +43,60 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern;
 import org.springframework.web.util.WebUtils
 
-import javax.servlet.http.Cookie
+//import jakarta.servlet.http.Cookie
+import io.beapi.api.service.TraceService
+import io.beapi.api.utils.UriObject
+
+import org.springframework.scheduling.annotation.Async;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(JwtRequestFilter.class);
-	String markerText = "DEVNOTES";
-	Marker devnotes = MarkerFactory.getMarker(markerText);
+	//String markerText = "DEVNOTES";
+	//Marker devnotes = MarkerFactory.getMarker(markerText);
 
-	@Autowired private UserService userService;
-	@Autowired Environment env;
-	@Autowired private JwtUserDetailsService userDetails;
-	@Autowired private JwtTokenUtil jwtTokenUtil;
+	private UserService userService;
+	//@Autowired Environment env;
+	//@Autowired private JwtUserDetailsService userDetails;
+	private JwtTokenUtil jwtTokenUtil;
+	protected TraceService traceService
 
 	private ApiProperties apiProperties;
 	private String version
 
+	private UriObject uObj
+	protected boolean trace
+	protected String uri
+	public String controller
+	public String action
+	ArrayList publicUris
 
-	public JwtRequestFilter(ApiProperties apiProperties, String version) {
+	public JwtRequestFilter(ApiProperties apiProperties, String version, JwtTokenUtil jwtTokenUtil, TraceService traceService, UserService userService, ArrayList publicUris) {
 		this.apiProperties = apiProperties
 		this.version = version
+		this.jwtTokenUtil = jwtTokenUtil
+		this.traceService = traceService
+		this.userService = userService
+		this.publicUris = publicUris
 	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
 		//println("### JwtRequestFilter > "+request.getRequestURI())
 
-// TESTING
-//println("Header : "+request.getHeader("Content-Type"))
-//Enumeration<String> headerEnums = request.getHeaderNames();
-//while (headerEnums.hasMoreElements()) {
-//	String elementName = headerEnums.nextElement();
-//	String elementValue = request.getHeader(elementName);
-//	println(elementName+"="+elementValue)
-//}
+		request.setAttribute('publicUris', this.publicUris)
+
+		this.uri = request.getRequestURI()
+		createUriObj(request)
+
+
+		trace = this.uObj.isTrace()
+		if (trace == true) {
+			traceService.startTrace('JwtRequestFilter','doFilterInternal', request.getSession().getId());
+		}
+
+
 
 		/*
 		* NOTE : If system detects a 'public' api, it will run 'RESPONSE' through filters for CORS handling
@@ -88,13 +107,18 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		//println("### request method : "+request.getMethod())
 
 		if(CorsUtils.isCorsRequest(request)==true && request.getMethod()=="OPTIONS"){
+
+			if (trace == true) {
+				traceService.endTrace('JwtRequestFilter','doFilterInternal', request.getSession().getId())
+			}
 			chain.doFilter(request, response);
 		}else{
-			Pattern p = ~/[v|b|c|t]${version}/
-			if(request.getRequestURI().length()>3) {
+			//Pattern p = ~/[v|b|c|t]${version}/
+			if(this.uri.length()>3) {
 
-				Matcher match = p.matcher(request.getRequestURI()[1..4])
-				if (match.find()) {
+				//Matcher match = p.matcher(this.uri[1..4])
+				//if (match.find()) {
+				if (uObj.getCallType()) {
 					String username = null;
 					String jwtToken = null;
 					String uri = request.getRequestURI();
@@ -120,7 +144,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 							// check session token == cookie token
 							if (!validateTokenHeaders(jwtToken, request)) {
-								logger.warn("tokenHeaders do not match (possible token hijack or using token at different location/browser)");
+
+								if (trace == true) { traceService.endTrace('JwtRequestFilter','doFilterInternal', request.getSession().getId()) }
+
+								//logger.warn("tokenHeaders do not match (possible token hijack or using token at different location/browser)");
 								writeErrorResponse(request, response, '403', "Invalid Token or Token is empty")
 							}
 
@@ -131,11 +158,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 							// no token
 						}
 					} else {
+
+						if (trace == true) { traceService.endTrace('JwtRequestFilter','doFilterInternal', request.getSession().getId()) }
 						logger.warn("JWT Token does not begin with Bearer String");
 					}
 
 					// Once we get the token validate it.
-					if (!apiProperties.getReservedUris().contains(uri)) {
+					if (!this.publicUris.contains(uri)) {
 						if (username != null) {
 							UserDetails userDetails = loadUserByUsername(username);
 
@@ -149,10 +178,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 									// check cookie against existing session
 									if (request.getSession().getId() == WebUtils.getCookie(request, 'JSESSIONID')?.getValue()) {
+
+										if (trace == true) {
+											traceService.endTrace('JwtRequestFilter','doFilterInternal', request.getSession().getId())
+										}
 										chain.doFilter(request, response)
 									} else {
-										//println("session does not match: "+WebUtils.getCookie(request, 'JSESSIONID')?.getValue())
-										logger.warn("session does not match");
+										if (trace == true) {
+											traceService.endTrace('JwtRequestFilter','doFilterInternal', request.getSession().getId())
+										}
+
+										//logger.warn("session does not match");
 										writeErrorResponse(request, response, '403', "Invalid session or session cookie not sent")
 									}
 
@@ -165,10 +201,18 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 							}
 
 						} else {
+
+							if (trace == true) {
+								traceService.endTrace('JwtRequestFilter','doFilterInternal', request.getSession().getId())
+							}
 							writeErrorResponse(request, response, '403', "no username/authentication for " + request.getRequestURI())
 						}
 					} else {
 						// fix for errorController
+
+						if (trace == true) {
+							traceService.endTrace('JwtRequestFilter','doFilterInternal', request.getSession().getId())
+						}
 						try {
 							chain.doFilter(request, response);
 						} catch (Exception ignored) {
@@ -176,8 +220,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 							//ignored.printStackTrace();
 						}
 					}
-
 				} else {
+
+					if (trace == true) {
+						traceService.endTrace('JwtRequestFilter','doFilterInternal', request.getSession().getId())
+					}
 					// ### fix for public api
 					try {
 						chain.doFilter(request, response);
@@ -186,6 +233,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 						//ignored.printStackTrace();
 					}
 				}
+
 			}
 
 		}
@@ -208,7 +256,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		//authorities.each(){ auth ->
 		for(Authority auth: authorities){
 			SimpleGrantedAuthority authority = new SimpleGrantedAuthority(auth.getAuthority());
-			//SimpleGrantedAuthority authority = new SimpleGrantedAuthority(auth);
 			updatedAuthorities.add(authority);
 		}
 
@@ -310,4 +357,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		response.writer.flush()
 		//request.getRequestDispatcher("/error").forward(request, response);
 	};
+
+	private void createUriObj(HttpServletRequest request) {
+		try{
+			this.uObj = new UriObject(this.uri, this.version)
+			request.setAttribute('uriObj', this.uObj)
+		} catch (Exception e) {
+			println("error setting uriobj(2) : " + e);
+			// old token / no token
+		}
+	}
 }
